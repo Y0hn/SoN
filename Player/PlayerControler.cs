@@ -20,7 +20,6 @@ public class PlayerControler : MonoBehaviour
     void Update()
     {
         moveDir = input_move.action.ReadValue<Vector2>();
-        moveDir = moveDir.normalized;
     }
     void FixedUpdate()
     {
