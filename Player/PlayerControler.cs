@@ -8,6 +8,8 @@ public class PlayerControler : MonoBehaviour
     Rigidbody2D rb;
     [SerializeField]
     InputActionReference input_move;
+    [SerializeField]
+    InputActionReference input_fire;
 
     public float speed = 1f;
     private Vector2 moveDir;
@@ -15,7 +17,7 @@ public class PlayerControler : MonoBehaviour
 
     void Start()
     {
-
+        input_fire.action.performed += Fire;
     }
     void Update()
     {
@@ -36,5 +38,9 @@ public class PlayerControler : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
             animator.SetBool("move", false);
         }
+    }
+    void Fire(InputAction.CallbackContext context)
+    {
+            Debug.Log("FIRE");
     }
 }

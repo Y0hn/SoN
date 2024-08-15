@@ -152,7 +152,7 @@ MonoBehaviour:
   m_MoveRepeatDelay: 0.5
   m_MoveRepeatRate: 0.1
   m_XRTrackingOrigin: {fileID: 0}
-  m_ActionsAsset: {fileID: -944628639613478452, guid: e9d7c164b16fb4f488a6d687fc052b8e, type: 3}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_PointAction: {fileID: -5951004449924605152, guid: e9d7c164b16fb4f488a6d687fc052b8e, type: 3}
   m_MoveAction: {fileID: -2798790240288274132, guid: e9d7c164b16fb4f488a6d687fc052b8e, type: 3}
   m_SubmitAction: {fileID: -2770867934093699733, guid: e9d7c164b16fb4f488a6d687fc052b8e, type: 3}
@@ -1215,7 +1215,7 @@ Tilemap:
       - {fileID: -548848971, guid: 6b4a6928c179ea74db5537b0751c5739, type: 3}
       - {fileID: 281518225, guid: 6b4a6928c179ea74db5537b0751c5739, type: 3}
       - {fileID: -1213284877, guid: 6b4a6928c179ea74db5537b0751c5739, type: 3}
-      m_AnimationSpeed: 5.0000005
+      m_AnimationSpeed: 5
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 0, y: -6, z: 0}
@@ -1336,7 +1336,7 @@ Tilemap:
       - {fileID: -548848971, guid: 6b4a6928c179ea74db5537b0751c5739, type: 3}
       - {fileID: 281518225, guid: 6b4a6928c179ea74db5537b0751c5739, type: 3}
       - {fileID: -1213284877, guid: 6b4a6928c179ea74db5537b0751c5739, type: 3}
-      m_AnimationSpeed: 5.0000005
+      m_AnimationSpeed: 5
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 1, y: -3, z: 0}
@@ -1435,7 +1435,7 @@ Tilemap:
       - {fileID: -548848971, guid: 6b4a6928c179ea74db5537b0751c5739, type: 3}
       - {fileID: 281518225, guid: 6b4a6928c179ea74db5537b0751c5739, type: 3}
       - {fileID: -1213284877, guid: 6b4a6928c179ea74db5537b0751c5739, type: 3}
-      m_AnimationSpeed: 5
+      m_AnimationSpeed: 5.0000005
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -4, y: -1, z: 0}
@@ -1600,7 +1600,7 @@ Tilemap:
       - {fileID: -548848971, guid: 6b4a6928c179ea74db5537b0751c5739, type: 3}
       - {fileID: 281518225, guid: 6b4a6928c179ea74db5537b0751c5739, type: 3}
       - {fileID: -1213284877, guid: 6b4a6928c179ea74db5537b0751c5739, type: 3}
-      m_AnimationSpeed: 5.0000005
+      m_AnimationSpeed: 5
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -9, y: 2, z: 0}
@@ -2844,7 +2844,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: e9d7c164b16fb4f488a6d687fc052b8e, type: 3}
+  m_Actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_NotificationBehavior: 0
   m_UIInputModule: {fileID: 249037773}
   m_DeviceLostEvent:
@@ -2859,7 +2859,7 @@ MonoBehaviour:
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: Player_Movement
+  m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 519420031}
 --- !u!114 &1195840830
@@ -2876,7 +2876,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 1586355081}
   rb: {fileID: 1195840832}
-  input_move: {fileID: -2798790240288274132, guid: e9d7c164b16fb4f488a6d687fc052b8e, type: 3}
+  input_move: {fileID: -1680190386980627800, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  input_fire: {fileID: 1120369429361536294, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   speed: 2
 --- !u!70 &1195840831
 CapsuleCollider2D:
