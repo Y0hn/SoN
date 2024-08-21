@@ -12,11 +12,12 @@ public class PlayerControler : NetworkBehaviour
     public float speed = 1f;
     Vector2 moveDir;
     const float minC = 0.1f;
-
+    private 
     void Start()
     {
         if (IsOwner)
         {
+            GameManager.instance.PlayerSpawned();
             input_fire.action.performed += Fire;
             cam.SetActive(true);
         }
