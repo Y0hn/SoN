@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
-using UnityEditor;
-using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -44,6 +42,6 @@ public class GameManager : MonoBehaviour
     }
     public void Copy()
     {
-        EditorGUIUtility.systemCopyBuffer = connectionManager.codeText.text;
+        GUIUtility.systemCopyBuffer = connectionManager.codeText.text;
     }
 }
