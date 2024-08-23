@@ -9,10 +9,9 @@ public class PlayerControler : NetworkBehaviour
     [SerializeField] InputActionReference input_move;
     [SerializeField] InputActionReference input_fire;
 
-    public float speed = 1f;
+    [SerializeField] private PlayerStats stats;
     Vector2 moveDir;
     const float minC = 0.1f;
-    private 
     void Start()
     {
         if (IsOwner)
@@ -38,7 +37,7 @@ public class PlayerControler : NetworkBehaviour
                 animator.SetBool("move", true);
             animator.SetFloat("horizontal", moveDir.x);
             animator.SetFloat("vertical", moveDir.y);
-            rb.linearVelocity = moveDir * speed;
+            rb.linearVelocity = moveDir * stats.speed;
         }
         else
         {
@@ -48,6 +47,13 @@ public class PlayerControler : NetworkBehaviour
     }
     void Fire(InputAction.CallbackContext context)
     {
-            Debug.Log("FIRE");
+        // Debug.Log("FIRE");
+        HitServerRpc();
+    }
+    [ServerRpc]
+    private void HitServerRpc()
+    {
+        stats.TakeDamage(new Damage (Damage.Type.bludgeoning, 10));
+        //Debug.Log("Take damage called");
     }
 }

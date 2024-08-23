@@ -1,15 +1,30 @@
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class PlayerStats : NetworkBehaviour
+public class PlayerStats : EntityStats
 {
-    public int health { get; private set; }
-    void Start()
+    /*  Inhereted Variables
+     * 
+     *  NetworkList<Rezistance> rezists = new();
+     *  [SF] NetworkVariable<int> maxHp = new();
+     *  NetworkVariable<int> hp = new();
+     *  [SF] Slider hpBar;
+     *
+     */
+    public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
         
+        if (IsOwner)
+        {
+            hpBar.gameObject.SetActive(false);
+            hpBar = GameManager.instance.GetPlayerHpBar();
+            nameTag.text = GameManager.instance.GetPlayerName();
+        }
     }
-    void Update()
+    protected override void Update()
     {
-        
+        base.Update();
     }
 }

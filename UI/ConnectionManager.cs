@@ -8,9 +8,6 @@ using Unity.Services.Authentication;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
-using Unity.VisualScripting;
-using UnityEngine.Rendering;
-using System.Threading.Tasks;
 public class ConnectionManager : MonoBehaviour
 {
     [SerializeField] GameObject mainCam;
