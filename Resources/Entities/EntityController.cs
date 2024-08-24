@@ -1,4 +1,3 @@
-using UnityEngine.InputSystem;
 using Unity.Netcode;
 using UnityEngine;
 public class EntityControler : NetworkBehaviour
@@ -10,7 +9,7 @@ public class EntityControler : NetworkBehaviour
     protected const float minC = 0.1f;
     public override void OnNetworkSpawn()
     {
-
+        
     }
     protected virtual void Update()
     {
@@ -18,6 +17,25 @@ public class EntityControler : NetworkBehaviour
     }
     protected virtual void FixedUpdate()
     {
-        
+        if (IsServer)
+            AnimateMovement();
+    }
+    protected virtual void AnimateMovement()
+    {
+        if (moveDir.magnitude > minC)
+        {
+            if (!animator.GetBool("move"))
+                animator.SetBool("move", true);
+
+            animator.SetFloat("horizontal", moveDir.x);
+            animator.SetFloat("vertical", moveDir.y);
+
+            rb.linearVelocity = moveDir * stats.speed;
+        }
+        else
+        {
+            rb.linearVelocity = Vector2.zero;
+            animator.SetBool("move", false);
+        }
     }
 }

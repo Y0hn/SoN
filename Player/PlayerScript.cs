@@ -32,21 +32,8 @@ public class PlayerControler : EntityControler
     }
     protected override void FixedUpdate()
     {
-        if (!IsOwner)
-            return;
-        if (moveDir.magnitude > minC)
-        {
-            if (!animator.GetBool("move"))
-                animator.SetBool("move", true);
-            animator.SetFloat("horizontal", moveDir.x);
-            animator.SetFloat("vertical", moveDir.y);
-            rb.linearVelocity = moveDir * stats.speed;
-        }
-        else
-        {
-            rb.linearVelocity = Vector2.zero;
-            animator.SetBool("move", false);
-        }
+        if (IsOwner)
+            AnimateMovement();
     }
     void Fire(InputAction.CallbackContext context)
     {

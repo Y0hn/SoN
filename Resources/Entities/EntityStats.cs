@@ -44,7 +44,7 @@ public class EntityStats : NetworkBehaviour
     {
         float value = (float)hp.Value / (float)maxHp.Value;
         hpBar.value = value;
-        Debug.Log($"HP bar: [{hpBar.value}/{hpBar.maxValue}] Acsual: [{hp.Value}/{maxHp.Value}] => {value}");
+        //Debug.Log($"HP bar: [{hpBar.value}/{hpBar.maxValue}] Acsual: [{hp.Value}/{maxHp.Value}] => {value}");
     }
     public virtual void TakeDamage(Damage damage)
     {
@@ -52,7 +52,7 @@ public class EntityStats : NetworkBehaviour
         {
             int newDamage = rezists[(int)damage.type].GetDamage(damage.amount);
             hp.Value -= newDamage;
-            Debug.Log($"Entity {name} damaged by {damage.amount}, protection absorbed {damage.amount-newDamage} final damage is {newDamage} HP[{hp.Value}/{maxHp.Value}]");
+            //Debug.Log($"Entity {name} damaged by {damage.amount}, protection absorbed {damage.amount-newDamage} final damage is {newDamage} HP[{hp.Value}/{maxHp.Value}]");
         }
         if (hp.Value <= 0)
             Die();
