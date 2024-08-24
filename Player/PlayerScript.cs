@@ -1,18 +1,21 @@
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 using UnityEngine;
-public class PlayerControler : NetworkBehaviour
+public class PlayerControler : EntityControler
 {
+    /* Inhereted variables
+     *
+     * [SF] protected Rigidbody2D rb;
+     * [SF] protected Animator animator;
+     * [SF] protected EntityStats stats;
+     * protected Vector2 moveDir;
+     * protected const float minC = 0.1f;
+     *
+     */
     [SerializeField] GameObject cam;
-    [SerializeField] Rigidbody2D rb;
-    [SerializeField] Animator animator;
     [SerializeField] InputActionReference input_move;
     [SerializeField] InputActionReference input_fire;
-
-    [SerializeField] private PlayerStats stats;
-    Vector2 moveDir;
-    const float minC = 0.1f;
-    void Start()
+    public override void OnNetworkSpawn()
     {
         if (IsOwner)
         {
@@ -21,13 +24,13 @@ public class PlayerControler : NetworkBehaviour
             cam.SetActive(true);
         }
     }
-    void Update()
+    protected override void Update()
     {
         if (!IsOwner)
             return;
         moveDir = input_move.action.ReadValue<Vector2>();
     }
-    void FixedUpdate()
+    protected override void FixedUpdate()
     {
         if (!IsOwner)
             return;
@@ -51,7 +54,7 @@ public class PlayerControler : NetworkBehaviour
         HitServerRpc();
     }
     [ServerRpc]
-    private void HitServerRpc()
+    void HitServerRpc()
     {
         stats.TakeDamage(new Damage (Damage.Type.bludgeoning, 10));
         //Debug.Log("Take damage called");

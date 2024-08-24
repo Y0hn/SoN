@@ -6,10 +6,13 @@ public class PlayerStats : EntityStats
 {
     /*  Inhereted Variables
      * 
-     *  NetworkList<Rezistance> rezists = new();
-     *  [SF] NetworkVariable<int> maxHp = new();
-     *  NetworkVariable<int> hp = new();
-     *  [SF] Slider hpBar;
+     * [SF] protected TMP_Text nameTag;
+     * protected NetworkList<Rezistance> rezists = new();
+     * [SF] protected NetworkVariable<int> maxHp = new();
+     * protected NetworkVariable<int> hp = new();
+     * [SF] protected Slider hpBar;
+     * [SF] public float speed;
+     * protected const float timeToDespawn = 0f;
      *
      */
     public override void OnNetworkSpawn()
