@@ -26,8 +26,7 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField] RectTransform ConnectionPanel;
     [SerializeField] public TMP_Text codeText;
     [SerializeField] TMP_Text titleText;
-
-    private string currentUI = "";
+    [SerializeField] int maxConnections = 10;
     private RectTransform relayUI;
     private RectTransform lanUI;
     private GameObject UIparent;
@@ -59,7 +58,7 @@ public class ConnectionManager : MonoBehaviour
     }
     async void CreateRelay(string role = "host")
     {
-        Allocation allocation = await RelayService.Instance.CreateAllocationAsync(3);
+        Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
         string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
         codeText.text = joinCode;
 
@@ -159,7 +158,5 @@ public class ConnectionManager : MonoBehaviour
                 titleText.text = "Server ip: ";
                 break;
         }
-        //Debug.Log(currentUI + " => " + changeTo);
-        currentUI = changeTo;
     }
 }
