@@ -1,11 +1,11 @@
 using UnityEngine;
 using Unity.Netcode;
-using Unity.VisualScripting;
 
-public class AttackArea : NetworkBehaviour
+public class AttackField : NetworkBehaviour
 {
     [SerializeField] PolygonCollider2D coll;
-    private Damage damage;
+    [SerializeField] EntityStats myStats;
+    private Damage damage = new (Damage.Type.bludgeoning, 0);
     public void Edit(Vector2 right, Vector2 center, Vector2 left)
     {
         coll.points[3] = right;
@@ -20,13 +20,29 @@ public class AttackArea : NetworkBehaviour
     }
     public void SetDamage(Damage damage)
     {
-        this.damage = damage;
+        if (IsServer)
+        {
+            this.damage = damage;
+            Debug.Log(name + " AT field Damage updated");
+        }
     }
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        if (collider.TryGetComponent(out EntityStats stats))
+        Debug.Log("OnTriggerEnter2D");
+        if (collider.TryGetComponent(out EntityStats stats) && IsOwner)
         {
-            stats.TakeDamage(damage);
+            ulong ownID = stats.GetComponent<NetworkObject>().OwnerClientId;
+            myStats.TakeDamageServerRpc(damage, ownID);
+            Debug.Log("Attack area collided with " + stats.name);
         }
+        
+        if (IsOwner)
+        {
+            Debug.Log("Called by owner");
+        }
+    }
+    private void OnEnable()
+    {
+        Debug.Log("Attack Zone Enabled");
     }
 }

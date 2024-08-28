@@ -1,5 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
+
+[RequireComponent(typeof(EntityStats))]
 public class EntityControler : NetworkBehaviour
 {
     [SerializeField] protected Rigidbody2D rb;
@@ -30,7 +32,7 @@ public class EntityControler : NetworkBehaviour
             animator.SetFloat("horizontal", moveDir.x);
             animator.SetFloat("vertical", moveDir.y);
 
-            rb.linearVelocity = moveDir * stats.speed;
+            rb.linearVelocity = moveDir * stats.speed.Value;
         }
         else
         {

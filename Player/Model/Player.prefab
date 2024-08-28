@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2288895485089239460}
   - component: {fileID: 2088633483552327274}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: LegL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,7 +98,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8159220624726194625}
   - component: {fileID: 771983073770737646}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -188,7 +188,7 @@ GameObject:
   - component: {fileID: 7238094560455940080}
   - component: {fileID: 570819617045016190}
   - component: {fileID: 4323717381002371114}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: LegRin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -289,7 +289,7 @@ GameObject:
   - component: {fileID: 640738416525223120}
   - component: {fileID: 7223397766352516579}
   - component: {fileID: 9037360891752627309}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -370,7 +370,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5089671458853671853}
   - component: {fileID: 2629923468932222071}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ArmR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -684,7 +684,7 @@ GameObject:
   - component: {fileID: 5955905178530722202}
   - component: {fileID: 1584298220819064418}
   - component: {fileID: 8541182515522469698}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: AttackArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -699,7 +699,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3206289172277293102}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -1, w: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -772,6 +772,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   coll: {fileID: 1584298220819064418}
+  myStats: {fileID: 815570875612618110}
 --- !u!1 &3426598273247752370
 GameObject:
   m_ObjectHideFlags: 0
@@ -790,7 +791,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &213487195075447655
 RectTransform:
   m_ObjectHideFlags: 0
@@ -960,7 +961,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4193907322049942819}
   - component: {fileID: 4745514885510385324}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ArmL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1048,7 +1049,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1004084959166962008}
   - component: {fileID: 473037183162276977}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Legs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1096,7 +1097,7 @@ GameObject:
   m_Component:
   - component: {fileID: 778703166148713724}
   - component: {fileID: 8529716544915031131}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: LegR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1185,7 +1186,7 @@ GameObject:
   - component: {fileID: 5499905743942743060}
   - component: {fileID: 5442889300591941232}
   - component: {fileID: 1492617263711675301}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: LegLin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1308,7 +1309,7 @@ RectTransform:
   m_Father: {fileID: 5533301894803893380}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1361,7 +1362,7 @@ GameObject:
   - component: {fileID: 282532570719031493}
   - component: {fileID: 1508078458276918738}
   - component: {fileID: 3701181379692179093}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HeadIn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1463,7 +1464,7 @@ GameObject:
   - component: {fileID: 7651357464661273206}
   - component: {fileID: 6629410564642330406}
   - component: {fileID: 6714660679130561798}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1599,7 +1600,7 @@ GameObject:
   - component: {fileID: 1719333713973916383}
   - component: {fileID: 2561083478959912761}
   - component: {fileID: 3370983741587996310}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ArmIn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1700,7 +1701,7 @@ GameObject:
   - component: {fileID: 6404891338992407202}
   - component: {fileID: 6697907849212935700}
   - component: {fileID: 7456099107765823405}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ArmIn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1800,7 +1801,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5907414482328529818}
   - component: {fileID: 2853731319181982216}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Hair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1931,7 +1932,7 @@ GameObject:
   - component: {fileID: 598114227409261749}
   - component: {fileID: 1318168147513248754}
   - component: {fileID: 815570875612618110}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2040,7 +2041,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
+  m_Radius: 0.44
 --- !u!114 &2754002676927773997
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2053,7 +2054,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1898505987
+  GlobalObjectIdHash: 3417700143
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -2140,11 +2141,10 @@ MonoBehaviour:
   rb: {fileID: 5334299599089962294}
   animator: {fileID: 6957463403833659648}
   stats: {fileID: 815570875612618110}
-  attackArea: {fileID: 8541182515522469698}
   cam: {fileID: 6853975805858021038}
   input_move: {fileID: -1680190386980627800, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  input_attack: {fileID: 1120369429361536294, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   input_look: {fileID: -5630151704836100654, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  input_attack: {fileID: 1120369429361536294, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
 --- !u!114 &815570875612618110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2161,8 +2161,12 @@ MonoBehaviour:
   maxHp:
     m_InternalValue: 100
   hpBar: {fileID: 965478513992398403}
-  speed: 3
-  attackArea: {fileID: 8541182515522469698}
+  speed:
+    m_InternalValue: 3
+  atField: {fileID: 8541182515522469698}
+  damage:
+    type: 0
+    amount: 5
 --- !u!1 &9166786115526468982
 GameObject:
   m_ObjectHideFlags: 0
@@ -2173,7 +2177,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7940325686618431584}
   - component: {fileID: 5725557721839275388}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Arms
   m_TagString: Untagged
   m_Icon: {fileID: 0}

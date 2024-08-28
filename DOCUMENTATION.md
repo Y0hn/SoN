@@ -22,4 +22,5 @@ https://youtu.be/VAM3Ve7ARwc
 ## Mechanics:
 ```
 Attack: https://youtu.be/ChE7u5EdR-U
+        https://youtu.be/ktGJstDvEmU
 ```

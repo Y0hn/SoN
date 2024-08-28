@@ -27,10 +27,19 @@ public class PlayerStats : EntityStats
             hpBar = GameManager.instance.GetPlayerHpBar();
             playerName.Value = GameManager.instance.GetPlayerName();
         }
-        nameTag.text = playerName.Value.ToString(); 
+        nameTag.text = playerName.Value.ToString();
+        name = playerName.Value.ToString();
     }
-    protected override void Update()
+    public override void TakeDamage(Damage damage)
     {
-        base.Update();
+        base.TakeDamage(damage);
+
+        Debug.Log("Taken damage");
+    }
+    [ClientRpc]
+    public void TakenDamageClientRpc(Damage damage, ClientRpcParams clientRpcParams = default)
+    {
+        if (IsOwner) return;
+        Debug.Log($"Client got damaged by {damage.amount} as {damage.type}");
     }
 }

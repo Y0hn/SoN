@@ -14,13 +14,15 @@ public class PlayerControler : EntityControler
      */
     [SerializeField] GameObject cam;
     [SerializeField] InputActionReference input_move;
-    [SerializeField] InputActionReference input_fire;
+    [SerializeField] InputActionReference input_look;
+    [SerializeField] InputActionReference input_attack;
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
         {
             GameManager.instance.PlayerSpawned();
-            input_fire.action.performed += Fire;
+            input_attack.action.started += Fire;
+            input_attack.action.canceled += Fire;
             cam.SetActive(true);
         }
     }
@@ -37,13 +39,9 @@ public class PlayerControler : EntityControler
     }
     void Fire(InputAction.CallbackContext context)
     {
-        // Debug.Log("FIRE");
-        HitServerRpc();
-    }
-    [ServerRpc]
-    void HitServerRpc()
-    {
-        stats.TakeDamage(new Damage (Damage.Type.bludgeoning, 10));
-        //Debug.Log("Take damage called");
+        if      (context.started)
+            animator.SetBool("attack", true);
+        else if (context.canceled)
+            animator.SetBool("attack", false);
     }
 }
