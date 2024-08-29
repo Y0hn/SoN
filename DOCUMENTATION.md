@@ -21,6 +21,20 @@ https://youtu.be/VAM3Ve7ARwc
 ```
 ## Mechanics:
 ```
-Attack: https://youtu.be/ChE7u5EdR-U
+Attack:
         https://youtu.be/ktGJstDvEmU
 ```
+
+# Interesting things
+```
+float value = (float)hp.Value / (float)maxHp.Value;
+```
+must be "(float)" couse hp & maxHp is INT so value would turn out 0
+
+```
+public void Copy()
+{
+    GUIUtility.systemCopyBuffer = connectionManager.codeText.text;
+}
+```
+UnityEngine method to copy from variable

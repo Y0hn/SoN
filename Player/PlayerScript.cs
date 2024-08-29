@@ -1,6 +1,7 @@
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 using UnityEngine;
+using Unity.VisualScripting;
 public class PlayerControler : EntityControler
 {
     /* Inhereted variables
@@ -8,6 +9,7 @@ public class PlayerControler : EntityControler
      * [SF] protected Rigidbody2D rb;
      * [SF] protected Animator animator;
      * [SF] protected EntityStats stats;
+     * protected bool attacking = false;
      * protected Vector2 moveDir;
      * protected const float minC = 0.1f;
      *
@@ -30,6 +32,8 @@ public class PlayerControler : EntityControler
     {
         if (!IsOwner)
             return;
+        
+        base.Update();
         moveDir = input_move.action.ReadValue<Vector2>();
     }
     protected override void FixedUpdate()
@@ -40,8 +44,8 @@ public class PlayerControler : EntityControler
     void Fire(InputAction.CallbackContext context)
     {
         if      (context.started)
-            animator.SetBool("attack", true);
+            attacking = true;
         else if (context.canceled)
-            animator.SetBool("attack", false);
+            attacking = false;
     }
 }

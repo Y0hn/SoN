@@ -8,11 +8,14 @@ public class GameManager : MonoBehaviour
     { instance = this; }
     public static GameManager instance;
     [SerializeField] ConnectionManager connectionManager;
+    [SerializeField] GameObject mainCam;
     [SerializeField] GameObject conUI;
     [SerializeField] GameObject pauseUI;
     [SerializeField] GameObject playerUI;
     [SerializeField] GameObject playerUIface;
     [SerializeField] GameObject playerUIhpBar;
+    [SerializeField] GameObject playerUIxpBar;
+    [SerializeField] GameObject deathScreen;
     [SerializeField] Button copy;
     [SerializeField] InputActionReference inputUI;
     [SerializeField] InputActionReference inputPlayer;
@@ -22,6 +25,7 @@ public class GameManager : MonoBehaviour
     {
         inputUI.action.performed += Pause;
         copy.onClick.AddListener(Copy);
+        deathScreen.SetActive(false);
         playerUI.SetActive(false);
         pauseUI.SetActive(false);
         conUI.SetActive(true);
@@ -39,11 +43,25 @@ public class GameManager : MonoBehaviour
     }
     public void PlayerSpawned()
     {
+        mainCam.gameObject.SetActive(false);
         playerUI.SetActive(true);
     }
-    public Slider GetPlayerHpBar()
+    public void PlayerDied(Vector2 pos)
     {
-        return playerUIhpBar.GetComponent<Slider>();
+        mainCam.transform.position = new Vector3(pos.x, pos.y, mainCam.transform.position.z);
+        mainCam.gameObject.SetActive(true);
+        deathScreen.SetActive(true);
+        playerUI.SetActive(false);
+    }
+    public Slider GetBar(string bar)
+    {
+        switch (bar)
+        {
+            case "xp":      return playerUIxpBar.GetComponent<Slider>();
+            case "hp":
+            case "health":
+            default:        return playerUIhpBar.GetComponent<Slider>();
+        }
     }
     public string GetPlayerName()
     {

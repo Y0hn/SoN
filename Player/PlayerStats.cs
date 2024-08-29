@@ -1,6 +1,7 @@
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 public class PlayerStats : EntityStats
 {
     /*  Inhereted Variables
@@ -10,10 +11,18 @@ public class PlayerStats : EntityStats
      * [SF] protected NetworkVariable<int> maxHp = new();
      * protected NetworkVariable<int> hp = new();
      * [SF] protected Slider hpBar;
-     * [SF] public float speed;
+     * [SF]    public NetworkVariable<int> speed = new();
+     * [SF]    protected Transform attackPoint;
+     * public NetworkVariable<bool> IsAlive = new();
+     * [SF]    protected NetworkVariable<Attack> attack = new ();
      * protected const float timeToDespawn = 0f;
      *
      */
+
+    Slider xpBar;
+    int xpMax = 10, xpMin = 0, xp = 0;
+
+    float atTime = 0;
     NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     public override void OnNetworkSpawn()
     {
@@ -24,22 +33,36 @@ public class PlayerStats : EntityStats
         if (IsOwner)
         {
             hpBar.gameObject.SetActive(false);
-            hpBar = GameManager.instance.GetPlayerHpBar();
+            hpBar = GameManager.instance.GetBar("hp");
+            xpBar = GameManager.instance.GetBar("xp");
+            xpBar.maxValue = xpMax;
+            xpBar.minValue = xpMin;
+            xpBar.value = xp;
+
             playerName.Value = GameManager.instance.GetPlayerName();
         }
         nameTag.text = playerName.Value.ToString();
-        name = playerName.Value.ToString();
+        name = nameTag.text;
+    }
+    public override bool AttackTrigger()
+    {
+        if (Time.time >= atTime)
+        {
+            if (attack.Value.type == Attack.Type.Melee)
+                base.MeleeAttack();
+
+            atTime = Time.time + 1/attack.Value.rate;
+            return true;
+        }
+        return false;
     }
     public override void TakeDamage(Damage damage)
     {
         base.TakeDamage(damage);
-
-        Debug.Log("Taken damage");
     }
-    [ClientRpc]
-    public void TakenDamageClientRpc(Damage damage, ClientRpcParams clientRpcParams = default)
+    protected override void Die()
     {
-        if (IsOwner) return;
-        Debug.Log($"Client got damaged by {damage.amount} as {damage.type}");
+        GameManager.instance.PlayerDied(transform.position);
+        base.Die();
     }
 }

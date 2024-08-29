@@ -10,7 +10,6 @@ using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
 public class ConnectionManager : MonoBehaviour
 {
-    [SerializeField] GameObject mainCam;
     #region UI_Buttons
     [SerializeField] Button relayServBtn;
     [SerializeField] Button relayHostBtn;
@@ -69,7 +68,6 @@ public class ConnectionManager : MonoBehaviour
         if (role == "host")
         {
             NetworkManager.Singleton.StartHost();
-            mainCam.SetActive(false);
         }
         else
             NetworkManager.Singleton.StartServer();
@@ -95,7 +93,6 @@ public class ConnectionManager : MonoBehaviour
             {
                 codeText.text = joinCode;
                 UIparent.SetActive(false);
-                mainCam.SetActive(false);
             }
             else
             {
@@ -115,7 +112,6 @@ public class ConnectionManager : MonoBehaviour
                 break;
             case "host":  
                 NetworkManager.Singleton.StartHost(); 
-                mainCam.SetActive(false); 
                 break;
         }
         codeText.text = serverIP;
@@ -128,7 +124,6 @@ public class ConnectionManager : MonoBehaviour
         {
             codeText.text = "Server IP: " + serverIP;
             UIparent.SetActive(false);
-            mainCam.SetActive(false);
         }
         else
         {

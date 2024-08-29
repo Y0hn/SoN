@@ -7,6 +7,8 @@ public class EntityControler : NetworkBehaviour
     [SerializeField] protected Rigidbody2D rb;
     [SerializeField] protected Animator animator;
     [SerializeField] protected EntityStats stats;
+
+    protected bool attacking = false;
     protected Vector2 moveDir;
     protected const float minC = 0.1f;
     public override void OnNetworkSpawn()
@@ -15,7 +17,8 @@ public class EntityControler : NetworkBehaviour
     }
     protected virtual void Update()
     {
-        
+        if (attacking)
+            Attack();
     }
     protected virtual void FixedUpdate()
     {
@@ -38,6 +41,19 @@ public class EntityControler : NetworkBehaviour
         {
             rb.linearVelocity = Vector2.zero;
             animator.SetBool("move", false);
+        }
+    }
+    /*protected virtual void AnimateAttack()
+    {
+
+    }*/
+    protected virtual void Attack()
+    {
+        if (stats.AttackTrigger())
+        {
+            float atBlend = animator.GetFloat("atBlend") * -1;
+            animator.SetFloat("atBlend", atBlend);
+            animator.SetTrigger("attack");
         }
     }
 }
