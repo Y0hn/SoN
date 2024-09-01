@@ -18,7 +18,7 @@ public class EntityStats : NetworkBehaviour
     [SerializeField]    protected Transform attackPoint;
                         public NetworkVariable<bool> IsAlive = new();
     [SerializeField]    protected Animator animator;
-    [SerializeField]    protected NetworkVariable<Rase> rase;
+    [SerializeField]    protected Rase rase;
                         protected NetworkVariable<Attack> attack = new ();
                         protected const float timeToDespawn = 0f;
 
@@ -44,31 +44,26 @@ public class EntityStats : NetworkBehaviour
     {
         if (body != null)
             Destroy(body);
-        body = Instantiate(rase.Value.body, transform.position, Quaternion.identity, transform);
+        body = Instantiate(rase.body, transform.position, Quaternion.identity, transform);
         body.name = "Body";
 
-        //animator.runtimeAnimatorController = rase.Value.animator.runtimeAnimatorController;
         animator.Rebind();
         animator.Update(0);
-
-        //animator = body.GetComponent<Animator>();
-        //GetComponent<NetworkAnimator>().Animator = animator;
-        //GetComponent<EntityControler>().anima = animator;
 
         GetComponent<EntityControler>().animate = animator;
 
         if (IsServer)
         {
             attackPoint = body.transform.GetChild(0);
-            attack.Value = rase.Value.attack;
+            attack.Value = rase.attack;
 
-            maxHp.Value = rase.Value.maxHp;
+            maxHp.Value = rase.maxHp;
             hp.Value = maxHp.Value;
 
-            speed.Value = rase.Value.speed;
+            speed.Value = rase.speed;
 
-            for (int i = 0; i < rase.Value.rezistances.Count; i++)
-                rezists.Add(rase.Value.rezistances[Enum.GetName(typeof(Damage.Type), i)]);    
+            for (int i = 0; i < rase.rezistances.Count; i++)
+                rezists.Add(rase.rezistances[Enum.GetName(typeof(Damage.Type), i)]);    
         }
     }
     protected virtual void Update()
@@ -79,7 +74,6 @@ public class EntityStats : NetworkBehaviour
     {
         float value = (float)hp.Value / (float)maxHp.Value;
         hpBar.value = value;
-        //Debug.Log($"HP bar: [{hpBar.value}/{hpBar.maxValue}] Acsual hp: [{hp.Value}/{maxHp.Value}] => {value}");
     }
     [ServerRpc]
     public virtual void TakeDamageServerRpc(Damage damage, ulong clientId)
@@ -98,7 +92,6 @@ public class EntityStats : NetworkBehaviour
             Debug.Log("Server is doing damage !");
             int newDamage = rezists[(int)damage.type].GetDamage(damage.amount);
             hp.Value -= newDamage;
-            //Debug.Log($"Entity {name} damaged by {damage.amount}, protection absorbed {damage.amount-newDamage} final damage is {newDamage} HP[{hp.Value}/{maxHp.Value}]");
             
             if (hp.Value <= 0)
                 Die();

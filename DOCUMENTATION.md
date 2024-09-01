@@ -25,16 +25,48 @@ Attack:
         https://youtu.be/ktGJstDvEmU
 ```
 
-# Interesting things
+# Interesting things & Problems Down the road
+
+must be "(float)" couse hp & maxHp is INT so value would turn out 0
 ```
 float value = (float)hp.Value / (float)maxHp.Value;
 ```
-must be "(float)" couse hp & maxHp is INT so value would turn out 0
 
+UnityEngine method to copy from variable
 ```
 public void Copy()
 {
     GUIUtility.systemCopyBuffer = connectionManager.codeText.text;
 }
 ```
-UnityEngine method to copy from variable
+
+## Problems with Multiplayer
+
+### NetworkVariables<'CustomStruck'> are pain in ass 
+```
+They have to be value data types (cannot be null)
+They have to have inplemented 'NetworkSerialize<T>(BufferSerializer<T> serializer)' serializer from 'INetworkSerializable'
+U cant have Arrays or Dictionaries only as 'NetworkList<T>' and "T" must have 'Equals(T other)' from 'IEquatable<T>'
+Perfect examle is struck 'Rezistance' in 'EntityStats'
+```
+
+## Problems with Animator & Prefabs
+
+### Animator on Entity Body
+When Destroyed animated Child 'Body' of gameobject 'Entity' (examp. Player) and subsequently replacing it with PreFab Animator is not registring new GameObjects as part of animation even if they have same names.
+
+Sullution:
+```
+private RuntimeAnimatorController RNA;
+
+// Function called in 'EntityStats.OnNetworkSpawn().RaseSetUp()' from 'EntityController'
+public Animator animate { set { animator = value; RNA = value.runtimeAnimatorController; animator.runtimeAnimatorController = null; } }
+
+// Later in 'EntityController.FixedUpdate().AnimateMovement()'
+protected virtual void AnimateMovement()
+{
+    if (animator != null)
+        animator.runtimeAnimatorController = RNA;
+    // ...
+}
+```
