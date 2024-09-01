@@ -9,31 +9,48 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     [SerializeField] ConnectionManager connectionManager;
     [SerializeField] GameObject mainCam;
+    [SerializeField] GameObject mainUI;
+    [SerializeField] Animator uiAnimator;
     [SerializeField] GameObject conUI;
     [SerializeField] GameObject pauseUI;
     [SerializeField] GameObject playerUI;
+    [SerializeField] GameObject invUI;
     [SerializeField] GameObject playerUIface;
     [SerializeField] GameObject playerUIhpBar;
     [SerializeField] GameObject playerUIxpBar;
     [SerializeField] GameObject deathScreen;
     [SerializeField] Button copy;
-    [SerializeField] InputActionReference inputUI;
-    [SerializeField] InputActionReference inputPlayer;
-    private bool paused;
+    [SerializeField] Button inventBtn;
+    [SerializeField] InputActionReference inputUIpause;
+    [SerializeField] InputActionReference inputUIinventory;
+    
+    public Inventory inventory;
+
+    private bool paused = false, inv = false;
+
     private string gameTag;
     void Start()
     {
-        inputUI.action.performed += Pause;
+        // Events
+        inventBtn.onClick.AddListener(() => OC_Inventory(new()));
+        inputUIinventory.action.started += OC_Inventory;
         copy.onClick.AddListener(Copy);
+        inputUIpause.action.started += OC_Pause;
+
         deathScreen.SetActive(false);
         playerUI.SetActive(false);
         pauseUI.SetActive(false);
+        invUI.SetActive(false);
         conUI.SetActive(true);
-        paused = false;
     }
-    void Pause(InputAction.CallbackContext context)
+    void OC_Inventory(InputAction.CallbackContext context)
     {
-        Debug.Log($"Pause {paused}");
+        inv = !inv;
+        uiAnimator.SetBool("inv-open", inv);
+    }
+    void OC_Pause(InputAction.CallbackContext context)
+    {
+        //Debug.Log($"Pause {paused}");
         paused = !paused;
         pauseUI.SetActive(paused);
         if (paused)
@@ -41,10 +58,12 @@ public class GameManager : MonoBehaviour
         else
             Time.timeScale = 1f;
     }
+
     public void PlayerSpawned()
     {
         mainCam.gameObject.SetActive(false);
         playerUI.SetActive(true);
+        invUI.SetActive(true);
     }
     public void PlayerDied(Vector2 pos)
     {
@@ -53,6 +72,7 @@ public class GameManager : MonoBehaviour
         deathScreen.SetActive(true);
         playerUI.SetActive(false);
     }
+
     public Slider GetBar(string bar)
     {
         switch (bar)

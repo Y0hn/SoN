@@ -59,6 +59,7 @@ public class PlayerStats : EntityStats
     public override void TakeDamage(Damage damage)
     {
         base.TakeDamage(damage);
+        Debug.Log($"Player taking damage");
     }
     protected override void Die()
     {

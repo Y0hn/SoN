@@ -52,9 +52,10 @@ public class EntityStats : NetworkBehaviour
 
         GetComponent<EntityControler>().animate = animator;
 
+        attackPoint = body.transform.GetChild(0);
+        
         if (IsServer)
         {
-            attackPoint = body.transform.GetChild(0);
             attack.Value = rase.attack;
 
             maxHp.Value = rase.maxHp;
@@ -76,13 +77,13 @@ public class EntityStats : NetworkBehaviour
         hpBar.value = value;
     }
     [ServerRpc]
-    public virtual void TakeDamageServerRpc(Damage damage, ulong clientId)
+    public virtual void TakeDamageServerRpc(Damage damage, ulong clientId, ulong senderId)
     {
         var playerDamaged = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.GetComponent<PlayerStats>();
         //Debug.Log($"Server Rpc hitting client {clientId}");
         if (playerDamaged != null && playerDamaged.IsAlive.Value)
         {
-            playerDamaged.TakeDamage(damage);
+            playerDamaged.TakeDamage(damage/*, senderId*/);
         }
     }
     public virtual void TakeDamage(Damage damage)
@@ -96,6 +97,8 @@ public class EntityStats : NetworkBehaviour
             if (hp.Value <= 0)
                 Die();
         }
+        else
+            Debug.Log("Take damage on client");
     }
     public virtual void MeleeAttack()
     {
@@ -108,8 +111,8 @@ public class EntityStats : NetworkBehaviour
                 ulong ownID = netObj.OwnerClientId;
                 if (OwnerClientId != ownID)
                 {
-                    // Debug.Log("Attack area collided with player");
-                    TakeDamageServerRpc(attack.Value.damage, ownID);
+                    TakeDamageServerRpc(attack.Value.damage, ownID, OwnerClientId);
+                    Debug.Log($"{OwnerClientId} attacking player {ownID}");
                 }
             }
         }
@@ -123,7 +126,9 @@ public class EntityStats : NetworkBehaviour
         IsAlive.Value = false;
         hpBar.gameObject.SetActive(false);
         // Play death animation
+
         Destroy(gameObject, timeToDespawn);
+        //Debug.Log("Killed by " + killer);
     }
     protected void OnDrawGizmosSelected()
     {
