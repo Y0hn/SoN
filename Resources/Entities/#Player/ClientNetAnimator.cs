@@ -1,5 +1,5 @@
 using Unity.Netcode.Components;
-public class ClientNetwordAnimator : NetworkAnimator
+public class ClientNetworkAnimator : NetworkAnimator
 {
     protected override bool OnIsServerAuthoritative()
     {

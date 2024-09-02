@@ -6,9 +6,7 @@ using System;
 [CreateAssetMenu(fileName = "NewRase", menuName = "Entity/Rase"), Serializable] public class Rase : ScriptableObject
 {
     public Attack attack = new(new Damage(Damage.Type.bludgeoning, 1), 1, 1, Attack.Type.Melee);
-    public AnimatorOverrideController animator;
-    public GameObject body;
-    public Color color = new (1,1,1,1);
+    // public GameObject body;
     public float speed = 1;
     public int maxHp = 100;
     [SerializedDictionary("Type", "rezist")]

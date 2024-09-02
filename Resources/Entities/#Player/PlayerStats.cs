@@ -49,18 +49,20 @@ public class PlayerStats : EntityStats
         if (Time.time >= atTime)
         {
             if (attack.Value.type == Attack.Type.Melee)
-                base.MeleeAttack();
+                MeleeAttack();
+            else
+                Debug.Log($"Player {name} attack type not defined");
 
             atTime = Time.time + 1/attack.Value.rate;
             return true;
         }
         return false;
-    }
+    }/*
     public override void TakeDamage(Damage damage)
     {
         base.TakeDamage(damage);
         Debug.Log($"Player taking damage");
-    }
+    }*/
     protected override void Die()
     {
         GameManager.instance.PlayerDied(transform.position);

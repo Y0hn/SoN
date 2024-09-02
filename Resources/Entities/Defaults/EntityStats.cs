@@ -17,7 +17,6 @@ public class EntityStats : NetworkBehaviour
     [SerializeField]    protected GameObject body;
     [SerializeField]    protected Transform attackPoint;
                         public NetworkVariable<bool> IsAlive = new();
-    [SerializeField]    protected Animator animator;
     [SerializeField]    protected Rase rase;
                         protected NetworkVariable<Attack> attack = new ();
                         protected const float timeToDespawn = 0f;
@@ -42,18 +41,6 @@ public class EntityStats : NetworkBehaviour
     }
     protected virtual void RaseSetUp()
     {
-        if (body != null)
-            Destroy(body);
-        body = Instantiate(rase.body, transform.position, Quaternion.identity, transform);
-        body.name = "Body";
-
-        animator.Rebind();
-        animator.Update(0);
-
-        GetComponent<EntityControler>().animate = animator;
-
-        attackPoint = body.transform.GetChild(0);
-        
         if (IsServer)
         {
             attack.Value = rase.attack;
@@ -76,14 +63,20 @@ public class EntityStats : NetworkBehaviour
         float value = (float)hp.Value / (float)maxHp.Value;
         hpBar.value = value;
     }
-    [ServerRpc]
-    public virtual void TakeDamageServerRpc(Damage damage, ulong clientId, ulong senderId)
+    [ServerRpc] protected void TakeDamageServerRpc(Damage damage, ulong clientId)
     {
         var playerDamaged = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.GetComponent<PlayerStats>();
         //Debug.Log($"Server Rpc hitting client {clientId}");
-        if (playerDamaged != null && playerDamaged.IsAlive.Value)
+        if (playerDamaged != null)
         {
-            playerDamaged.TakeDamage(damage/*, senderId*/);
+            if (playerDamaged.IsAlive.Value)
+                playerDamaged.TakeDamage(damage);
+            else
+                Debug.Log($"Player {clientId} already dead");
+        }
+        else
+        {
+            Debug.Log($"Player {clientId} not found");
         }
     }
     public virtual void TakeDamage(Damage damage)
@@ -92,6 +85,7 @@ public class EntityStats : NetworkBehaviour
         {
             Debug.Log("Server is doing damage !");
             int newDamage = rezists[(int)damage.type].GetDamage(damage.amount);
+            Debug.Log($"Damage {damage.amount} redused by Rezists to {newDamage}");
             hp.Value -= newDamage;
             
             if (hp.Value <= 0)
@@ -108,11 +102,11 @@ public class EntityStats : NetworkBehaviour
         {
             if (target.TryGetComponent(out NetworkObject netObj))
             {
-                ulong ownID = netObj.OwnerClientId;
-                if (OwnerClientId != ownID)
+                ulong hitID = netObj.OwnerClientId;
+                if (OwnerClientId != hitID)
                 {
-                    TakeDamageServerRpc(attack.Value.damage, ownID, OwnerClientId);
-                    Debug.Log($"{OwnerClientId} attacking player {ownID}");
+                    TakeDamageServerRpc(attack.Value.damage, hitID);
+                    Debug.Log($"{OwnerClientId} attacking player {hitID}");
                 }
             }
         }
@@ -129,12 +123,6 @@ public class EntityStats : NetworkBehaviour
 
         Destroy(gameObject, timeToDespawn);
         //Debug.Log("Killed by " + killer);
-    }
-    protected void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        attackPoint.position = new(attackPoint.position.x, attack.Value.range);
-        Gizmos.DrawWireSphere(attackPoint.position, attack.Value.range);
     }
 }
 
