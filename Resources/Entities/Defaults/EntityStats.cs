@@ -3,6 +3,7 @@ using System;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(EntityControler))]
 public class EntityStats : NetworkBehaviour
@@ -13,7 +14,8 @@ public class EntityStats : NetworkBehaviour
     [SerializeField]    protected NetworkVariable<int> maxHp = new();
                         protected NetworkVariable<int> hp = new();
     [SerializeField]    protected Slider hpBar;
-    [SerializeField]    public NetworkVariable<float> speed = new();
+                        public NetworkVariable<float> speed = new();
+                        public NetworkVariable<byte> level = new();
     [SerializeField]    protected GameObject body;
     [SerializeField]    protected Transform attackPoint;
                         public NetworkVariable<bool> IsAlive = new();
@@ -48,6 +50,8 @@ public class EntityStats : NetworkBehaviour
             maxHp.Value = rase.maxHp;
             hp.Value = maxHp.Value;
 
+            level.Value = 1;
+
             speed.Value = rase.speed;
 
             for (int i = 0; i < rase.rezistances.Count; i++)
@@ -63,66 +67,44 @@ public class EntityStats : NetworkBehaviour
         float value = (float)hp.Value / (float)maxHp.Value;
         hpBar.value = value;
     }
-    [ServerRpc] protected void TakeDamageServerRpc(Damage damage, ulong clientId)
-    {
-        var playerDamaged = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.GetComponent<PlayerStats>();
-        //Debug.Log($"Server Rpc hitting client {clientId}");
-        if (playerDamaged != null)
-        {
-            if (playerDamaged.IsAlive.Value)
-                playerDamaged.TakeDamage(damage);
-            else
-                Debug.Log($"Player {clientId} already dead");
-        }
-        else
-        {
-            Debug.Log($"Player {clientId} not found");
-        }
-    }
-    public virtual void TakeDamage(Damage damage)
+    // Take damage from player Run on server
+    public virtual bool TakeDamage(Damage damage)
     {
         if (IsServer)
         {
-            Debug.Log("Server is doing damage !");
             int newDamage = rezists[(int)damage.type].GetDamage(damage.amount);
-            Debug.Log($"Damage {damage.amount} redused by Rezists to {newDamage}");
             hp.Value -= newDamage;
+
+            Debug.Log($"Damage {damage.amount} from redused by Rezists to {newDamage}");
             
             if (hp.Value <= 0)
-                Die();
+                return true;
         }
-        else
-            Debug.Log("Take damage on client");
+        return false;
     }
-    public virtual void MeleeAttack()
+    protected virtual NetworkObject[] MeleeAttack()
     {
-        if (!IsOwner) return;
-        Collider2D[] targets = Physics2D.OverlapCircleAll(attackPoint.position, attack.Value.range /* , layer mask */);
-        foreach (var target in targets)
-        {
-            if (target.TryGetComponent(out NetworkObject netObj))
-            {
-                ulong hitID = netObj.OwnerClientId;
-                if (OwnerClientId != hitID)
-                {
-                    TakeDamageServerRpc(attack.Value.damage, hitID);
-                    Debug.Log($"{OwnerClientId} attacking player {hitID}");
-                }
-            }
-        }
+        List<NetworkObject> netO = new();
+        Collider2D[] targets = Physics2D.OverlapCircleAll(attackPoint.position, attack.Value.range /*, layer mask */);
+        foreach (Collider2D target in targets)
+            if (target.TryGetComponent(out NetworkObject targetObj))
+                netO.Add(targetObj);
+
+        return netO.ToArray();
     }
     public virtual bool AttackTrigger()
     {
         return false;
     }
+    public virtual void KilledEnemy(EntityStats died)
+    {
+
+    }
     protected virtual void Die()
     {
         IsAlive.Value = false;
         hpBar.gameObject.SetActive(false);
-        // Play death animation
-
         Destroy(gameObject, timeToDespawn);
-        //Debug.Log("Killed by " + killer);
     }
 }
 

@@ -18,15 +18,12 @@ public class PlayerControler : EntityControler
     [SerializeField] InputActionReference input_move;
     [SerializeField] InputActionReference input_look;
     [SerializeField] InputActionReference input_attack;
-    //protected RuntimeAnimatorController runCont;
 
     public override void OnNetworkSpawn()
     {
-        //runCont = GetComponent<Animator>().runtimeAnimatorController;
-
         if (IsOwner)
         {
-            GameManager.instance.PlayerSpawned();
+            GameManager.instance.PlayerSpawned((PlayerStats)stats);
             input_attack.action.started += Fire;
             input_attack.action.canceled += Fire;
             cam.SetActive(true);
@@ -34,25 +31,17 @@ public class PlayerControler : EntityControler
     }
     protected override void Update()
     {
-        if (!IsOwner)
-            return;
-
-        if (Input.GetKeyDown(KeyCode.Space))
-            animator.enabled = !animator.enabled;/*
-        else if (Input.GetKeyDown(KeyCode.M))
-            switch (animator.runtimeAnimatorController)
-            {
-                case null:  animator.runtimeAnimatorController = runCont; break;
-                default:    animator.runtimeAnimatorController = null;    break;
-            }*/
+        if (!IsOwner) return;
 
         base.Update();
+
         moveDir = input_move.action.ReadValue<Vector2>();
     }
     protected override void FixedUpdate()
     {
-        if (IsOwner)
-            AnimateMovement();
+        if (!IsOwner) return;
+        
+        AnimateMovement();
     }
     void Fire(InputAction.CallbackContext context)
     {

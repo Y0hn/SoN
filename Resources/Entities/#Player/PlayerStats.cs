@@ -42,7 +42,7 @@ public class PlayerStats : EntityStats
             playerName.Value = GameManager.instance.GetPlayerName();
         }
         nameTag.text = playerName.Value.ToString();
-        name = nameTag.text;
+        transform.name = nameTag.text;
     }
     public override bool AttackTrigger()
     {
@@ -57,15 +57,48 @@ public class PlayerStats : EntityStats
             return true;
         }
         return false;
-    }/*
-    public override void TakeDamage(Damage damage)
+    }
+    protected override NetworkObject[] MeleeAttack()
     {
-        base.TakeDamage(damage);
-        Debug.Log($"Player taking damage");
-    }*/
+        foreach (NetworkObject netO in base.MeleeAttack())
+        {
+            ulong hitID = netO.OwnerClientId;
+            if (OwnerClientId != hitID)
+            {
+                TakeDamageServerRpc(attack.Value.damage, OwnerClientId, hitID);
+                Debug.Log($"'{name}' (ID: {OwnerClientId}) attacking player '{netO.name}' with ID: {hitID}");
+            }
+        }
+        return null;
+    }
+    [ServerRpc] protected void TakeDamageServerRpc(Damage damage, ulong dealerId, ulong targetId)
+    {
+        var playerDamaged = NetworkManager.Singleton.ConnectedClients[targetId].PlayerObject.GetComponent<PlayerStats>();
+        if (playerDamaged != null)
+        {
+            if (playerDamaged.IsAlive.Value)
+                if (playerDamaged.TakeDamage(damage))
+                {
+                    playerDamaged.Die();
+                    NetworkManager.Singleton.ConnectedClients[dealerId].PlayerObject.GetComponent<PlayerStats>().KilledEnemy(playerDamaged);                    
+                }
+                else
+                    Debug.Log("Player {targetId} lives");                
+            else
+                Debug.Log($"Player {targetId} already dead");
+        }
+        else
+        {
+            Debug.Log($"Player {targetId} not found");
+        }
+    }
+    public override void KilledEnemy(EntityStats died)
+    {
+        base.KilledEnemy(died);
+        xp += died.level.Value;
+    }
     protected override void Die()
     {
-        GameManager.instance.PlayerDied(transform.position);
         base.Die();
     }
 }
