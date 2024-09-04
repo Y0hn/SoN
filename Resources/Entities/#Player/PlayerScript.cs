@@ -33,9 +33,12 @@ public class PlayerControler : EntityControler
     {
         if (!IsOwner) return;
 
-        base.Update();
+        if (stats.IsAlive.Value)
+        {
+            base.Update();
 
-        moveDir = input_move.action.ReadValue<Vector2>();
+            moveDir = input_move.action.ReadValue<Vector2>();
+        }
     }
     protected override void FixedUpdate()
     {
@@ -43,11 +46,22 @@ public class PlayerControler : EntityControler
         
         AnimateMovement();
     }
-    void Fire(InputAction.CallbackContext context)
+    public void Fire(InputAction.CallbackContext context)
     {
+        if (!stats.IsAlive.Value)
+        {
+            Debug.Log(name + " called RespawnServerRpc()");
+            SetLiveServerRpc(OwnerClientId);
+            return;
+        }
+            
         if      (context.started)
-            attacking = true;
+                attacking = true;
         else if (context.canceled)
             attacking = false;
+    }
+    [ServerRpc] protected void SetLiveServerRpc(ulong playerId)
+    {
+        NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerStats>().IsAlive.Value = true;
     }
 }

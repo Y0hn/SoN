@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 public class PlayerStats : EntityStats
 {
     /*  Inhereted Variables
@@ -20,9 +21,9 @@ public class PlayerStats : EntityStats
      */
 
     Slider xpBar;
-    int xpMax = 10, xpMin = 0, xp = 0;
-
     float atTime = 0;
+    int xpMax = 10, xpMin = 0;
+    protected NetworkVariable<int> xp = new(0);
     NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     public override void OnNetworkSpawn()
     {
@@ -35,14 +36,26 @@ public class PlayerStats : EntityStats
             hpBar.gameObject.SetActive(false);
             hpBar = GameManager.instance.GetBar("hp");
             xpBar = GameManager.instance.GetBar("xp");
-            xpBar.maxValue = xpMax;
             xpBar.minValue = xpMin;
-            xpBar.value = xp;
+            xpBar.maxValue = xpMax;
+            xpBar.value = xp.Value;
+
+            xp.OnValueChanged += (int prevValue, int newValue) => OnXpUpdate();
 
             playerName.Value = GameManager.instance.GetPlayerName();
         }
         nameTag.text = playerName.Value.ToString();
-        transform.name = nameTag.text;
+        GetComponent<NetworkObject>().name = nameTag.text;
+    }
+    protected void OnXpUpdate()
+    {
+        xpBar.value = xp.Value;
+    }
+    protected void OnLevelUp()
+    {
+        xpMax += xp.Value * level.Value;
+        xpBar.minValue = xp.Value;
+        xpBar.maxValue = xpMax;
     }
     public override bool AttackTrigger()
     {
@@ -51,39 +64,62 @@ public class PlayerStats : EntityStats
             if (attack.Value.type == Attack.Type.Melee)
                 MeleeAttack();
             else
-                Debug.Log($"Player {name} attack type not defined");
+                Debug.Log($"Player {name} attack type {Enum.GetName(typeof(Attack.Type), attack.Value.type)} not defined");
 
             atTime = Time.time + 1/attack.Value.rate;
             return true;
         }
         return false;
     }
-    protected override NetworkObject[] MeleeAttack()
+    protected override EntityStats[] MeleeAttack()
     {
-        foreach (NetworkObject netO in base.MeleeAttack())
+        foreach (EntityStats stats in base.MeleeAttack())
         {
-            ulong hitID = netO.OwnerClientId;
-            if (OwnerClientId != hitID)
+            if (stats is PlayerStats)
             {
-                TakeDamageServerRpc(attack.Value.damage, OwnerClientId, hitID);
-                Debug.Log($"'{name}' (ID: {OwnerClientId}) attacking player '{netO.name}' with ID: {hitID}");
+                ulong hitID = stats.GetComponent<NetworkObject>().OwnerClientId;
+                DamagePlayerServerRpc(attack.Value.damage, OwnerClientId, hitID);
+                Debug.Log($"'{name}' (ID: {OwnerClientId}) attacking player '{stats.name}' with ID: {hitID}");
             }
         }
         return null;
     }
-    [ServerRpc] protected void TakeDamageServerRpc(Damage damage, ulong dealerId, ulong targetId)
+    public override void KilledEnemy(EntityStats died)
     {
-        var playerDamaged = NetworkManager.Singleton.ConnectedClients[targetId].PlayerObject.GetComponent<PlayerStats>();
-        if (playerDamaged != null)
+        base.KilledEnemy(died);
+        xp.Value += died.level.Value;
+    }
+    protected override void SetLive(bool alive)
+    {
+        base.SetLive(alive);
+        
+        SetLiveClientRpc(alive);
+    }
+
+
+
+
+    /// <summary>
+    /// Server does this for Player doing damage to another Player
+    /// </summary>
+    /// <param name="damage"></param>
+    /// <param name="dealerId"></param>
+    /// <param name="targetId"></param>
+    [ServerRpc] protected void DamagePlayerServerRpc(Damage damage, ulong dealerId, ulong targetId)
+    {
+        PlayerStats playerTarget = NetworkManager.Singleton.ConnectedClients[targetId].PlayerObject.GetComponent<PlayerStats>();
+        PlayerStats playerDealer = NetworkManager.Singleton.ConnectedClients[dealerId].PlayerObject.GetComponent<PlayerStats>();
+
+        if (playerTarget != null)
         {
-            if (playerDamaged.IsAlive.Value)
-                if (playerDamaged.TakeDamage(damage))
+            if (playerTarget.IsAlive.Value)
+                if (playerTarget.TakeDamage(damage))
                 {
-                    playerDamaged.Die();
-                    NetworkManager.Singleton.ConnectedClients[dealerId].PlayerObject.GetComponent<PlayerStats>().KilledEnemy(playerDamaged);                    
+                    playerTarget.IsAlive.Value = false;
+                    playerDealer.KilledEnemy(playerTarget);                    
                 }
                 else
-                    Debug.Log("Player {targetId} lives");                
+                    Debug.Log($"Player {targetId} lives");                
             else
                 Debug.Log($"Player {targetId} already dead");
         }
@@ -92,13 +128,10 @@ public class PlayerStats : EntityStats
             Debug.Log($"Player {targetId} not found");
         }
     }
-    public override void KilledEnemy(EntityStats died)
+
+    [ClientRpc] protected void SetLiveClientRpc(bool alive)
     {
-        base.KilledEnemy(died);
-        xp += died.level.Value;
-    }
-    protected override void Die()
-    {
-        base.Die();
+        if (IsOwner)
+            GameManager.instance.SetPlayerUI(alive);
     }
 }

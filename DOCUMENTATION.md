@@ -70,5 +70,10 @@ protected virtual void AnimateMovement()
     // ...
 }
 ```
+Result:
+```
+does not work for other Players trough Net
+reverted back to having 'Animator' at Player (Entiry) gameobject instead of Player.Body
+```
+!!! IDEA SCRAPED !!!
 
-does not work for other Players

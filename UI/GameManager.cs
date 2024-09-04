@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
-using Unity.VisualScripting;
+/// <summary>
+/// Managing Game and PLayerUI - has 'instance'
+/// </summary>
 public class GameManager : MonoBehaviour
 {
     void Awake()
@@ -31,7 +33,6 @@ public class GameManager : MonoBehaviour
     public Inventory inventory;
 
     private bool paused = false, inv = false, equip = false;
-    private bool playerSpawned;
     private string gameTag;
     private PlayerStats player;
     void Start()
@@ -47,17 +48,42 @@ public class GameManager : MonoBehaviour
 
         copy.onClick.AddListener(Copy);
 
-        playerSpawned = false;
-        deathScreen.SetActive(playerSpawned);
-        playerUI.SetActive(playerSpawned);
-        equipUI.SetActive(playerSpawned);
-        pauseUI.SetActive(playerSpawned);
-        invUI.SetActive(playerSpawned);
+        SetStartUI();
+    }
+    void SetStartUI()
+    {
+        deathScreen.SetActive(false);
+        playerUI.SetActive(false);
+        equipUI.SetActive(false);
+        pauseUI.SetActive(false);
+        invUI.SetActive(false);
         conUI.SetActive(true);
+    }
+    public void SetPlayerUI(bool lives = true)
+    {
+        // Death Screen ☠︎︎
+        if (!lives)
+            mainCam.transform.position = new
+            (
+                player.transform.position.x, player.transform.position.y, mainCam.transform.position.z
+            );
+        deathScreen.SetActive(!lives);
+        mainCam.SetActive(!lives);
+
+        playerUI.SetActive(lives);
+        pauseUI.SetActive(false);
+        equipUI.SetActive(lives);
+        invUI.SetActive(lives);
+        conUI.SetActive(false);
+    }
+    public void PlayerSpawned(PlayerStats plStats)
+    {
+        player = plStats;
+        SetPlayerUI();
     }
     void OC_Inventory(InputAction.CallbackContext context)
     {
-        if (!playerSpawned) return;
+        if (!player.IsAlive.Value) return;
         inv = !inv;
         uiAnimator.SetBool("inv-open", inv);
         TMP_Text tmp = inventBtn.GetComponentInChildren<TMP_Text>();
@@ -66,7 +92,7 @@ public class GameManager : MonoBehaviour
     }
     void OC_Equipment(InputAction.CallbackContext context)
     {
-        if (!playerSpawned) return;
+        if (!player.IsAlive.Value) return;
         equip = !equip;
         uiAnimator.SetBool("equ-open", equip);
         TMP_Text tmp = equipBtn.GetComponentInChildren<TMP_Text>();
@@ -75,7 +101,11 @@ public class GameManager : MonoBehaviour
     }
     void OC_Pause(InputAction.CallbackContext context)
     {
-        if (!playerSpawned) return;
+        if (!player.IsAlive.Value) 
+        {
+            player.GetComponent<PlayerControler>().Fire(new());
+            return;
+        }
         //Debug.Log($"Pause {paused}");
         paused = !paused;
         pauseUI.SetActive(paused);
@@ -83,30 +113,6 @@ public class GameManager : MonoBehaviour
             Time.timeScale = 0f;
         else
             Time.timeScale = 1f;
-    }
-
-    public void PlayerSpawned(PlayerStats plStats)
-    {
-        playerSpawned = true;
-        player = plStats;
-        player.IsAlive.OnValueChanged += (bool prev, bool newv) => { if(!newv) PD(); };
-        mainCam.gameObject.SetActive(false);
-        playerUI.SetActive(true);
-        equipUI.SetActive(true);
-        invUI.SetActive(true);
-    }
-    private void PD()
-    {
-        PlayerDied(player.transform.position);
-    }
-    public void PlayerDied(Vector2 pos)
-    {
-        mainCam.transform.position = new Vector3(pos.x, pos.y, mainCam.transform.position.z);
-        mainCam.gameObject.SetActive(true);
-        deathScreen.SetActive(true);
-        playerUI.SetActive(false);
-        equipUI.SetActive(false);
-        invUI.SetActive(false);
     }
 
     public Slider GetBar(string bar)

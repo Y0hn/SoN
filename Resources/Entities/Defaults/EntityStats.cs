@@ -4,7 +4,9 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-
+/// <summary>
+/// 
+/// </summary>
 [RequireComponent(typeof(EntityControler))]
 public class EntityStats : NetworkBehaviour
 {
@@ -18,7 +20,7 @@ public class EntityStats : NetworkBehaviour
                         public NetworkVariable<byte> level = new();
     [SerializeField]    protected GameObject body;
     [SerializeField]    protected Transform attackPoint;
-                        public NetworkVariable<bool> IsAlive = new();
+                        public NetworkVariable<bool> IsAlive = new(true);
     [SerializeField]    protected Rase rase;
                         protected NetworkVariable<Attack> attack = new ();
                         protected const float timeToDespawn = 0f;
@@ -27,11 +29,8 @@ public class EntityStats : NetworkBehaviour
     {
         RaseSetUp();
 
-        if (IsServer)
-            IsAlive.Value = true;
-
         // Health values
-        hp.OnValueChanged += (int prevValue, int newValue) => HpUpdate();
+        hp.OnValueChanged += (int prevValue, int newValue) => OnHpUpdate();
         maxHp.OnValueChanged += (int prevValue, int newValue) => 
         {
             if (IsServer)
@@ -40,6 +39,11 @@ public class EntityStats : NetworkBehaviour
         hpBar.value = hp.Value;
 
         attackPoint.position = new(attackPoint.position.x, attack.Value.range);
+
+        IsAlive.OnValueChanged += (bool prev, bool alive) => 
+        { 
+            SetLive(alive);
+        };
     }
     protected virtual void RaseSetUp()
     {
@@ -56,18 +60,19 @@ public class EntityStats : NetworkBehaviour
 
             for (int i = 0; i < rase.rezistances.Count; i++)
                 rezists.Add(rase.rezistances[Enum.GetName(typeof(Damage.Type), i)]);    
+
+            IsAlive.Value = true;
         }
     }
     protected virtual void Update()
     {
 
     }
-    protected virtual void HpUpdate()
+    protected virtual void OnHpUpdate()
     {
         float value = (float)hp.Value / (float)maxHp.Value;
         hpBar.value = value;
-    }
-    // Take damage from player Run on server
+    } 
     public virtual bool TakeDamage(Damage damage)
     {
         if (IsServer)
@@ -82,15 +87,16 @@ public class EntityStats : NetworkBehaviour
         }
         return false;
     }
-    protected virtual NetworkObject[] MeleeAttack()
+    protected virtual EntityStats[] MeleeAttack()
     {
-        List<NetworkObject> netO = new();
+        List<EntityStats> targetStats = new();
         Collider2D[] targets = Physics2D.OverlapCircleAll(attackPoint.position, attack.Value.range /*, layer mask */);
         foreach (Collider2D target in targets)
-            if (target.TryGetComponent(out NetworkObject targetObj))
-                netO.Add(targetObj);
+            if (target.TryGetComponent(out EntityStats stats))
+                if (stats != this)
+                    targetStats.Add(stats);
 
-        return netO.ToArray();
+        return targetStats.ToArray();
     }
     public virtual bool AttackTrigger()
     {
@@ -100,11 +106,13 @@ public class EntityStats : NetworkBehaviour
     {
 
     }
-    protected virtual void Die()
+    protected virtual void SetLive(bool alive)
     {
-        IsAlive.Value = false;
-        hpBar.gameObject.SetActive(false);
-        Destroy(gameObject, timeToDespawn);
+        if (IsServer && alive)
+            hp.Value = maxHp.Value;
+        hpBar.gameObject.SetActive(alive);
+        // Play animation 
+        gameObject.SetActive(alive);
     }
 }
 
