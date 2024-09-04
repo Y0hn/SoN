@@ -63,8 +63,7 @@ public class PlayerStats : EntityStats
         {
             if (attack.Value.type == Attack.Type.Melee)
                 MeleeAttack();
-            else
-                Debug.Log($"Player {name} attack type {Enum.GetName(typeof(Attack.Type), attack.Value.type)} not defined");
+            //else Debug.Log($"Player {name} attack type {Enum.GetName(typeof(Attack.Type), attack.Value.type)} not defined");
 
             atTime = Time.time + 1/attack.Value.rate;
             return true;
@@ -79,7 +78,7 @@ public class PlayerStats : EntityStats
             {
                 ulong hitID = stats.GetComponent<NetworkObject>().OwnerClientId;
                 DamagePlayerServerRpc(attack.Value.damage, OwnerClientId, hitID);
-                Debug.Log($"'{name}' (ID: {OwnerClientId}) attacking player '{stats.name}' with ID: {hitID}");
+                //Debug.Log($"'{name}' (ID: {OwnerClientId}) attacking player '{stats.name}' with ID: {hitID}");
             }
         }
         return null;
@@ -118,10 +117,8 @@ public class PlayerStats : EntityStats
                     playerTarget.IsAlive.Value = false;
                     playerDealer.KilledEnemy(playerTarget);                    
                 }
-                else
-                    Debug.Log($"Player {targetId} lives");                
-            else
-                Debug.Log($"Player {targetId} already dead");
+                ///else Debug.Log($"Player {targetId} lives");                
+            //else Debug.Log($"Player {targetId} already dead");
         }
         else
         {

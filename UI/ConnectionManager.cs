@@ -55,6 +55,14 @@ public class ConnectionManager : MonoBehaviour
         relayServBtn.onClick.AddListener(() => CreateRelay("server"));
         relayJoinBtn.onClick.AddListener(() => JoinRelay(relayJoinInput.text));
     }
+    /*
+            ____         __             
+           / __ \ ___   / /____ _ __  __
+          / /_/ // _ \ / // __ `// / / /
+         / _, _//  __// // /_/ // /_/ / 
+        /_/ |_| \___//_/ \__,_/ \__, /  
+                               /____/   
+     */
     async void CreateRelay(string role = "host")
     {
         Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
@@ -100,6 +108,13 @@ public class ConnectionManager : MonoBehaviour
             }
         }
     }
+    /*
+            __     ___     _   __
+           / /    /   |   / | / /
+          / /    / /| |  /  |/ / 
+         / /___ / ___ | / /|  /  
+        /_____//_/  |_|/_/ |_/   
+    */
     void CreateLAN(string role)
     {
         //string serverIP = IPManager.GetIP(IPManager.AddressForm.IPv4);
@@ -131,6 +146,16 @@ public class ConnectionManager : MonoBehaviour
         }
     }
     
+    /*    
+         /$$   /$$ /$$$$$$
+        | $$  | $$|_  $$_/
+        | $$  | $$  | $$  
+        | $$  | $$  | $$  
+        | $$  | $$  | $$  
+        | $$  | $$  | $$  
+        |  $$$$$$/ /$$$$$$
+         \______/ |______/
+    */
     void ChangeUI(string changeTo)
     {
         switch (changeTo)

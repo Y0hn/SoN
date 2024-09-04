@@ -3,7 +3,7 @@ using Unity.Netcode.Components;
 using UnityEngine;
 
 [RequireComponent(typeof(EntityStats))]
-public class EntityControler : NetworkBehaviour
+public class EntityController : NetworkBehaviour
 {
     [SerializeField] protected Rigidbody2D rb;
     [SerializeField] protected NetworkAnimator animator;

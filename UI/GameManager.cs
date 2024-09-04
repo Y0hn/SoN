@@ -50,6 +50,87 @@ public class GameManager : MonoBehaviour
 
         SetStartUI();
     }
+    /*    
+          _____     __   ___        _____                                 __     _                   
+          \_   \ /\ \ \ / _ \ /\ /\/__   \   ___   _ __    ___  _ __     / /___ | |  ___   ___   ___ 
+           / /\//  \/ // /_)// / \ \ / /\/  / _ \ | '_ \  / _ \| '_ \   / // __|| | / _ \ / __| / _ \
+        /\/ /_ / /\  // ___/ \ \_/ // /    | (_) || |_) ||  __/| | | | / /| (__ | || (_) |\__ \|  __/
+        \____/ \_\ \/ \/      \___/ \/      \___/ | .__/  \___||_| |_|/_/  \___||_| \___/ |___/ \___|
+                                                  |_|                                                                                                                  
+     */
+#region INPUT open/close
+    void OC_Inventory(InputAction.CallbackContext context)
+    {
+        if (!player.IsAlive.Value) return;
+        inv = !inv;
+        uiAnimator.SetBool("inv-open", inv);
+        TMP_Text tmp = inventBtn.GetComponentInChildren<TMP_Text>();
+        if (inv) tmp.text = ">";
+        else tmp.text = "<";
+    }
+    void OC_Equipment(InputAction.CallbackContext context)
+    {
+        if (!player.IsAlive.Value) return;
+        equip = !equip;
+        uiAnimator.SetBool("equ-open", equip);
+        TMP_Text tmp = equipBtn.GetComponentInChildren<TMP_Text>();
+        if (equip) tmp.text = ">";
+        else tmp.text = "<";
+    }
+    void OC_Pause(InputAction.CallbackContext context)
+    {
+        if (!player.IsAlive.Value) 
+        {
+            player.GetComponent<PlayerController>().Fire(new());
+            return;
+        }
+        //Debug.Log($"Pause {paused}");
+        paused = !paused;
+        pauseUI.SetActive(paused);
+        if (paused)
+            Time.timeScale = 0f;
+        else
+            Time.timeScale = 1f;
+    }
+#endregion
+    public Slider GetBar(string bar)
+    {
+        switch (bar)
+        {
+            case "xp":      return playerUIxpBar.GetComponent<Slider>();
+            case "hp":
+            case "health":
+            default:        return playerUIhpBar.GetComponent<Slider>();
+        }
+    }
+    public string GetPlayerName()
+    {
+        switch (Random.Range(0, 5))
+        {
+            case 0: gameTag = "Toby"; break;
+            case 1: gameTag = "Markuz"; break;
+            case 2: gameTag = "Hugo"; break;
+            case 3: gameTag = "xX_Legend_Xx"; break;
+            case 4: gameTag = "Jerry"; break;
+        }
+        return gameTag;
+    }
+    public void Copy() { GUIUtility.systemCopyBuffer = connectionManager.codeText.text; }
+    public void PlayerSpawned(PlayerStats plStats)
+    {
+        player = plStats;
+        SetPlayerUI();
+    }
+    /*    
+         /$$   /$$ /$$$$$$
+        | $$  | $$|_  $$_/
+        | $$  | $$  | $$  
+        | $$  | $$  | $$  
+        | $$  | $$  | $$  
+        | $$  | $$  | $$  
+        |  $$$$$$/ /$$$$$$
+         \______/ |______/
+    */
     void SetStartUI()
     {
         deathScreen.SetActive(false);
@@ -75,70 +156,5 @@ public class GameManager : MonoBehaviour
         equipUI.SetActive(lives);
         invUI.SetActive(lives);
         conUI.SetActive(false);
-    }
-    public void PlayerSpawned(PlayerStats plStats)
-    {
-        player = plStats;
-        SetPlayerUI();
-    }
-    void OC_Inventory(InputAction.CallbackContext context)
-    {
-        if (!player.IsAlive.Value) return;
-        inv = !inv;
-        uiAnimator.SetBool("inv-open", inv);
-        TMP_Text tmp = inventBtn.GetComponentInChildren<TMP_Text>();
-        if (inv) tmp.text = ">";
-        else tmp.text = "<";
-    }
-    void OC_Equipment(InputAction.CallbackContext context)
-    {
-        if (!player.IsAlive.Value) return;
-        equip = !equip;
-        uiAnimator.SetBool("equ-open", equip);
-        TMP_Text tmp = equipBtn.GetComponentInChildren<TMP_Text>();
-        if (equip) tmp.text = ">";
-        else tmp.text = "<";
-    }
-    void OC_Pause(InputAction.CallbackContext context)
-    {
-        if (!player.IsAlive.Value) 
-        {
-            player.GetComponent<PlayerControler>().Fire(new());
-            return;
-        }
-        //Debug.Log($"Pause {paused}");
-        paused = !paused;
-        pauseUI.SetActive(paused);
-        if (paused)
-            Time.timeScale = 0f;
-        else
-            Time.timeScale = 1f;
-    }
-
-    public Slider GetBar(string bar)
-    {
-        switch (bar)
-        {
-            case "xp":      return playerUIxpBar.GetComponent<Slider>();
-            case "hp":
-            case "health":
-            default:        return playerUIhpBar.GetComponent<Slider>();
-        }
-    }
-    public string GetPlayerName()
-    {
-        switch (Random.Range(0, 5))
-        {
-            case 0: gameTag = "Toby"; break;
-            case 1: gameTag = "Markuz"; break;
-            case 2: gameTag = "Hugo"; break;
-            case 3: gameTag = "xX_Legend_Xx"; break;
-            case 4: gameTag = "Jerry"; break;
-        }
-        return gameTag;
-    }
-    public void Copy()
-    {
-        GUIUtility.systemCopyBuffer = connectionManager.codeText.text;
     }
 }

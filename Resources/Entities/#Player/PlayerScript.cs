@@ -2,7 +2,7 @@ using UnityEngine.InputSystem;
 using Unity.Netcode;
 using UnityEngine;
 using Unity.VisualScripting;
-public class PlayerControler : EntityControler
+public class PlayerController : EntityController
 {
     /* Inhereted variables
      *
@@ -50,7 +50,7 @@ public class PlayerControler : EntityControler
     {
         if (!stats.IsAlive.Value)
         {
-            Debug.Log(name + " called RespawnServerRpc()");
+            //Debug.Log(name + " called RespawnServerRpc()");
             SetLiveServerRpc(OwnerClientId);
             return;
         }

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 
 /// </summary>
-[RequireComponent(typeof(EntityControler))]
+[RequireComponent(typeof(EntityController))]
 public class EntityStats : NetworkBehaviour
 {
     // Server Autoritative
@@ -80,7 +80,7 @@ public class EntityStats : NetworkBehaviour
             int newDamage = rezists[(int)damage.type].GetDamage(damage.amount);
             hp.Value -= newDamage;
 
-            Debug.Log($"Damage {damage.amount} from redused by Rezists to {newDamage}");
+            //Debug.Log($"Damage {damage.amount} from redused by Rezists to {newDamage}");
             
             if (hp.Value <= 0)
                 return true;
