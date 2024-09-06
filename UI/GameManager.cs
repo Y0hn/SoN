@@ -105,7 +105,8 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            nameTag.text = "Name must be longer";
+            nameTag.text = "";
+            nameTagPlaceHolder.text = "Name must be longer";
         }
     }
 #endregion
