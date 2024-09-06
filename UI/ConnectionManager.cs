@@ -28,12 +28,10 @@ public class ConnectionManager : MonoBehaviour
     [SerializeField] int maxConnections = 10;
     private RectTransform relayUI;
     private RectTransform lanUI;
-    private GameObject UIparent;
 
     async void Start()
     {
         // UI setup
-        UIparent = ConnectionPanel.parent.gameObject;
         relayUI = ConnectionPanel.GetChild(0).GetComponent<RectTransform>();
         lanUI = ConnectionPanel.GetChild(1).GetComponent<RectTransform>();
         relayUISwitch.onClick.AddListener(() => ChangeUI("relay"));
@@ -79,7 +77,6 @@ public class ConnectionManager : MonoBehaviour
         }
         else
             NetworkManager.Singleton.StartServer();
-        UIparent.SetActive(false);
     }
     async void JoinRelay(string joinCode)
     {
@@ -100,7 +97,6 @@ public class ConnectionManager : MonoBehaviour
             if (NetworkManager.Singleton.StartClient())
             {
                 codeText.text = joinCode;
-                UIparent.SetActive(false);
             }
             else
             {
@@ -130,15 +126,13 @@ public class ConnectionManager : MonoBehaviour
                 break;
         }
         codeText.text = serverIP;
-        UIparent.SetActive(false);
     }
     void JoinLAN(string serverIP)
     {
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(serverIP, 7777);
         if (NetworkManager.Singleton.StartClient())
         {
-            codeText.text = "Server IP: " + serverIP;
-            UIparent.SetActive(false);
+            codeText.text = serverIP;
         }
         else
         {

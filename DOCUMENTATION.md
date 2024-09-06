@@ -25,7 +25,7 @@ Attack:
         https://youtu.be/ktGJstDvEmU
 ```
 
-# Interesting things & Problems Down the road
+# Problems Down the road
 
 must be "(float)" couse hp & maxHp is INT so value would turn out 0
 ```

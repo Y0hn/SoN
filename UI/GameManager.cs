@@ -1,6 +1,7 @@
-using UnityEngine;
-using UnityEngine.UI;
+using AYellowpaper.SerializedCollections;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using UnityEngine;
 using TMPro;
 /// <summary>
 /// Managing Game and PLayerUI - has 'instance'
@@ -11,29 +12,36 @@ public class GameManager : MonoBehaviour
     { instance = this; }
     public static GameManager instance;
     [SerializeField] ConnectionManager connectionManager;
-    [SerializeField] GameObject mainCam;
-    [SerializeField] GameObject mainUI;
-    [SerializeField] Animator uiAnimator;
-    [SerializeField] GameObject conUI;
-    [SerializeField] GameObject pauseUI; 
-    [SerializeField] GameObject playerUI; 
-    [SerializeField] GameObject invUI;
-    [SerializeField] GameObject equipUI;
-    [SerializeField] GameObject playerUIface;
-    [SerializeField] GameObject playerUIhpBar;
-    [SerializeField] GameObject playerUIxpBar;
-    [SerializeField] GameObject deathScreen;
+
+    [SerializedDictionary("Name", "GameObject"), SerializeField]
+    protected SerializedDictionary<string, GameObject> UIs = new();
+    /*
+        {"mainCam", null},
+        {"mainUI", null},
+        {"conUI", null},
+        {"pauseUI", null},
+        {"playerUI", null},
+
+        {"invUI", null},
+        {"playerUIface", null},
+        {"playerUIhpBar", null},
+        {"playerUIxpBar", null},
+        {"deathScreen", null},
+    */
+    [SerializeField] Animator animatorGameUI;
+    [SerializeField] Animator animatorMenuUI;
     [SerializeField] Button copy;
     [SerializeField] Button inventBtn;
     [SerializeField] Button equipBtn;
     [SerializeField] InputActionReference inputUIpause;
     [SerializeField] InputActionReference inputUIinventory;
     [SerializeField] InputActionReference inputUIequipment;
-    
+    [SerializeField] InputActionReference submit;
+    [SerializeField] TMP_InputField nameTag;
+    [SerializeField] TMP_Text nameTagPlaceHolder;
     public Inventory inventory;
 
-    private bool paused = false, inv = false, equip = false;
-    private string gameTag;
+    private bool paused = false, inv = false, equip = false, inMenu = true;
     private PlayerStats player;
     void Start()
     {
@@ -45,6 +53,7 @@ public class GameManager : MonoBehaviour
         inputUIequipment.action.started += OC_Equipment;
 
         inputUIpause.action.started += OC_Pause;
+        submit.action.started += InputNameTag;
 
         copy.onClick.AddListener(Copy);
 
@@ -63,7 +72,7 @@ public class GameManager : MonoBehaviour
     {
         if (!player.IsAlive.Value) return;
         inv = !inv;
-        uiAnimator.SetBool("inv-open", inv);
+        animatorGameUI.SetBool("inv-open", inv);
         TMP_Text tmp = inventBtn.GetComponentInChildren<TMP_Text>();
         if (inv) tmp.text = ">";
         else tmp.text = "<";
@@ -72,7 +81,7 @@ public class GameManager : MonoBehaviour
     {
         if (!player.IsAlive.Value) return;
         equip = !equip;
-        uiAnimator.SetBool("equ-open", equip);
+        animatorGameUI.SetBool("equ-open", equip);
         TMP_Text tmp = equipBtn.GetComponentInChildren<TMP_Text>();
         if (equip) tmp.text = ">";
         else tmp.text = "<";
@@ -86,36 +95,35 @@ public class GameManager : MonoBehaviour
         }
         //Debug.Log($"Pause {paused}");
         paused = !paused;
-        pauseUI.SetActive(paused);
-        if (paused)
-            Time.timeScale = 0f;
+        UIs["pauseUI"].SetActive(paused);
+    }
+    void InputNameTag(InputAction.CallbackContext context)
+    {
+        if (nameTag.text.Length > 1)
+        {
+            animatorMenuUI.SetBool("next", true);
+        }
         else
-            Time.timeScale = 1f;
+        {
+            nameTag.text = "Name must be longer";
+        }
     }
 #endregion
     public Slider GetBar(string bar)
     {
         switch (bar)
         {
-            case "xp":      return playerUIxpBar.GetComponent<Slider>();
+            case "xp":      return UIs["playerUIxpBar"].GetComponent<Slider>();
             case "hp":
             case "health":
-            default:        return playerUIhpBar.GetComponent<Slider>();
+            default:        return UIs["playerUIhpBar"].GetComponent<Slider>();
         }
     }
     public string GetPlayerName()
     {
-        switch (Random.Range(0, 5))
-        {
-            case 0: gameTag = "Toby"; break;
-            case 1: gameTag = "Markuz"; break;
-            case 2: gameTag = "Hugo"; break;
-            case 3: gameTag = "xX_Legend_Xx"; break;
-            case 4: gameTag = "Jerry"; break;
-        }
-        return gameTag;
+        return nameTag.text;
     }
-    public void Copy() { GUIUtility.systemCopyBuffer = connectionManager.codeText.text; }
+    public void Copy() { GUIUtility.systemCopyBuffer = connectionManager.codeText.text; animatorGameUI.SetTrigger("copy"); }
     public void PlayerSpawned(PlayerStats plStats)
     {
         player = plStats;
@@ -133,28 +141,34 @@ public class GameManager : MonoBehaviour
     */
     void SetStartUI()
     {
-        deathScreen.SetActive(false);
-        playerUI.SetActive(false);
-        equipUI.SetActive(false);
-        pauseUI.SetActive(false);
-        invUI.SetActive(false);
-        conUI.SetActive(true);
+        UIs["deathScreen"].SetActive(false);
+        UIs["playerUI"].SetActive(false);
+        UIs["equipUI"].SetActive(false);
+        UIs["pauseUI"].SetActive(false);
+        UIs["invUI"].SetActive(false);
+
+        UIs["conUI"].SetActive(false);
+        UIs["menuUI"].SetActive(true);
     }
     public void SetPlayerUI(bool lives = true)
     {
         // Death Screen ☠︎︎
         if (!lives)
-            mainCam.transform.position = new
+            UIs["mainCam"].transform.position = new
             (
-                player.transform.position.x, player.transform.position.y, mainCam.transform.position.z
+                player.transform.position.x, player.transform.position.y, UIs["mainCam"].transform.position.z
             );
-        deathScreen.SetActive(!lives);
-        mainCam.SetActive(!lives);
+        UIs["deathScreen"].SetActive(!lives);
+        UIs["mainCam"].SetActive(!lives);
 
-        playerUI.SetActive(lives);
-        pauseUI.SetActive(false);
-        equipUI.SetActive(lives);
-        invUI.SetActive(lives);
-        conUI.SetActive(false);
+        UIs["playerUI"].SetActive(lives);
+        UIs["equipUI"].SetActive(lives);
+        UIs["invUI"].SetActive(lives);
+
+        UIs["pauseUI"].SetActive(false);
+
+        animatorMenuUI.enabled = false;
+        UIs["menuUI"].SetActive(false);
+        UIs["conUI"].SetActive(false);
     }
 }
