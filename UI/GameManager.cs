@@ -172,4 +172,12 @@ public class GameManager : MonoBehaviour
         UIs["menuUI"].SetActive(false);
         UIs["conUI"].SetActive(false);
     }
+    public void AnimateFace(float state)
+    {
+        animatorGameUI.SetFloat("state", state);
+    }
+    public void AnimateFace(string action)
+    {
+        animatorGameUI.SetTrigger(action);
+    }
 }

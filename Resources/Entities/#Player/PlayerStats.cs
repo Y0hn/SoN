@@ -43,6 +43,8 @@ public class PlayerStats : EntityStats
             xp.OnValueChanged += (int prevValue, int newValue) => OnXpUpdate();
 
             playerName.Value = GameManager.instance.GetPlayerName();
+
+            hp.OnValueChanged += (int prevValue, int newValue) => GameManager.instance.AnimateFace(HP);
         }
         nameTag.text = playerName.Value.ToString();
         GetComponent<NetworkObject>().name = nameTag.text;
@@ -94,10 +96,11 @@ public class PlayerStats : EntityStats
         
         SetLiveClientRpc(alive);
     }
-
-
-
-
+    public override bool TakeDamage(Damage damage)
+    {
+        TakenDamageClientRpc();
+        return base.TakeDamage(damage);
+    }
     /// <summary>
     /// Server does this for Player doing damage to another Player
     /// </summary>
@@ -115,7 +118,7 @@ public class PlayerStats : EntityStats
                 if (playerTarget.TakeDamage(damage))
                 {
                     playerTarget.IsAlive.Value = false;
-                    playerDealer.KilledEnemy(playerTarget);                    
+                    playerDealer.KilledEnemy(playerTarget);
                 }
                 ///else Debug.Log($"Player {targetId} lives");                
             //else Debug.Log($"Player {targetId} already dead");
@@ -130,5 +133,10 @@ public class PlayerStats : EntityStats
     {
         if (IsOwner)
             GameManager.instance.SetPlayerUI(alive);
+    }
+    [ClientRpc] protected void TakenDamageClientRpc()
+    {
+        if (IsOwner)
+            GameManager.instance.AnimateFace("got-hit");
     }
 }

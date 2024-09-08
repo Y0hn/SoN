@@ -60,6 +60,12 @@ public class PlayerController : EntityController
         else if (context.canceled)
             attacking = false;
     }
+    protected override void Attack()
+    {
+        base.Attack();
+        if (IsOwner)
+            GameManager.instance.AnimateFace("hit");
+    }
     [ServerRpc] protected void SetLiveServerRpc(ulong playerId)
     {
         NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerStats>().IsAlive.Value = true;

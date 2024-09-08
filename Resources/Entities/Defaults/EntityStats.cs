@@ -24,6 +24,7 @@ public class EntityStats : NetworkBehaviour
     [SerializeField]    protected Rase rase;
                         protected NetworkVariable<Attack> attack = new ();
                         protected const float timeToDespawn = 0f;
+                        protected float HP { get { return (float)hp.Value/(float)maxHp.Value; } }
 
     public override void OnNetworkSpawn()
     {
@@ -70,7 +71,7 @@ public class EntityStats : NetworkBehaviour
     }
     protected virtual void OnHpUpdate()
     {
-        float value = (float)hp.Value / (float)maxHp.Value;
+        float value = HP;
         hpBar.value = value;
     } 
     public virtual bool TakeDamage(Damage damage)
