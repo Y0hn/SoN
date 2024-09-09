@@ -1,8 +1,15 @@
+# LORE
+```
+https://en.wikipedia.org/wiki/List_of_Slavic_deities
+https://en.wikipedia.org/wiki/Nav_(Slavic_folklore)
+
+```
 # SOURCES
 
 ## Fonts
+```
 https://www.1001fonts.com/
-
+```
 ## Multiplayer:
 ```        
 Setup:
