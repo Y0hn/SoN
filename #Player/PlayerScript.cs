@@ -1,7 +1,6 @@
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 using UnityEngine;
-using Unity.VisualScripting;
 public class PlayerController : EntityController
 {
     /* Inhereted variables

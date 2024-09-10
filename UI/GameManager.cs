@@ -31,27 +31,18 @@ public class GameManager : MonoBehaviour
     [SerializeField] Animator animatorGameUI;
     [SerializeField] Animator animatorMenuUI;
     [SerializeField] Button copy;
-    [SerializeField] Button inventBtn;
-    [SerializeField] Button equipBtn;
     [SerializeField] InputActionReference inputUIpause;
-    [SerializeField] InputActionReference inputUIinventory;
     [SerializeField] InputActionReference inputUIequipment;
     [SerializeField] InputActionReference submit;
     [SerializeField] TMP_InputField nameTag;
     [SerializeField] TMP_Text nameTagPlaceHolder;
     public Inventory inventory;
-
-    private bool paused = false, inv = false, equip = false, inMenu = true;
+    public bool playerLives;
+    private bool paused = false, inMenu = true;
     private PlayerStats player;
     void Start()
     {
         // Events
-        inventBtn.onClick.AddListener(() => OC_Inventory(new()));
-        inputUIinventory.action.started += OC_Inventory;
-
-        equipBtn.onClick.AddListener(() => OC_Equipment(new()));
-        inputUIequipment.action.started += OC_Equipment;
-
         inputUIpause.action.started += OC_Pause;
         submit.action.started += InputNameTag;
 
@@ -68,24 +59,6 @@ public class GameManager : MonoBehaviour
                                                   |_|                                                                                                                  
      */
 #region INPUT open/close
-    void OC_Inventory(InputAction.CallbackContext context)
-    {
-        if (!player.IsAlive.Value) return;
-        inv = !inv;
-        animatorGameUI.SetBool("inv-open", inv);
-        TMP_Text tmp = inventBtn.GetComponentInChildren<TMP_Text>();
-        if (inv) tmp.text = ">";
-        else tmp.text = "<";
-    }
-    void OC_Equipment(InputAction.CallbackContext context)
-    {
-        if (!player.IsAlive.Value) return;
-        equip = !equip;
-        animatorGameUI.SetBool("equ-open", equip);
-        TMP_Text tmp = equipBtn.GetComponentInChildren<TMP_Text>();
-        if (equip) tmp.text = ">";
-        else tmp.text = "<";
-    }
     void OC_Pause(InputAction.CallbackContext context)
     {
         if (!player.IsAlive.Value) 
@@ -171,6 +144,8 @@ public class GameManager : MonoBehaviour
         animatorMenuUI.enabled = false;
         UIs["menuUI"].SetActive(false);
         UIs["conUI"].SetActive(false);
+
+        playerLives = lives;
     }
     public void AnimateFace(float state)
     {
