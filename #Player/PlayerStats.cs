@@ -23,6 +23,7 @@ public class PlayerStats : EntityStats
     Slider xpBar;
     float atTime = 0;
     int xpMax = 10, xpMin = 0;
+    protected Inventory inventory;
     protected NetworkVariable<int> xp = new(0);
     NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     public override void OnNetworkSpawn()
@@ -128,6 +129,10 @@ public class PlayerStats : EntityStats
             Debug.Log($"Player {targetId} not found");
         }
     }
+    [ClientRpc] public void AddItemClientRpc(Item item)
+    {
+        //inventory.
+    }
 
     [ClientRpc] protected void SetLiveClientRpc(bool alive)
     {
@@ -138,5 +143,10 @@ public class PlayerStats : EntityStats
     {
         if (IsOwner)
             GameManager.instance.AnimateFace("got-hit");
+    }
+    [ClientRpc] public void ItemPickUpClientRpc(Item item)
+    {
+        if (IsOwner)
+            inventory.AddItem(item);
     }
 }

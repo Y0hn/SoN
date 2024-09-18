@@ -11,10 +11,11 @@ public class EquipmentPanel : MonoBehaviour
     bool equip = false;
     void Start()
     {
-        button.onClick.AddListener(() => OC_Equipment(new()));
+        button.onClick.AddListener(OC_Equipment);
         input.action.started += OC_Equipment;        
     }
-    void OC_Equipment(InputAction.CallbackContext context)
+    void OC_Equipment(InputAction.CallbackContext context) { OC_Equipment(); }
+    void OC_Equipment()
     {
         if (!GameManager.instance.playerLives) return;
         equip = !equip;

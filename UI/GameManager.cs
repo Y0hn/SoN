@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMP_Text nameTagPlaceHolder;
     public Inventory inventory;
     public bool playerLives;
-    private bool paused = false, inMenu = true;
+    private bool paused = false;
     private PlayerStats player;
     void Start()
     {
@@ -50,15 +50,28 @@ public class GameManager : MonoBehaviour
 
         SetStartUI();
     }
-    /*    
-          _____     __   ___        _____                                 __     _                   
-          \_   \ /\ \ \ / _ \ /\ /\/__   \   ___   _ __    ___  _ __     / /___ | |  ___   ___   ___ 
-           / /\//  \/ // /_)// / \ \ / /\/  / _ \ | '_ \  / _ \| '_ \   / // __|| | / _ \ / __| / _ \
-        /\/ /_ / /\  // ___/ \ \_/ // /    | (_) || |_) ||  __/| | | | / /| (__ | || (_) |\__ \|  __/
-        \____/ \_\ \/ \/      \___/ \/      \___/ | .__/  \___||_| |_|/_/  \___||_| \___/ |___/ \___|
-                                                  |_|                                                                                                                  
-     */
+    public Slider GetBar(string bar)
+    {
+        switch (bar)
+        {
+            case "xp":      return UIs["playerUIxpBar"].GetComponent<Slider>();
+            case "hp":
+            case "health":
+            default:        return UIs["playerUIhpBar"].GetComponent<Slider>();
+        }
+    }
+    public string GetPlayerName()
+    {
+        return nameTag.text;
+    }
+    public void Copy() { GUIUtility.systemCopyBuffer = connectionManager.codeText.text; animatorGameUI.SetTrigger("copy"); }
+    public void PlayerSpawned(PlayerStats plStats)
+    {
+        player = plStats;
+        SetPlayerUI();
+    }
 #region INPUT open/close
+    /*void OC_Pause() { OC_Pause(new()); }*/
     void OC_Pause(InputAction.CallbackContext context)
     {
         if (!player.IsAlive.Value) 
@@ -83,26 +96,8 @@ public class GameManager : MonoBehaviour
         }
     }
 #endregion
-    public Slider GetBar(string bar)
-    {
-        switch (bar)
-        {
-            case "xp":      return UIs["playerUIxpBar"].GetComponent<Slider>();
-            case "hp":
-            case "health":
-            default:        return UIs["playerUIhpBar"].GetComponent<Slider>();
-        }
-    }
-    public string GetPlayerName()
-    {
-        return nameTag.text;
-    }
-    public void Copy() { GUIUtility.systemCopyBuffer = connectionManager.codeText.text; animatorGameUI.SetTrigger("copy"); }
-    public void PlayerSpawned(PlayerStats plStats)
-    {
-        player = plStats;
-        SetPlayerUI();
-    }
+    
+#region UI
     /*    
          /$$   /$$ /$$$$$$
         | $$  | $$|_  $$_/
@@ -111,7 +106,7 @@ public class GameManager : MonoBehaviour
         | $$  | $$  | $$  
         | $$  | $$  | $$  
         |  $$$$$$/ /$$$$$$
-         \______/ |______/
+        \______/  |______/
     */
     void SetStartUI()
     {
@@ -155,4 +150,5 @@ public class GameManager : MonoBehaviour
     {
         animatorGameUI.SetTrigger(action);
     }
+#endregion
 }
