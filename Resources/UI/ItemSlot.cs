@@ -6,12 +6,14 @@ public class ItemSlot : MonoBehaviour
     public bool empty = true;
     [SerializeField] Image icon;
     [SerializeField] Image background;
+    [SerializeField] Color defaultColor;
+    private Item item;
     public Item Item
     {
-        get { return Item; }
+        get { return item; }
         private set 
-        { 
-            Item = value; 
+        {
+            item = value; 
             empty = Item == null;
             if (!empty)
                 ItemUpdate(); 
@@ -19,11 +21,20 @@ public class ItemSlot : MonoBehaviour
     }
     void ItemUpdate()
     {
-        icon.sprite = Resources.Load<Sprite>(Item.iconRef);
-        icon.color = Item.color;
-        background.color = Item.rarity;
+        if (empty)
+        {
+            background.color = defaultColor;
+            icon.sprite = null;
+        }
+        else
+        {
+            icon.sprite = Resources.Load<Sprite>(Item.iconRef);
+            icon.color = Item.color;
+            background.color = Item.rarity;
+        }
+        icon.enabled = !empty;
     }
-    public void SetItem(Item item)
+    public void SetItem(Item item = null)
     {
         Item = item;
     }

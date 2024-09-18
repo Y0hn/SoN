@@ -131,7 +131,8 @@ public class PlayerStats : EntityStats
     }
     [ClientRpc] public void AddItemClientRpc(Item item)
     {
-        //inventory.
+        if (IsOwner)
+            Inventory.instance.AddItem(item);
     }
 
     [ClientRpc] protected void SetLiveClientRpc(bool alive)

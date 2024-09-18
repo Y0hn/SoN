@@ -35,7 +35,10 @@ public class PlayerController : EntityController
         if (stats.IsAlive.Value)
         {
             base.Update();
-
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                Inventory.instance.DropItem();
+            }
             moveDir = input_move.action.ReadValue<Vector2>();
         }
     }

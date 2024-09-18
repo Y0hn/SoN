@@ -1,24 +1,24 @@
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using Unity.Netcode;
 using UnityEngine;
 using System;
 using TMPro;
 public class Inventory : MonoBehaviour
 {
     public static Inventory instance;
-    [SerializeField] int size = 1;
+    [SerializeField] ushort size = 1;
     [SerializeField] TMP_Text btn;
     [SerializeField] Button button;
     [SerializeField] Transform parent;
     [SerializeField] Animator animator;
     [SerializeField] GameObject slotPreFab;
+    [SerializeField] GameObject dropPreFab;
     [SerializeField] GridLayoutGroup grid;
     [SerializeField] InputActionReference input;
     // Inventory
-    [SerializeField] List<Item> inventory;
-    List<ItemSlot> itemSlots;
+    //[SerializeField] List<Item> inventory;
+    List<ItemSlot> itemSlots = new();
     bool inv = false;
     const int pixelSize = 600;
     const int spacing = 10;
@@ -34,34 +34,25 @@ public class Inventory : MonoBehaviour
     void Awake()
     {
         if (instance == null) instance = this;
-        if (size <= 0) return;
-        
-        int kids = parent.childCount;
-
-        if      (kids > size)
-            for (int i = kids - 1; kids - size < i; i--)
-            {
-#if UNITY_EDITOR
-                DestroyImmediate(parent.GetChild(i).gameObject);
-#else
-                Destroy(parent.GetChild(i).gameObject);
-#endif
-                Item last = inventory[inventory.Count - 1];
-                if (last != null)
-                {
-                    
-                }
-                else
-                    inventory.RemoveAt(inventory.Count - 1);
-            }
-        else if (kids < size)
-            for (int i = 0; i < size - kids; i++)
-            {
-                itemSlots.Add(Instantiate(slotPreFab, parent).GetComponent<ItemSlot>());
-                inventory.Add(null);
-            }
-        else
+        if (size <= 0) 
+        {
+            gameObject.SetActive(false);
             return;
+        }
+        else if (!gameObject.activeSelf)
+        {
+            gameObject.SetActive(true);
+        }
+        
+        if (parent.childCount != itemSlots.Count) 
+        { 
+            Debug.LogWarning($"Inventory Count discrepancy {parent.childCount} Kids for {itemSlots.Count} ItemSlots");
+            FixDiscrepancy();
+        }
+
+        if (itemSlots.Count == size) return;
+
+        FixDiscrepancy();
 
         int space = pixelSize%size + spacing;
         int rows = (int)Math.Ceiling(Math.Sqrt(size));
@@ -72,6 +63,61 @@ public class Inventory : MonoBehaviour
 
         grid.cellSize = new(f,f);
         grid.spacing = new(space,space);
+    }
+    void FixDiscrepancy()
+    {
+        int kids = parent.childCount,
+            itCo = itemSlots.Count;
+
+        // viac Realnych objektov ako Virtualnych slotov
+        if      (kids > itCo)
+        {
+            for (int i = kids -1; i >= itCo; i--)
+                DestroySlot(i);
+        }
+        // viac Virtualnych slotov ako Realnych objektov
+        else if (kids < itCo)
+        {
+            for (int i = itCo -1; i >= kids; i--)
+                itemSlots.RemoveAt(i);
+        }
+        // Nastavit podla "size"
+        else
+        {
+            // Treba zmensit inventar (pripadne dropnut itemy)
+            if      (kids > size)
+            {
+                for (int i = kids - 1; size <= i; i--)
+                {
+                    if (itemSlots[i].empty)
+                    {
+                        itemSlots.RemoveAt(i);
+                    }
+                    else
+                    {
+                        itemSlots[i].Item.DropItemServerRpc();
+                        itemSlots.RemoveAt(i);
+                        // DROP item
+                    }
+                    DestroySlot(i);
+                }
+            }
+            // Treba zvacsit iventar 
+            else if (kids < size)
+                for (int i = 0; i < size - kids; i++)
+                {
+                    ItemSlot iS = Instantiate(slotPreFab, parent).GetComponent<ItemSlot>();
+                    itemSlots.Add(iS);
+                }
+        }
+    }
+    void DestroySlot(int index)
+    {
+#if UNITY_EDITOR
+        DestroyImmediate(parent.GetChild(index).gameObject);
+#else
+        Destroy(parent.GetChild(index).gameObject);
+#endif
     }
     void OC_Inventory(InputAction.CallbackContext context) { OC_Inventory(); }
     void OC_Inventory() 
@@ -84,71 +130,25 @@ public class Inventory : MonoBehaviour
     }
     public bool AddItem(Item item)
     {
-        if (inventory.Count >= size || item == null)
+        if (!itemSlots.Exists(it => it.empty) || item == null)
+        {
+            Debug.Log("Cannot pickup item " + item.name);
             return false;
+        }
+    
+        itemSlots.Find(it => it.empty).SetItem(item);
         
-        inventory.Add(item);
+        Debug.Log(item.name + " added to invetory");
         return true;
     }
-}
+    public void DropItem(Item item = null)
+    {
+        int i = itemSlots.Count - 1;
+        if (item != null)
+            i = itemSlots.FindIndex(it => it.Item == item);
 
-#region Items
-[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Item"), Serializable] public class Item : ScriptableObject, INetworkSerializable
-{
-    public new string name;
-    public string description;
-    public string iconRef;
-    public Color color;
-    public Color rarity;
-    [ServerRpc] public virtual void DropItemServerRpc()
-    {
-        // Server do this
-        // Swawn of ItemDrop
-        GameObject drop = Instantiate(Resources.Load<GameObject>("Items"));
-        drop.GetComponent<ItemDrop>().Item = this;
-        
-        Debug.Log("Item Droped");
-    }
-
-    public virtual void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref name);
-        serializer.SerializeValue(ref color);
-        serializer.SerializeValue(ref iconRef);
-        serializer.SerializeValue(ref description);
+        item = itemSlots[i].Item;
+        Instantiate(dropPreFab).GetComponent<ItemDrop>().Item = item;
+        itemSlots[i].SetItem();
     }
 }
-[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Equipment"), Serializable] public class Equipment : Item
-{
-    public Rezistance rezistance;
-    public Slot slot;
-    public enum Slot
-    {
-        Head, Torso, Hands, Legs,
-        Body
-    }
-    public override void NetworkSerialize<T>(BufferSerializer<T> serializer)
-    {
-        base.NetworkSerialize(serializer);
-        serializer.SerializeValue(ref rezistance);
-        serializer.SerializeValue(ref slot);
-    }
-}
-[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Weapon"), Serializable] public class Weapon : Item
-{
-    public Attack attack;
-    public override void NetworkSerialize<T>(BufferSerializer<T> serializer)
-    {
-        base.NetworkSerialize(serializer);
-        serializer.SerializeValue(ref attack);
-    }
-}
-[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Money"), Serializable] public class Coin : Item
-{
-    public int amount;
-    public override void NetworkSerialize<T>(BufferSerializer<T> serializer)
-    {
-        serializer.SerializeValue(ref amount);
-    }
-}
-#endregion

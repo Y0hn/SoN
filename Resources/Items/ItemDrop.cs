@@ -5,7 +5,7 @@ public class ItemDrop : NetworkBehaviour
 {
     [SerializeField] SpriteRenderer texture;
     [SerializeField] CircleCollider2D colli;
-    private Item item;
+    [SerializeField] Item item;
     private const string defaultTexturePath = "Items/textures/";
     public Item Item
     {
@@ -25,6 +25,11 @@ public class ItemDrop : NetworkBehaviour
             // if class Sprite had implemented 'IEnumerable<Customer>'
             // sprites.Where(s => s.name == item.iconRef);
         }
+    }
+    void Start()
+    {
+        if (item == null) return;
+        Item = item;
     }
     void OnCollisionEnter2D(Collision2D collision)
     {

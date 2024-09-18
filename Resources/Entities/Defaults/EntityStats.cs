@@ -8,7 +8,7 @@ using System.Collections.Generic;
 /// 
 /// </summary>
 [RequireComponent(typeof(EntityController))]
-public class EntityStats : NetworkBehaviour
+public abstract class EntityStats : NetworkBehaviour
 {
     // Server Autoritative
     [SerializeField]    protected TMP_Text nameTag;
