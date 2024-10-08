@@ -16,12 +16,9 @@ public class Inventory : MonoBehaviour
     [SerializeField] GameObject dropPreFab;
     [SerializeField] GridLayoutGroup grid;
     [SerializeField] InputActionReference input;
-    // Inventory
-    //[SerializeField] List<Item> inventory;
+    [SerializeField] Vector2 pixelSize = new(1200, 500);
     List<ItemSlot> itemSlots = new();
     bool inv = false;
-    const int pixelSize = 600;
-    const int spacing = 10;
     void Start()
     {
         button.onClick.AddListener(OC_Inventory);
@@ -33,36 +30,55 @@ public class Inventory : MonoBehaviour
     }
     void Awake()
     {
-        if (instance == null) instance = this;
+        if (instance == null) 
+            instance = this;
+        Sizing();
+    }
+    void Sizing()
+    {
+        if (size <= 0) return;
+
+        /*
+        RectTransform rs = parent.GetComponent<RectTransform>();
+        Vector2 pixelSize = new (
+            (rs.anchorMax.x - rs.anchorMin.x)*Screen.width  - (grid.padding.right + grid.padding.left),
+            (rs.anchorMax.y - rs.anchorMin.y)*Screen.height - (grid.padding.top + grid.padding.bottom)
+             600, 1200
+        );
+        */
+        Vector2 spacing = grid.spacing;
         if (size <= 0) 
         {
             gameObject.SetActive(false);
             return;
         }
         else if (!gameObject.activeSelf)
-        {
             gameObject.SetActive(true);
-        }
         
-        if (parent.childCount != itemSlots.Count) 
-        { 
-            Debug.LogWarning($"Inventory Count discrepancy {parent.childCount} Kids for {itemSlots.Count} ItemSlots");
+        if (parent.childCount != itemSlots.Count)
             FixDiscrepancy();
-        }
-
-        if (itemSlots.Count == size) return;
+        if (itemSlots.Count == size)
+            return;
 
         FixDiscrepancy();
 
-        int space = pixelSize%size + spacing;
-        int rows = (int)Math.Ceiling(Math.Sqrt(size));
-
-        space /= rows;
+        int rows = Mathf.CeilToInt((float)Math.Sqrt(size * pixelSize.x/pixelSize.y)),
+            //cols = (byte)Mathf.Floor(cols-spacing.x/pixelSize.x*cols);
+            cols = (int)Mathf.Ceil(((float)size/(float)rows));
+        //Debug.Log($"Mathf.CeilToInt({size}/{rows}) = {cols}");
+        //space /= rows;
         
-        float f = pixelSize / rows - space;
+        float cell = Mathf.Sqrt((float)(pixelSize.x*pixelSize.y) / (float)(cols*rows)) - spacing.x;
 
-        grid.cellSize = new(f,f);
-        grid.spacing = new(space,space);
+        //float cell = pixelSize.y/(float)rows - spacing.y;
+        //Debug.Log($"Mathf.Sqrt({pixelSize.x} * {pixelSize.y} / ({cols}*{rows})) - {spacing.x} = {cell}");
+
+        MakeItFit(pixelSize, new(rows, cols), ref cell, spacing.x);
+
+        grid.cellSize = new(cell,cell);
+        //grid.spacing = new(spacing,spacing);
+
+        //Debug.Log($"Pixel size {cell} => [r:{rows},c:{cols}]");
     }
     void FixDiscrepancy()
     {
@@ -111,6 +127,17 @@ public class Inventory : MonoBehaviour
                 }
         }
     }
+    bool Fits(Vector2 size, Vector2 grid, float cell)
+    {
+        return !(size.x < grid.x * cell || grid.y * cell > size.y);
+    }
+    void MakeItFit(Vector2 size, Vector2 grid, ref float cell, float spase)
+    {
+        for (int i=1; i < size.x && !Fits(size, grid, cell + spase); i++)
+        {
+            cell -= i;
+        }
+    }
     void DestroySlot(int index)
     {
 #if UNITY_EDITOR
@@ -127,6 +154,11 @@ public class Inventory : MonoBehaviour
         animator.SetBool("open", inv);
         if (inv) btn.text = "<";
         else btn.text = ">";
+    }
+    public void SetSize(ushort newSize)
+    {
+        size = newSize;
+        Sizing();
     }
     public bool AddItem(Item item)
     {

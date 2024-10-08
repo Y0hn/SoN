@@ -23,8 +23,10 @@ public abstract class EntityStats : NetworkBehaviour
                         public NetworkVariable<bool> IsAlive = new(true);
     [SerializeField]    protected Rase rase;
                         protected NetworkVariable<Attack> attack = new ();
+    [SerializeField]    protected NetworkVariable<Weapon> weapon = new ();
                         protected const float timeToDespawn = 0f;
                         protected float HP { get { return (float)hp.Value/(float)maxHp.Value; } }
+                        protected SpriteRenderer weaponR, weaponL;
 
     public override void OnNetworkSpawn()
     {
@@ -44,6 +46,13 @@ public abstract class EntityStats : NetworkBehaviour
         IsAlive.OnValueChanged += (bool prev, bool alive) => 
         { 
             SetLive(alive);
+        };
+        weapon.OnValueChanged += (Weapon p, Weapon n) =>
+        {
+            Sprite s = Resources.Load<Sprite>(n.spriteRef);
+
+            weaponL.sprite = s;
+            weaponR.sprite = s;
         };
     }
     protected virtual void RaseSetUp()
@@ -115,6 +124,21 @@ public abstract class EntityStats : NetworkBehaviour
         // Play animation 
         gameObject.SetActive(alive);
     }
+    [ServerRpc] public virtual void SetWeaponServerRpc(Weapon newWeapon, bool unequip = false)
+    {
+        if (!IsServer) return;
+        if (unequip)
+        {
+            attack.Value = rase.attack;
+            weaponL.enabled = false;
+            weaponR.enabled = false;
+        }
+        else
+        {
+            attack.Value = newWeapon.attack;
+            weapon.Value = newWeapon;
+        }
+    }
 }
 
 [Serializable] public struct Rezistance : INetworkSerializable, IEquatable<Rezistance>
@@ -162,7 +186,7 @@ public abstract class EntityStats : NetworkBehaviour
     }
     public enum Type
     {
-        Melee, Ranged //, Magic
+        RaseUnnarmed, MeleeSlash//, MeleeStab, Melee, RangeBow
     }
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {

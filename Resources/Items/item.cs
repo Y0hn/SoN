@@ -3,7 +3,7 @@ using UnityEngine;
 using System;
 [CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Item"), Serializable] public class Item : ScriptableObject, INetworkSerializable
 {
-    public new string name;
+    public new string name = "null";
     public string description;
     public string iconRef = "Items/textures";
     public Color color = Color.white;
@@ -17,7 +17,6 @@ using System;
         
         Debug.Log("Item Droped");
     }
-
     public virtual void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref name);

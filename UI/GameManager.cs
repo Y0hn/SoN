@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
         {"playerUIhpBar", null},
         {"playerUIxpBar", null},
         {"deathScreen", null},
+        {"chatUI", null}
     */
     [SerializeField] Animator animatorGameUI;
     [SerializeField] Animator animatorMenuUI;
@@ -37,6 +38,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMP_InputField nameTag;
     [SerializeField] TMP_Text nameTagPlaceHolder;
     public Inventory inventory;
+    public string PlayerName { get { return nameTag.text.Trim(); } }
     public bool playerLives;
     private bool paused = false;
     private PlayerStats player;
@@ -59,10 +61,6 @@ public class GameManager : MonoBehaviour
             case "health":
             default:        return UIs["playerUIhpBar"].GetComponent<Slider>();
         }
-    }
-    public string GetPlayerName()
-    {
-        return nameTag.text;
     }
     public void Copy() { GUIUtility.systemCopyBuffer = connectionManager.codeText.text; animatorGameUI.SetTrigger("copy"); }
     public void PlayerSpawned(PlayerStats plStats)
@@ -112,9 +110,11 @@ public class GameManager : MonoBehaviour
     {
         UIs["deathScreen"].SetActive(false);
         UIs["playerUI"].SetActive(false);
-        UIs["equipUI"].SetActive(false);
+        //UIs["equipUI"].SetActive(false);
         UIs["pauseUI"].SetActive(false);
         UIs["invUI"].SetActive(false);
+
+        UIs["chatUI"].SetActive(false);
 
         UIs["conUI"].SetActive(false);
         UIs["menuUI"].SetActive(true);
@@ -131,10 +131,11 @@ public class GameManager : MonoBehaviour
         UIs["mainCam"].SetActive(!lives);
 
         UIs["playerUI"].SetActive(lives);
-        UIs["equipUI"].SetActive(lives);
+        //UIs["equipUI"].SetActive(lives);
         UIs["invUI"].SetActive(lives);
-
+        
         UIs["pauseUI"].SetActive(false);
+        UIs["chatUI"].SetActive(true);
 
         animatorMenuUI.enabled = false;
         UIs["menuUI"].SetActive(false);

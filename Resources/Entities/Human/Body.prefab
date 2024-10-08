@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 0.72, g: 0.6964706, b: 0.6964706, a: 1}
-  colorRef: {fileID: 3055387255578970318}
+  colorRef: {fileID: 0}
 --- !u!1 &415318275009737411
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,7 +337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e6541b4dfe906c4f95849ed1c49ebe3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  reference: {fileID: 3055387255578970318}
+  reference: {fileID: 0}
 --- !u!1 &1898017242153089443
 GameObject:
   m_ObjectHideFlags: 0
@@ -674,7 +674,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 0.85, g: 0.85, b: 0.85, a: 1}
-  colorRef: {fileID: 3055387255578970318}
+  colorRef: {fileID: 0}
 --- !u!1 &5317267985979567024
 GameObject:
   m_ObjectHideFlags: 0
@@ -862,8 +862,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5096983289356245501}
   - component: {fileID: 3055387255578970318}
-  - component: {fileID: 4359731347248158787}
-  - component: {fileID: 4763165031852222397}
   m_Layer: 6
   m_Name: Body
   m_TagString: Untagged
@@ -903,42 +901,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 0.7529412, g: 0.6627451, b: 0.5019608, a: 1}
---- !u!95 &4359731347248158787
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6246367011003989463}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 22100000, guid: 52a8eb3fda8d2024fa1926c2ba6097ae, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
---- !u!114 &4763165031852222397
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6246367011003989463}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7755370d06776b42bd3f85ea43566fe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TransitionStateInfoList: []
-  m_Animator: {fileID: 4359731347248158787}
 --- !u!1 &6598011010636216353
 GameObject:
   m_ObjectHideFlags: 0

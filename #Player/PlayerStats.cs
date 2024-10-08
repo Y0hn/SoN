@@ -43,7 +43,7 @@ public class PlayerStats : EntityStats
 
             xp.OnValueChanged += (int prevValue, int newValue) => OnXpUpdate();
 
-            playerName.Value = GameManager.instance.GetPlayerName();
+            playerName.Value = GameManager.instance.PlayerName;
 
             hp.OnValueChanged += (int prevValue, int newValue) => GameManager.instance.AnimateFace(HP);
         }
@@ -64,7 +64,7 @@ public class PlayerStats : EntityStats
     {
         if (Time.time >= atTime)
         {
-            if (attack.Value.type == Attack.Type.Melee)
+            if (attack.Value.type == Attack.Type.MeleeSlash)
                 MeleeAttack();
             //else Debug.Log($"Player {name} attack type {Enum.GetName(typeof(Attack.Type), attack.Value.type)} not defined");
 
