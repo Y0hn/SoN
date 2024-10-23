@@ -13,9 +13,14 @@ source: wiki
 ```
 # SOURCES
 
-## Fonts
+## Text Grafics
+Fonts
 ```
 https://www.1001fonts.com/
+```
+Curveature:
+```
+https://github.com/TonyViT/CurvedTextMeshPro
 ```
 ## Multiplayer:
 ```        
@@ -46,7 +51,7 @@ Attack:
         https://youtu.be/ktGJstDvEmU
 ```
 
-# Problems Down the road
+# Problems encountred down the road
 
 ## Problems with C#
 must be "(float)" couse hp & maxHp is INT so value would turn out 0
@@ -102,4 +107,3 @@ does not work for other Players trough Net
 reverted back to having 'Animator' at Player (Entiry) gameobject instead of Player.Body
 ```
 !!! IDEA SCRAPED !!!
-

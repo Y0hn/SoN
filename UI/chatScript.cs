@@ -11,20 +11,32 @@ public class ChatBehavior : NetworkBehaviour
     [SerializeField] TMP_InputField input;
     [SerializeField] InputActionReference send;
     private static event Action<string> OnMessage;
+    private bool selected;
     void Start()
     {
-        OnMessage += HandleNewMessage;
-        send.action.started += Send;
-    }
-    void Update()
-    {
+        selected = false;
+        input.text = "";
+        text.text = "";
 
+        OnMessage += HandleNewMessage;
+
+        send.action.started += Send;
+        
+        input.onSelect.AddListener(Selector);
+        input.onDeselect.AddListener(DeSelector);
+        input.onValueChanged.AddListener(TextUpdate);
+    }
+    void Selector   (string arg = "")    { selected = true;  }
+    void DeSelector (string arg = "")    { selected = false; }
+    void TextUpdate (string arg = "")
+    {
+        
     }
     void HandleNewMessage(string message)
     {
-        text.text += "\n" + message;
+        text.text += message;
     }
-    public void Send(InputAction.CallbackContext context)
+    public void Send(InputAction.CallbackContext context = new())
     {
         if (string.IsNullOrWhiteSpace(input.text))
             return;
