@@ -116,7 +116,7 @@ public class GameManager : MonoBehaviour
 
         UIs["chatUI"].SetActive(false);
 
-        UIs["conUI"].SetActive(false);
+        //UIs["conUI"].SetActive(false);
         UIs["menuUI"].SetActive(true);
     }
     public void SetPlayerUI(bool lives = true)
@@ -139,7 +139,7 @@ public class GameManager : MonoBehaviour
 
         animatorMenuUI.enabled = false;
         UIs["menuUI"].SetActive(false);
-        UIs["conUI"].SetActive(false);
+        //UIs["conUI"].SetActive(false);
 
         playerLives = lives;
     }
