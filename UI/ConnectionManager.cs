@@ -7,6 +7,7 @@ using Unity.Services.Authentication;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
+using UnityEditor.PackageManager;
 public class ConnectionManager : MonoBehaviour
 {
     public static ConnectionManager instance;
@@ -34,41 +35,30 @@ public class ConnectionManager : MonoBehaviour
         /_/ |_| \___//_/ \__,_/ \__, /  
                                /____/   
      */
-    async void CreateRelay(string role = "host")
+    async void CreateRelay(bool host = true)
     {
         Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
         string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-        codeText.text = joinCode;
 
         var relayServerData = new RelayServerData(allocation, "dtls");
 
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
         
-        if (role == "host")
-        {
+        if (host)
             NetworkManager.Singleton.StartHost();
-        }
         else
             NetworkManager.Singleton.StartServer();
+
+        codeText.text = joinCode;        
     }
     async void JoinRelay(string joinCode)
     {
-        if (joinCode != "")
-        {
-            try 
-            {
-                var JoinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
-                var relayServerData = new RelayServerData(JoinAllocation, "dtls");
-                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
-            }
-            catch
-            {
-                //relayJoinInput.text = "Incorrect Code";
-                return;
-            }
-            if (NetworkManager.Singleton.StartClient())
-                codeText.text = joinCode;
-        }
+        var JoinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+        var relayServerData = new RelayServerData(JoinAllocation, "dtls");
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+
+        if (NetworkManager.Singleton.StartClient())
+            codeText.text = joinCode;
     }
     /*
             __     ___     _   __
@@ -77,20 +67,17 @@ public class ConnectionManager : MonoBehaviour
          / /___ / ___ | / /|  /  
         /_____//_/  |_|/_/ |_/   
     */
-    void CreateLAN(string role)
+    void CreateLAN(bool host = true)
     {
         //string serverIP = IPManager.GetIP(IPManager.AddressForm.IPv4);
         string serverIP = "127.0.0.1";
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(serverIP, 7777);
-        switch (role)
-        {
-            case "server": 
-                NetworkManager.Singleton.StartServer(); 
-                break;
-            case "host":  
-                NetworkManager.Singleton.StartHost(); 
-                break;
-        }
+
+        if (host)
+            NetworkManager.Singleton.StartHost(); 
+        else
+            NetworkManager.Singleton.StartServer();
+
         codeText.text = serverIP;
     }
     void JoinLAN(string serverIP)
@@ -98,5 +85,48 @@ public class ConnectionManager : MonoBehaviour
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(serverIP, 7777);
         if (NetworkManager.Singleton.StartClient())
             codeText.text = serverIP;
+    }
+    public bool StartConnection(bool online)
+    {
+        bool start = true;
+
+        if (online)
+            CreateRelay();
+        else
+            CreateLAN();
+
+        return start;
+    }
+    public bool JoinConnection(string connection, out string errorCode)
+    {
+        bool join = true;
+        errorCode = "expresion";
+
+        try
+        {
+            // LAN CONNNECTION
+            if (connection.Contains("."))
+            {
+                errorCode = "ip address";
+                JoinLAN(connection);
+            }
+            // RELAY CONNECTION
+            else // if (connection.Lenght == 6)
+            {
+                errorCode = "code";
+                JoinRelay(connection);
+            }/*
+            else 
+            {
+                errorCode += " in worng format";
+            }*/
+        }
+        catch
+        {
+            errorCode += " is invalid";
+            join = false;
+        }
+
+        return join;
     }
 }

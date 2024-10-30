@@ -17,8 +17,7 @@ public class GameManager : MonoBehaviour
     protected SerializedDictionary<string, GameObject> UIs = new();
     /*
         {"mainCam", null},
-        {"mainUI", null},
-        {"conUI", null},
+        {"gameUI", null},
         {"pauseUI", null},
         {"playerUI", null},
 
@@ -110,13 +109,12 @@ public class GameManager : MonoBehaviour
     {
         UIs["deathScreen"].SetActive(false);
         UIs["playerUI"].SetActive(false);
-        //UIs["equipUI"].SetActive(false);
+
         UIs["pauseUI"].SetActive(false);
         UIs["invUI"].SetActive(false);
 
         UIs["chatUI"].SetActive(false);
 
-        //UIs["conUI"].SetActive(false);
         UIs["menuUI"].SetActive(true);
     }
     public void SetPlayerUI(bool lives = true)
@@ -139,7 +137,7 @@ public class GameManager : MonoBehaviour
 
         animatorMenuUI.enabled = false;
         UIs["menuUI"].SetActive(false);
-        //UIs["conUI"].SetActive(false);
+        UIs["gameUI"].SetActive(true);
 
         playerLives = lives;
     }
