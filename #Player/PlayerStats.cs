@@ -2,7 +2,6 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
 public class PlayerStats : EntityStats
 {
     /*  Inhereted Variables

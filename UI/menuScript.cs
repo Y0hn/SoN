@@ -11,60 +11,60 @@ public class menuScript : MonoBehaviour
     [SerializedDictionary("Name", "Button"), SerializeField]
     protected SerializedDictionary<string, Button> buttons = new();
     /* OBSAH
-        {"exit",        #EDITOR_SETTED_VALUE },
-        {"solo",        #EDITOR_SETTED_VALUE },
-        {"multi",        #EDITOR_SETTED_VALUE },
-        {"sett",        #EDITOR_SETTED_VALUE },
+        {"exit",            - },
+        {"solo",            - },
+        {"multi",           - },
+        {"sett",            - },
 
-        {"soloCont",    #EDITOR_SETTED_VALUE },
-        {"soloLoad",    #EDITOR_SETTED_VALUE },
-        {"soloCrea",    #EDITOR_SETTED_VALUE },
+        {"soloCont",        - },
+        {"soloLoad",        - },
+        {"soloCrea",        - },
 
-        {"multiJoin",    #EDITOR_SETTED_VALUE },
-        {"multiLoad",    #EDITOR_SETTED_VALUE },
-        {"multiCreate",    #EDITOR_SETTED_VALUE },
-        {"multiStart",    #EDITOR_SETTED_VALUE },
+        {"multiJoin",       - },
+        {"multiLoad",       - },
+        {"multiCreate",     - },
+        {"multiStart",      - },
 
-        {"joinMultiJoin",  #EDITOR_SETTED_VALUE }
+        {"joinMultiJoin",   - }
     */
     
     [SerializedDictionary("Name", "InputField"), SerializeField]
     protected SerializedDictionary<string, TMP_InputField> inputFields = new();
      /* OBSAH
-        {"playerName",  #EDITOR_SETTED_VALUE },
-        {"ipCode",  #EDITOR_SETTED_VALUE },
+        {"playerName",  - },
+        {"ipCode",      - }
     */
     
     [SerializedDictionary("Name", "TextField"), SerializeField]
     protected SerializedDictionary<string, TMP_Text> textFields = new();
     /* OBSAH
-        {"mSolo",               #EDITOR_SETTED_VALUE },
-        {"sTitle",              #EDITOR_SETTED_VALUE },
-        {"sContinue",           #EDITOR_SETTED_VALUE },
-        {"sLoad",               #EDITOR_SETTED_VALUE }, 
-        {"sCreate",             #EDITOR_SETTED_VALUE }, 
+        {"mSolo",               - },
+        {"sTitle",              - },
+        {"sContinue",           - },
+        {"sLoad",               - }, 
+        {"sCreate",             - }, 
 
-        {"mMulti",              #EDITOR_SETTED_VALUE }, 
-        {"muTitle",             #EDITOR_SETTED_VALUE }, 
-        {"muPlayerNameTitle",   #EDITOR_SETTED_VALUE },
-        {"muPlayerNamePlace",   #EDITOR_SETTED_VALUE },
-        {"UserNameError",       #EDITOR_SETTED_VALUE },
-        {"muCreate",            #EDITOR_SETTED_VALUE }, 
-        {"muJoin",              #EDITOR_SETTED_VALUE },
+        {"mMulti",              - }, 
+        {"muTitle",             - }, 
+        {"muPlayerNameTitle",   - },
+        {"muPlayerNamePlace",   - },
+        {"UserNameError",       - },
+        {"muCreate",            - }, 
+        {"muJoin",              - },
 
-        {"joTitle",             #EDITOR_SETTED_VALUE }, 
-        {"joServerTitle",       #EDITOR_SETTED_VALUE }
-        {"joServerPlace",       #EDITOR_SETTED_VALUE },
-        {"IPCodeError",         #EDITOR_SETTED_VALUE }, 
-        {"joJoin",              #EDITOR_SETTED_VALUE }, 
+        {"joTitle",             - }, 
+        {"joServerTitle",       - }
+        {"joServerPlace",       - },
+        {"IPCodeError",         - }, 
+        {"joJoin",              - }, 
 
-        {"mSett",               #EDITOR_SETTED_VALUE },
-        {"setTitle",            #EDITOR_SETTED_VALUE }, 
+        {"mSett",               - },
+        {"setTitle",            - }, 
 
-        {"Exit",                #EDITOR_SETTED_VALUE },
+        {"Exit",                - },
 
-        {"VERSION",             #EDITOR_SETTED_VALUE },
-        {"COMPANY",             #EDITOR_SETTED_VALUE }
+        {"VERSION",             - },
+        {"COMPANY",             - }
     */
     
     void Start()

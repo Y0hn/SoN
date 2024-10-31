@@ -1,57 +1,79 @@
-using UnityEngine.InputSystem;
-using UnityEngine;
 using Unity.Netcode;
+using UnityEngine;
 using System;
 using TMPro;
+using UnityEngine.InputSystem;
 
 public class ChatBehavior : NetworkBehaviour
 {
-    [SerializeField] ColorChainReference refer;
-    [SerializeField] TMP_Text text;
+    [SerializeField] InputActionReference inputUIchat;
+    [SerializeField] InputActionReference inputUIsend;
+    [SerializeField] RectTransform chatBox;
     [SerializeField] TMP_InputField input;
-    [SerializeField] InputActionReference send;
-    private static event Action<string> OnMessage;
-    private bool selected;
-    void Start()
+    [SerializeField] TMP_Text text;
+    
+    private float receiveTimer;
+    private const float receiveShow = 5.0f;
+    
+    public override void OnNetworkSpawn()
     {
-        selected = false;
+        inputUIchat.action.started += OpenChat;
+        inputUIsend.action.started += SendMess;
+        chatBox.gameObject.SetActive(false);
+        input.gameObject.SetActive(false);
+
         input.text = "";
         text.text = "";
 
         OnMessage += HandleNewMessage;
-
-        send.action.started += Send;
-        
-        input.onSelect.AddListener(Selector);
-        input.onDeselect.AddListener(DeSelector);
-        input.onValueChanged.AddListener(TextUpdate);
+        /*GetChatRecordServerRpc(out string record);
+        text.text = record;*/
     }
-    void Selector   (string arg = "")    { selected = true;  }
-    void DeSelector (string arg = "")    { selected = false; }
-    void TextUpdate (string arg = "")
+    void Update()
     {
-        
+        if (receiveTimer != 0 && Time.time > receiveTimer)
+        {
+            receiveTimer = 0;
+            chatBox.gameObject.SetActive(false);
+        }
     }
+
+
+    void OpenChat(InputAction.CallbackContext context)
+    {
+        GameManager.instance.chatting = true;
+        input.gameObject.SetActive(true);
+        input.Select();
+        input.ActivateInputField();
+    }
+    void SendMess(InputAction.CallbackContext context)
+    {
+        GameManager.instance.chatting = false;
+        input.gameObject.SetActive(false);        
+        if (input.text.Trim() == "") return;
+        SendMsgRpc(GameManager.instance.PlayerName, input.text);
+        input.text = "";
+        Debug.Log("Message send");
+    }
+
+    // EVENTs
+    private static event Action<string> OnMessage;
     void HandleNewMessage(string message)
     {
+        receiveTimer = Time.time + receiveShow;
+        chatBox.gameObject.SetActive(true);
         text.text += message;
     }
-    public void Send(InputAction.CallbackContext context = new())
+
+    // RPCs
+    [Rpc(SendTo.Server)] private void SendMsgRpc(string sender, string msg)
     {
-        if (string.IsNullOrWhiteSpace(input.text))
-            return;
-        SendMsgServerRpc(input.text);
-        input.text = string.Empty;
+        HandleMsgRpc($"[{sender}]: {msg}");
+        Debug.Log("[SERVER]: " + msg);
     }
-    [ServerRpc]
-    private void SendMsgServerRpc(string msg)
-    {
-        // validate if profanity ...
-        HandleMsgClientRpc($"[{GameManager.instance.PlayerName}]: {msg}");
-    }
-    [ClientRpc]
-    private void HandleMsgClientRpc(string msg)
+    [Rpc(SendTo.Everyone)] private void HandleMsgRpc(string msg)
     {
         OnMessage?.Invoke($"\n{msg}");
+        Debug.Log(msg);
     }
 }

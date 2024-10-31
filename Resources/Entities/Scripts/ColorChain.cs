@@ -43,6 +43,6 @@ public class ColorChain : MonoBehaviour
         {
             txt.color = color;
         }
-        Debug.Log("Setted to: " + color);
+        // Debug.Log("Setted to: " + color);
     }
 }

@@ -18,11 +18,13 @@ public class PlayerController : EntityController
     [SerializeField] InputActionReference input_look;
     [SerializeField] InputActionReference input_attack;
 
+    private GameManager game;
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
         {
-            GameManager.instance.PlayerSpawned((PlayerStats)stats);
+            game = GameManager.instance;
+            game.PlayerSpawned((PlayerStats)stats);
             input_attack.action.started += Fire;
             input_attack.action.canceled += Fire;
             cam.SetActive(true);
@@ -32,7 +34,7 @@ public class PlayerController : EntityController
     {
         if (!IsOwner) return;
 
-        if (stats.IsAlive.Value)
+        if (stats.IsAlive.Value && game.PlayerAble)
         {
             base.Update();
             if (Input.GetKeyDown(KeyCode.R))
@@ -41,6 +43,8 @@ public class PlayerController : EntityController
             }
             moveDir = input_move.action.ReadValue<Vector2>();
         }
+        else if (moveDir != Vector2.zero)
+            moveDir = Vector2.zero;
     }
     protected override void FixedUpdate()
     {

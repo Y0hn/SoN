@@ -638,6 +638,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Chat"",
+                    ""type"": ""Button"",
+                    ""id"": ""28d0480b-ea4d-4e78-96d6-ba2afb09bcd9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1135,6 +1144,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""action"": ""Equipment"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""85804e9d-1b7b-4cb7-a6b5-522643fcaff6"",
+                    ""path"": ""<Keyboard>/t"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Chat"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -1229,6 +1249,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
         m_UI_Inventory = m_UI.FindAction("Inventory", throwIfNotFound: true);
         m_UI_Equipment = m_UI.FindAction("Equipment", throwIfNotFound: true);
+        m_UI_Chat = m_UI.FindAction("Chat", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1427,6 +1448,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_TrackedDeviceOrientation;
     private readonly InputAction m_UI_Inventory;
     private readonly InputAction m_UI_Equipment;
+    private readonly InputAction m_UI_Chat;
     public struct UIActions
     {
         private @InputSystem_Actions m_Wrapper;
@@ -1444,6 +1466,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         public InputAction @TrackedDeviceOrientation => m_Wrapper.m_UI_TrackedDeviceOrientation;
         public InputAction @Inventory => m_Wrapper.m_UI_Inventory;
         public InputAction @Equipment => m_Wrapper.m_UI_Equipment;
+        public InputAction @Chat => m_Wrapper.m_UI_Chat;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1492,6 +1515,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Equipment.started += instance.OnEquipment;
             @Equipment.performed += instance.OnEquipment;
             @Equipment.canceled += instance.OnEquipment;
+            @Chat.started += instance.OnChat;
+            @Chat.performed += instance.OnChat;
+            @Chat.canceled += instance.OnChat;
         }
 
         private void UnregisterCallbacks(IUIActions instance)
@@ -1535,6 +1561,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Equipment.started -= instance.OnEquipment;
             @Equipment.performed -= instance.OnEquipment;
             @Equipment.canceled -= instance.OnEquipment;
+            @Chat.started -= instance.OnChat;
+            @Chat.performed -= instance.OnChat;
+            @Chat.canceled -= instance.OnChat;
         }
 
         public void RemoveCallbacks(IUIActions instance)
@@ -1625,5 +1654,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
         void OnInventory(InputAction.CallbackContext context);
         void OnEquipment(InputAction.CallbackContext context);
+        void OnChat(InputAction.CallbackContext context);
     }
 }
