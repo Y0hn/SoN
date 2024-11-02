@@ -39,9 +39,9 @@ public class GameManager : MonoBehaviour
     public Inventory inventory;
     public string PlayerName    { get { return inputFields["name"].text.Trim(); } }
     public bool playerLives;
-    public bool PlayerAble      { get { return !(paused || chatting); } }
+    public bool PlayerAble      { get { return !(paused || chatting || inventory.open); } }
     private bool paused;
-    public bool chatting        { get; set; }
+    private bool chatting;
     private PlayerStats player;
     
     void Start()
@@ -59,7 +59,21 @@ public class GameManager : MonoBehaviour
     }
     void OC_Pause(InputAction.CallbackContext context)
     {
-        if (player.IsAlive.Value) 
+        if (PlayerAble)
+        {
+            paused = !paused;
+            UIs["pauseUI"].SetActive(paused);
+        }
+        else if (chatting)
+        {
+            chatting = false;
+            UIs["chatUI"].SetActive(chatting);
+        }
+        else if (inventory.open)
+        {
+            inventory.OC_Inventory();
+        }
+        else if (player.IsAlive.Value && paused) 
         {
             paused = !paused;
             UIs["pauseUI"].SetActive(paused);
@@ -69,10 +83,13 @@ public class GameManager : MonoBehaviour
     }
     void OpenChat(InputAction.CallbackContext context)
     {
-        chatting = true;
-        UIs["chatUI"].SetActive(true);
-        inputFields["chat"].Select();
-        inputFields["chat"].ActivateInputField();
+        if (PlayerAble)
+        {
+            chatting = true;
+            UIs["chatUI"].SetActive(chatting);
+            inputFields["chat"].Select();
+            inputFields["chat"].ActivateInputField();
+        }
     }
     void SendMess(InputAction.CallbackContext context)
     {

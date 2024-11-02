@@ -18,11 +18,12 @@ public class Inventory : MonoBehaviour
     [SerializeField] InputActionReference input;
     [SerializeField] Vector2 pixelSize = new(1200, 500);
     List<ItemSlot> itemSlots = new();
-    bool inv = false;
+    public bool open { get; private set; }
     void Start()
     {
         button.onClick.AddListener(OC_Inventory);
         input.action.started += OC_Inventory;
+        open = false;
     }
     void OnDrawGizmos()
     {
@@ -147,13 +148,16 @@ public class Inventory : MonoBehaviour
 #endif
     }
     void OC_Inventory(InputAction.CallbackContext context) { OC_Inventory(); }
-    void OC_Inventory() 
+    public void OC_Inventory() 
     {
-        if (!GameManager.instance.playerLives) return;
-        inv = !inv;
-        animator.SetBool("open", inv);
-        if (inv) btn.text = "<";
-        else btn.text = ">";
+        if (GameManager.instance.PlayerAble || open)
+        {
+            if (!GameManager.instance.playerLives) return;
+            open = !open;
+            animator.SetBool("open", open);
+            if (open) btn.text = "<";
+            else btn.text = ">";
+        }
     }
     public void SetSize(ushort newSize)
     {
