@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 public class PlayerStats : EntityStats
 {
     /*  Inhereted Variables
@@ -18,7 +19,10 @@ public class PlayerStats : EntityStats
      * protected const float timeToDespawn = 0f;
      *
      */
-
+    [SerializeField] GameObject chatField;
+    [SerializeField] TMP_Text chatBox;
+    float chatTimer; const float chatTime = 5.0f;
+    
     Slider xpBar;
     float atTime = 0;
     int xpMax = 10, xpMin = 0;
@@ -46,8 +50,21 @@ public class PlayerStats : EntityStats
 
             hp.OnValueChanged += (int prevValue, int newValue) => GameManager.instance.AnimateFace(HP);
         }
+        chatTimer = 0;
+        chatBox.text = "";
+        chatField.SetActive(false);
         nameTag.text = playerName.Value.ToString();
         GetComponent<NetworkObject>().name = nameTag.text;
+    }
+    protected override void Update()
+    {
+        if (chatTimer != 0)
+            if (chatTimer <= Time.time)
+            {
+                chatField.SetActive(false);
+                chatBox.text = "";
+                chatTimer = 0;
+            }
     }
     protected void OnXpUpdate()
     {
@@ -148,5 +165,19 @@ public class PlayerStats : EntityStats
     {
         if (IsOwner)
             inventory.AddItem(item);
+    }
+    [ServerRpc] public void SendMessageServerRpc(string message)
+    {
+        SendMessageClientRpc(message);
+    }
+    [ClientRpc] protected void SendMessageClientRpc(string message)
+    {
+        SpeakText(message);
+    }
+    void SpeakText(string text)
+    {
+        chatBox.text = text;
+        chatField.SetActive(true);
+        chatTimer = Time.time + chatTime;
     }
 }

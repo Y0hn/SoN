@@ -7,7 +7,6 @@ using Unity.Services.Authentication;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
-using UnityEditor.PackageManager;
 public class ConnectionManager : MonoBehaviour
 {
     public static ConnectionManager instance;

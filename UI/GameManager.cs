@@ -31,11 +31,13 @@ public class GameManager : MonoBehaviour
     [SerializedDictionary("Name", "input"), SerializeField]
     private SerializedDictionary<string, InputActionReference> inputs = new();
 
+    [SerializedDictionary("Name", "inputField"), SerializeField]
+    private SerializedDictionary<string, TMP_InputField> inputFields = new();
+
     [SerializeField] Animator animatorGameUI;
-    [SerializeField] TMP_InputField nameTag;
     [SerializeField] Button copy;
     public Inventory inventory;
-    public string PlayerName    { get { return nameTag.text.Trim(); } }
+    public string PlayerName    { get { return inputFields["name"].text.Trim(); } }
     public bool playerLives;
     public bool PlayerAble      { get { return !(paused || chatting); } }
     private bool paused;
@@ -50,7 +52,8 @@ public class GameManager : MonoBehaviour
     void SubscribeInput()
     {
         inputs["pause"].action.started += OC_Pause;
-        //inputs["chat"].action.started += OC_Chat;
+        inputs["chat"].action.started += OpenChat;
+        inputs["submit"].action.started += SendMess;
 
         copy.onClick.AddListener(Copy);
     }
@@ -63,6 +66,25 @@ public class GameManager : MonoBehaviour
         }
         else
             player.GetComponent<PlayerController>().Fire(new());
+    }
+    void OpenChat(InputAction.CallbackContext context)
+    {
+        chatting = true;
+        UIs["chatUI"].SetActive(true);
+        inputFields["chat"].Select();
+        inputFields["chat"].ActivateInputField();
+    }
+    void SendMess(InputAction.CallbackContext context)
+    {
+        if (chatting)
+        {
+            chatting = false;
+            UIs["chatUI"].SetActive(chatting);
+            string mess = inputFields["chat"].text.Trim()/*.Substring(0, 64)*/;
+            if (inputFields["chat"].text.Trim() == "") return;
+            player.SendMessageServerRpc(mess);
+            inputFields["chat"].text = "";
+        }
     }
 
     public Slider GetBar(string bar)
@@ -113,7 +135,7 @@ public class GameManager : MonoBehaviour
         
         UIs["pauseUI"].SetActive(false);
         paused = false;
-        UIs["chatUI"].SetActive(true);
+        UIs["chatUI"].SetActive(false);
         chatting = false;
 
         UIs["menuUI"].SetActive(false);
