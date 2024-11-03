@@ -164,4 +164,9 @@ public class GameManager : MonoBehaviour
     public void Copy() { GUIUtility.systemCopyBuffer = connectionManager.codeText.text; animatorGameUI.SetTrigger("copy"); }
     public void AnimateFace(float state)    { animatorGameUI.SetFloat("state", state);  }
     public void AnimateFace(string action)  { animatorGameUI.SetTrigger(action);        }
+
+    public void EquipmentChange(Equipment equipment, bool equip = true)
+    {
+        
+    }
 }

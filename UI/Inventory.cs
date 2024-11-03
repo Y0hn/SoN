@@ -7,27 +7,40 @@ using TMPro;
 public class Inventory : MonoBehaviour
 {
     public static Inventory instance;
-    [SerializeField] ushort size = 1;
+    public ushort Size 
+    { 
+        get { return size; } 
+        set { size = value; onSizeChange.Invoke(); } 
+    }
+    [SerializeField] private ushort size = 1;
     [SerializeField] TMP_Text btn;
     [SerializeField] Button button;
     [SerializeField] Transform parent;
     [SerializeField] Animator animator;
     [SerializeField] GameObject slotPreFab;
     [SerializeField] GameObject dropPreFab;
-    [SerializeField] GridLayoutGroup grid;
+    [SerializeField] GridLayoutGroup inventoryGrid;
     [SerializeField] InputActionReference input;
     [SerializeField] Vector2 pixelSize = new(1200, 500);
+    [SerializeField] bool onGizmos = true;
     List<ItemSlot> itemSlots = new();
+    List<EquipmentSlot> equipSlots = new();
     public bool open { get; private set; }
+    private event Action onSizeChange;
+    private GameManager game;
     void Start()
     {
         button.onClick.AddListener(OC_Inventory);
         input.action.started += OC_Inventory;
+        game = GameManager.instance;
         open = false;
+
+        onSizeChange += Sizing;
     }
     void OnDrawGizmos()
     {
-        Awake();
+        if (onGizmos)
+            Awake();
     }
     void Awake()
     {
@@ -47,7 +60,7 @@ public class Inventory : MonoBehaviour
              600, 1200
         );
         */
-        Vector2 spacing = grid.spacing;
+        Vector2 spacing = inventoryGrid.spacing;
         if (size <= 0) 
         {
             gameObject.SetActive(false);
@@ -76,7 +89,7 @@ public class Inventory : MonoBehaviour
 
         MakeItFit(pixelSize, new(rows, cols), ref cell, spacing.x);
 
-        grid.cellSize = new(cell,cell);
+        inventoryGrid.cellSize = new(cell,cell);
         //grid.spacing = new(spacing,spacing);
 
         //Debug.Log($"Pixel size {cell} => [r:{rows},c:{cols}]");
@@ -125,6 +138,7 @@ public class Inventory : MonoBehaviour
                 {
                     ItemSlot iS = Instantiate(slotPreFab, parent).GetComponent<ItemSlot>();
                     itemSlots.Add(iS);
+                    iS.name = iS.name.Split('(')[0];
                 }
         }
     }
@@ -172,19 +186,35 @@ public class Inventory : MonoBehaviour
             return false;
         }
     
-        itemSlots.Find(it => it.empty).SetItem(item);
+        itemSlots.Find(it => it.empty).Item = item;
         
         Debug.Log(item.name + " added to invetory");
         return true;
     }
     public void DropItem(Item item = null)
     {
-        int i = itemSlots.Count - 1;
-        if (item != null)
-            i = itemSlots.FindIndex(it => it.Item == item);
+        if (itemSlots.Count > 0)
+        {
+            int i = itemSlots.Count - 1;
+            if (item != null)
+                i = itemSlots.FindIndex(it => it.Item == item);
 
-        item = itemSlots[i].Item;
-        Instantiate(dropPreFab).GetComponent<ItemDrop>().Item = item;
-        itemSlots[i].SetItem();
+            item = itemSlots[i].Item;
+            if (item != null)
+            {
+                Instantiate(dropPreFab).GetComponent<ItemDrop>().Item = item;
+                itemSlots[i].Item = null;
+            }
+        }
+    }
+    public void Equip(Equipment equipment)  
+    { 
+        equipSlots.Find(it => it.slot == equipment.slot).Item = equipment;
+        // GIVE STATS to local Player
+    }
+    public void Unequip(Equipment equipment)    
+    { 
+        equipSlots.Find(it => it.slot == equipment.slot).Item = null;
+        // TAKE STATS from local Player
     }
 }

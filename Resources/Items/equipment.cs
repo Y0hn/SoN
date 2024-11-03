@@ -15,4 +15,12 @@ using System;[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Equipm
         serializer.SerializeValue(ref rezistance);
         serializer.SerializeValue(ref slot);
     }
+    public override void Use()
+    {
+        Inventory.instance.Equip(this);
+    }
+    public virtual void Unequip()
+    {
+        Inventory.instance.Unequip(this);
+    }
 }

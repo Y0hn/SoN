@@ -25,4 +25,8 @@ using System;
         serializer.SerializeValue(ref iconRef);
         serializer.SerializeValue(ref description);
     }
+    public virtual void Use()
+    {
+        // usage of Item here
+    }
 }

@@ -35,6 +35,8 @@ namespace ntw.CurvedTextMeshPro
     [ExecuteInEditMode]
     public abstract class TextProOnACurve : MonoBehaviour
     {
+        [SerializeField] private bool forceUpdate = false;
+        [SerializeField] private bool forceUpdateGizmos = false;
         /// <summary>
         /// The text component of interest
         /// </summary>
@@ -63,10 +65,21 @@ namespace ntw.CurvedTextMeshPro
         }
 
         /// <summary>
+        /// OnDrawGizmos (for editor)
+        /// </summary>
+        private void OnDrawGizmos()
+        {
+            if (forceUpdateGizmos)
+                OnEnable();
+        }
+
+        /// <summary>
         /// Update
         /// </summary>
         protected void Update()
         {
+            if (forceUpdate)
+                OnEnable();
             //if the text and the parameters are the same of the old frame, don't waste time in re-computing everything
             if (!m_forceUpdate && !m_TextComponent.havePropertiesChanged && !ParametersHaveChanged())
             {

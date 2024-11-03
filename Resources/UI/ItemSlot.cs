@@ -4,38 +4,37 @@ using UnityEngine;
 public class ItemSlot : MonoBehaviour
 {
     public bool empty = true;
-    [SerializeField] Image icon;
-    [SerializeField] Image background;
-    [SerializeField] Color defaultColor;
+    [SerializeField] protected Image icon;
+    [SerializeField] protected Button button;
+    [SerializeField] protected Image background;
+    [SerializeField] protected Color defaultColor;
     private Item item;
     public Item Item
     {
         get { return item; }
-        private set 
+        set 
         {
             item = value; 
             empty = Item == null;
-            if (!empty)
-                ItemUpdate(); 
+            ItemUpdate();
         }
     }
-    void ItemUpdate()
+    protected virtual void ItemUpdate()
     {
         if (empty)
         {
+            button.onClick.RemoveAllListeners();
             background.color = defaultColor;
             icon.sprite = null;
         }
         else
         {
             icon.sprite = Resources.Load<Sprite>(Item.iconRef);
-            icon.color = Item.color;
+            button.onClick.AddListener(Item.Use);
             background.color = Item.rarity;
+            icon.color = Item.color;
         }
+        button.interactable = !empty;
         icon.enabled = !empty;
-    }
-    public void SetItem(Item item = null)
-    {
-        Item = item;
     }
 }
