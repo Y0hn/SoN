@@ -30,7 +30,7 @@ public class ItemSlot : MonoBehaviour
         else
         {
             icon.sprite = Resources.Load<Sprite>(Item.iconRef);
-            button.onClick.AddListener(Item.Use);
+            button.onClick.AddListener( delegate { Item.Use(this); });
             background.color = Item.rarity;
             icon.color = Item.color;
         }

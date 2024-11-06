@@ -137,20 +137,48 @@ public class PlayerStats : EntityStats
                     playerTarget.IsAlive.Value = false;
                     playerDealer.KilledEnemy(playerTarget);
                 }
-                ///else Debug.Log($"Player {targetId} lives");                
-            //else Debug.Log($"Player {targetId} already dead");
         }
         else
         {
-            Debug.Log($"Player {targetId} not found");
+            Debug.LogWarning($"Player {targetId} not found");
         }
     }
-    [ClientRpc] public void AddItemClientRpc(Item item)
+    [Rpc(SendTo.SpecifiedInParams)] public void PickUpItemRpc(string refItem, RpcParams rpcParams)
     {
-        if (IsOwner)
-            Inventory.instance.AddItem(item);
+        Item item = Item.GetItem(refItem);
+        Inventory.instance.AddItem(item);
     }
-
+    [ServerRpc] public void ChangeEquipmentServerRpc(string refEquip, bool equip)
+    {
+        Item stuff = Item.GetItem(refEquip);
+        if      (stuff is Weapon)
+        {
+            Weapon w = (Weapon)stuff;
+            if (equip)
+            {
+                attack.Value = w.attack;
+                weapRef.Value = w.spriteRef;
+            }
+            else
+            {
+                attack.Value = rase.attack;
+                weapRef.Value = "";
+            }
+        }
+        else if (stuff is Armor)
+        {
+            Armor a = (Armor)stuff;
+            if (equip)
+            {
+                rezists.Add(a.rezistance);
+            }
+            else
+            {
+                rezists.RemoveAt(rezists.IndexOf(a.rezistance));
+            }
+        }
+        //Debug.Log("Player stats changed becouse of equipment change");
+    }
     [ClientRpc] protected void SetLiveClientRpc(bool alive)
     {
         if (IsOwner)
@@ -160,11 +188,6 @@ public class PlayerStats : EntityStats
     {
         if (IsOwner)
             GameManager.instance.AnimateFace("got-hit");
-    }
-    [ClientRpc] public void ItemPickUpClientRpc(Item item)
-    {
-        if (IsOwner)
-            inventory.AddItem(item);
     }
     [ServerRpc] public void SendMessageServerRpc(string message)
     {

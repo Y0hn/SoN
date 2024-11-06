@@ -1,32 +1,33 @@
-using Unity.Netcode;
 using UnityEngine;
 using System;
-[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Item"), Serializable] public class Item : ScriptableObject, INetworkSerializable
+[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Item"), Serializable] 
+public abstract class Item : ScriptableObject, IEquatable<Item>
 {
-    public new string name = "null";
+    public string title = "null";
     public string description;
     public string iconRef = "Items/textures";
     public Color color = Color.white;
     public Color rarity = Color.white;
-    [ServerRpc] public virtual void DropItemServerRpc()
+    public static Item GetItem (string referency)
     {
-        // Server do this
-        // Swawn of ItemDrop
-        GameObject drop = Instantiate(Resources.Load<GameObject>("Items"));
-        drop.GetComponent<ItemDrop>().Item = this;
-        
-        Debug.Log("Item Droped");
+        return Resources.Load<Item>(referency);
     }
-    public virtual void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref name);
-        serializer.SerializeValue(ref color);
-        serializer.SerializeValue(ref rarity);
-        serializer.SerializeValue(ref iconRef);
-        serializer.SerializeValue(ref description);
-    }
+    public virtual string GetReferency { get { return FileManager.ITEM_DEFAULT_PATH + "/" + name; } }
     public virtual void Use()
     {
         // usage of Item here
+    }
+    public virtual void Use(ItemSlot iS)
+    {
+        // usage of Item here
+        Debug.LogWarning("This is NOT SUPOSSED TO HAPPEN !!");
+    }
+    public virtual bool Equals(Item other)
+    {
+        return 
+        name == other.name && 
+        rarity == other.rarity &&
+        iconRef == other.iconRef && 
+        description == other.description;
     }
 }

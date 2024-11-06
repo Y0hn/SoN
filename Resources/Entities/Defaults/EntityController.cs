@@ -1,17 +1,16 @@
 using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine;
-
+/// <summary>
+/// 
+/// </summary>
 [RequireComponent(typeof(EntityStats))]
 public abstract class EntityController : NetworkBehaviour
 {
-    [SerializeField] protected Rigidbody2D rb;
-    [SerializeField] protected NetworkAnimator animator;
     [SerializeField] protected EntityStats stats;
 
     protected bool attacking = false;
     protected Vector2 moveDir;
-    protected const float minC = 0.1f;
+    protected const float MIN_MOVE_TOL = 0.1f;
 
     public override void OnNetworkSpawn()
     {
@@ -29,31 +28,31 @@ public abstract class EntityController : NetworkBehaviour
     }
     protected virtual void AnimateMovement()
     {
-        if (animator == null)
+        if (stats.Animator == null)
             return;
-        if (moveDir.magnitude > minC)
+        if (moveDir.magnitude > MIN_MOVE_TOL)
         {
-            if (!animator.Animator.GetBool("move"))
-                animator.Animator.SetBool("move", true);
+            if (!stats.Animator.GetBool("move"))
+                stats.Animator.SetBool("move", true);
 
-            animator.Animator.SetFloat("horizontal", moveDir.x);
-            animator.Animator.SetFloat("vertical", moveDir.y);
+            stats.Animator.SetFloat("horizontal", moveDir.x);
+            stats.Animator.SetFloat("vertical", moveDir.y);
 
-            rb.linearVelocity = moveDir * stats.speed.Value;
+            stats.RigidBody2D.linearVelocity = moveDir * stats.speed.Value;
         }
         else
         {
-            rb.linearVelocity = Vector2.zero;
-            animator.Animator.SetBool("move", false);
+            stats.RigidBody2D.linearVelocity = Vector2.zero;
+            stats.Animator.SetBool("move", false);
         }
     }
     protected virtual void Attack()
     {
         if (stats.AttackTrigger())
         {
-            float atBlend = animator.Animator.GetFloat("atBlend") * -1;
-            animator.Animator.SetFloat("atBlend", atBlend);
-            animator.Animator.SetTrigger("attack");
+            float atBlend = stats.Animator.GetFloat("atBlend") * -1;
+            stats.Animator.SetFloat("atBlend", atBlend);
+            stats.Animator.SetTrigger("attack");
         }
     }
 }

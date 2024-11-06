@@ -43,14 +43,28 @@ public class GameManager : MonoBehaviour
     private bool paused;
     private bool chatting;
     private PlayerStats player;
-    
+    public PlayerStats LocalPlayer { get { return player; } }
     void Start()
     {
         SubscribeInput();
         SetStartUI();
     }
+    void Update()   // DEBUG
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            GameObject i = Instantiate(
+                Resources.LoadAll<GameObject>("Items/ItemDrop")[0], 
+                new Vector3(Random.Range(-11, 10), 
+                Random.Range(-11, 10), -3), 
+                Quaternion.identity);
+            i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/sword-1");
+            i.GetComponent<Unity.Netcode.NetworkObject>().Spawn();
+        }
+    }
     void SubscribeInput()
     {
+        // Stanovuje vstupy pre input system
         inputs["pause"].action.started += OC_Pause;
         inputs["chat"].action.started += OpenChat;
         inputs["submit"].action.started += SendMess;
@@ -164,9 +178,4 @@ public class GameManager : MonoBehaviour
     public void Copy() { GUIUtility.systemCopyBuffer = connectionManager.codeText.text; animatorGameUI.SetTrigger("copy"); }
     public void AnimateFace(float state)    { animatorGameUI.SetFloat("state", state);  }
     public void AnimateFace(string action)  { animatorGameUI.SetTrigger(action);        }
-
-    public void EquipmentChange(Equipment equipment, bool equip = true)
-    {
-        
-    }
 }

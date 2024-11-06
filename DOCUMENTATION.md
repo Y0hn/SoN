@@ -73,21 +73,60 @@ public void Copy()
 ```
 
 ## Problems with Multiplayer
-
-### NetworkVariables<'CustomStruck'> are pain in ass 
-```
+### NetworkVariables<'CustomStruck'> are pain 
 They have to be value data types (cannot be null)
 They have to have inplemented 'NetworkSerialize<T>(BufferSerializer<T> serializer)' serializer from 'INetworkSerializable'
 U cant have Arrays or Dictionaries only as 'NetworkList<T>' and "T" must have 'Equals(T other)' from 'IEquatable<T>'
 Perfect examle is struck 'Rezistance' in 'EntityStats'
+### Items Cannot be send trough network - Server/Clinet RPSs
+Line 446 in FastBufferReader.cs which take care of sending data between PCs (Serializer) states:
+```
+public void ReadNetworkSerializable<T>(out T value) where T : INetworkSerializable, new()
+{
+    value = new T();
+    var bufferSerializer = new BufferSerializer<BufferSerializerReader>(new BufferSerializerReader(this));
+    value.NetworkSerialize(bufferSerializer);
+}
+```
+My Item Class "tree" looks like this:
+```
+public /*abstract*/ class Item : ScriptableObject, INetworkSerializable, IEquatable<Item>
+public class Money : Item
+public class Equipment : Item
+public class Weapon : Equipment
+public class Armor : Equipment
+```
+My Rpc Looks like this:
+```
+[Rpc(SendTo.SpecifiedInParams)] public void PickUpItemRpc(Item item, RpcParams rpcParams)
+{
+    Inventory.instance.AddItem(item);
+}
+```
+so if I were to do this:
+```
+PickUpItemRpc((Item)weapon, RpcTarget.Single(id, RpcTargetUse.Temp)); 
+
+// FOR EXAMPLE: PickUpItemRpc(((Item)({Scriptable object of weapon})), RpcTarget.Single(1, RpcTargetUse.Temp));
+```
+It would not only refuse to Create "Scriptable Object" (becouse they have to be created trough "CreateInstanve()").
+It would also trow away all other atributes from inhereted classes.
+And don't even talk about "abstract class Item".
+What a joke :,) 
+
+SULLUTION:
+send only "string refItem"
+```
+pl.PickUpItemRpc(Item.GetReferency, RpcTarget.Single(id, RpcTargetUse.Temp));
+
+// FOR EXAMPLE: PickUpItemRpc("Items/weapons/sword-1", RpcTarget.Single(1, RpcTargetUse.Temp));
 ```
 
 ## Problems with Animator & Prefabs
-
 ### Animator on Entity Body
 When Destroyed animated Child 'Body' of gameobject 'Entity' (examp. Player) and subsequently replacing it with PreFab Animator is not registring new GameObjects as part of animation even if they have same names.
 
-Sullution:
+WANABEE SULLUTION:
 ```
 private RuntimeAnimatorController RNA;
 
@@ -102,7 +141,8 @@ protected virtual void AnimateMovement()
     // ...
 }
 ```
-Result:
+
+RESULT:
 ```
 does not work for other Players trough Net
 reverted back to having 'Animator' at Player (Entiry) gameobject instead of Player.Body

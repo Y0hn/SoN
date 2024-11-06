@@ -1,9 +1,11 @@
-using TMPro;
+using System.Collections.Generic;
 using System;
+using Unity.Netcode.Components;
 using Unity.Netcode;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
+using TMPro;
 /// <summary>
 /// 
 /// </summary>
@@ -12,48 +14,59 @@ public abstract class EntityStats : NetworkBehaviour
 {
     // Server Autoritative
     [SerializeField]    protected TMP_Text nameTag;
+    [SerializeField]    protected Rase rase;
+    [SerializeField]    protected Slider hpBar;
+    [SerializeField]    protected GameObject body;
+    [SerializeField]    protected NetworkObject netObject;
+    [SerializeField]    protected Transform attackPoint;
+    [SerializeField]    protected SpriteRenderer weaponR, weaponL;
+    [SerializeField]    protected NetworkAnimator animator;
+    [SerializeField]    protected Rigidbody2D rb;
     [SerializeField]    protected NetworkList<Rezistance> rezists = new();
     [SerializeField]    protected NetworkVariable<int> maxHp = new();
                         protected NetworkVariable<int> hp = new();
-    [SerializeField]    protected Slider hpBar;
                         public NetworkVariable<float> speed = new();
                         public NetworkVariable<byte> level = new();
-    [SerializeField]    protected GameObject body;
-    [SerializeField]    protected Transform attackPoint;
                         public NetworkVariable<bool> IsAlive = new(true);
-    [SerializeField]    protected Rase rase;
                         protected NetworkVariable<Attack> attack = new ();
-    [SerializeField]    protected NetworkVariable<Weapon> weapon = new ();
+                        protected NetworkVariable<FixedString128Bytes> weapRef = new();
                         protected const float timeToDespawn = 0f;
                         protected float HP { get { return (float)hp.Value/(float)maxHp.Value; } }
-                        protected SpriteRenderer weaponR, weaponL;
+
+                        public NetworkObject NetObject { get { return netObject; } }
+                        public Animator Animator { get { return animator.Animator; } }
+                        public Rigidbody2D RigidBody2D { get { return rb; } }
 
     public override void OnNetworkSpawn()
     {
         RaseSetUp();
 
-        // Health values
+        SubscribeOnNetworkValueChanged();
+
+        attackPoint.position = new(attackPoint.position.x, attack.Value.range);
+        hpBar.value = hp.Value;
+        IsAlive.OnValueChanged += (bool prev, bool alive) => SetLive(alive);
+    }
+    private void SubscribeOnNetworkValueChanged()
+    {
         hp.OnValueChanged += (int prevValue, int newValue) => OnHpUpdate();
         maxHp.OnValueChanged += (int prevValue, int newValue) => 
         {
             if (IsServer)
                 hp.Value = maxHp.Value;
-        };
-        hpBar.value = hp.Value;
-
-        attackPoint.position = new(attackPoint.position.x, attack.Value.range);
-
-        IsAlive.OnValueChanged += (bool prev, bool alive) => 
-        { 
-            SetLive(alive);
-        };
-        weapon.OnValueChanged += (Weapon p, Weapon n) =>
+        };        
+        weapRef.OnValueChanged += (FixedString128Bytes o, FixedString128Bytes s) =>
         {
-            Sprite s = Resources.Load<Sprite>(n.spriteRef);
-
-            weaponL.sprite = s;
-            weaponR.sprite = s;
+            if (s != "") 
+            {
+                Sprite texture = Resources.Load<Sprite>(s.ToString());
+                weaponL.sprite = texture;
+                weaponR.sprite = texture;
+            }
+            weaponL.enabled = s != "";
+            weaponR.enabled = s != "";
         };
+        attack.OnValueChanged += (Attack prevValue, Attack newValue) => Animator.SetFloat("weapon", (float)newValue.type);
     }
     protected virtual void RaseSetUp()
     {
@@ -124,21 +137,6 @@ public abstract class EntityStats : NetworkBehaviour
         // Play animation 
         gameObject.SetActive(alive);
     }
-    [ServerRpc] public virtual void SetWeaponServerRpc(Weapon newWeapon, bool unequip = false)
-    {
-        if (!IsServer) return;
-        if (unequip)
-        {
-            attack.Value = rase.attack;
-            weaponL.enabled = false;
-            weaponR.enabled = false;
-        }
-        else
-        {
-            attack.Value = newWeapon.attack;
-            weapon.Value = newWeapon;
-        }
-    }
 }
 
 [Serializable] public struct Rezistance : INetworkSerializable, IEquatable<Rezistance>
@@ -166,12 +164,11 @@ public abstract class EntityStats : NetworkBehaviour
     }
     public bool Equals(Rezistance other)
     {
-        //return other.rezAmount == rezAmount && other.rezTil == rezTil;
-        return false;
+        return other.rezAmount == rezAmount && other.rezTil == rezTil;
     }
 }
 
-[Serializable] public struct Attack : INetworkSerializable
+[Serializable] public struct Attack : INetworkSerializable, IEquatable<Attack>
 {
     public Damage damage;
     public float range;
@@ -188,6 +185,14 @@ public abstract class EntityStats : NetworkBehaviour
     {
         RaseUnnarmed, MeleeSlash//, MeleeStab, Melee, RangeBow
     }
+    public bool Equals (Attack other)
+    {
+        return
+        other.type.Equals(type) &&
+        other.rate.Equals(rate) &&
+        other.range.Equals(range) && 
+        other.damage.Equals(damage);
+    }
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref damage);
@@ -196,7 +201,7 @@ public abstract class EntityStats : NetworkBehaviour
     }
 }
 
-[Serializable] public struct Damage : INetworkSerializable
+[Serializable] public struct Damage : INetworkSerializable, IEquatable<Damage>
 {
     public Type type;
     public int amount;
@@ -218,5 +223,12 @@ public abstract class EntityStats : NetworkBehaviour
     {
         serializer.SerializeValue(ref type);
         serializer.SerializeValue(ref amount);
+    }
+
+    public bool Equals(Damage other)
+    {
+        return 
+        type == other.type && 
+        amount == other.amount;
     }
 }

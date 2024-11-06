@@ -1,26 +1,42 @@
-using Unity.Netcode;
 using UnityEngine;
-using System;[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Equipment"), Serializable] public class Equipment : Item
+using System;
+[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Equipment"), Serializable] 
+public class Equipment : Item
 {
-    public Rezistance rezistance;
     public Slot slot;
+    public string spriteRef;
     public enum Slot
     {
         Head, Torso, Hands, Legs,
-        Body
+        Body, 
+        WeaponL, WeaponR, 
+        WeaponBoth, NoPreference
     }
-    public override void NetworkSerialize<T>(BufferSerializer<T> serializer)
+    public override string GetReferency
     {
-        base.NetworkSerialize(serializer);
-        serializer.SerializeValue(ref rezistance);
-        serializer.SerializeValue(ref slot);
+        get { return FileManager.ITEM_DEFAULT_PATH; }
     }
-    public override void Use()
+    public override void Use(ItemSlot iS)
     {
-        Inventory.instance.Equip(this);
+        if (iS is EquipmentSlot)
+        {
+            Inventory.instance.UnEquip((EquipmentSlot)iS);
+        }
+        else
+        {
+            iS.Item = null;
+            Inventory.instance.Equip(this);
+        }
     }
-    public virtual void Unequip()
+    public override bool Equals(Item other)
     {
-        Inventory.instance.Unequip(this);
+        bool eq = false;
+        if (other is Equipment)
+        {
+            eq = base.Equals(other);
+            var e = (Equipment)other;
+            eq = slot == e.slot;
+        }
+        return eq;
     }
 }

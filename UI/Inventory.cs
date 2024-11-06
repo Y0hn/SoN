@@ -1,3 +1,4 @@
+using AYellowpaper.SerializedCollections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -12,7 +13,10 @@ public class Inventory : MonoBehaviour
         get { return size; } 
         set { size = value; onSizeChange.Invoke(); } 
     }
-    [SerializeField] private ushort size = 1;
+    public bool open { get; private set; }
+    public bool FreeSpace { get { return itemSlots.Find(iS => iS.empty == true) != null; } }
+
+    [SerializeField] ushort size = 1;
     [SerializeField] TMP_Text btn;
     [SerializeField] Button button;
     [SerializeField] Transform parent;
@@ -23,9 +27,12 @@ public class Inventory : MonoBehaviour
     [SerializeField] InputActionReference input;
     [SerializeField] Vector2 pixelSize = new(1200, 500);
     [SerializeField] bool onGizmos = true;
+    
+    // INVENTORY
     List<ItemSlot> itemSlots = new();
-    List<EquipmentSlot> equipSlots = new();
-    public bool open { get; private set; }
+    [SerializedDictionary("Slot", "SlotObject"), SerializeField]
+    SerializedDictionary<Equipment.Slot, EquipmentSlot> equipSlots = new();
+
     private event Action onSizeChange;
     private GameManager game;
     void Start()
@@ -125,7 +132,7 @@ public class Inventory : MonoBehaviour
                     }
                     else
                     {
-                        itemSlots[i].Item.DropItemServerRpc();
+                        //itemSlots[i].Item.DropItemServerRpc();
                         itemSlots.RemoveAt(i);
                         // DROP item
                     }
@@ -180,16 +187,19 @@ public class Inventory : MonoBehaviour
     }
     public bool AddItem(Item item)
     {
-        if (!itemSlots.Exists(it => it.empty) || item == null)
+        bool add = FreeSpace;
+
+        string a = item.name;
+        if (add)
         {
-            Debug.Log("Cannot pickup item " + item.name);
-            return false;
+            itemSlots.Find(it => it.empty).Item = item;
+            a += " was added to inventory";
         }
+        else
+            a += " cannot be added to inventory";
     
-        itemSlots.Find(it => it.empty).Item = item;
-        
-        Debug.Log(item.name + " added to invetory");
-        return true;
+        Debug.Log(a);
+        return add;
     }
     public void DropItem(Item item = null)
     {
@@ -207,14 +217,19 @@ public class Inventory : MonoBehaviour
             }
         }
     }
-    public void Equip(Equipment equipment)  
-    { 
-        equipSlots.Find(it => it.slot == equipment.slot).Item = equipment;
-        // GIVE STATS to local Player
+    public void Equip(Equipment equip)  
+    {
+        equipSlots[equip.slot].Item = equip;
+        game.LocalPlayer.ChangeEquipmentServerRpc(equip.GetReferency, true);
     }
-    public void Unequip(Equipment equipment)    
-    { 
-        equipSlots.Find(it => it.slot == equipment.slot).Item = null;
-        // TAKE STATS from local Player
+    public void UnEquip(EquipmentSlot equip)
+    {
+        Item eq = equip.Item;
+        if (FreeSpace)
+        {
+            equip.Item = null;
+            game.LocalPlayer.ChangeEquipmentServerRpc(eq.GetReferency, false);
+            AddItem(eq);
+        }
     }
 }

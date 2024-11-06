@@ -15,12 +15,13 @@ public class EquipmentSlot : ItemSlot
     [SerializeField] public Equipment.Slot slot;
     protected override void ItemUpdate()
     {
+        base.ItemUpdate();
         if (!empty)
         {
-            button.onClick.RemoveListener(Item.Use);
-            button.onClick.AddListener(((Equipment)Item).Unequip);
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener( delegate { Item.Use(this);});
         }
-        placeHolder.gameObject.SetActive(!empty);
+        placeHolder.gameObject.SetActive(empty);
         button.interactable = !empty;
         icon.enabled = !empty;
     }

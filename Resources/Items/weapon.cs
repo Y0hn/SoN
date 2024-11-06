@@ -1,21 +1,26 @@
-using Unity.Netcode;
 using UnityEngine;
 using System;
-[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Weapon"), Serializable] public class Weapon : Item, IEquatable<Weapon>
+[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Weapon"), Serializable] 
+public class Weapon : Equipment
 {
     public Attack attack;
-    public bool twoHanded = false;
-    public string spriteRef;
-
-    public bool Equals(Weapon other)
+    public override string GetReferency
     {
-        throw new NotImplementedException();
+        get { return FileManager.WEAPONS_DEFAULT_PATH + "/" + name; }
     }
-
-    public override void NetworkSerialize<T>(BufferSerializer<T> serializer)
+    public override void Use(ItemSlot iS)
     {
-        base.NetworkSerialize(serializer);
-        serializer.SerializeValue(ref attack);
-        serializer.SerializeValue(ref twoHanded);
+        base.Use(iS);
+    }
+    public override bool Equals(Item other)
+    {
+        bool eq = false;
+        if (other is Weapon)
+        {
+            eq = base.Equals(other);
+            var w = (Weapon)other;
+            eq &= attack.Equals(w.attack);
+        }
+        return eq;
     }
 }
