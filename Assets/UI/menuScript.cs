@@ -124,9 +124,9 @@ public class menuScript : MonoBehaviour
 
         switch (choice)
         {
-            case 1: break;  // Pokracovat v hre
+            case 1: ConnectionManager.instance.CreateSolo(); break;  // Pokracovat v hre
             case 2: break;  // Nacitat zo subora hru
-            case 3: break;  // Vytvorit novu hru
+            case 3: ConnectionManager.instance.CreateSolo(); break;  // Vytvorit novu hru
 
             default: Debug.LogWarning("Bad input [" + choice + "] on SoloNavigation!"); break;
         }

@@ -43,6 +43,18 @@ public class GameManager : MonoBehaviour
     private bool paused;
     private bool chatting;
     private PlayerStats player;
+    public Vector2 mousePos
+    { 
+        get 
+        {
+            Vector2 mouse = inputs["point"].action.ReadValue<Vector2>();
+            Vector2 v= new(Screen.width/2, Screen.height/2);
+            v= new(
+                mouse.x - v.x, 
+                mouse.y - v.y);
+            return v;
+        }
+    }
     public PlayerStats LocalPlayer { get { return player; } }
     void Start()
     {
@@ -51,7 +63,7 @@ public class GameManager : MonoBehaviour
     }
     void Update()   // DEBUG
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        /*if (Input.GetKeyDown(KeyCode.P))
         {
             GameObject i = Instantiate(
                 Resources.LoadAll<GameObject>("Items/ItemDrop")[0], 
@@ -60,7 +72,7 @@ public class GameManager : MonoBehaviour
                 Quaternion.identity);
             i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/sword-1");
             i.GetComponent<Unity.Netcode.NetworkObject>().Spawn();
-        }
+        }*/
     }
     void SubscribeInput()
     {

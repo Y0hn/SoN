@@ -12,6 +12,7 @@ public class ConnectionManager : MonoBehaviour
     public static ConnectionManager instance;
     [SerializeField] public TMP_Text codeText;
     [SerializeField] int maxConnections = 10;
+    private string serverIP { get { return IPManager.GetIP(IPManager.AddressForm.IPv4); } }
     void Awake()
     {
         if (instance == null)
@@ -68,8 +69,6 @@ public class ConnectionManager : MonoBehaviour
     */
     void CreateLAN(bool host = true)
     {
-        //string serverIP = IPManager.GetIP(IPManager.AddressForm.IPv4);
-        string serverIP = "127.0.0.1";
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(serverIP, 7777);
 
         if (host)
@@ -127,5 +126,10 @@ public class ConnectionManager : MonoBehaviour
         }
 
         return join;
+    }
+    public void CreateSolo()
+    {
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 7777);
+        NetworkManager.Singleton.StartHost(); 
     }
 }

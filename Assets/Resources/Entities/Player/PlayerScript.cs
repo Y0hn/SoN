@@ -37,10 +37,6 @@ public class PlayerController : EntityController
         if (stats.IsAlive.Value && game.PlayerAble)
         {
             base.Update();
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                Inventory.instance.DropItem();
-            }
             moveDir = input_move.action.ReadValue<Vector2>();
         }
         else if (moveDir != Vector2.zero)
@@ -60,11 +56,35 @@ public class PlayerController : EntityController
             SetLiveServerRpc(OwnerClientId);
             return;
         }
+
+        Vector2 pos = game.mousePos.normalized;
+        pos = RoundVector(pos, 1);
+        string p = "";
+        
+        if      (pos.x < 0)
+            p += "L";
+        else if (pos.x > 0)
+            p += "R";
+        if      (pos.y < 0)
+            p += "D";
+        else if (pos.y > 0)
+            p += "U";
+
+        if (p != "")
+            Debug.Log(p + "pos: " + $"[{pos.x},{pos.y}]");
             
         if      (context.started)
                 attacking = true;
         else if (context.canceled)
             attacking = false;
+    }
+    protected Vector2 RoundVector(Vector2 v, byte d = 1)
+    {
+        return new(Round(v.x,d), Round(v.y,d));
+    }
+    protected float Round(float f, byte d = 1)
+    {
+        return Mathf.Round(f*d)/(float)d;
     }
     protected override void Attack()
     {
