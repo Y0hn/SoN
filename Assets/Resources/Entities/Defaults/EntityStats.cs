@@ -6,6 +6,7 @@ using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
 /// <summary>
 /// 
 /// </summary>
@@ -100,8 +101,8 @@ public abstract class EntityStats : NetworkBehaviour
     {
         if (IsServer)
         {
-            int newDamage = rezists[(int)damage.type].GetDamage(damage.amount);
-            hp.Value -= newDamage;
+            //int newDamage = rezists[(int)damage.type].GetDamage(damage.amount);
+            //hp.Value -= newDamage;
 
             //Debug.Log($"Damage {damage.amount} from redused by Rezists to {newDamage}");
             
@@ -141,30 +142,51 @@ public abstract class EntityStats : NetworkBehaviour
 
 [Serializable] public struct Rezistance : INetworkSerializable, IEquatable<Rezistance>
 {
-    [field: SerializeField] private  int rezAmount; // Amount value     (-∞ <=> ∞)
-    // Stacks with avg
-    [field: SerializeField] private  float rezTil;  // Precentil value  (-1 <=> 1)
-    // Stacks with +
+    [field: SerializeField] public int amount;
+    // Amount value     (-∞ <=> ∞) Stacks with +
+    // Precentil value  (-1 <=> 1) Stacks with avg
+    public Damage.Type Damage   { get { return damageType; }    }
+    public Equipment.Slot Slot  { get { return slot; }          }
 
-    public Rezistance (int amount, float percetil)
+    private Equipment.Slot slot;
+    [field: SerializeField] private Damage.Type damageType;
+
+    public Rezistance (int _amount, Equipment.Slot _slot, Damage.Type _damageType)
     {
-        rezAmount = amount;
-        rezTil = percetil;            
-    }
-    public void ModRez(int amount)      { rezAmount += amount;  }
-    public void ModRez(float percetil)  { rezTil += percetil;   }
-    public int GetDamage(int damage)
-    {
-        return (int)Mathf.Round(damage * (1 - rezTil) - rezAmount);
+        damageType = _damageType;
+        amount = _amount; 
+        slot = _slot;
     }
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        serializer.SerializeValue(ref rezAmount);
-        serializer.SerializeValue(ref rezTil);
+        serializer.SerializeValue(ref damageType);
+        serializer.SerializeValue(ref amount);
+        serializer.SerializeValue(ref slot);
     }
     public bool Equals(Rezistance other)
     {
-        return other.rezAmount == rezAmount && other.rezTil == rezTil;
+        return other.amount == amount;
+    }
+    public static float CalculateDMG(List<Rezistance> rezists, Damage dmg)
+    {
+        float rez = 0f, avg = 0f;
+
+        rezists= rezists.FindAll(r => r.damageType == dmg.type);
+        // 
+        rezists.ForEach(r => rez += (r.amount > 1) ? r.amount : 0f); // pre vsetky Celkove rezisty
+
+        if (rez > dmg.amount)   // ak je damage vacsi ako velkost Celkovych rezistov
+        {
+            int count = 0;
+             rezists.ForEach(r => { // pre prercentualne rezisty
+                if (r.amount < 1) 
+                {
+                    count++; 
+                avg+=r.amount;
+                }});    
+        }
+
+        return rez;
     }
 }
 

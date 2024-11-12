@@ -1,8 +1,10 @@
+using AYellowpaper.SerializedCollections;
 using UnityEngine;
 using System;
 [CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Armor"), Serializable] 
 public class Armor : Equipment
 {
+    [SerializedDictionary("DamageType","Value")]
     public Rezistance rezistance;
     public override string GetReferency
     {
