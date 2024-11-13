@@ -3,6 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
 public class PlayerStats : EntityStats
 {
     /*  Inhereted Variables
@@ -151,9 +152,8 @@ public class PlayerStats : EntityStats
     [ServerRpc] public void ChangeEquipmentServerRpc(string refEquip, bool equip)
     {
         Item stuff = Item.GetItem(refEquip);
-        if      (stuff is Weapon)
+        if      (stuff is Weapon w)
         {
-            Weapon w = (Weapon)stuff;
             if (equip)
             {
                 attack.Value = w.attack;
@@ -165,16 +165,18 @@ public class PlayerStats : EntityStats
                 weapRef.Value = "";
             }
         }
-        else if (stuff is Armor)
+        else if (stuff is Armor a)
         {
-            Armor a = (Armor)stuff;
             if (equip)
             {
-                rezists.Add(a.rezistance);
+                foreach (KeyValuePair<Damage.Type, Rezistance> rez in a.rezists)
+                    rezists.Add(new(rez.Value.amount, a.slot, rez.Key));
             }
             else
             {
-                rezists.RemoveAt(rezists.IndexOf(a.rezistance));
+                foreach (Rezistance rez in rezists)
+                    if (rez.Slot.Equals(a.slot))
+                        rezists.Remove(rez);
             }
         }
         //Debug.Log("Player stats changed becouse of equipment change");

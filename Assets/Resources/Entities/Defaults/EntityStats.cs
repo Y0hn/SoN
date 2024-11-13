@@ -6,7 +6,6 @@ using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Linq;
 /// <summary>
 /// 
 /// </summary>
@@ -142,16 +141,16 @@ public abstract class EntityStats : NetworkBehaviour
 
 [Serializable] public struct Rezistance : INetworkSerializable, IEquatable<Rezistance>
 {
-    [field: SerializeField] public int amount;
+    [field: SerializeField] public float amount;
     // Amount value     (-∞ <=> ∞) Stacks with +
     // Precentil value  (-1 <=> 1) Stacks with avg
     public Damage.Type Damage   { get { return damageType; }    }
     public Equipment.Slot Slot  { get { return slot; }          }
 
     private Equipment.Slot slot;
-    [field: SerializeField] private Damage.Type damageType;
+    private Damage.Type damageType;
 
-    public Rezistance (int _amount, Equipment.Slot _slot, Damage.Type _damageType)
+    public Rezistance (float _amount, Equipment.Slot _slot, Damage.Type _damageType)
     {
         damageType = _damageType;
         amount = _amount; 
@@ -229,7 +228,7 @@ public abstract class EntityStats : NetworkBehaviour
         this.type = type;
         this.amount = amount;
     }
-    public enum Type
+    [Serializable] public enum Type
     {
         // STANDARD
         bludgeoning, slashing, piercing, 

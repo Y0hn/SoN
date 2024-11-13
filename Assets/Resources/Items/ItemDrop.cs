@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,6 +7,7 @@ public class ItemDrop : NetworkBehaviour
     [SerializeField] SpriteRenderer texture;
     [SerializeField] CircleCollider2D colli;
     [SerializeField] public Item item;
+    [SerializeField] bool tester = false;
     public Item Item
     {
         get { return item; }
@@ -18,27 +17,26 @@ public class ItemDrop : NetworkBehaviour
             if (item != null)
             {
                 texture.sprite = Resources.Load<Sprite>(item.iconRef);
-                /*List<Sprite> sprites = Resources.LoadAll<Sprite>(defaultTexturePath).ToList();
-                texture.sprite = sprites.Find(sprite => sprite.name == item.iconRef);*/
-                
-                // if class Sprite had implemented 'IEnumerable<Customer>'
-                /* 
-                    Sprite[] sprites = Resources.LoadAll<Sprite>(defaultTexturePath);
-                    sprites.Where(s => s.name == item.iconRef);
-
-                    There would be no need for .ToList()
-                */
+                texture.color = item.color;
             }
             else 
                 netObj.Despawn();
         }
     }
-
     public override void OnNetworkSpawn()
     {
         // inak by sa mohol znicil prilis skoro
         if (item != null)
             Item = item;    // vyzera to zaujimavo ale nastavi to iconu pre item ak nie je null
+    }
+#pragma warning disable IDE0051 // Remove unused private members
+    void OnDrawGizmos()
+    {
+        if (tester)
+        {
+            OnNetworkSpawn();
+            tester = !tester;
+        }
     }
     void OnCollisionEnter2D(Collision2D collision)
     {
@@ -57,6 +55,7 @@ public class ItemDrop : NetworkBehaviour
             Item = null;
         }
     }
+#pragma warning restore IDE0051 // Remove unused private members
     [Rpc(SendTo.Server)] public void PickedUpRpc()
     {
         Debug.Log($"Item {name} picked up");

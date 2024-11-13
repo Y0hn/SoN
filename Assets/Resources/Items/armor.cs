@@ -1,11 +1,14 @@
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
 using System;
-[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Armor"), Serializable] 
+
+[CreateAssetMenu(fileName = "NewArmor", menuName = "Inventory/Armor"), Serializable] 
 public class Armor : Equipment
 {
-    [SerializedDictionary("DamageType","Value")]
-    public Rezistance rezistance;
+
+    [SerializedDictionary("Name", "GameObject")]
+    public SerializedDictionary<Damage.Type, Rezistance> rezists = new();
+    
     public override string GetReferency
     {
         get { return FileManager.ARMORS_DEFAULT_PATH + "/" + name; }
@@ -16,12 +19,17 @@ public class Armor : Equipment
     }
     public override bool Equals(Item other)
     {
-        bool eq = false;
-        if (other is Armor)
+        bool eq = base.Equals(other);
+        try
         {
-            eq = base.Equals(other);
-            var a = (Armor)other;
-            eq &= rezistance.Equals(a.rezistance);
+            Armor a = (Armor)other;
+            eq &= other is Armor;
+            eq &= rezists.Count == a.rezists.Count;
+            foreach (Damage.Type key in rezists.Keys)
+                eq &= rezists[key].Equals(a.rezists[key]);
+        } catch (Exception e) {
+            Debug.Log("Equals error " + e.Message);
+            eq = false;
         }
         return eq;
     }
