@@ -8,6 +8,7 @@ The phrase Nawia (Polish) or Nav (used across Slavic tongues) was also utilised 
 source: wiki
 # GAME MECHANICS
 ### Inventory autosize
+
 $$
 \displaystyle
 cellSize
@@ -28,6 +29,7 @@ cellSize
 } - spacing.x
 $$
 ### Damage Calculation
+
 $$
 \displaystyle
 damageDealt = damage -
