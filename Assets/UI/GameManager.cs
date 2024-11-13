@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
     }
     void Update()   // DEBUG
     {
-        /*if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P))
         {
             GameObject i = Instantiate(
                 Resources.LoadAll<GameObject>("Items/ItemDrop")[0], 
@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
                 Quaternion.identity);
             i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/sword-1");
             i.GetComponent<Unity.Netcode.NetworkObject>().Spawn();
-        }*/
+        }
     }
     void SubscribeInput()
     {

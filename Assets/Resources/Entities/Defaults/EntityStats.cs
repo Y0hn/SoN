@@ -167,26 +167,23 @@ public abstract class EntityStats : NetworkBehaviour
     {
         return other.amount == amount;
     }
-    public static float CalculateDMG(List<Rezistance> rezists, Damage dmg)
+    public static int CalculateDMG(List<Rezistance> rezists, Damage dmg, bool clamp = true)
     {
-        float rez = 0f, avg = 0f;
+        float sum = 0f, per = 0f;
 
-        rezists= rezists.FindAll(r => r.damageType == dmg.type);
-        // 
-        rezists.ForEach(r => rez += (r.amount > 1) ? r.amount : 0f); // pre vsetky Celkove rezisty
+        rezists= rezists.FindAll(r => r.damageType == dmg.type);    // vyberie len 1 damage type
 
-        if (rez > dmg.amount)   // ak je damage vacsi ako velkost Celkovych rezistov
-        {
-            int count = 0;
-             rezists.ForEach(r => { // pre prercentualne rezisty
-                if (r.amount < 1) 
-                {
-                    count++; 
-                avg+=r.amount;
-                }});    
-        }
+        rezists.ForEach(r => sum += (r.amount > 1) ? r.amount : 0f);                    // scita Pocetny rezisty
 
-        return rez;
+        rezists.ForEach(r => per = (per < r.amount && r.amount < 1) ? r.amount: per);   // najvacsi percentualny Rezist
+        per *= dmg.amount;  // nastavi ciselnu vysku 
+
+
+        int damage = Mathf.RoundToInt(dmg.amount - (sum + per));
+        if (clamp)
+            damage = Math.Clamp(damage, 0, int.MaxValue);
+
+        return damage;
     }
 }
 

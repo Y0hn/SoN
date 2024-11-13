@@ -15,4 +15,10 @@
     </div>
 </div>
 
-![Alt text](https://github.com/Y0hn/SoN/blob/main/_attachs/Screenshot%202024-10-23%20181823.png)
+![MainMenu](./_attachs/Screenshot%202024-10-23%20181823.png)
+
+<div align="center">
+
+[Documentation](./DOCUMENTATION.md)
+
+</dev>
