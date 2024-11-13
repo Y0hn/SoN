@@ -7,12 +7,12 @@ The phrase Nawia (Polish) or Nav (used across Slavic tongues) was also utilised 
 ```
 source: wiki
 # GAME MECHANICS
+
 ### Inventory autosize
 
 $$
 \displaystyle
-cellSize
-=
+cellSize =
 \sqrt
 {
     \frac
@@ -20,14 +20,15 @@ cellSize
         \sqrt{ pixelSize.x*pixelSize.y }
     }
     {
-        \left⌈
+        \left[
             \frac{size}
             {\sqrt{size * \frac{pixelSize.x}{pixelSize.y}}}
-        \right⌉ *
+        \right] *
         \sqrt{size * \frac{pixelSize.x}{pixelSize.y}}
     }
 } - spacing.x
 $$
+
 ### Damage Calculation
 
 $$
@@ -39,6 +40,7 @@ damageDealt = damage -
     \sum_{}{amoRezists}
 \right)
 $$
+
 # SOURCES
 ## Lore:
 ```
