@@ -21,13 +21,16 @@
 </p>
 
 ### Reasons for choosing RPG genre:
-<p>
-1. <b>Personal intrests and experiences</b>: 
+<ol>
+    <li>
+    <b>Personal intrests and experiences</b>: 
     I choosed this genre for my own preference in games. I know many RPGs and I played quite few of them. I think that gives me a lot of experience with how should and shouldn't RPG look like.
-</p> <p>
-2. <b>Development advantages</b>: 
-    RPGs can contain many diffrent mechanics and features. That gives me a ton of room to expand upon. 
-</p>
+    </li> <p>
+    <li>
+    <b>Development advantages</b>: 
+    RPGs can contain many diffrent mechanics and features. That gives me a ton of room to expand upon.
+    </li>
+</ol>
 
 ### Development Enviroment:
 <p>
