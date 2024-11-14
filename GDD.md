@@ -83,7 +83,6 @@
     </li> <li>
         <b>Diffrent types of Damage</b>: every type of damage has diffrent use against an enemy - charakters and equipment have diffrent rezists agains individual types of damage
     </li> <li>
-    </li> <li>
         <b>Enemy AI</b>: Offensive / deffensive behavior.
     </li>
     <!--<b>Usage of Magic</b>: -->
