@@ -11,13 +11,13 @@
 
 ### Concept:
 &emsp;<b>Genre:</b> RPG <br>
+&emsp;<b>Target audience:</b> 15+ <br>
 &emsp;<b>Platfrom:</b> PC <br>
-<!--&emsp;<b>Target audience:</b> 12+ <br>-->
 
 ## Introduction:
 <p>
 <b>Souls of Nav</b> 
-    is an action-adventure game in world based on Slovanian Mytology. There is a war. Player take control of nameless soldier, who died during this war, after which he has regained counciusness and found himself in Nav (Slavic afterlife). After some time he reliazes there someting wrong...
+    is an action-adventure game in world based on Slavic Mytology. There is a war. Player take control of nameless soldier, who died during this war, after which he has regained counciusness and found himself in Nav (Slavic afterlife). After some time he reliazes there someting wrong...
 </p>
 
 ### Reasons for choosing RPG genre:
@@ -28,14 +28,14 @@
     </li> <p>
     <li>
     <b>Development advantages</b>: 
-    RPGs can contain many diffrent mechanics and features. That gives me a ton of room to expand upon.
+    RPGs can contain many different mechanics and features. That gives me a ton of room to expand upon.
     </li>
 </ol>
 
 ### Development Enviroment:
 <p>
 <b>Unity Engine:</b> 
-    I choosed this engine for amount of functionality that it provides for 2D and 3D development. It also uses C#, which I'm familiar with. It's well documented and supported by large community of developers. 
+    I chose this engine for the amount of functionality that it provides for 2D and 3D development. It also uses C#, which I'm familiar with. It's well documented and supported by large community of developers. 
 </p>
 
 ## Goals
@@ -69,24 +69,24 @@
 
 ## Gameplay
 <p>
-    <b>Basic priciple of the game</b>: Kill enemies, get stronger, unlock tougher regions. Cooperate with other players. Evensually get to final Boss and defeat him.
+    <b>Basic priciple of the game</b>: Kill enemies, get stronger, unlock harsher regions. Cooperate with other players. Eventually get to final Boss and defeat him.
 </p>
 
 ### Game World
 <p>
-    Nav is representation of Slavic afterlife, covered with plains of grass. On West side of Nav there is Sea of Living which seperates entrance to World. On East there is Vales's palace and plains convered with corruption. 
+    Nav is representation of Slavic afterlife, covered with plains of grass. On West side of Nav there is Sea of Living which separates entrance to Mortal Realm. On East there is Vales's palace and plains convered with corruption. 
 </p>
 
 ### Mechanics
 <ul>
     <li>
-        <b>Inventory system</b>: holds as many items as player can carry at the momment
+        <b>Inventory system</b>: holds as many items as player can carry at the moment
     </li> <li>
-        <b>Combat styles</b>: diffrent kind of weapon have diffrent usecase.
+        <b>Combat styles</b>: different kind of weapon have different usecase.
     </li> <li>
-        <b>Diffrent types of Damage</b>: every type of damage has diffrent use against an enemy - charakters and equipment have diffrent rezists agains individual types of damage
+        <b>Different types of Damage</b>: every type of damage has different use against an enemy - characters and equipment have different resistances agains individual types of damage
     </li> <li>
-        <b>Enemy AI</b>: Offensive / deffensive behavior.
+        <b>Enemy AI</b>: Offensive / defensive behavior.
     </li>
     <!--<b>Usage of Magic</b>: -->
 </ul>
