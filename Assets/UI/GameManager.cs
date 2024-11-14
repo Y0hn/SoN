@@ -25,7 +25,9 @@ public class GameManager : MonoBehaviour
         {"playerUIhpBar",   -},
         {"playerUIxpBar",   -},
         {"deathScreen",     -},
-        {"chatUI",          -}
+        {"chatUI",          -},
+
+        {"quitUI",          -}
     */
 
     [SerializedDictionary("Name", "input"), SerializeField]
@@ -61,18 +63,9 @@ public class GameManager : MonoBehaviour
         SubscribeInput();
         SetStartUI();
     }
-    void Update()   // DEBUG
+    void Update()   // Single Player DEBUG
     {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            GameObject i = Instantiate(
-                Resources.LoadAll<GameObject>("Items/ItemDrop")[0], 
-                new Vector3(Random.Range(-11, 10), 
-                Random.Range(-11, 10), -3), 
-                Quaternion.identity);
-            i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/sword-1");
-            i.GetComponent<Unity.Netcode.NetworkObject>().Spawn();
-        }
+
     }
     void SubscribeInput()
     {

@@ -41,6 +41,20 @@ public class PlayerController : EntityController
         }
         else if (moveDir != Vector2.zero)
             moveDir = Vector2.zero;
+        
+
+        if (Input.GetKeyDown(KeyCode.P))
+            DropRpc();        
+    }
+    [Rpc(SendTo.Server)] void DropRpc()
+    {
+            GameObject i = Instantiate(
+            Resources.LoadAll<GameObject>("Items/ItemDrop")[0], 
+            new Vector3(Random.Range(-11, 10), 
+            Random.Range(-11, 10), -3), 
+            Quaternion.identity);
+            i.GetComponent<NetworkObject>().Spawn();
+            i.GetComponent<ItemDrop>().SetItemRpc("Items/weapons/sword-1");
     }
     protected override void FixedUpdate()
     {
@@ -89,8 +103,8 @@ public class PlayerController : EntityController
     protected override void Attack()
     {
         base.Attack();
-        if (IsOwner)
-            GameManager.instance.AnimateFace("hit");
+        /*if (IsOwner)
+            GameManager.instance.AnimateFace("hit");*/
     }
     [ServerRpc] protected void SetLiveServerRpc(ulong playerId)
     {

@@ -81,7 +81,7 @@ public class PlayerStats : EntityStats
     {
         if (Time.time >= atTime)
         {
-            if (attack.Value.type == Attack.Type.MeleeSlash)
+            if (attack.Value.type == Attack.Type.RaseUnnarmed || Attack.Type.RaseUnnarmed == attack.Value.type)
                 MeleeAttack();
             //else Debug.Log($"Player {name} attack type {Enum.GetName(typeof(Attack.Type), attack.Value.type)} not defined");
 
@@ -156,7 +156,8 @@ public class PlayerStats : EntityStats
         {
             if (equip)
             {
-                attack.Value = w.attack;
+                // attack.Value = w.attack;
+                attack.Value = new (w.attack.damage, w.attack.range, w.attack.rate, w.attack.type);
                 weapRef.Value = w.spriteRef;
             }
             else

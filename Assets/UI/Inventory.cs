@@ -162,11 +162,7 @@ public class Inventory : MonoBehaviour
     }
     void DestroySlot(int index)
     {
-#if UNITY_EDITOR
         DestroyImmediate(parent.GetChild(index).gameObject);
-#else
-        Destroy(parent.GetChild(index).gameObject);
-#endif
     }
     void OC_Inventory(InputAction.CallbackContext context) { OC_Inventory(); }
     public void OC_Inventory() 

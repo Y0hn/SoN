@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ public class ItemDrop : NetworkBehaviour
     [SerializeField] CircleCollider2D colli;
     [SerializeField] public Item item;
     [SerializeField] bool tester = false;
+    private static Dictionary<int, ItemOnFoor> itemsOnFoor = new();
+    private int floorID;
     public Item Item
     {
         get { return item; }
@@ -20,14 +23,22 @@ public class ItemDrop : NetworkBehaviour
                 texture.color = item.color;
             }
             else 
+            {
+                if (IsServer)
+                    itemsOnFoor.Remove(floorID);
                 netObj.Despawn();
+            }
         }
     }
     public override void OnNetworkSpawn()
     {
-        // inak by sa mohol znicil prilis skoro
-        if (item != null)
-            Item = item;    // vyzera to zaujimavo ale nastavi to iconu pre item ak nie je null
+        Item = item;
+
+        if (IsServer)
+        {
+            floorID = itemsOnFoor.Count;
+            itemsOnFoor.Add(floorID, new (transform.position, item.GetReferency));
+        }
     }
 #pragma warning disable IDE0051 // Remove unused private members
     void OnDrawGizmos()
@@ -61,5 +72,20 @@ public class ItemDrop : NetworkBehaviour
         Debug.Log($"Item {name} picked up");
         Item = null;
         // nasledne sa objekt znici
+    }
+    [Rpc(SendTo.Everyone)] public void SetItemRpc(string pathReferncy)
+    {
+        Item = Item.GetItem(pathReferncy);
+    }
+
+    public class ItemOnFoor
+    {
+        public Vector2 pos;
+        public string itemRef;
+        public ItemOnFoor(Vector2 _pos, string _itemRef)
+        {
+            pos = _pos;
+            itemRef = _itemRef;
+        }
     }
 }
