@@ -77,7 +77,10 @@ public class ItemDrop : NetworkBehaviour
     {
         Item = Item.GetItem(pathReferncy);
     }
-
+    [Rpc(SendTo.SpecifiedInParams)] public void SetItemRpc(string pathReferncy, RpcParams rpcParams)
+    {
+        Item = Resources.Load<Item>(pathReferncy);
+    }
     public class ItemOnFoor
     {
         public Vector2 pos;

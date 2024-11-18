@@ -132,4 +132,17 @@ public class ConnectionManager : MonoBehaviour
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 7777);
         NetworkManager.Singleton.StartHost(); 
     }
+    private void LoadWorld(bool load = false, bool host = true)
+    {
+        World world;
+        if (host && load)
+            world = FileManager.LoadWorldData(""/*get path to world save file*/);
+        else if (host && !load)
+            world = new();
+        else // if (load)
+            world = new();
+
+        // load world
+    }
+
 }
