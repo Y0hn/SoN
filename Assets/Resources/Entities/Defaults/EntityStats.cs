@@ -6,6 +6,8 @@ using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
+using AYellowpaper.SerializedCollections;
 /// <summary>
 /// 
 /// </summary>
@@ -13,29 +15,31 @@ using TMPro;
 public abstract class EntityStats : NetworkBehaviour
 {
     // Server Autoritative
-    [SerializeField]    protected TMP_Text nameTag;
-    [SerializeField]    protected Rase rase;
-    [SerializeField]    protected Slider hpBar;
-    [SerializeField]    protected GameObject body;
-    [SerializeField]    protected NetworkObject netObject;
-    [SerializeField]    protected Transform attackPoint;
-    [SerializeField]    protected SpriteRenderer weaponR, weaponL;
-    [SerializeField]    protected NetworkAnimator animator;
-    [SerializeField]    protected Rigidbody2D rb;
-    [SerializeField]    protected NetworkList<Rezistance> rezists = new();
+    [SerializeField] protected TMP_Text nameTag;
+    [SerializeField] protected Rase rase;
+    [SerializeField] protected Slider hpBar;
+    [SerializeField] protected GameObject body;
+    [SerializeField] protected NetworkObject netObject;
+    [SerializeField] protected Transform attackPoint;
+    [SerializeField] protected SpriteRenderer weaponR, weaponL;
+    [SerializeField] protected NetworkAnimator animator;
+    [SerializeField] protected Rigidbody2D rb;
+    protected Defence defence;
+
     [SerializeField]    protected NetworkVariable<int> maxHp = new();
                         protected NetworkVariable<int> hp = new();
                         public NetworkVariable<float> speed = new();
-                        public NetworkVariable<byte> level = new();
+                        public NetworkVariable<byte> level = new(1);
                         public NetworkVariable<bool> IsAlive = new(true);
                         protected NetworkVariable<Attack> attack = new ();
                         protected NetworkVariable<FixedString128Bytes> weapRef = new();
-                        protected const float timeToDespawn = 0f;
-                        protected float HP { get { return (float)hp.Value/(float)maxHp.Value; } }
 
+                        protected const float timeToDespawn = 0f;
+                        public float HP { get { return (float)hp.Value/(float)maxHp.Value; } }
                         public NetworkObject NetObject { get { return netObject; } }
                         public Animator Animator { get { return animator.Animator; } }
                         public Rigidbody2D RigidBody2D { get { return rb; } }
+                        private bool clampedDMG = true;
 
     public override void OnNetworkSpawn()
     {
@@ -79,10 +83,10 @@ public abstract class EntityStats : NetworkBehaviour
 
             level.Value = 1;
 
-            speed.Value = rase.speed;
+            speed.Value = rase.speed;/*
 
             for (int i = 0; i < rase.rezistances.Count; i++)
-                rezists.Add(rase.rezistances[Enum.GetName(typeof(Damage.Type), i)]);    
+                protection.Add(rase.rezistances[Enum.GetName(typeof(Damage.Type), i)]);   */ 
 
             IsAlive.Value = true;
         }
@@ -98,17 +102,16 @@ public abstract class EntityStats : NetworkBehaviour
     } 
     public virtual bool TakeDamage(Damage damage)
     {
-        if (IsServer)
-        {
-            //int newDamage = rezists[(int)damage.type].GetDamage(damage.amount);
-            //hp.Value -= newDamage;
+        if (!IsServer) { Debug.Log("Called from not server "); return false; }
 
-            //Debug.Log($"Damage {damage.amount} from redused by Rezists to {newDamage}");
-            
-            if (hp.Value <= 0)
-                return true;
-        }
-        return false;
+        int newDamage = defence.CalculateDMG(damage, clampedDMG);
+        hp.Value -= newDamage;
+        Debug.Log($"Damage {damage.amount} from redused by Rezists to {newDamage}");
+        
+        if (hp.Value <= 0)
+            return true;
+        else
+            return false;
     }
     protected virtual EntityStats[] MeleeAttack()
     {
@@ -138,54 +141,50 @@ public abstract class EntityStats : NetworkBehaviour
         gameObject.SetActive(alive);
     }
 }
-
-[Serializable] public struct Rezistance : INetworkSerializable, IEquatable<Rezistance>
+[Serializable] public class Defence
 {
-    [field: SerializeField] public float amount;
-    // Amount value     (-∞ <=> ∞) Stacks with +
-    // Precentil value  (-1 <=> 1) Stacks with avg
-    public Damage.Type Damage   { get { return damageType; }    }
-    public Equipment.Slot Slot  { get { return slot; }          }
+    List<Armor> armors;
 
-    private Equipment.Slot slot;
-    private Damage.Type damageType;
-
-    public Rezistance (float _amount, Equipment.Slot _slot, Damage.Type _damageType)
-    {
-        damageType = _damageType;
-        amount = _amount; 
-        slot = _slot;
-    }
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref damageType);
-        serializer.SerializeValue(ref amount);
-        serializer.SerializeValue(ref slot);
-    }
-    public bool Equals(Rezistance other)
-    {
-        return other.amount == amount;
-    }
-    public static int CalculateDMG(List<Rezistance> rezists, Damage dmg, bool clamp = true)
+    public int CalculateDMG(Damage damage, bool clamp = true)
     {
         float sum = 0f, per = 0f;
 
-        rezists= rezists.FindAll(r => r.damageType == dmg.type);    // vyberie len 1 damage type
+        armors.ForEach(a=> a.GetElemental(damage.type).ForEach(r=>  // vyberie len 1 damage type
+        {   if (r.amount < 1)
+                per = (per < r.amount && r.amount < 1) ? r.amount: per;     // scita Pocetny rezisty
+            else
+                sum += (r.amount > 1) ? r.amount : 0f;                      // najvacsi percentualny Rezist
+        }));
+        per *= damage.amount;  // nastavi ciselnu vysku 
 
-        rezists.ForEach(r => sum += (r.amount > 1) ? r.amount : 0f);                    // scita Pocetny rezisty
 
-        rezists.ForEach(r => per = (per < r.amount && r.amount < 1) ? r.amount: per);   // najvacsi percentualny Rezist
-        per *= dmg.amount;  // nastavi ciselnu vysku 
-
-
-        int damage = Mathf.RoundToInt(dmg.amount - (sum + per));
+        int recieved = Mathf.RoundToInt(damage.amount - (sum + per));
         if (clamp)
-            damage = Math.Clamp(damage, 0, int.MaxValue);
-
-        return damage;
+            recieved = Math.Clamp(recieved, 0, int.MaxValue);
+        return recieved;
+    }
+    public bool Add(Armor a, bool over = false)
+    {
+        if (!armors.Contains(a))
+        {
+            Armor ar = armors.Find(ar=> ar.slot == a.slot);
+            if (ar != null || over)
+                armors.Remove(ar);
+            armors.Add(a);
+            return true;
+        }
+        return false;
+    }
+    public bool Remove(Armor a)
+    {
+        if (armors.Contains(a))
+        {
+            armors.Remove(a);
+            return true;
+        }
+        return false;
     }
 }
-
 [Serializable] public struct Attack : INetworkSerializable, IEquatable<Attack>
 {
     public Damage damage;

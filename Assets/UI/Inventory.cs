@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using System;
 using TMPro;
+using System.Linq;
 public class Inventory : MonoBehaviour
 {
     public static Inventory instance;
@@ -215,11 +216,15 @@ public class Inventory : MonoBehaviour
     }
     public void Equip(Equipment equip)  
     {
-        equipSlots[equip.slot].Item = equip;
-        game.LocalPlayer.ChangeEquipmentServerRpc(equip.GetReferency, true);
+        if (equipSlots.Keys.Contains(equip.slot))
+        {
+            equipSlots[equip.slot].Item = equip;
+            game.LocalPlayer.ChangeEquipmentServerRpc(equip.GetReferency, true);
+        }
     }
     public void UnEquip(EquipmentSlot equip)
     {
+        if (!equipSlots.Keys.Contains(equip.slot)) return;
         Item eq = equip.Item;
         if (FreeSpace)
         {

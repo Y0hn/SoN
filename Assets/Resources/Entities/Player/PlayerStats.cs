@@ -23,7 +23,7 @@ public class PlayerStats : EntityStats
     [SerializeField] GameObject chatField;
     [SerializeField] TMP_Text chatBox;
     float chatTimer; const float chatTime = 5.0f;
-    
+    public RpcParams OwnerRPC { get { return RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp); } }
     Slider xpBar;
     float atTime = 0;
     int xpMax = 10, xpMin = 0;
@@ -97,7 +97,7 @@ public class PlayerStats : EntityStats
             if (stats is PlayerStats)
             {
                 ulong hitID = stats.GetComponent<NetworkObject>().OwnerClientId;
-                DamagePlayerServerRpc(attack.Value.damage, OwnerClientId, hitID);
+                DamagePlayerRpc(attack.Value.damage, OwnerClientId, hitID);
                 //Debug.Log($"'{name}' (ID: {OwnerClientId}) attacking player '{stats.name}' with ID: {hitID}");
             }
         }
@@ -116,7 +116,9 @@ public class PlayerStats : EntityStats
     }
     public override bool TakeDamage(Damage damage)
     {
-        TakenDamageClientRpc();
+        if (!IsServer) { Debug.Log("Called from noooo server"); return false; }
+
+        OwnerTakenDamageRpc();
         return base.TakeDamage(damage);
     }
     /// <summary>
@@ -125,7 +127,7 @@ public class PlayerStats : EntityStats
     /// <param name="damage"></param>
     /// <param name="dealerId"></param>
     /// <param name="targetId"></param>
-    [ServerRpc] protected void DamagePlayerServerRpc(Damage damage, ulong dealerId, ulong targetId)
+    [Rpc(SendTo.Server)] protected void DamagePlayerRpc(Damage damage, ulong dealerId, ulong targetId)
     {
         PlayerStats playerTarget = NetworkManager.Singleton.ConnectedClients[targetId].PlayerObject.GetComponent<PlayerStats>();
         PlayerStats playerDealer = NetworkManager.Singleton.ConnectedClients[dealerId].PlayerObject.GetComponent<PlayerStats>();
@@ -144,6 +146,10 @@ public class PlayerStats : EntityStats
             Debug.LogWarning($"Player {targetId} not found");
         }
     }
+    [Rpc(SendTo.Owner)] protected void OwnerTakenDamageRpc()
+    {
+        GameManager.instance.AnimateFace("got-hit");
+    }
     [Rpc(SendTo.SpecifiedInParams)] public void PickUpItemRpc(string refItem, RpcParams rpcParams)
     {
         Item item = Item.GetItem(refItem);
@@ -152,6 +158,8 @@ public class PlayerStats : EntityStats
     [ServerRpc] public void ChangeEquipmentServerRpc(string refEquip, bool equip)
     {
         Item stuff = Item.GetItem(refEquip);
+        bool error = false;
+
         if      (stuff is Weapon w)
         {
             if (equip)
@@ -169,16 +177,14 @@ public class PlayerStats : EntityStats
         else if (stuff is Armor a)
         {
             if (equip)
-            {
-                foreach (KeyValuePair<Damage.Type, Rezistance> rez in a.rezists)
-                    rezists.Add(new(rez.Value.amount, a.slot, rez.Key));
-            }
+                defence.Add(a);
             else
-            {
-                foreach (Rezistance rez in rezists)
-                    if (rez.Slot.Equals(a.slot))
-                        rezists.Remove(rez);
-            }
+                defence.Remove(a);
+        }
+
+        if (error)
+        {
+            PickUpItemRpc(refEquip, OwnerRPC);
         }
         //Debug.Log("Player stats changed becouse of equipment change");
     }
@@ -187,11 +193,7 @@ public class PlayerStats : EntityStats
         if (IsOwner)
             GameManager.instance.SetPlayerUI(alive);
     }
-    [ClientRpc] protected void TakenDamageClientRpc()
-    {
-        if (IsOwner)
-            GameManager.instance.AnimateFace("got-hit");
-    }
+
     [ServerRpc] public void SendMessageServerRpc(string message)
     {
         SendMessageClientRpc(message);
