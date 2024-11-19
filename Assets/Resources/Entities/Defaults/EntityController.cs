@@ -38,7 +38,8 @@ public abstract class EntityController : NetworkBehaviour
             stats.Animator.SetFloat("horizontal", moveDir.x);
             stats.Animator.SetFloat("vertical", moveDir.y);
 
-            stats.RigidBody2D.linearVelocity = moveDir * stats.speed.Value;
+            float mod = stats.speed.Value * Time.deltaTime;
+            stats.RigidBody2D.linearVelocity = moveDir * mod;
         }
         else
         {

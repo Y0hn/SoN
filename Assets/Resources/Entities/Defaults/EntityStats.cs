@@ -250,3 +250,23 @@ public abstract class EntityStats : NetworkBehaviour
         amount == other.amount;
     }
 }
+public struct BodyEquipment
+{
+    public Dictionary<Equipment.Slot, string> references;/* = new()
+    {
+        {Equipment.Slot.WeaponL,    ""},
+        {Equipment.Slot.WeaponR,    ""},
+        {Equipment.Slot.WeaponBoth, ""},
+        //references.Add(Equipment.Slot.NoPreference,"");
+
+        {Equipment.Slot.Head,       ""},
+        {Equipment.Slot.Torso,      ""},
+        {Equipment.Slot.Body,       ""},
+        {Equipment.Slot.Legs,       ""}
+    };*/
+
+    public BodyEquipment(string s)
+    {
+        references = new();
+    }
+}
