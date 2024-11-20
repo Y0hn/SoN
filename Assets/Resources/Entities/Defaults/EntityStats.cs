@@ -24,7 +24,7 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected SpriteRenderer weaponR, weaponL;
     [SerializeField] protected NetworkAnimator animator;
     [SerializeField] protected Rigidbody2D rb;
-    protected Defence defence;
+    protected Defence defence;  // iba na servery/hoste Servery
 
     [SerializeField]    protected NetworkVariable<int> maxHp = new();
                         protected NetworkVariable<int> hp = new();
@@ -43,6 +43,7 @@ public abstract class EntityStats : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        name = name.Split('(')[0].Trim();
         RaseSetUp();
 
         SubscribeOnNetworkValueChanged();
@@ -83,10 +84,9 @@ public abstract class EntityStats : NetworkBehaviour
 
             level.Value = 1;
 
-            speed.Value = rase.speed;/*
-
-            for (int i = 0; i < rase.rezistances.Count; i++)
-                protection.Add(rase.rezistances[Enum.GetName(typeof(Damage.Type), i)]);   */ 
+            speed.Value = rase.speed;
+            
+            defence = new(rase.naturalArmor);
 
             IsAlive.Value = true;
         }
@@ -102,16 +102,17 @@ public abstract class EntityStats : NetworkBehaviour
     } 
     public virtual bool TakeDamage(Damage damage)
     {
-        if (!IsServer) { Debug.Log("Called from not server "); return false; }
+        if (!IsServer) 
+        { Debug.Log("Called from not server "); return false; }
 
         int newDamage = defence.CalculateDMG(damage, clampedDMG);
         hp.Value -= newDamage;
         Debug.Log($"Damage {damage.amount} from redused by Rezists to {newDamage}");
         
         if (hp.Value <= 0)
-            return true;
-        else
-            return false;
+            IsAlive.Value = false;
+
+        return !IsAlive.Value;
     }
     protected virtual EntityStats[] MeleeAttack()
     {
@@ -144,7 +145,15 @@ public abstract class EntityStats : NetworkBehaviour
 [Serializable] public class Defence
 {
     List<Armor> armors;
-
+    public Defence()
+    {
+        armors = new();
+    }
+    public Defence(Armor armor)
+    {
+        armors = new();
+        Add(armor);
+    }
     public int CalculateDMG(Damage damage, bool clamp = true)
     {
         float sum = 0f, per = 0f;

@@ -1,9 +1,9 @@
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
-using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine;
 using TMPro;
-using System.Collections.Generic;
 public class PlayerStats : EntityStats
 {
     /*  Inhereted Variables
@@ -54,7 +54,8 @@ public class PlayerStats : EntityStats
         chatTimer = 0;
         chatBox.text = "";
         chatField.SetActive(false);
-        nameTag.text = playerName.Value.ToString();
+        name = playerName.Value.ToString();
+        nameTag.text = name;
         GetComponent<NetworkObject>().name = nameTag.text;
     }
     protected override void Update()
@@ -81,9 +82,21 @@ public class PlayerStats : EntityStats
     {
         if (Time.time >= atTime)
         {
-            if (attack.Value.type == Attack.Type.RaseUnnarmed || Attack.Type.RaseUnnarmed == attack.Value.type)
-                MeleeAttack();
-            //else Debug.Log($"Player {name} attack type {Enum.GetName(typeof(Attack.Type), attack.Value.type)} not defined");
+            if (attack.Value.type == Attack.Type.MeleeSlash || Attack.Type.RaseUnnarmed == attack.Value.type)
+            {
+                foreach(EntityStats et in MeleeAttack())
+                {
+                    if (et is PlayerStats)
+                    {
+                        ulong hitID = et.GetComponent<NetworkObject>().OwnerClientId;
+                        DamagePlayerRpc(attack.Value.damage, OwnerClientId, hitID);
+
+                        //Debug.Log($"'{name}' (ID: {OwnerClientId}) attacking player '{stats.name}' with ID: {hitID}");
+                    }
+                }
+            }
+            else 
+                Debug.Log($"Player {name} attack type {System.Enum.GetName(typeof(Attack.Type), attack.Value.type)} not defined");
 
             atTime = Time.time + 1/attack.Value.rate;
             return true;
@@ -92,16 +105,7 @@ public class PlayerStats : EntityStats
     }
     protected override EntityStats[] MeleeAttack()
     {
-        foreach (EntityStats stats in base.MeleeAttack())
-        {
-            if (stats is PlayerStats)
-            {
-                ulong hitID = stats.GetComponent<NetworkObject>().OwnerClientId;
-                DamagePlayerRpc(attack.Value.damage, OwnerClientId, hitID);
-                //Debug.Log($"'{name}' (ID: {OwnerClientId}) attacking player '{stats.name}' with ID: {hitID}");
-            }
-        }
-        return null;
+        return base.MeleeAttack();
     }
     public override void KilledEnemy(EntityStats died)
     {
@@ -135,11 +139,11 @@ public class PlayerStats : EntityStats
         if (playerTarget != null)
         {
             if (playerTarget.IsAlive.Value)
-                if (playerTarget.TakeDamage(damage))
+                if (playerTarget.TakeDamage(damage))    // pravdive ak target zomrie
                 {
-                    playerTarget.IsAlive.Value = false;
                     playerDealer.KilledEnemy(playerTarget);
                 }
+            Debug.Log("Player hitted");
         }
         else
         {
