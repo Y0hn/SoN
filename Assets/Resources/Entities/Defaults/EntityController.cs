@@ -56,4 +56,12 @@ public abstract class EntityController : NetworkBehaviour
             stats.Animator.SetTrigger("attack");
         }
     }
+    protected Vector2 RoundVector(Vector2 v, byte d = 1)
+    {
+        return new(Round(v.x,d), Round(v.y,d));
+    }
+    protected float Round(float f, byte d = 1)
+    {
+        return Mathf.Round(f*d)/(float)d;
+    }
 }

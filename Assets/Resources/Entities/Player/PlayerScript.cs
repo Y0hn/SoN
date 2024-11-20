@@ -86,19 +86,8 @@ public class PlayerController : EntityController
 
         if (p != "")
             Debug.Log(p + "pos: " + $"[{pos.x},{pos.y}]");
-            
-        if      (context.started)
-                attacking = true;
-        else if (context.canceled)
-            attacking = false;
-    }
-    protected Vector2 RoundVector(Vector2 v, byte d = 1)
-    {
-        return new(Round(v.x,d), Round(v.y,d));
-    }
-    protected float Round(float f, byte d = 1)
-    {
-        return Mathf.Round(f*d)/(float)d;
+
+        attacking = !context.canceled;
     }
     protected override void Attack()
     {

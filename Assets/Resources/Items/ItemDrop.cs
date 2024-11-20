@@ -59,7 +59,7 @@ public class ItemDrop : NetworkBehaviour
         {
             ulong id = pl.NetObject.OwnerClientId;
             // ziska id clienta
-            pl.PickUpItemRpc(Item.GetReferency, RpcTarget.Single(id, RpcTargetUse.Temp));
+            pl.PickUpItemRpc(Item.GetReferency, pl.OwnerRPC);
             // hrac skusi zobrat ItemDrop
 
             // Pridat overenie ci hrac zobral item

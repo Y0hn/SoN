@@ -1,13 +1,11 @@
-using AYellowpaper.SerializedCollections;
+using System.Collections.Generic;
 using UnityEngine;
 using System;
 
 [CreateAssetMenu(fileName = "NewArmor", menuName = "Inventory/Armor"), Serializable] 
 public class Armor : Equipment
 {
-
-    [SerializedDictionary("Name", "GameObject")]
-    public SerializedDictionary<Damage.Type, Rezistance> rezists = new();
+    public List<Resistance> rezists = new();
     
     public override string GetReferency
     {
@@ -17,20 +15,13 @@ public class Armor : Equipment
     {
         base.Use(iS);
     }
-    public override bool Equals(Item other)
+    public List<Resistance> GetElemental(Damage.Type type)
     {
-        bool eq = base.Equals(other);
-        try
-        {
-            Armor a = (Armor)other;
-            eq &= other is Armor;
-            eq &= rezists.Count == a.rezists.Count;
-            foreach (Damage.Type key in rezists.Keys)
-                eq &= rezists[key].Equals(a.rezists[key]);
-        } catch (Exception e) {
-            Debug.Log("Equals error " + e.Message);
-            eq = false;
-        }
-        return eq;
+        return rezists.FindAll(r => r.defenceType == type);
+    }
+    [Serializable] public class Resistance
+    {
+        public float amount;
+        [SerializeField] public Damage.Type defenceType;
     }
 }
