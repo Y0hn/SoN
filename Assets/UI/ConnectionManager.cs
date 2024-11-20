@@ -92,7 +92,9 @@ public class ConnectionManager : MonoBehaviour
             CreateRelay();
         else
             CreateLAN();
-
+        
+        if (start)
+            FileManager.RegeneradeSettings();
         return start;
     }
     public bool JoinConnection(string connection, out string errorCode)
@@ -134,15 +136,10 @@ public class ConnectionManager : MonoBehaviour
     }
     private void LoadWorld(bool load = false, bool host = true)
     {
-        World world;
         if (host && load)
-            world = FileManager.LoadWorldData(""/*get path to world save file*/);
+            FileManager.WorldAct(FileManager.WorldAction.Load/*get path to world save file*/);
         else if (host && !load)
-            world = new();
-        else // if (load)
-            world = new();
-
+             FileManager.WorldAct(FileManager.WorldAction.Create);
         // load world
     }
-
 }

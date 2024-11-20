@@ -1,9 +1,10 @@
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using System.IO;
 using System;
 using UnityEngine;
-using Unity.Netcode;
+using Newtonsoft.Json;
 public static class FileManager
 {
     // FROM RECOURCES
@@ -14,7 +15,7 @@ public static class FileManager
 
     // FROM APP DATA PATH
     private const string LOG_DEFAULT_PATH = @"";
-    private const string SETTINGS_DEFAULT_PATH = @"/settings.json";
+    private const string SETTINGS_DEFAULT_PATH = @"/settings.xml";
     private const string WORLD_DEFAULT_PATH = @"/saves/"; // + nazov
 
 
@@ -74,6 +75,44 @@ public static class FileManager
         return loaded;
     }
 
+    private static Settings settings = new();
+    public static void RegeneradeSettings() // Called on ConnectToSever/SettingsClose
+    {
+        settings = new Settings(true);
+        TextWriter writer = null;
+        try
+        {
+            var serializer = new XmlSerializer(typeof(Settings));
+            writer = new StreamWriter(SettingsPath);
+            serializer.Serialize(writer, settings);
+        }
+        finally
+        {
+            if (writer != null)
+                writer.Close();
+        }
+    }
+    public static void LoadSettings()
+    {/*
+        if (settings == null)
+            settings = new(false);*/
+        if (File.Exists(SettingsPath))
+        {
+            TextReader reader = null;
+            try
+            {
+                var serializer = new XmlSerializer(typeof(Settings));
+                reader = new StreamReader(SettingsPath);
+                settings.SetSettings((Settings)serializer.Deserialize(reader));
+            }
+            finally
+            {
+                if (reader != null)
+                    reader.Close();
+            }
+        }
+    }
+
     public static class Log
     {
         public enum MessageType { RECORD, ERROR, WARNING }
@@ -95,7 +134,45 @@ public static class FileManager
         }
     }
 }
-public class World
+[Serializable] public class Settings
+{
+    public string playerName;
+    public bool online;
+    public string lastConnection;
+    // ...
+    public Settings()
+    {
+        lastConnection = "";
+        playerName = "";
+        online = true;
+    }
+    public Settings(bool get = true)
+    {
+        if (get)
+        {
+            lastConnection = ConnectionManager.instance.codeText.text;
+            playerName = GameManager.instance.PlayerName;
+            online = GameManager.UI.Online;
+        }
+        else
+        {
+            lastConnection = "";
+            playerName = "";
+            online = true;
+        }
+    }
+    public void SetSettings(Settings settings)
+    {
+        this.playerName = settings.playerName;
+        this.online = settings.online;
+        this.lastConnection = settings.lastConnection;
+
+        ConnectionManager.instance.codeText.text = lastConnection;
+        GameManager.instance.PlayerName = playerName;
+        GameManager.UI.Online = online;
+    }
+}
+[Serializable] public class World
 {
     readonly List<ItemOnFoor> items;
     readonly List<EntitySave> players;

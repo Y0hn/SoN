@@ -10,9 +10,12 @@ using Unity.Netcode;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public static MenuScript UI { get { return instance.menuScript; } }
     public static bool IsServer { get; private set; }
     void Awake()    { instance = this; }
+
     [SerializeField] ConnectionManager connectionManager;
+    [SerializeField] MenuScript menuScript;
 
     [SerializedDictionary("Name", "GameObject"), SerializeField]
     protected SerializedDictionary<string, GameObject> UIs = new();
@@ -41,7 +44,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] Animator animatorGameUI;
     [SerializeField] Button copy;
     public Inventory inventory;
-    public string PlayerName    { get { return inputFields["name"].text.Trim(); } }
+    public string PlayerName    { get { return inputFields["name"].text.Trim(); } set { inputFields["name"].text = value; } }
     public bool playerLives;
     public bool PlayerAble      { get { return !(paused || chatting || inventory.open); } }
     private bool paused;
@@ -65,6 +68,7 @@ public class GameManager : MonoBehaviour
         IsServer = NetworkManager.Singleton.IsServer;
         SubscribeInput();
         SetStartUI();
+        FileManager.LoadSettings();
     }
     void Update()   // Single Player DEBUG
     {

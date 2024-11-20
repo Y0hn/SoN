@@ -2,11 +2,12 @@ using AYellowpaper.SerializedCollections;
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
-public class menuScript : MonoBehaviour
+public class MenuScript : MonoBehaviour
 {
     int navLayer;
     [SerializeField] Animator animator;
     [SerializeField] Toggle onlineToggle;
+    public bool Online { get => onlineToggle.isOn; set => onlineToggle.isOn = value; }
 
     [SerializedDictionary("Name", "Button"), SerializeField]
     protected SerializedDictionary<string, Button> buttons = new();
@@ -142,7 +143,7 @@ public class menuScript : MonoBehaviour
 
             case 3: proceed = true; break;  // Otvori menu pre loadnutie hry pre viac hracov zo suboru
 
-            case 4: StartConnection(onlineToggle.isOn); proceed = true; break; // Zapne hru ako Host pre viac hracov
+            case 4: StartConnection(Online); proceed = true; break; // Zapne hru ako Host pre viac hracov
 
             case 5: ConnectionCheck(); break;  // Pripoji sa do hry pre viac hracov
 
