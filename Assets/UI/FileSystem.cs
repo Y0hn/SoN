@@ -1,39 +1,169 @@
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
-using System.Numerics;
-
+using System.IO;
+using System;
+using UnityEngine;
+using Unity.Netcode;
 public static class FileManager
 {
-    public const string TEXTURE_DEFAULT_PATH = "Items/textures";
-    public const string ITEM_DEFAULT_PATH = "Items";
-    public const string WEAPONS_DEFAULT_PATH = "Items/weapons";
-    public const string ARMORS_DEFAULT_PATH = "Items/armors";
+    // FROM RECOURCES
+    public const string TEXTURE_DEFAULT_PATH = @"Items/textures";
+    public const string ITEM_DEFAULT_PATH = @"Items";
+    public const string WEAPONS_DEFAULT_PATH = @"Items/weapons";
+    public const string ARMORS_DEFAULT_PATH = @"Items/armors";
+
+    // FROM APP DATA PATH
+    private const string LOG_DEFAULT_PATH = @"";
+    private const string SETTINGS_DEFAULT_PATH = @"/settings.json";
+    private const string WORLD_DEFAULT_PATH = @"/saves/"; // + nazov
 
 
-    // Ulozene iba na servery
-    public static World world;
+    public static string AppData { get =>  Application.persistentDataPath; }
+    public static string SettingsPath   { get => AppData + SETTINGS_DEFAULT_PATH; }
+    public static string LogPath        { get => AppData + LOG_DEFAULT_PATH;    }
+    public static string WorldPath     { get => AppData + WORLD_DEFAULT_PATH;  }
 
-    public static World LoadWorldData(string path)
+
+    private static World world;     // Ulozene iba na servery
+    public enum WorldAction
     {
-        return new();
+        Create, Load, Save, Check
+    }
+    public static bool WorldAct(WorldAction action)
+    {
+        bool acted= false;
+
+        switch (action)
+        {
+            case WorldAction.Create:
+                world = new();
+                acted = true;
+                break;
+            case WorldAction.Load:
+                acted = LoadWorldData(WorldPath+"save1");
+                break;
+            case WorldAction.Save:
+                acted = SaveWorldData(WorldPath+"save1");
+                break;
+            case WorldAction.Check:
+                //acted = false;
+                break;
+        }
+
+        return acted;
+    }
+    private static bool SaveWorldData(string path)
+    {
+        bool saved = false;
+        BinaryFormatter formatter = new();
+        FileStream stream = new(path, FileMode.Create);
+
+        world = new(world);
+        formatter.Serialize(stream, world);
+        saved = File.Exists(path);        
+        stream.Close();
+
+        return saved;
+    }
+    private static bool LoadWorldData(string path)
+    {
+        bool loaded = false;
+
+
+
+        return loaded;
+    }
+
+    public static class Log
+    {
+        public enum MessageType { RECORD, ERROR, WARNING }
+        public static void Write(string message, MessageType type)
+        {
+            switch (type)
+            {
+                case MessageType.RECORD:
+                    Debug.Log("[RECORDED] " + message);
+                    break;
+                case MessageType.ERROR:
+                    Debug.LogWarning("[RECORDED] " + message);
+                    break;
+                case MessageType.WARNING:
+                    Debug.LogError("[RECORDED] " + message);
+                    break;
+            }
+
+        }
     }
 }
 public class World
 {
-    List<ItemDrop> items;
-    List<EntitySave> entities;
-    Dictionary<string, InventorySave> inventories;
+    readonly List<ItemOnFoor> items;
+    readonly List<EntitySave> players;
+    readonly List<EntitySave> entities;
 
-    public World()
+    public World(bool get = false)
     {
-        items = new List<ItemDrop>();
+        if (get)
+        {
+            if (GameManager.IsServer)
+            {
+                foreach (GameObject e in GameObject.FindGameObjectsWithTag("Entity"))
+                {
+                    EntitySave es = new (e.GetComponent<EntityStats>());
+
+                    if (es.isPlayer)
+                        players.Add(es);
+                    else
+                        entities.Add(es);
+                }
+                foreach (GameObject d in GameObject.FindGameObjectsWithTag("Drop"))
+                    items.Add(new (d.GetComponent<ItemDrop>()));
+            }
+            // Client nemoze Ukladat stav sveta
+        }
+        else
+        {
+            items = new();
+            entities = new();
+        }
     }
-    public class EntitySave
+    /// <summary>
+    /// Spaja data (o hracoch) z stareho aj aktualneho ulozenia
+    /// </summary>
+    /// <param name="old_world"></param>
+    public World(World old_world)
     {
-        Defence defence;
-        Vector2 position;
-        string etName;
-        bool isPlayer;
-        float hp;
+        World new_world= new(true);
+        items = new_world.items;
+        players = new_world.players;
+        entities = new_world.entities;
+
+        List<EntitySave> pl = old_world.entities.FindAll(e => e.isPlayer);
+        pl = players.FindAll(e => entities.Find(en => en.etName == e.etName) == null); // najde vsetkych hracov co nesu pripojeny
+        players.AddRange(pl);
+    }
+    [Serializable] public class ItemOnFoor
+    {
+        public Vector2 pos;
+        public string itemRef;
+        public ItemOnFoor(Vector2 _pos, string _itemRef)
+        {
+            pos = _pos;
+            itemRef = _itemRef;
+        }
+        public ItemOnFoor(ItemDrop iDrop)
+        {
+            pos = iDrop.transform.position;
+            itemRef = iDrop.Item.GetReferency;
+        }
+    }
+    [Serializable] public class EntitySave
+    {
+        protected Defence defence;
+        protected Vector2 position;
+        public string etName;
+        public bool isPlayer;
+        protected float hp;
 
         public EntitySave(EntityStats entity)
         {
@@ -43,8 +173,171 @@ public class World
             hp = entity.HP;
         }
     }
-    public class InventorySave
+    [Serializable] public class PlayerSave : EntitySave
     {
+        InventorySave inventory;
+        public PlayerSave(EntityStats player) : base(player)
+        {
 
+        }
+
+        [Serializable] public class InventorySave
+        {
+            public readonly string playerName;
+            private string[] items;
+            private string[] equiped;/*
+            public InventorySave(Inventory inventory)
+            {
+                playerName = GameManager.instance.PlayerName;
+                foreach (ItemSlot it in inventory.inventoryGrid)
+                {
+
+                }
+            }*/
+        }
+    }
+    
+    /// <summary>
+    /// Nahrada za Vector2 v World pre FileSystem
+    /// </summary>
+    [Serializable] public class Cordinates
+    {
+        public float x,y;
+        public Cordinates(float x, float y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+        public Cordinates(Vector2 vector)
+        {
+            x = vector.x;
+            y = vector.y;
+        }
+        public Cordinates(Vector3 vector)
+        {
+            x = vector.x;
+            y = vector.y;
+        }
+        public Vector2 Vector { get { return new Vector2(x,y); } }
     }
 }
+/********************************************************************************** OLD CODE *****************************************************************************\
+public static class SaveSystem
+{
+    public static bool CheckSaveNeed()
+    {
+        return CompareData(GetData(), Load());
+    }
+    public static bool SaveDataExist(string filename = "data")
+    {
+        Data d = Load();
+        return DataCheck(d);
+    }
+    private static bool DataCheck(Data data)
+    {
+        bool check = true;
+        try
+        {
+            // Level number
+            check &= data != null;
+            check &= data.curLevel >= 0;
+            check &= data.level.roomsPos.Length == data.level.rooms.Length;
+
+
+            // Entities => min. 1 {Player}
+            check &= data.entities.Length >= 1;
+            foreach (Data.CharakterData e in data.entities)
+                check &= e.curHealth >= 0 && e.charName != "" && e.position != null;
+
+            // Inventory + Equipment DUPLICATE CHECK
+            check &= data.inventory.items.Count >= 0;
+            check &= data.inventory.equipment.Length >= 0;
+            List<ItemData> list = new();
+            for (int i = 0, e = 0; (i < data.inventory.items.Count || data.inventory.equipment.Length > e) && check; i++, e++)
+            {
+                if (i < data.inventory.items.Count)
+                {
+                    check &= !list.Contains(data.inventory.items[i]);
+                    list.Add(data.inventory.items[i]);
+                }
+                if (e < data.inventory.equipment.Length)
+                {
+                    check &= !list.Contains(data.inventory.equipment[e]);
+                    list.Add(data.inventory.equipment[e]);
+                }
+            }
+            list.Clear();
+
+            // Interactables
+            check &= data.interactables.positions.Length == data.interactables.items.Length;
+        }
+        catch
+        {
+            check = false;
+        }
+        if (check)
+            Debug.Log("Passed data check!");
+        else
+            Debug.Log("Failed data check!");
+        return check;
+    }
+    private static void DebugLogForComperators(bool pass, string message)
+    {
+        if (debug)
+        {
+            if (pass)
+                Debug.Log(message + " passed!");
+            else
+                Debug.Log(message + " failed!");
+        }
+    }
+    private static void DebugLogDataOut(Data data, string action)
+    {
+        if (debug)
+            Debug.Log($"Data {action} " + data);
+    }
+    public static void Save()
+    {
+        BinaryFormatter formatter = new();
+        FileStream stream = new(Path("data"), FileMode.Create);
+
+        Data data = GetData();
+        formatter.Serialize(stream, data);
+        stream.Close();
+        DebugLogDataOut(data, "saved");
+    }
+    private static Data GetData()
+    {
+        // Entities DATA
+        List<Data.CharakterData> charakterData = new()
+        { GameManager.instance.playerStats.SaveData() };
+        foreach (GameObject e in GameObject.FindGameObjectsWithTag("Enemy"))
+            charakterData.Add(e.GetComponent<EnemyStats>().SaveData());
+        if (GameManager.instance.boss != null)
+            charakterData.Add(GameManager.instance.boss.SaveData());
+
+        return new(charakterData);
+    }
+    public static Data Load()
+    {
+        if (File.Exists(Path("data")))
+        {
+            BinaryFormatter formatter = new();
+            FileStream steam = new(Path("data"), FileMode.Open);
+
+            Data data = formatter.Deserialize(steam) as Data;
+            steam.Close();
+            DebugLogDataOut(data, "loaded");
+            return data;
+        }
+        else
+        {
+            Debug.LogError("Savefile not found: " + Path("data"));
+            return null;
+        }
+    }
+    private static string Path(string filename)
+    {
+        string path = Application.persistentDataPath + "/" + filename + ".file";
+        return path;
+    }*/

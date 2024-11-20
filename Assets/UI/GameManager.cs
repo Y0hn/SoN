@@ -3,12 +3,14 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
+using Unity.Netcode;
 /// <summary>
 /// Managing Game and PLayerUI - has 'instance'
 /// </summary>
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public static bool IsServer { get; private set; }
     void Awake()    { instance = this; }
     [SerializeField] ConnectionManager connectionManager;
 
@@ -60,12 +62,23 @@ public class GameManager : MonoBehaviour
     public PlayerStats LocalPlayer { get { return player; } }
     void Start()
     {
+        IsServer = NetworkManager.Singleton.IsServer;
         SubscribeInput();
         SetStartUI();
     }
     void Update()   // Single Player DEBUG
     {
-
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            GameObject i = Instantiate(
+                Resources.LoadAll<GameObject>("Items/ItemDrop")[0], 
+                new Vector3(Random.Range(-11, 10), 
+                Random.Range(-11, 10), -3), 
+                Quaternion.identity);
+            i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/sword-1");
+            i.GetComponent<Unity.Netcode.NetworkObject>().Spawn(true);
+            Destroy(i);
+        }
     }
     void SubscribeInput()
     {
@@ -183,4 +196,6 @@ public class GameManager : MonoBehaviour
     public void Copy() { GUIUtility.systemCopyBuffer = connectionManager.codeText.text; animatorGameUI.SetTrigger("copy"); }
     public void AnimateFace(float state)    { animatorGameUI.SetFloat("state", state);  }
     public void AnimateFace(string action)  { animatorGameUI.SetTrigger(action);        }
+    
+    public void ServerRequest(string action) {  }
 }

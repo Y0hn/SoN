@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -9,8 +10,8 @@ public class ItemDrop : NetworkBehaviour
     [SerializeField] CircleCollider2D colli;
     [SerializeField] public Item item;
     [SerializeField] bool tester = false;
-    private static Dictionary<int, ItemOnFoor> itemsOnFoor = new();
-    private int floorID;
+    private static List<World.ItemOnFoor> itemsOnFoor = new();     // iba na Servery
+    private World.ItemOnFoor itFoor;
     public Item Item
     {
         get { return item; }
@@ -21,24 +22,31 @@ public class ItemDrop : NetworkBehaviour
             {
                 texture.sprite = Resources.Load<Sprite>(item.iconRef);
                 texture.color = item.color;
+                Register();
             }
-            else 
-            {
-                if (IsServer)
-                    itemsOnFoor.Remove(floorID);
+            else
                 netObj.Despawn();
-            }
         }
     }
     public override void OnNetworkSpawn()
     {
-        Item = item;
+        if (item == null) return;
 
+        Item = item;
+        
+        Register();
+    }
+    private void Register()
+    {
+        if (!IsServer)  return;
+        itFoor = new (transform.position, item.GetReferency);
+        itemsOnFoor.Add(itFoor);
+    }
+    public override void OnNetworkDespawn()
+    {
         if (IsServer)
-        {
-            floorID = itemsOnFoor.Count;
-            itemsOnFoor.Add(floorID, new (transform.position, item.GetReferency));
-        }
+            itemsOnFoor.Remove(itFoor);
+        
     }
 #pragma warning disable IDE0051 // Remove unused private members
     void OnDrawGizmos()
@@ -51,12 +59,9 @@ public class ItemDrop : NetworkBehaviour
     }
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!IsServer) 
-            return;
-        // sem sa dostane len Server aby sa nestalo ze viaceri Clienti detekuju to iste
-
-        if (collision.transform.TryGetComponent(out PlayerStats pl))
+        if (IsServer && collision.transform.TryGetComponent(out PlayerStats pl))
         {
+            // sem sa dostane len Server aby sa nestalo ze viaceri Clienti detekuju to iste
             ulong id = pl.NetObject.OwnerClientId;
             // ziska id clienta
             pl.PickUpItemRpc(Item.GetReferency, pl.OwnerRPC);
@@ -80,15 +85,5 @@ public class ItemDrop : NetworkBehaviour
     [Rpc(SendTo.SpecifiedInParams)] public void SetItemRpc(string pathReferncy, RpcParams rpcParams)
     {
         Item = Resources.Load<Item>(pathReferncy);
-    }
-    public class ItemOnFoor
-    {
-        public Vector2 pos;
-        public string itemRef;
-        public ItemOnFoor(Vector2 _pos, string _itemRef)
-        {
-            pos = _pos;
-            itemRef = _itemRef;
-        }
     }
 }

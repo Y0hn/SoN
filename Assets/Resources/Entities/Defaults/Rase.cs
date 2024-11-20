@@ -1,4 +1,3 @@
-using AYellowpaper.SerializedCollections;
 using UnityEngine;
 using System;
 [CreateAssetMenu(fileName = "NewRase", menuName = "Entity/Rase"), Serializable] public class Rase : ScriptableObject

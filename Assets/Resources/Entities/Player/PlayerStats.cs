@@ -22,12 +22,12 @@ public class PlayerStats : EntityStats
      */
     [SerializeField] GameObject chatField;
     [SerializeField] TMP_Text chatBox;
-    float chatTimer; const float chatTime = 5.0f;
     public RpcParams OwnerRPC { get { return RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp); } }
-    Slider xpBar;
-    float atTime = 0;
+    float chatTimer; const float chatTime = 5.0f;
+    Slider xpBar;       // UI nastavene len pre Ownera
+    float atTime = 0;   // pouziva len owner
     int xpMax = 10, xpMin = 0;
-    protected Inventory inventory;
+    protected Inventory inventory;      // nastavene len pre Ownera
     protected NetworkVariable<int> xp = new(0);
     NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     public override void OnNetworkSpawn()

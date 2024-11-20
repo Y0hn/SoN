@@ -16,6 +16,23 @@ public class Inventory : MonoBehaviour
     }
     public bool open { get; private set; }
     public bool FreeSpace { get { return itemSlots.Find(iS => iS.empty == true) != null; } }
+    public string[] GetReference(bool inv = true) 
+    { 
+        string[] references;
+        if (inv)
+        {
+            references= new string[itemSlots.Count];
+            for (int i = 0; i < references.Length; i++)
+                references[i] = itemSlots[i].Item.GetReferency;
+        }
+        else
+        {
+            references= new string[equipSlots.Count];
+            for (int i = 0; i < references.Length; i++)
+                references[i] = equipSlots[(Equipment.Slot)i].Item.GetReferency;
+        }
+        return references;
+    }
 
     [SerializeField] ushort size = 1;
     [SerializeField] TMP_Text btn;

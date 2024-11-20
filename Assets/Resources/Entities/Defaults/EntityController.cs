@@ -1,7 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 /// <summary>
-/// 
+/// For controlloing Entities
 /// </summary>
 [RequireComponent(typeof(EntityStats))]
 public abstract class EntityController : NetworkBehaviour
