@@ -64,7 +64,7 @@ public class ItemDrop : NetworkBehaviour
             // sem sa dostane len Server aby sa nestalo ze viaceri Clienti detekuju to iste
             ulong id = pl.NetObject.OwnerClientId;
             // ziska id clienta
-            pl.PickUpItemRpc(Item.GetReferency, pl.OwnerRPC);
+            pl.PickUpItem(Item.GetReferency);
             // hrac skusi zobrat ItemDrop
 
             // Pridat overenie ci hrac zobral item

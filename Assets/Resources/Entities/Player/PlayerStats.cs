@@ -27,9 +27,11 @@ public class PlayerStats : EntityStats
     Slider xpBar;       // UI nastavene len pre Ownera
     float atTime = 0;   // pouziva len owner
     int xpMax = 10, xpMin = 0;
-    protected Inventory inventory;      // nastavene len pre Ownera
     protected NetworkVariable<int> xp = new(0);
+    NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
     NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+    protected GameManager game;
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -38,9 +40,10 @@ public class PlayerStats : EntityStats
 
         if (IsOwner)
         {
+            game = GameManager.instance;
             hpBar.gameObject.SetActive(false);
-            hpBar = GameManager.instance.GetBar("hp");
-            xpBar = GameManager.instance.GetBar("xp");
+            hpBar = game.GetBar("hp");
+            xpBar = game.GetBar("xp");
             xpBar.minValue = xpMin;
             xpBar.maxValue = xpMax;
             xpBar.value = xp.Value;
@@ -50,6 +53,8 @@ public class PlayerStats : EntityStats
             playerName.Value = GameManager.instance.PlayerName;
 
             hp.OnValueChanged += (int prevValue, int newValue) => GameManager.instance.AnimateFace(HP);
+
+            inventory.OnListChanged += (NetworkListEvent<FixedString64Bytes> changeEvent) => { OnInventoryUpdate(ref changeEvent); };
         }
         chatTimer = 0;
         chatBox.text = "";
@@ -68,15 +73,35 @@ public class PlayerStats : EntityStats
                 chatTimer = 0;
             }
     }
-    protected void OnXpUpdate()
+    protected void OnXpUpdate()     // iba lokalne
     {
         xpBar.value = xp.Value;
     }
-    protected void OnLevelUp()
+    protected void OnLevelUp()      // iba lokalne
     {
         xpMax += xp.Value * level.Value;
         xpBar.minValue = xp.Value;
         xpBar.maxValue = xpMax;
+    }
+    protected void OnInventoryUpdate(ref NetworkListEvent<FixedString64Bytes> changeEvent)  // iba lokalne
+    {        
+        switch (changeEvent.Type)
+        {
+            case NetworkListEvent<FixedString64Bytes>.EventType.Add:
+                //int index = changeEvent.Index; // the position of the added value in the list
+                game.inventory.Add(changeEvent.Value.ToString()); // the new value at the index position
+                break;
+            case NetworkListEvent<FixedString64Bytes>.EventType.Remove:
+            case NetworkListEvent<FixedString64Bytes>.EventType.RemoveAt:
+                game.inventory.Remove(changeEvent.Value.ToString());
+                break;
+            case NetworkListEvent<FixedString64Bytes>.EventType.Full:
+            case NetworkListEvent<FixedString64Bytes>.EventType.Clear:
+            case NetworkListEvent<FixedString64Bytes>.EventType.Value:
+            case NetworkListEvent<FixedString64Bytes>.EventType.Insert:
+            default:
+                break;
+        }
     }
     public override bool AttackTrigger()
     {
@@ -154,10 +179,10 @@ public class PlayerStats : EntityStats
     {
         GameManager.instance.AnimateFace("got-hit");
     }
-    [Rpc(SendTo.SpecifiedInParams)] public void PickUpItemRpc(string refItem, RpcParams rpcParams)
+    public void PickUpItem(string refItem)
     {
-        Item item = Item.GetItem(refItem);
-        Inventory.instance.AddItem(item);
+        if (IsServer)
+            inventory.Add(refItem);
     }
     [ServerRpc] public void ChangeEquipmentServerRpc(string refEquip, bool equip)
     {
@@ -188,7 +213,7 @@ public class PlayerStats : EntityStats
 
         if (error)
         {
-            PickUpItemRpc(refEquip, OwnerRPC);
+            PickUpItem(refEquip);
         }
         //Debug.Log("Player stats changed becouse of equipment change");
     }

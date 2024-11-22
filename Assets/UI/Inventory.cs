@@ -199,8 +199,9 @@ public class Inventory : MonoBehaviour
         size = newSize;
         Sizing();
     }
-    public bool AddItem(Item item)
+    public bool Add(string refItem)
     {
+        Item item = Item.GetItem(refItem);
         bool add = FreeSpace;
 
         string a = item.name;
@@ -215,8 +216,10 @@ public class Inventory : MonoBehaviour
         Debug.Log(a);
         return add;
     }
-    public void DropItem(Item item = null)
+    public void Remove(string refItem)
     {
+        
+        Item item = Item.GetItem(refItem);
         if (itemSlots.Count > 0)
         {
             int i = itemSlots.Count - 1;
@@ -247,7 +250,7 @@ public class Inventory : MonoBehaviour
         {
             equip.Item = null;
             game.LocalPlayer.ChangeEquipmentServerRpc(eq.GetReferency, false);
-            AddItem(eq);
+            Add(eq.GetReferency);
         }
     }
 }
