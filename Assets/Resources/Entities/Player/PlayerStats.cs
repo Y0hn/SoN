@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine.UI;
@@ -6,20 +5,36 @@ using UnityEngine;
 using TMPro;
 public class PlayerStats : EntityStats
 {
-    /*  Inhereted Variables
-     * 
-     * [SF] protected TMP_Text nameTag;
-     * protected NetworkList<Rezistance> rezists = new();
-     * [SF] protected NetworkVariable<int> maxHp = new();
-     * protected NetworkVariable<int> hp = new();
-     * [SF] protected Slider hpBar;
-     * [SF]    public NetworkVariable<int> speed = new();
-     * [SF]    protected Transform attackPoint;
-     * public NetworkVariable<bool> IsAlive = new();
-     * [SF]    protected NetworkVariable<Attack> attack = new ();
-     * protected const float timeToDespawn = 0f;
+    /*  ZDEDENE ATRIBUTY
+     *      
+     *  [SF] protected TMP_Text nameTag;
+     *  [SF] protected Rase rase;
+     *  [SF] protected Slider hpBar;
+     *  [SF] protected GameObject body;
+     *  [SF] protected NetworkObject netObject;
+     *  [SF] protected Transform attackPoint;
+     *  [SF] protected SpriteRenderer weaponR, weaponL;
+     *  [SF] protected NetworkAnimator animator;
+     *  [SF] protected Rigidbody2D rb;
      *
-     */
+     *  [SF]    protected NetworkVariable<int> maxHp = new();
+     *
+     *  protected NetworkVariable<int> hp = new();
+     *  protected NetworkVariable<Attack> attack = new ();
+     *  protected NetworkVariable<FixedString128Bytes> weapRef = new();
+     *  public NetworkVariable<bool> IsAlive = new(true);
+     *  public NetworkVariable<float> speed = new();
+     *  public NetworkVariable<byte> level = new(1);
+     *
+     *  public float HP { get { return (float)hp.Value/(float)maxHp.Value; } }
+     *  public NetworkObject NetObject { get { return netObject; } }
+     *  public Animator Animator { get { return animator.Animator; } }
+     *  public Rigidbody2D RigidBody2D { get { return rb; } }
+     *
+     *  protected const float timeToDespawn = 0f;
+     *  private bool clampedDMG = true;
+     *  protected Defence defence;
+     *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
     [SerializeField] GameObject chatField;
     [SerializeField] TMP_Text chatBox;
     public RpcParams OwnerRPC { get { return RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp); } }
