@@ -239,7 +239,7 @@ public class Inventory : MonoBehaviour
         if (equipSlots.Keys.Contains(equip.slot))
         {
             equipSlots[equip.slot].Item = equip;
-            game.LocalPlayer.ChangeEquipmentServerRpc(equip.GetReferency, true);
+            game.LocalPlayer.EquipRpc(equip.GetReferency, equip.slot);
         }
     }
     public void UnEquip(EquipmentSlot equip)
@@ -249,7 +249,7 @@ public class Inventory : MonoBehaviour
         if (FreeSpace)
         {
             equip.Item = null;
-            game.LocalPlayer.ChangeEquipmentServerRpc(eq.GetReferency, false);
+            game.LocalPlayer.EquipRpc(eq.GetReferency, equip.slot);
             Add(eq.GetReferency);
         }
     }

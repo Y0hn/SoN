@@ -8,8 +8,8 @@ public class Equipment : Item
     public enum Slot
     {
         Head, Torso, Hands, Legs,
-        Body, 
         WeaponL, WeaponR, 
+        Body, 
         WeaponBoth, NoPreference
     }
     public override string GetReferency

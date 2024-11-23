@@ -1,15 +1,13 @@
-using System.Collections.Generic;
-using System;
 using Unity.Netcode.Components;
 using Unity.Netcode;
 using Unity.Collections;
-using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine;
+using System.Collections.Generic;
+using System;
 using TMPro;
-using Unity.VisualScripting;
-using AYellowpaper.SerializedCollections;
 /// <summary>
-/// 
+/// Drzi hodnoty pre entitu
 /// </summary>
 [RequireComponent(typeof(EntityController))]
 public abstract class EntityStats : NetworkBehaviour
@@ -26,55 +24,42 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected Rigidbody2D rb;
     protected Defence defence;  // iba na servery/hoste Servery
 
-    [SerializeField]    protected NetworkVariable<int> maxHp = new();
-                        protected NetworkVariable<int> hp = new();
-                        public NetworkVariable<float> speed = new();
-                        public NetworkVariable<byte> level = new(1);
-                        public NetworkVariable<bool> IsAlive = new(true);
-                        protected NetworkVariable<Attack> attack = new ();
-                        protected NetworkVariable<FixedString128Bytes> weapRef = new();
+    [SerializeField]    protected   NetworkList<FixedString64Bytes> equipment = new();    // Sprava sa ako Dictionary ale je to list
+    [SerializeField]    protected   NetworkVariable<int> maxHp = new();
+                        protected   NetworkVariable<int> hp = new();
+                        public      NetworkVariable<float> speed = new();
+                        public      NetworkVariable<byte> level = new(1);
+                        public      NetworkVariable<bool> IsAlive = new(true);
+                        protected   NetworkVariable<Attack> attack = new ();
 
-                        protected const float timeToDespawn = 0f;
-                        public float HP { get { return (float)hp.Value/(float)maxHp.Value; } }
-                        public NetworkObject NetObject { get { return netObject; } }
-                        public Animator Animator { get { return animator.Animator; } }
-                        public Rigidbody2D RigidBody2D { get { return rb; } }
-                        private bool clampedDMG = true;
+    public float HP                 { get { return (float)hp.Value/(float)maxHp.Value; } }
+    public NetworkObject NetObject  { get { return netObject; } }
+    public Animator Animator        { get { return animator.Animator; } }
+    public Rigidbody2D RigidBody2D  { get { return rb; } }
+    protected const float timeToDespawn = 0f;
+    private bool clampedDMG = true;
 
     public override void OnNetworkSpawn()
     {
-        name = name.Split('(')[0].Trim();
-        RaseSetUp();
-
-        SubscribeOnNetworkValueChanged();
+        EntitySetUp();
+        SubsOnNetValChanged();
 
         attackPoint.position = new(attackPoint.position.x, attack.Value.range);
         hpBar.value = hp.Value;
-        IsAlive.OnValueChanged += (bool prev, bool alive) => SetLive(alive);
     }
-    private void SubscribeOnNetworkValueChanged()
+    protected virtual void SubsOnNetValChanged()
     {
-        hp.OnValueChanged += (int prevValue, int newValue) => OnHpUpdate();
-        maxHp.OnValueChanged += (int prevValue, int newValue) => 
-        {
-            if (IsServer)
-                hp.Value = maxHp.Value;
-        };        
-        weapRef.OnValueChanged += (FixedString128Bytes o, FixedString128Bytes s) =>
-        {
-            if (s != "") 
-            {
-                Sprite texture = Resources.Load<Sprite>(s.ToString());
-                weaponL.sprite = texture;
-                weaponR.sprite = texture;
-            }
-            weaponL.enabled = s != "";
-            weaponR.enabled = s != "";
-        };
-        attack.OnValueChanged += (Attack prevValue, Attack newValue) => Animator.SetFloat("weapon", (float)newValue.type);
+        if (IsServer)
+            maxHp.OnValueChanged += (int prevValue, int newValue) => hp.Value = maxHp.Value;
+
+        equipment.OnListChanged += (NetworkListEvent<FixedString64Bytes> listEvent) => OnEquipmentUpdate(listEvent);
+        attack.OnValueChanged   += (Attack prevValue, Attack newValue)              => Animator.SetFloat("weapon", (float)newValue.type);
+        IsAlive.OnValueChanged  += (bool prev, bool alive)          => SetLive(alive);
+        hp.OnValueChanged       += (int prevValue, int newValue)    => OnHpUpdate();
     }
-    protected virtual void RaseSetUp()
+    protected virtual void EntitySetUp()
     {
+        name = name.Split('(')[0].Trim();
         if (IsServer)
         {
             attack.Value = rase.attack;
@@ -86,9 +71,49 @@ public abstract class EntityStats : NetworkBehaviour
 
             speed.Value = rase.speed;
             
-            defence = new(rase.naturalArmor);
+            int length = Enum.GetNames(typeof(Equipment.Slot)).Length,
+                count = equipment.Count;
+            if (count != length)
+            {
+                for (bool add = count < length; equipment.Count == length;)
+                    if (add)
+                        equipment.Add("");
+                    else
+                        equipment.RemoveAt(equipment.Count - 1);
+                SortEquipmentList();
+            }
 
             IsAlive.Value = true;
+        }
+        defence = new(rase.naturalArmor);
+    }
+    protected void SortEquipmentList()
+    {
+        int length = Enum.GetNames(typeof(Equipment.Slot)).Length;
+        List<Equipment> change = new();
+        Equipment e;
+        for (int n = 0; n < 2; n++)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                if ("" != equipment[i].ToString())
+                {
+                    e = (Equipment)Item.GetItem(equipment[i].ToString());
+                    if (e.slot != (Equipment.Slot)i)
+                    {
+                        change.Add(e);
+                        equipment[i] = "";
+                    }
+                }
+                if ("" == equipment[i].ToString())
+                {
+                    e = change.Find(eq => eq.slot == (Equipment.Slot)i);
+                    if (e != null)
+                        equipment[i] = e.GetReferency;
+                }
+            }
+            if (change.Count == 0)
+                break;
         }
     }
     protected virtual void Update()
@@ -100,6 +125,44 @@ public abstract class EntityStats : NetworkBehaviour
         float value = HP;
         hpBar.value = value;
     } 
+    protected virtual void OnEquipmentUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
+    {
+        string referencia = changeEvent.Value.ToString();
+        string previous = changeEvent.PreviousValue.ToString();
+
+        if (changeEvent.Type == NetworkListEvent<FixedString64Bytes>.EventType.Value)
+        {
+            Item value = Item.GetItem(referencia);
+            Equipment.Slot slot = (Equipment.Slot)changeEvent.Index;
+            
+            switch (slot)
+            {
+                case Equipment.Slot.Head:
+                case Equipment.Slot.Torso:
+                case Equipment.Slot.Legs:
+                    if (referencia != "")
+                    {
+                        Armor a = (Armor)value;
+                        defence.Add(a);
+                    }
+                    else
+                        defence.Remove((Armor)Item.GetItem(previous));
+                    break;
+                case Equipment.Slot.WeaponR:
+                case Equipment.Slot.WeaponL:
+                    Weapon w = (Weapon)value;
+                    if (IsServer)
+                        attack.Value = new (w.attack.damage, w.attack.range, w.attack.rate, w.attack.type);                    
+                    weaponL.sprite = Resources.Load<Sprite>(w.spriteRef);
+                    weaponR.sprite = Resources.Load<Sprite>(w.spriteRef);
+                    break;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Equipment corrupted");
+        }
+    }
     public virtual bool TakeDamage(Damage damage)
     {
         if (!IsServer) 
@@ -140,6 +203,12 @@ public abstract class EntityStats : NetworkBehaviour
         hpBar.gameObject.SetActive(alive);
         // Play animation 
         gameObject.SetActive(alive);
+    }
+    [Rpc(SendTo.Server)] public void EquipRpc(string reference, Equipment.Slot slot = Equipment.Slot.NoPreference)
+    {
+        if (slot == Equipment.Slot.NoPreference)
+            slot = ((Equipment)Item.GetItem(reference)).slot;
+        equipment[(int)slot] = reference;
     }
 }
 [Serializable] public class Defence
@@ -193,6 +262,7 @@ public abstract class EntityStats : NetworkBehaviour
         }
         return false;
     }
+
 }
 [Serializable] public struct Attack : INetworkSerializable, IEquatable<Attack>
 {

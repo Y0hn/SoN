@@ -43,15 +43,18 @@ public class PlayerStats : EntityStats
     float atTime = 0;   // pouziva len owner
     int xpMax = 10, xpMin = 0;
     protected NetworkVariable<int> xp = new(0);
-    NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
-    NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
+    protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     protected GameManager game;
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        
-        playerName.OnValueChanged += (FixedString32Bytes prevValue, FixedString32Bytes newValue) => { nameTag.text = newValue.ToString(); };
+        OwnerSubsOnNetValChanged();
+    }
+    protected override void EntitySetUp()
+    {
+        base.EntitySetUp();
 
         if (IsOwner)
         {
@@ -63,13 +66,7 @@ public class PlayerStats : EntityStats
             xpBar.maxValue = xpMax;
             xpBar.value = xp.Value;
 
-            xp.OnValueChanged += (int prevValue, int newValue) => OnXpUpdate();
-
             playerName.Value = GameManager.instance.PlayerName;
-
-            hp.OnValueChanged += (int prevValue, int newValue) => GameManager.instance.AnimateFace(HP);
-
-            inventory.OnListChanged += (NetworkListEvent<FixedString64Bytes> changeEvent) => { OnInventoryUpdate(ref changeEvent); };
         }
         chatTimer = 0;
         chatBox.text = "";
@@ -78,15 +75,16 @@ public class PlayerStats : EntityStats
         nameTag.text = name;
         GetComponent<NetworkObject>().name = nameTag.text;
     }
-    protected override void Update()
+    protected override void SubsOnNetValChanged()
     {
-        if (chatTimer != 0)
-            if (chatTimer <= Time.time)
-            {
-                chatField.SetActive(false);
-                chatBox.text = "";
-                chatTimer = 0;
-            }
+        base.SubsOnNetValChanged();
+        playerName.OnValueChanged += (FixedString32Bytes prevValue, FixedString32Bytes newValue) => { nameTag.text = newValue.ToString(); };
+    }
+    protected void OwnerSubsOnNetValChanged()
+    {
+        xp.OnValueChanged += (int prevValue, int newValue) => OnXpUpdate();
+        hp.OnValueChanged += (int prevValue, int newValue) => GameManager.instance.AnimateFace(HP);
+        inventory.OnListChanged += (NetworkListEvent<FixedString64Bytes> changeEvent) => { OnInventoryUpdate(changeEvent); };
     }
     protected void OnXpUpdate()     // iba lokalne
     {
@@ -98,7 +96,7 @@ public class PlayerStats : EntityStats
         xpBar.minValue = xp.Value;
         xpBar.maxValue = xpMax;
     }
-    protected void OnInventoryUpdate(ref NetworkListEvent<FixedString64Bytes> changeEvent)  // iba lokalne
+    protected void OnInventoryUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)  // iba lokalne
     {        
         switch (changeEvent.Type)
         {
@@ -165,6 +163,16 @@ public class PlayerStats : EntityStats
         OwnerTakenDamageRpc();
         return base.TakeDamage(damage);
     }
+    protected override void Update()
+    {
+        if (chatTimer != 0)
+            if (chatTimer <= Time.time)
+            {
+                chatField.SetActive(false);
+                chatBox.text = "";
+                chatTimer = 0;
+            }
+    }
     /// <summary>
     /// Server does this for Player doing damage to another Player
     /// </summary>
@@ -199,45 +207,11 @@ public class PlayerStats : EntityStats
         if (IsServer)
             inventory.Add(refItem);
     }
-    [ServerRpc] public void ChangeEquipmentServerRpc(string refEquip, bool equip)
-    {
-        Item stuff = Item.GetItem(refEquip);
-        bool error = false;
-
-        if      (stuff is Weapon w)
-        {
-            if (equip)
-            {
-                // attack.Value = w.attack;
-                attack.Value = new (w.attack.damage, w.attack.range, w.attack.rate, w.attack.type);
-                weapRef.Value = w.spriteRef;
-            }
-            else
-            {
-                attack.Value = rase.attack;
-                weapRef.Value = "";
-            }
-        }
-        else if (stuff is Armor a)
-        {
-            if (equip)
-                defence.Add(a);
-            else
-                defence.Remove(a);
-        }
-
-        if (error)
-        {
-            PickUpItem(refEquip);
-        }
-        //Debug.Log("Player stats changed becouse of equipment change");
-    }
     [ClientRpc] protected void SetLiveClientRpc(bool alive)
     {
         if (IsOwner)
             GameManager.instance.SetPlayerUI(alive);
     }
-
     [ServerRpc] public void SendMessageServerRpc(string message)
     {
         SendMessageClientRpc(message);
