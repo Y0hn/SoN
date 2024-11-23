@@ -35,6 +35,7 @@ public abstract class EntityStats : NetworkBehaviour
     public NetworkObject NetObject  { get { return netObject; } }
     public Animator Animator        { get { return animator.Animator; } }
     public Rigidbody2D RigidBody2D  { get { return rb; } }
+    protected bool bothHandedAttack;
     protected const float timeToDespawn = 0f;
     private bool clampedDMG = true;
 
@@ -146,11 +147,23 @@ public abstract class EntityStats : NetworkBehaviour
                     break;
                 case Equipment.Slot.WeaponR:
                 case Equipment.Slot.WeaponL:
+                case Equipment.Slot.WeaponBoth:
                     Weapon w = (Weapon)value;
                     if (IsServer)
-                        attack.Value = new (w.attack.damage, w.attack.range, w.attack.rate, w.attack.type);                    
-                    weaponL.sprite = Resources.Load<Sprite>(w.spriteRef);
-                    weaponR.sprite = Resources.Load<Sprite>(w.spriteRef);
+                    {
+                        if (w != null)
+                            attack.Value = new (w.attack.damage, w.attack.range, w.attack.rate, w.attack.type);
+                        else
+                            attack.Value = rase.attack;
+                    }
+
+                    Sprite sprite = Resources.Load<Sprite>(w.spriteRef);
+                    weaponL.sprite = sprite;
+                    weaponR.sprite = sprite;
+
+                    bothHandedAttack = w.slot == Equipment.Slot.WeaponBoth;
+                    weaponR.enabled = bothHandedAttack || w.slot == Equipment.Slot.WeaponR;
+                    weaponL.enabled = bothHandedAttack || w.slot == Equipment.Slot.WeaponL;
                     break;
             }
         }
@@ -266,8 +279,10 @@ public abstract class EntityStats : NetworkBehaviour
     public float range;
     public float rate;
     public Type type;
-    public Attack (Damage damage, float range, float rate, Type type)
+    public bool bothHanded;
+    public Attack (Damage damage, float range, float rate, Type type, bool both = false)
     {
+        this.bothHanded = both;
         this.damage = damage;
         this.range = range;
         this.rate = rate;
@@ -287,9 +302,11 @@ public abstract class EntityStats : NetworkBehaviour
     }
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
+        serializer.SerializeValue(ref bothHanded);
         serializer.SerializeValue(ref damage);
         serializer.SerializeValue(ref range);
         serializer.SerializeValue(ref rate);
+        serializer.SerializeValue(ref type);
     }
 }
 
