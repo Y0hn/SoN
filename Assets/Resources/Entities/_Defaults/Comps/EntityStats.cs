@@ -9,7 +9,6 @@ using TMPro;
 /// <summary>
 /// Drzi hodnoty pre entitu
 /// </summary>
-[RequireComponent(typeof(EntityController))]
 public abstract class EntityStats : NetworkBehaviour
 {
     // Server Autoritative
@@ -71,23 +70,20 @@ public abstract class EntityStats : NetworkBehaviour
 
             speed.Value = rase.speed;
             
-            int length = Enum.GetNames(typeof(Equipment.Slot)).Length,
-                count = equipment.Count;
-            if (count != length)
-            {
-                for (bool add = count < length; equipment.Count == length;)
-                    if (add)
-                        equipment.Add("");
-                    else
-                        equipment.RemoveAt(equipment.Count - 1);
-                SortEquipmentList();
-            }
+            int length = Enum.GetNames(typeof(Equipment.Slot)).Length;
+            for (; equipment.Count < length;)
+                equipment.Add("");
+
+            string s = "";
+            foreach (FixedString64Bytes r in equipment)
+                s += r.ToString() + "\n";
+            Debug.Log(s);
 
             IsAlive.Value = true;
         }
         defence = new(rase.naturalArmor);
     }
-    protected void SortEquipmentList()
+    /*protected void SortEquipmentList()
     {
         int length = Enum.GetNames(typeof(Equipment.Slot)).Length;
         List<Equipment> change = new();
@@ -115,7 +111,7 @@ public abstract class EntityStats : NetworkBehaviour
             if (change.Count == 0)
                 break;
         }
-    }
+    }*/
     protected virtual void Update()
     {
 
