@@ -4,7 +4,8 @@ using System;
 public class Equipment : Item
 {
     public Slot slot;
-    public string spriteRef;
+    [SerializeField] protected string sprite;
+    public virtual string SpriteRef { get; }
     public enum Slot
     {
         Head, Torso, Hands, Legs,

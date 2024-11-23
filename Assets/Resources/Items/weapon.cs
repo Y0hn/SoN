@@ -1,13 +1,15 @@
+using System.Collections.Generic;
 using UnityEngine;
 using System;
 [CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Weapon"), Serializable] 
 public class Weapon : Equipment
 {
-    public Attack attack;
+    public List<Attack> attack;
     public override string GetReferency
     {
         get { return FileManager.WEAPONS_DEFAULT_PATH + "/" + name; }
     }
+    public override string SpriteRef => FileManager.WEAPONS_REF_DEFAULT_PATH + "/" + sprite;
     public override void Use(ItemSlot iS)
     {
         base.Use(iS);

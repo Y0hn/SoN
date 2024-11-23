@@ -51,8 +51,11 @@ public abstract class EntityController : NetworkBehaviour
     {
         if (stats.AttackTrigger())
         {
-            float atBlend = stats.Animator.GetFloat("atBlend") * -1;
-            stats.Animator.SetFloat("atBlend", atBlend);
+            if (stats.AttackBoth)
+            {
+                float atBlend = stats.Animator.GetFloat("atBlend") * -1;
+                stats.Animator.SetFloat("atBlend", atBlend);
+            }
             stats.Animator.SetTrigger("attack");
         }
     }

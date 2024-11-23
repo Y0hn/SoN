@@ -12,17 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b663a2d908cea242bdda3a338f4d2ea, type: 3}
   m_Name: sword-1
   m_EditorClassIdentifier: 
-  title: null
+  title: Sword
   description: good at slashing
   iconRef: Items/textures/sword-1
   color: {r: 0.6, g: 0.6, b: 0.6, a: 1}
   rarity: {r: 0.8352942, g: 0.5176471, b: 0.1254902, a: 1}
   slot: 5
-  spriteRef: Entities/Weapons/sword1
+  sprite: sword-1
   attack:
-    damage:
-      type: 1
-      amount: 10
+  - damage:
+      type: 0
+      amount: 0
     range: 1
-    rate: 0.5
+    rate: 0.7
     type: 1
+    bothHanded: 0
+  - damage:
+      type: 0
+      amount: 0
+    range: 2
+    rate: 0.5
+    type: 2
+    bothHanded: 0

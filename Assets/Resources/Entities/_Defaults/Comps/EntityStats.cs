@@ -33,9 +33,9 @@ public abstract class EntityStats : NetworkBehaviour
 
     public float HP                 { get { return (float)hp.Value/(float)maxHp.Value; } }
     public NetworkObject NetObject  { get { return netObject; } }
-    public Animator Animator        { get { return animator.Animator; } }
     public Rigidbody2D RigidBody2D  { get { return rb; } }
-    protected bool bothHandedAttack;
+    public bool AttackBoth   { get { return attack.Value.bothHanded; } }
+    public Animator Animator        { get { return animator.Animator; } }
     protected const float timeToDespawn = 0f;
     private bool clampedDMG = true;
 
@@ -53,7 +53,15 @@ public abstract class EntityStats : NetworkBehaviour
             maxHp.OnValueChanged += (int prevValue, int newValue) => hp.Value = maxHp.Value;
 
         equipment.OnListChanged += (NetworkListEvent<FixedString64Bytes> listEvent) => OnEquipmentUpdate(listEvent);
-        attack.OnValueChanged   += (Attack prevValue, Attack newValue)              => Animator.SetFloat("weapon", (float)newValue.type);
+        attack.OnValueChanged   += (Attack prevValue, Attack newValue) => 
+        {
+            if (newValue.type == Attack.Type.RaseUnnarmed)
+            {
+                weaponL.gameObject.SetActive(false);
+                weaponR.gameObject.SetActive(false);
+            }
+            Animator.SetFloat("weapon", (float)newValue.type);
+        };
         IsAlive.OnValueChanged  += (bool prev, bool alive)          => SetLive(alive);
         hp.OnValueChanged       += (int prevValue, int newValue)    => OnHpUpdate();
     }
@@ -74,11 +82,6 @@ public abstract class EntityStats : NetworkBehaviour
             int length = Enum.GetNames(typeof(Equipment.Slot)).Length;
             for (; equipment.Count < length;)
                 equipment.Add("");
-
-            string s = "";
-            foreach (FixedString64Bytes r in equipment)
-                s += r.ToString() + "\n";
-            Debug.Log(s);
 
             IsAlive.Value = true;
         }
@@ -149,28 +152,32 @@ public abstract class EntityStats : NetworkBehaviour
                 case Equipment.Slot.WeaponL:
                 case Equipment.Slot.WeaponBoth:
                     Weapon w = (Weapon)value;
-                    if (IsServer)
+                    if (IsServer && referencia == "")
+                        attack.Value = rase.attack;
+                    else if (referencia != "")
                     {
-                        if (w != null)
-                            attack.Value = new (w.attack.damage, w.attack.range, w.attack.rate, w.attack.type);
-                        else
-                            attack.Value = rase.attack;
+                        attack.Value = w.attack[0];
+
+                        Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
+                        weaponL.sprite = sprite;
+                        weaponR.sprite = sprite;
+    
+                        bool 
+                        R = w.slot == Equipment.Slot.WeaponR,                             
+                        L = w.slot == Equipment.Slot.WeaponL, 
+                        B = w.slot == Equipment.Slot.WeaponBoth;
+    
+                        weaponR.gameObject.SetActive(R || B); 
+                        weaponL.gameObject.SetActive(L || B);
+    
+                        float atBlend = (R || B) ? 1 : -1;
+                        Animator.SetFloat("atBlend", atBlend);
                     }
-
-                    Sprite sprite = Resources.Load<Sprite>(w.spriteRef);
-                    weaponL.sprite = sprite;
-                    weaponR.sprite = sprite;
-
-                    bothHandedAttack = w.slot == Equipment.Slot.WeaponBoth;
-                    weaponR.enabled = bothHandedAttack || w.slot == Equipment.Slot.WeaponR;
-                    weaponL.enabled = bothHandedAttack || w.slot == Equipment.Slot.WeaponL;
                     break;
             }
         }
         else
-        {
             Debug.LogWarning("Equipment corrupted");
-        }
     }
     public virtual bool TakeDamage(Damage damage)
     {
@@ -213,9 +220,9 @@ public abstract class EntityStats : NetworkBehaviour
         // Play animation 
         gameObject.SetActive(alive);
     }
-    [Rpc(SendTo.Server)] public void EquipRpc(string reference, Equipment.Slot slot = Equipment.Slot.NoPreference)
+    [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot = Equipment.Slot.NoPreference)
     {
-        if (slot == Equipment.Slot.NoPreference)
+        if (slot == Equipment.Slot.NoPreference && reference != "")
             slot = ((Equipment)Item.GetItem(reference)).slot;
         equipment[(int)slot] = reference;
     }
@@ -290,7 +297,7 @@ public abstract class EntityStats : NetworkBehaviour
     }
     public enum Type
     {
-        RaseUnnarmed, MeleeSlash//, MeleeStab, Melee, RangeBow
+        RaseUnnarmed, MeleeSlash, MeleeStab, BowSingle, BowMulti // Magi
     }
     public bool Equals (Attack other)
     {
@@ -309,7 +316,6 @@ public abstract class EntityStats : NetworkBehaviour
         serializer.SerializeValue(ref type);
     }
 }
-
 [Serializable] public struct Damage : INetworkSerializable, IEquatable<Damage>
 {
     public Type type;

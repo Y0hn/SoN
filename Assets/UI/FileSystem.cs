@@ -12,6 +12,7 @@ public static class FileManager
     public const string ITEM_DEFAULT_PATH = @"Items";
     public const string WEAPONS_DEFAULT_PATH = @"Items/weapons";
     public const string ARMORS_DEFAULT_PATH = @"Items/armors";
+    public const string WEAPONS_REF_DEFAULT_PATH = @"Items/textures/InGame";
 
     // FROM APP DATA PATH
     private const string LOG_DEFAULT_PATH = @"";
