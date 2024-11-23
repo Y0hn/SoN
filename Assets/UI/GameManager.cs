@@ -135,7 +135,7 @@ public class GameManager : MonoBehaviour
             UIs["chatUI"].SetActive(chatting);
             string mess = inputFields["chat"].text.Trim()/*.Substring(0, 64)*/;
             if (inputFields["chat"].text.Trim() == "") return;
-            player.SendMessageServerRpc(mess);
+            player.message.Value = mess;
             inputFields["chat"].text = "";
         }
     }

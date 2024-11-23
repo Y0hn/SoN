@@ -43,9 +43,9 @@ public class PlayerStats : EntityStats
     float atTime = 0;   // pouziva len owner
     int xpMin = 0;
     protected NetworkVariable<int> xp = new(0);
-    protected NetworkVariable<FixedString128Bytes> message = new("");
     protected NetworkVariable<int> xpMax = new(10, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
+    public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     protected GameManager game;
@@ -65,7 +65,7 @@ public class PlayerStats : EntityStats
             hpBar = game.GetBar("hp");
             xpBar = game.GetBar("xp");
             xpBar.minValue = xpMin;
-            xpBar.maxValue = xpMax;
+            xpBar.maxValue = xpMax.Value;
             xpBar.value = xp.Value;
 
             playerName.Value = game.PlayerName;
@@ -94,13 +94,13 @@ public class PlayerStats : EntityStats
     {
         xp.OnValueChanged += (int prevValue, int newValue) => 
         { 
-            if (newValue < xpMax)
+            if (newValue < xpMax.Value)
                 xpBar.value = xp.Value; 
             else
             {
-                xpMax += xp.Value * level.Value;
+                xpMax.Value += xp.Value * level.Value;
                 xpBar.minValue = xp.Value;
-                xpBar.maxValue = xpMax;
+                xpBar.maxValue = xpMax.Value;
             }
         };
         hp.OnValueChanged += (int prevValue, int newValue) => 
