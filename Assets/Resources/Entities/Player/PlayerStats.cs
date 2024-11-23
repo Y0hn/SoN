@@ -37,12 +37,14 @@ public class PlayerStats : EntityStats
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
     [SerializeField] GameObject chatField;
     [SerializeField] TMP_Text chatBox;
-    public RpcParams OwnerRPC { get { return RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp); } }
+    //public RpcParams OwnerRPC { get { return RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp); } }
     float chatTimer; const float chatTime = 5.0f;
     Slider xpBar;       // UI nastavene len pre Ownera
     float atTime = 0;   // pouziva len owner
-    int xpMax = 10, xpMin = 0;
+    int xpMin = 0;
     protected NetworkVariable<int> xp = new(0);
+    protected NetworkVariable<FixedString128Bytes> message = new("");
+    protected NetworkVariable<int> xpMax = new(10, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
     protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -66,7 +68,7 @@ public class PlayerStats : EntityStats
             xpBar.maxValue = xpMax;
             xpBar.value = xp.Value;
 
-            playerName.Value = GameManager.instance.PlayerName;
+            playerName.Value = game.PlayerName;
         }
         chatTimer = 0;
         chatBox.text = "";
@@ -78,23 +80,37 @@ public class PlayerStats : EntityStats
     protected override void SubsOnNetValChanged()
     {
         base.SubsOnNetValChanged();
+        if (IsServer)
+            xpMax.OnValueChanged += (int prev, int newValue) => level.Value++;
         playerName.OnValueChanged += (FixedString32Bytes prevValue, FixedString32Bytes newValue) => { nameTag.text = newValue.ToString(); };
+        message.OnValueChanged += (FixedString128Bytes prevValue, FixedString128Bytes newMess) => 
+        {
+            chatBox.text = newMess.ToString();
+            chatField.SetActive(true);
+            chatTimer = Time.time + chatTime;
+        };
     }
     protected void OwnerSubsOnNetValChanged()
     {
-        xp.OnValueChanged += (int prevValue, int newValue) => OnXpUpdate();
-        hp.OnValueChanged += (int prevValue, int newValue) => GameManager.instance.AnimateFace(HP);
-        inventory.OnListChanged += (NetworkListEvent<FixedString64Bytes> changeEvent) => { OnInventoryUpdate(changeEvent); };
-    }
-    protected void OnXpUpdate()     // iba lokalne
-    {
-        xpBar.value = xp.Value;
-    }
-    protected void OnLevelUp()      // iba lokalne
-    {
-        xpMax += xp.Value * level.Value;
-        xpBar.minValue = xp.Value;
-        xpBar.maxValue = xpMax;
+        xp.OnValueChanged += (int prevValue, int newValue) => 
+        { 
+            if (newValue < xpMax)
+                xpBar.value = xp.Value; 
+            else
+            {
+                xpMax += xp.Value * level.Value;
+                xpBar.minValue = xp.Value;
+                xpBar.maxValue = xpMax;
+            }
+        };
+        hp.OnValueChanged += (int prevValue, int newValue) => 
+        { 
+            if (prevValue > newValue)
+                game.AnimateFace("got-hit");
+            game.AnimateFace(HP);
+        };
+        inventory.OnListChanged += (NetworkListEvent<FixedString64Bytes> changeEvent)   => OnInventoryUpdate(changeEvent);
+        IsAlive.OnValueChanged  += (bool prevValue, bool newValue)                      => game.SetPlayerUI(newValue);
     }
     protected void OnInventoryUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)  // iba lokalne
     {        
@@ -141,27 +157,10 @@ public class PlayerStats : EntityStats
         }
         return false;
     }
-    protected override EntityStats[] MeleeAttack()
-    {
-        return base.MeleeAttack();
-    }
     public override void KilledEnemy(EntityStats died)
     {
         base.KilledEnemy(died);
-        xp.Value += died.level.Value;
-    }
-    protected override void SetLive(bool alive)
-    {
-        base.SetLive(alive);
-        
-        SetLiveClientRpc(alive);
-    }
-    public override bool TakeDamage(Damage damage)
-    {
-        if (!IsServer) { Debug.Log("Called from noooo server"); return false; }
-
-        OwnerTakenDamageRpc();
-        return base.TakeDamage(damage);
+        xp.Value += died.level.Value * 5 ;
     }
     protected override void Update()
     {
@@ -198,32 +197,8 @@ public class PlayerStats : EntityStats
             Debug.LogWarning($"Player {targetId} not found");
         }
     }
-    [Rpc(SendTo.Owner)] protected void OwnerTakenDamageRpc()
-    {
-        GameManager.instance.AnimateFace("got-hit");
-    }
     public void PickUpItem(string refItem)
     {
-        if (IsServer)
-            inventory.Add(refItem);
-    }
-    [ClientRpc] protected void SetLiveClientRpc(bool alive)
-    {
-        if (IsOwner)
-            GameManager.instance.SetPlayerUI(alive);
-    }
-    [ServerRpc] public void SendMessageServerRpc(string message)
-    {
-        SendMessageClientRpc(message);
-    }
-    [ClientRpc] protected void SendMessageClientRpc(string message)
-    {
-        SpeakText(message);
-    }
-    void SpeakText(string text)
-    {
-        chatBox.text = text;
-        chatField.SetActive(true);
-        chatTimer = Time.time + chatTime;
+        inventory.Add(refItem);
     }
 }
