@@ -92,6 +92,7 @@ public class PlayerStats : EntityStats
     }
     protected void OwnerSubsOnNetValChanged()
     {
+        if (!IsOwner) return;
         xp.OnValueChanged += (int prevValue, int newValue) => 
         { 
             if (newValue < xpMax.Value)
@@ -105,7 +106,7 @@ public class PlayerStats : EntityStats
         };
         hp.OnValueChanged += (int prevValue, int newValue) => 
         { 
-            if (prevValue > newValue)
+            if (newValue < prevValue)
                 game.AnimateFace("got-hit");
             game.AnimateFace(HP);
         };
