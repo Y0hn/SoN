@@ -59,16 +59,11 @@ public class ItemDrop : NetworkBehaviour
     }
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (IsServer && collision.transform.TryGetComponent(out PlayerStats pl))
+        if (collision.transform.TryGetComponent(out PlayerStats pl))
         {
-            // sem sa dostane len Server aby sa nestalo ze viaceri Clienti detekuju to iste
-            ulong id = pl.NetObject.OwnerClientId;
-            // ziska id clienta
-            pl.PickUpItem(Item.GetReferency);
-            // hrac skusi zobrat ItemDrop
-
+            pl.PickedUpRpc(Item.GetReferency);
+            PickedUpRpc();
             // Pridat overenie ci hrac zobral item
-            Item = null;
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members

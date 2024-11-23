@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
     }
     void Update()   // Single Player DEBUG
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P) && player.IsServer)
         {
             GameObject i = Instantiate(
                 Resources.LoadAll<GameObject>("Items/ItemDrop")[0], 

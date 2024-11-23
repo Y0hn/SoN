@@ -40,14 +40,12 @@ public class PlayerStats : EntityStats
     //public RpcParams OwnerRPC { get { return RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp); } }
     float chatTimer; const float chatTime = 5.0f;
     Slider xpBar;       // UI nastavene len pre Ownera
-    float atTime = 0;   // pouziva len owner
     int xpMin = 0;
     protected NetworkVariable<int> xp = new(0);
     protected NetworkVariable<int> xpMax = new(10, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
     public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-
     protected GameManager game;
     public override void OnNetworkSpawn()
     {
@@ -135,28 +133,7 @@ public class PlayerStats : EntityStats
     }
     public override bool AttackTrigger()
     {
-        if (Time.time >= atTime)
-        {
-            if (attack.Value.type == Attack.Type.MeleeSlash || Attack.Type.RaseUnnarmed == attack.Value.type)
-            {
-                foreach(EntityStats et in MeleeAttack())
-                {
-                    if (et is PlayerStats)
-                    {
-                        ulong hitID = et.GetComponent<NetworkObject>().OwnerClientId;
-                        DamagePlayerRpc(attack.Value.damage, OwnerClientId, hitID);
-
-                        //Debug.Log($"'{name}' (ID: {OwnerClientId}) attacking player '{stats.name}' with ID: {hitID}");
-                    }
-                }
-            }
-            else 
-                Debug.Log($"Player {name} attack type {System.Enum.GetName(typeof(Attack.Type), attack.Value.type)} not defined");
-
-            atTime = Time.time + 1/attack.Value.rate;
-            return true;
-        }
-        return false;
+        return base.AttackTrigger();
     }
     public override void KilledEnemy(EntityStats died)
     {
@@ -173,32 +150,7 @@ public class PlayerStats : EntityStats
                 chatTimer = 0;
             }
     }
-    /// <summary>
-    /// Server does this for Player doing damage to another Player
-    /// </summary>
-    /// <param name="damage"></param>
-    /// <param name="dealerId"></param>
-    /// <param name="targetId"></param>
-    [Rpc(SendTo.Server)] protected void DamagePlayerRpc(Damage damage, ulong dealerId, ulong targetId)
-    {
-        PlayerStats playerTarget = NetworkManager.Singleton.ConnectedClients[targetId].PlayerObject.GetComponent<PlayerStats>();
-        PlayerStats playerDealer = NetworkManager.Singleton.ConnectedClients[dealerId].PlayerObject.GetComponent<PlayerStats>();
-
-        if (playerTarget != null)
-        {
-            if (playerTarget.IsAlive.Value)
-                if (playerTarget.TakeDamage(damage))    // pravdive ak target zomrie
-                {
-                    playerDealer.KilledEnemy(playerTarget);
-                }
-            Debug.Log("Player hitted");
-        }
-        else
-        {
-            Debug.LogWarning($"Player {targetId} not found");
-        }
-    }
-    public void PickUpItem(string refItem)
+    [Rpc(SendTo.Server)] public override void PickedUpRpc(string refItem)
     {
         inventory.Add(refItem);
     }

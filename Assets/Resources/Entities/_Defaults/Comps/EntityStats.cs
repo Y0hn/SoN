@@ -23,7 +23,8 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected Rigidbody2D rb;
     protected Defence defence;  // iba na servery/hoste Servery
 
-    [SerializeField]    protected   NetworkList<FixedString64Bytes> equipment = new();    // Sprava sa ako Dictionary ale je to list
+    [SerializeField]    protected   NetworkList<FixedString64Bytes> equipment = new(/*null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner*/);    
+    // Sprava sa ako Dictionary ale je to list
     [SerializeField]    protected   NetworkVariable<int> maxHp = new();
                         protected   NetworkVariable<int> hp = new();
                         public      NetworkVariable<float> speed = new();
@@ -36,6 +37,7 @@ public abstract class EntityStats : NetworkBehaviour
     public Rigidbody2D RigidBody2D  { get { return rb; } }
     public bool AttackBoth   { get { return attack.Value.bothHanded; } }
     public Animator Animator        { get { return animator.Animator; } }
+    protected float atTime = 0;
     protected const float timeToDespawn = 0f;
     private bool clampedDMG = true;
 
@@ -61,6 +63,7 @@ public abstract class EntityStats : NetworkBehaviour
                 weaponR.gameObject.SetActive(false);
             }
             Animator.SetFloat("weapon", (float)newValue.type);
+            attackPoint.localPosition = new(attackPoint.localPosition.x, newValue.range);
         };
         IsAlive.OnValueChanged  += (bool prev, bool alive)          => SetLive(alive);
         hp.OnValueChanged       += (int prevValue, int newValue)    => OnHpUpdate();
@@ -156,7 +159,8 @@ public abstract class EntityStats : NetworkBehaviour
                         attack.Value = rase.attack;
                     else if (referencia != "")
                     {
-                        attack.Value = w.attack[0];
+                        if (IsServer)
+                            attack.Value = w.attack[0];
 
                         Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
                         weaponL.sprite = sprite;
@@ -193,19 +197,14 @@ public abstract class EntityStats : NetworkBehaviour
 
         return !IsAlive.Value;
     }
-    protected virtual EntityStats[] MeleeAttack()
-    {
-        List<EntityStats> targetStats = new();
-        Collider2D[] targets = Physics2D.OverlapCircleAll(attackPoint.position, attack.Value.range /*, layer mask */);
-        foreach (Collider2D target in targets)
-            if (target.TryGetComponent(out EntityStats stats))
-                if (stats != this)
-                    targetStats.Add(stats);
-
-        return targetStats.ToArray();
-    }
     public virtual bool AttackTrigger()
     {
+        if (Time.time >= atTime)
+        {
+            AttackRpc();
+            atTime = Time.time + 1/attack.Value.rate;
+            return true;
+        }
         return false;
     }
     public virtual void KilledEnemy(EntityStats died)
@@ -225,6 +224,38 @@ public abstract class EntityStats : NetworkBehaviour
         if (slot == Equipment.Slot.NoPreference && reference != "")
             slot = ((Equipment)Item.GetItem(reference)).slot;
         equipment[(int)slot] = reference;
+    }
+    [Rpc(SendTo.Server)] protected void AttackRpc()
+    {
+
+        if      (Attack.MeleeAttack(attack.Value.type))
+        {
+            foreach(EntityStats et in MeleeAttack())
+                if (et.IsAlive.Value)
+                    if (et.TakeDamage(attack.Value.damage))    // pravdive ak target zomrie
+                        KilledEnemy(et);
+        }
+        else if (Attack.RangedAttack(attack.Value.type))
+        {
+
+        }
+        else 
+            Debug.Log($"Player {name} attack type {Enum.GetName(typeof(Attack.Type), attack.Value.type)} not yet defined");
+    }
+    protected virtual EntityStats[] MeleeAttack()
+    {
+        List<EntityStats> targetStats = new();
+        Collider2D[] targets = Physics2D.OverlapCircleAll(attackPoint.position, attack.Value.range /*, layer mask */);
+        foreach (Collider2D target in targets)
+            if (target.TryGetComponent(out EntityStats stats))
+                if (stats != this)
+                    targetStats.Add(stats);
+
+        return targetStats.ToArray();
+    }
+    [Rpc(SendTo.Server)] public virtual void PickedUpRpc(string reference)
+    {
+
     }
 }
 [Serializable] public class Defence
@@ -294,10 +325,18 @@ public abstract class EntityStats : NetworkBehaviour
         this.range = range;
         this.rate = rate;
         this.type = type;
-    }
+    }    
     public enum Type
     {
         RaseUnnarmed, MeleeSlash, MeleeStab, BowSingle, BowMulti // Magi
+    }
+    public static bool MeleeAttack(Type t)
+    {
+        return Type.RaseUnnarmed == t || t == Type.MeleeSlash || Type.MeleeStab == t;
+    }
+    public static bool RangedAttack(Type t)
+    {
+        return Type.BowSingle == t || t == Type.BowMulti;
     }
     public bool Equals (Attack other)
     {
