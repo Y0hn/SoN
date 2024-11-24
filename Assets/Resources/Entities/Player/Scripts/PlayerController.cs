@@ -71,7 +71,7 @@ public class PlayerController : EntityController
             return;
         }
 
-        Vector2 pos = game.mousePos.normalized;
+        Vector2 pos = game.MousePos.normalized;
         pos = RoundVector(pos, 1);
         string p = "";
         
@@ -83,9 +83,9 @@ public class PlayerController : EntityController
             p += "D";
         else if (pos.y > 0)
             p += "U";
-
+        /*
         if (p != "")
-            Debug.Log(p + "pos: " + $"[{pos.x},{pos.y}]");
+            Debug.Log(p + "pos: " + $"[{pos.x},{pos.y}]");*/
 
         attacking = !context.canceled;
     }

@@ -151,7 +151,7 @@ public static class FileManager
     {
         if (get)
         {
-            lastConnection = ConnectionManager.instance.codeText.text;
+            lastConnection = Connector.instance.codeText.text;
             playerName = GameManager.instance.PlayerName;
             online = GameManager.UI.Online;
         }
@@ -168,7 +168,7 @@ public static class FileManager
         this.online = settings.online;
         this.lastConnection = settings.lastConnection;
 
-        ConnectionManager.instance.codeText.text = lastConnection;
+        Connector.instance.codeText.text = lastConnection;
         GameManager.instance.PlayerName = playerName;
         GameManager.UI.Online = online;
     }

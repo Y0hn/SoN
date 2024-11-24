@@ -2,15 +2,17 @@ using AYellowpaper.SerializedCollections;
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
 public class MenuScript : MonoBehaviour
 {
     int navLayer;
+    [SerializeField] Connector conn;
     [SerializeField] Animator animator;
     [SerializeField] Toggle onlineToggle;
     public bool Online { get => onlineToggle.isOn; set => onlineToggle.isOn = value; }
 
     [SerializedDictionary("Name", "Button"), SerializeField]
-    protected SerializedDictionary<string, Button> buttons = new();
+    private SerializedDictionary<string, Button> buttons = new();
     /* OBSAH
         {"exit",            - },
         {"solo",            - },
@@ -30,14 +32,14 @@ public class MenuScript : MonoBehaviour
     */
     
     [SerializedDictionary("Name", "InputField"), SerializeField]
-    protected SerializedDictionary<string, TMP_InputField> inputFields = new();
+    private SerializedDictionary<string, TMP_InputField> inputFields = new();
      /* OBSAH
         {"playerName",  - },
         {"ipCode",      - }
     */
     
     [SerializedDictionary("Name", "TextField"), SerializeField]
-    protected SerializedDictionary<string, TMP_Text> textFields = new();
+    private SerializedDictionary<string, TMP_Text> textFields = new();
     /* OBSAH
         {"mSolo",               - },
         {"sTitle",              - },
@@ -67,12 +69,51 @@ public class MenuScript : MonoBehaviour
         {"VERSION",             - },
         {"COMPANY",             - }
     */
+    [SerializedDictionary("Name", "GameObject"), SerializeField]
+    private SerializedDictionary<string, GameObject> uis = new();
+    /*  OBSAH
     
+        {"BG"}
+        {"PT"}
+        {"PV"}
+        {"PC"}
+        {"EXIT"}
+        {"MenuBase"}
+        {"Main"}
+        {"SubSolo"}
+        {"SubMulti"}
+        {"SubMultiJoin"}
+        {"SubMultiStart"}
+        {"SubSett"}
+        {"SubLoad"}
+    */
     void Start()
     {
+        conn = Connector.instance;
         SubscribeToButtons();
         SetTextFields();
-        navLayer = 0;
+        SetUpUI();
+    }
+    public void SetUpUI(bool active = true)
+    {
+        uis["BG"].SetActive(active);
+        uis["PT"].SetActive(active);
+        uis["PV"].SetActive(active);
+        uis["PC"].SetActive(active);
+        uis["EXIT"].SetActive(active);
+        uis["MenuBase"].SetActive(active);
+        // if (active)
+        uis["Main"].SetActive(true);
+        uis["SubSolo"].SetActive(false);
+        uis["SubMulti"].SetActive(false);
+        uis["SubMultiJoin"].SetActive(false);
+        uis["SubMultiStart"].SetActive(false);
+        uis["SubSett"].SetActive(false);
+        uis["SubLoad"].SetActive(false);
+        
+        MainMenuNav(0);
+        if (!active)
+            animator.SetTrigger("reset");
     }
     void SetTextFields()
     {
@@ -85,19 +126,19 @@ public class MenuScript : MonoBehaviour
     }
     void SubscribeToButtons()
     {
-        buttons["exit"].onClick.AddListener(Exit);
-        buttons["solo"].onClick.AddListener(delegate { MainMenuNav(1); });
-        buttons["multi"].onClick.AddListener(delegate { MainMenuNav(2); });
-        buttons["sett"].onClick.AddListener(delegate { MainMenuNav(3); });
+        buttons["exit"].    onClick.AddListener(Exit);
+        buttons["solo"].    onClick.AddListener(delegate { MainMenuNav(1); });
+        buttons["multi"].   onClick.AddListener(delegate { MainMenuNav(2); });
+        buttons["sett"].    onClick.AddListener(delegate { MainMenuNav(3); });
 
-        buttons["soloCont"].onClick.AddListener(delegate { SoloMenuNav(1); });
-        buttons["soloLoad"].onClick.AddListener(delegate { SoloMenuNav(2); });
-        buttons["soloCreate"].onClick.AddListener(delegate { SoloMenuNav(3); });
+        buttons["soloCont"].    onClick.AddListener(delegate { SoloMenuNav(1); });
+        buttons["soloLoad"].    onClick.AddListener(delegate { SoloMenuNav(2); });
+        buttons["soloCreate"].  onClick.AddListener(delegate { SoloMenuNav(3); });
 
-        buttons["multiStart"].onClick.AddListener(delegate { MultiMenuNav(1); });
-        buttons["multiJoin"].onClick.AddListener(delegate { MultiMenuNav(2); });
-        buttons["multiLoad"].onClick.AddListener(delegate { MultiMenuNav(3); });
-        buttons["multiCreate"].onClick.AddListener(delegate { MultiMenuNav(4); });
+        buttons["multiStart"].  onClick.AddListener(delegate { MultiMenuNav(1); });
+        buttons["multiJoin"].   onClick.AddListener(delegate { MultiMenuNav(2); });
+        buttons["multiLoad"].   onClick.AddListener(delegate { MultiMenuNav(3); });
+        buttons["multiCreate"]. onClick.AddListener(delegate { MultiMenuNav(4); });
 
         buttons["joinMultiJoin"].onClick.AddListener(delegate { MultiMenuNav(5); });
     }
@@ -125,9 +166,9 @@ public class MenuScript : MonoBehaviour
 
         switch (choice)
         {
-            case 1: ConnectionManager.instance.CreateSolo(); break;  // Pokracovat v hre
+            case 1: conn.CreateSolo(); break;  // Pokracovat v hre
             case 2: break;  // Nacitat zo subora hru
-            case 3: ConnectionManager.instance.CreateSolo(); break;  // Vytvorit novu hru
+            case 3: conn.CreateSolo(); break;  // Vytvorit novu hru
 
             default: Debug.LogWarning("Bad input [" + choice + "] on SoloNavigation!"); break;
         }
@@ -178,7 +219,7 @@ public class MenuScript : MonoBehaviour
     {
         if (!load)
         {
-            ConnectionManager.instance.StartConnection(online);
+            conn.StartConnection(online);
         }
         else
         {
@@ -188,7 +229,7 @@ public class MenuScript : MonoBehaviour
     bool ConnectionCheck()
     {
         string ipCode = inputFields["ipCode"].text.Trim();
-        bool check = ConnectionManager.instance.JoinConnection(ipCode, out string e);
+        bool check = conn.JoinConnection(ipCode, out string e);
 
         if (!check)
             textFields["IPCodeError"].text = e;

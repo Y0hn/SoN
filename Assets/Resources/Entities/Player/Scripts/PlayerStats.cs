@@ -52,6 +52,10 @@ public class PlayerStats : EntityStats
         base.OnNetworkSpawn();
         OwnerSubsOnNetValChanged();
     }
+    public override void OnNetworkDespawn()
+    {
+        
+    }
     protected override void EntitySetUp()
     {
         base.EntitySetUp();

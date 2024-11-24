@@ -7,11 +7,13 @@ using Unity.Services.Authentication;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
-public class ConnectionManager : MonoBehaviour
+using System;
+public class Connector : MonoBehaviour
 {
-    public static ConnectionManager instance;
+    public static Connector instance;
     [SerializeField] public TMP_Text codeText;
     [SerializeField] int maxConnections = 10;
+    private NetworkManager netMan;
     private string serverIP { get { return IPManager.GetIP(IPManager.AddressForm.IPv4); } }
     void Awake()
     {
@@ -26,6 +28,7 @@ public class ConnectionManager : MonoBehaviour
         // Internet connection required
         await UnityServices.InitializeAsync();
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        netMan = NetworkManager.Singleton;
     }
     /*
             ____         __             
@@ -42,12 +45,12 @@ public class ConnectionManager : MonoBehaviour
 
         var relayServerData = new RelayServerData(allocation, "dtls");
 
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+        netMan.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
         
         if (host)
-            NetworkManager.Singleton.StartHost();
+            netMan.StartHost();
         else
-            NetworkManager.Singleton.StartServer();
+            netMan.StartServer();
 
         codeText.text = joinCode;        
     }
@@ -55,9 +58,9 @@ public class ConnectionManager : MonoBehaviour
     {
         var JoinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
         var relayServerData = new RelayServerData(JoinAllocation, "dtls");
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+        netMan.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
-        if (NetworkManager.Singleton.StartClient())
+        if (netMan.StartClient())
             codeText.text = joinCode;
     }
     /*
@@ -69,19 +72,19 @@ public class ConnectionManager : MonoBehaviour
     */
     void CreateLAN(bool host = true)
     {
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(serverIP, 7777);
+        netMan.GetComponent<UnityTransport>().SetConnectionData(serverIP, 7777);
 
         if (host)
-            NetworkManager.Singleton.StartHost(); 
+            netMan.StartHost(); 
         else
-            NetworkManager.Singleton.StartServer();
+            netMan.StartServer();
 
         codeText.text = serverIP;
     }
     void JoinLAN(string serverIP)
     {
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData(serverIP, 7777);
-        if (NetworkManager.Singleton.StartClient())
+        netMan.GetComponent<UnityTransport>().SetConnectionData(serverIP, 7777);
+        if (netMan.StartClient())
             codeText.text = serverIP;
     }
     public bool StartConnection(bool online)
@@ -131,8 +134,8 @@ public class ConnectionManager : MonoBehaviour
     }
     public void CreateSolo()
     {
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 7777);
-        NetworkManager.Singleton.StartHost(); 
+        netMan.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 7777);
+        netMan.StartHost(); 
     }
     private void LoadWorld(bool load = false, bool host = true)
     {
@@ -141,5 +144,13 @@ public class ConnectionManager : MonoBehaviour
         else if (host && !load)
              FileManager.WorldAct(FileManager.WorldAction.Create);
         // load world
+    }
+    public void Quit(ulong id)
+    {
+        if (!netMan.IsServer)
+            netMan.DisconnectClient(id);
+        else
+            netMan.Shutdown();
+        //Environment.Exit(0);
     }
 }
