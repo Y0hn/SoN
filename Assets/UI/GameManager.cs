@@ -10,25 +10,24 @@ using Unity.Netcode;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    public static MenuScript UI { get { return instance.menuScript; } }
-    public static bool IsServer { get; private set; }
+    public static Inventory inventory;
     void Awake()    { instance = this; }
 
     [SerializeField] Connector conn;
     [SerializeField] MenuScript menu;
     [SerializeField] MenuScript menuScript;
     [SerializeField] Animator animatorGameUI;
-    public Inventory inventory;
-    public string PlayerName    { get { return inputFields["name"].text.Trim(); } set { inputFields["name"].text = value; } }
     [HideInInspector] public bool playerLives;
-    public bool PlayerAble      { get { return !(paused || chatting || inventory.open); } }
     private bool paused;
     private bool chatting;
     private PlayerStats player;
-
-    [SerializedDictionary("Name", "GameObject"), SerializeField]
-    SerializedDictionary<string, GameObject> uiPanels = new();
-    /*  OBSAH
+    
+    [SerializedDictionary("Name", "buttn"), SerializeField]         SerializedDictionary<string, Button> buttons = new();           /*  OBSAH
+        {"copy"},
+        {"quit"},
+    */
+    [SerializedDictionary("Name", "Field"), SerializeField]         SerializedDictionary<string, TMP_Text> textFields = new();      /*  OBSAH   */
+    [SerializedDictionary("Name", "Objkt"), SerializeField]         SerializedDictionary<string, GameObject> uiPanels = new();          /*  OBSAH
         {"mainCam",         -},
         {"menuUI",          -},
         {"pauseUI",         -},
@@ -42,30 +41,17 @@ public class GameManager : MonoBehaviour
 
         {"quitUI",          -}
     */
-    [SerializedDictionary("Name", "input"), SerializeField]
-    SerializedDictionary<string, InputActionReference> inputs = new();
-    /*  OBSAH
+    [SerializedDictionary("Name", "Field"), SerializeField]         SerializedDictionary<string, TMP_InputField> inputFields = new();   /*  OBSAH   
+        {"name"},
+        {"chat"},
+    */
+    [SerializedDictionary("Name", "input"), SerializeField]         SerializedDictionary<string, InputActionReference> inputs = new();  /*  OBSAH
         {"pause"},
         {"chat"},
         {"submit"},
         {"inventory"},
         {"equipment"},
         {"point"},
-    */
-    [SerializedDictionary("Name", "Field"), SerializeField]
-    SerializedDictionary<string, TMP_InputField> inputFields = new();
-    /*  OBSAH   
-        {"name"},
-        {"chat"},
-    */
-    [SerializedDictionary("Name", "Field"), SerializeField]
-    SerializedDictionary<string, TMP_Text> textFields = new();
-    /*  OBSAH   */
-    [SerializedDictionary("Name", "button"), SerializeField]
-    SerializedDictionary<string, Button> buttons = new();
-    /*  OBSAH
-        {"copy"},
-        {"quit"},
     */
     public Vector2 MousePos
     { 
@@ -79,7 +65,11 @@ public class GameManager : MonoBehaviour
             return v;
         }
     }
-    public PlayerStats LocalPlayer { get { return player; } }
+    public PlayerStats LocalPlayer  { get { return player; } }
+    public bool PlayerAble          { get { return !(paused || chatting || inventory.open); } }
+    public string PlayerName        { get { return inputFields["name"].text.Trim(); } set { inputFields["name"].text = value; } }
+    public static MenuScript UI     { get { return instance.menuScript; } }
+    public static bool IsServer     { get; private set; }
     void Start()
     {
         IsServer = NetworkManager.Singleton.IsServer;
@@ -226,7 +216,7 @@ public class GameManager : MonoBehaviour
 
         playerLives = lives;
     }
-    public void Copy() { GUIUtility.systemCopyBuffer = conn.codeText.text; animatorGameUI.SetTrigger("copy"); }
+    public void Copy()      { GUIUtility.systemCopyBuffer = conn.codeText.text; animatorGameUI.SetTrigger("copy"); }
     public void AnimateFace(float state)    { animatorGameUI.SetFloat("state", state);  }
     public void AnimateFace(string action)  { animatorGameUI.SetTrigger(action);        }
 }

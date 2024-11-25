@@ -35,7 +35,7 @@ public abstract class EntityStats : NetworkBehaviour
     public float HP                 { get { return (float)hp.Value/(float)maxHp.Value; } }
     public NetworkObject NetObject  { get { return netObject; } }
     public Rigidbody2D RigidBody2D  { get { return rb; } }
-    public bool AttackBoth   { get { return attack.Value.bothHanded; } }
+    public bool AttackBoth          { get { return attack.Value.bothHanded; } }
     public Animator Animator        { get { return animator.Animator; } }
     protected float atTime = 0;
     protected const float timeToDespawn = 0f;
@@ -143,13 +143,14 @@ public abstract class EntityStats : NetworkBehaviour
                 case Equipment.Slot.Head:
                 case Equipment.Slot.Torso:
                 case Equipment.Slot.Legs:
-                    if (referencia != "")
-                    {
-                        Armor a = (Armor)value;
-                        defence.Add(a);
-                    }
-                    else
-                        defence.Remove((Armor)Item.GetItem(previous));
+                    if (IsServer)
+                        if (referencia == "")
+                            defence.Remove((Armor)Item.GetItem(previous));
+                        else
+                        {
+                            Armor a = (Armor)value;
+                            defence.Add(a);
+                        }
                     break;
                 case Equipment.Slot.WeaponR:
                 case Equipment.Slot.WeaponL:

@@ -47,6 +47,7 @@ public class PlayerStats : EntityStats
     public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected GameManager game;
+    protected Inventory inventUI;
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -54,7 +55,8 @@ public class PlayerStats : EntityStats
     }
     public override void OnNetworkDespawn()
     {
-        
+        if (!IsServer) return;
+
     }
     protected override void EntitySetUp()
     {
@@ -63,6 +65,7 @@ public class PlayerStats : EntityStats
         if (IsOwner)
         {
             game = GameManager.instance;
+            inventUI = GameManager.inventory;
             hpBar.gameObject.SetActive(false);
             hpBar = game.GetBar("hp");
             xpBar = game.GetBar("xp");
@@ -121,11 +124,11 @@ public class PlayerStats : EntityStats
         {
             case NetworkListEvent<FixedString64Bytes>.EventType.Add:
                 //int index = changeEvent.Index; // the position of the added value in the list
-                game.inventory.Add(changeEvent.Value.ToString()); // the new value at the index position
+                inventUI.Add(changeEvent.Value.ToString()); // the new value at the index position
                 break;
             case NetworkListEvent<FixedString64Bytes>.EventType.Remove:
             case NetworkListEvent<FixedString64Bytes>.EventType.RemoveAt:
-                game.inventory.Remove(changeEvent.Value.ToString());
+                inventUI.Remove(changeEvent.Value.ToString());
                 break;
             case NetworkListEvent<FixedString64Bytes>.EventType.Full:
             case NetworkListEvent<FixedString64Bytes>.EventType.Clear:

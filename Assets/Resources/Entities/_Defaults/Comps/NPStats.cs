@@ -33,5 +33,5 @@ public class NPStats : EntityStats
      *  private bool clampedDMG = true;
      *  protected Defence defence;
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
-
+    
 }
