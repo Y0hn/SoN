@@ -45,6 +45,8 @@ public class Inventory : MonoBehaviour
     [SerializeField] InputActionReference input;
     [SerializeField] Vector2 pixelSize = new(1200, 500);
     [SerializeField] bool onGizmos = true;
+    [SerializeField] Color activeColor;
+    [SerializeField] Color pasiveColor;
     
     // INVENTORY
     List<ItemSlot> itemSlots = new();
@@ -57,6 +59,7 @@ public class Inventory : MonoBehaviour
         button.onClick.AddListener(OC_Inventory);
         input.action.started += OC_Inventory;
         game = GameManager.instance;
+        SetQuicks();
         open = false;
 
         onSizeChange += Sizing;
@@ -71,6 +74,15 @@ public class Inventory : MonoBehaviour
         if (instance == null) 
             instance = this;
         Sizing();
+    }
+    void SetQuicks()
+    {
+        activeSlots["q1-a"].gameObject.SetActive(false);
+        activeSlots["q2-a"].gameObject.SetActive(false);
+        activeSlots["q3-a"].gameObject.SetActive(false);
+        activeSlots["q1"].color = pasiveColor;
+        activeSlots["q2"].color = pasiveColor;
+        activeSlots["q3"].color = pasiveColor;
     }
     void Sizing()
     {
@@ -238,6 +250,16 @@ public class Inventory : MonoBehaviour
         if (equipSlots.Keys.Contains(equip.slot))
         {
             equipSlots[equip.slot].Item = equip;
+            if (equip is Weapon)
+            {
+                Weapon w = (Weapon)equip;
+                string r1 = FileManager.GetAttackRefferency(w.attack[0].type);
+                string r2 = FileManager.GetAttackRefferency(w.attack[1].type);
+                activeSlots["q1-a"].sprite = Resources.Load<Sprite>(r1);
+                activeSlots["q2-a"].sprite = Resources.Load<Sprite>(r2);
+                activeSlots["q1-a"].gameObject.SetActive(true);
+                activeSlots["q2-a"].gameObject.SetActive(true);
+            }
             game.LocalPlayer.SetEquipmentRpc(equip.GetReferency, equip.slot);
         }
     }
@@ -251,5 +273,19 @@ public class Inventory : MonoBehaviour
             game.LocalPlayer.SetEquipmentRpc("", equip.slot);
             Add(eq.GetReferency);
         }
+        if (eq is Weapon)
+        {
+            activeSlots["q1-a"].gameObject.SetActive(false);
+            activeSlots["q2-a"].gameObject.SetActive(false);
+            activeSlots["q1"].color = pasiveColor;
+            activeSlots["q2"].color = pasiveColor;
+        }
+    }
+    private int last = 1;
+    public void SetQuick(int i)
+    {
+        activeSlots["q"+last].color = pasiveColor;
+        activeSlots["q"+i].color = activeColor;
+        last = i;
     }
 }

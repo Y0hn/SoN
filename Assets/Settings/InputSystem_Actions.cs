@@ -117,6 +117,33 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Q1"",
+                    ""type"": ""Button"",
+                    ""id"": ""be65f0ad-660a-4d95-9171-29a84b99b09a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Q2"",
+                    ""type"": ""Button"",
+                    ""id"": ""1ea0a65c-1312-494e-b164-490884607bbd"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Q3"",
+                    ""type"": ""Button"",
+                    ""id"": ""1ed89580-43f1-4d04-8041-96cc91e83a93"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -513,6 +540,39 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fb171e04-44dc-4c6a-bf74-9665cfe98b9e"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Q1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5c118f15-9362-4620-9729-6483b08790d0"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Q2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8691d5b3-1fb2-4d82-b2e8-e087d29b36fe"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Q3"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1234,6 +1294,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Next = m_Player.FindAction("Next", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
+        m_Player_Q1 = m_Player.FindAction("Q1", throwIfNotFound: true);
+        m_Player_Q2 = m_Player.FindAction("Q2", throwIfNotFound: true);
+        m_Player_Q3 = m_Player.FindAction("Q3", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Pause = m_UI.FindAction("Pause", throwIfNotFound: true);
@@ -1327,6 +1390,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Next;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Pause;
+    private readonly InputAction m_Player_Q1;
+    private readonly InputAction m_Player_Q2;
+    private readonly InputAction m_Player_Q3;
     public struct PlayerActions
     {
         private @InputSystem_Actions m_Wrapper;
@@ -1341,6 +1407,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         public InputAction @Next => m_Wrapper.m_Player_Next;
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         public InputAction @Pause => m_Wrapper.m_Player_Pause;
+        public InputAction @Q1 => m_Wrapper.m_Player_Q1;
+        public InputAction @Q2 => m_Wrapper.m_Player_Q2;
+        public InputAction @Q3 => m_Wrapper.m_Player_Q3;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1380,6 +1449,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Pause.started += instance.OnPause;
             @Pause.performed += instance.OnPause;
             @Pause.canceled += instance.OnPause;
+            @Q1.started += instance.OnQ1;
+            @Q1.performed += instance.OnQ1;
+            @Q1.canceled += instance.OnQ1;
+            @Q2.started += instance.OnQ2;
+            @Q2.performed += instance.OnQ2;
+            @Q2.canceled += instance.OnQ2;
+            @Q3.started += instance.OnQ3;
+            @Q3.performed += instance.OnQ3;
+            @Q3.canceled += instance.OnQ3;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1414,6 +1492,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Pause.started -= instance.OnPause;
             @Pause.performed -= instance.OnPause;
             @Pause.canceled -= instance.OnPause;
+            @Q1.started -= instance.OnQ1;
+            @Q1.performed -= instance.OnQ1;
+            @Q1.canceled -= instance.OnQ1;
+            @Q2.started -= instance.OnQ2;
+            @Q2.performed -= instance.OnQ2;
+            @Q2.canceled -= instance.OnQ2;
+            @Q3.started -= instance.OnQ3;
+            @Q3.performed -= instance.OnQ3;
+            @Q3.canceled -= instance.OnQ3;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1638,6 +1725,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnNext(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
         void OnPause(InputAction.CallbackContext context);
+        void OnQ1(InputAction.CallbackContext context);
+        void OnQ2(InputAction.CallbackContext context);
+        void OnQ3(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

@@ -13,6 +13,7 @@ public static class FileManager
     public const string WEAPONS_DEFAULT_PATH = @"Items/weapons";
     public const string ARMORS_DEFAULT_PATH = @"Items/armors";
     public const string WEAPONS_REF_DEFAULT_PATH = @"Items/textures/InGame";
+    public const string ATTACKS_ICONS_PATH = @"UI/at_types";
 
     // FROM APP DATA PATH
     private const string LOG_DEFAULT_PATH = @"";
@@ -113,26 +114,45 @@ public static class FileManager
             }
         }
     }
-
-    public static class Log
+    public static string GetAttackRefferency(Attack.Type type)
     {
-        public enum MessageType { RECORD, ERROR, WARNING }
-        public static void Write(string message, MessageType type)
+        string refer = ATTACKS_ICONS_PATH + "/";
+        switch (type)
         {
-            switch (type)
-            {
-                case MessageType.RECORD:
-                    Debug.Log("[RECORDED] " + message);
-                    break;
-                case MessageType.ERROR:
-                    Debug.LogWarning("[RECORDED] " + message);
-                    break;
-                case MessageType.WARNING:
-                    Debug.LogError("[RECORDED] " + message);
-                    break;
-            }
-
+            case Attack.Type.MeleeSlash:
+                refer += "sword-slash";
+                break;
+            case Attack.Type.MeleeStab:
+                refer += "sword-thrust";
+                break;
+            case Attack.Type.RaseUnnarmed:
+                refer += "fist";
+                break;
+            case Attack.Type.BowSingle:
+                refer += "bow-single";
+                break;
+            case Attack.Type.BowMulti:
+                refer += "bow-triple";
+                break;
         }
+        Debug.Log("Returning at ref on: " + refer);
+        return refer;
+    }
+    public enum MessageType { LOG, RECORD, ERROR, WARNING }
+    public static void Log(string message, MessageType type = MessageType.LOG)
+    {
+        switch (type)
+        {
+            case MessageType.RECORD:
+                Debug.Log("[RECORDED] " + message);
+                break;
+            case MessageType.ERROR:
+                Debug.LogWarning("[RECORDED] " + message);
+                break;
+            case MessageType.WARNING:
+                Debug.LogError("[RECORDED] " + message);
+                break;
+      }
     }
 }
 [Serializable] public class Settings

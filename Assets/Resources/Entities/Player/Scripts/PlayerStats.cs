@@ -3,6 +3,7 @@ using Unity.Netcode;
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 public class PlayerStats : EntityStats
 {
     /*  ZDEDENE ATRIBUTY
@@ -48,6 +49,8 @@ public class PlayerStats : EntityStats
     protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected GameManager game;
     protected Inventory inventUI;
+    protected Attack attack2;
+    protected Attack attack3;
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -94,6 +97,12 @@ public class PlayerStats : EntityStats
             chatField.SetActive(true);
             chatTimer = Time.time + chatTime;
         };
+        attack.OnValueChanged += (Attack prevValue, Attack newValue) => 
+        { 
+            string refer = equipment[(int)Equipment.Slot.WeaponR].ToString();
+            if (refer != "")
+                inventUI.SetQuick(((Weapon)Item.GetItem(refer)).attack.IndexOf(newValue)+1);
+        };
     }
     protected void OwnerSubsOnNetValChanged()
     {
@@ -110,7 +119,7 @@ public class PlayerStats : EntityStats
             }
         };
         hp.OnValueChanged += (int prevValue, int newValue) => 
-        { 
+        {
             if (newValue < prevValue)
                 game.AnimateFace("got-hit");
             game.AnimateFace(HP);
@@ -156,6 +165,13 @@ public class PlayerStats : EntityStats
                 chatBox.text = "";
                 chatTimer = 0;
             }
+    }
+    [Rpc(SendTo.Server)] public void SetAttackTypeRpc(byte t)
+    {
+        t--;
+        List<Attack> a = ((Weapon)Item.GetItem(equipment[(int)Equipment.Slot.WeaponR].ToString())).attack;
+        if (a.Count > t)
+            attack.Value = a[t];
     }
     [Rpc(SendTo.Server)] public override void PickedUpRpc(string refItem)
     {

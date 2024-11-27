@@ -827,9 +827,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stats: {fileID: -3433707315503268182}
   cam: {fileID: 8620589130980003894}
-  input_move: {fileID: -1680190386980627800, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  input_look: {fileID: -5630151704836100654, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  input_attack: {fileID: 1120369429361536294, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  input_actions:
+    _serializedList:
+    - Key: move
+      Value: {fileID: -1680190386980627800, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+    - Key: attack
+      Value: {fileID: 1120369429361536294, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+    - Key: look
+      Value: {fileID: -5630151704836100654, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+    - Key: q1
+      Value: {fileID: 3819910986490965344, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+    - Key: q2
+      Value: {fileID: 610438110587099897, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+    - Key: q3
+      Value: {fileID: -2194916521843087377, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
 --- !u!4 &8634959595581354562 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7691644660972815650, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}

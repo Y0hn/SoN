@@ -1,6 +1,7 @@
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 using UnityEngine;
+using AYellowpaper.SerializedCollections;
 public class PlayerController : EntityController
 {
     /* Inhereted variables
@@ -14,10 +15,7 @@ public class PlayerController : EntityController
      *
      */
     [SerializeField] GameObject cam;
-    [SerializeField] InputActionReference input_move;
-    [SerializeField] InputActionReference input_look;
-    [SerializeField] InputActionReference input_attack;
-
+    [SerializedDictionary("Key", "Input"),SerializeField] SerializedDictionary<string, InputActionReference> input_actions;
     private GameManager game;
     public override void OnNetworkSpawn()
     {
@@ -25,8 +23,11 @@ public class PlayerController : EntityController
         {
             game = GameManager.instance;
             game.PlayerSpawned((PlayerStats)stats);
-            input_attack.action.started += Fire;
-            input_attack.action.canceled += Fire;
+            input_actions["attack"].action.started += Fire;
+            input_actions["attack"].action.canceled += Fire;
+            input_actions["q1"].action.started += Q1;
+            input_actions["q2"].action.started += Q2;
+            input_actions["q3"].action.started += Q3;
             cam.SetActive(true);
         }
     }
@@ -37,7 +38,7 @@ public class PlayerController : EntityController
         if (stats.IsAlive.Value && game.PlayerAble)
         {
             base.Update();
-            moveDir = input_move.action.ReadValue<Vector2>();
+            moveDir = input_actions["move"].action.ReadValue<Vector2>();
         }
         else if (moveDir != Vector2.zero)
             moveDir = Vector2.zero;
@@ -46,15 +47,18 @@ public class PlayerController : EntityController
         if (Input.GetKeyDown(KeyCode.P))
             DropRpc();        
     }
+    void Q1(InputAction.CallbackContext context) { ((PlayerStats)stats).SetAttackTypeRpc(1); }
+    void Q2(InputAction.CallbackContext context) { ((PlayerStats)stats).SetAttackTypeRpc(2); }
+    void Q3(InputAction.CallbackContext context) { ((PlayerStats)stats).SetAttackTypeRpc(3); }
     [Rpc(SendTo.Server)] void DropRpc()
     {
-            GameObject i = Instantiate(
-            Resources.LoadAll<GameObject>("Items/ItemDrop")[0], 
-            new Vector3(Random.Range(-11, 10), 
-            Random.Range(-11, 10), -3), 
-            Quaternion.identity);
-            i.GetComponent<NetworkObject>().Spawn();
-            i.GetComponent<ItemDrop>().SetItemRpc("Items/weapons/sword-1");
+        GameObject i = Instantiate(
+        Resources.LoadAll<GameObject>("Items/ItemDrop")[0], 
+        new Vector3(Random.Range(-11, 10), 
+        Random.Range(-11, 10), -3), 
+        Quaternion.identity);
+        i.GetComponent<NetworkObject>().Spawn();
+        i.GetComponent<ItemDrop>().SetItemRpc("Items/weapons/sword-1");
     }
     protected override void FixedUpdate()
     {
