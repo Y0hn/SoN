@@ -65,7 +65,7 @@ public class PlayerStats : EntityStats
         if (IsOwner)
         {
             game = GameManager.instance;
-            inventUI = GameManager.inventory;
+            inventUI = GameManager.instance.inventory;
             hpBar.gameObject.SetActive(false);
             hpBar = game.GetBar("hp");
             xpBar = game.GetBar("xp");

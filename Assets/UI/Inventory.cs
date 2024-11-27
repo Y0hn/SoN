@@ -48,9 +48,8 @@ public class Inventory : MonoBehaviour
     
     // INVENTORY
     List<ItemSlot> itemSlots = new();
-    [SerializedDictionary("Slot", "SlotObject"), SerializeField]
-    SerializedDictionary<Equipment.Slot, EquipmentSlot> equipSlots = new();
-
+    [SerializedDictionary("Slot", "SlotObject"), SerializeField]    SerializedDictionary<Equipment.Slot, EquipmentSlot> equipSlots = new();
+    [SerializedDictionary("Name", "Image"), SerializeField]         SerializedDictionary<string, Image> activeSlots = new();   /* OBSAH */ 
     private event Action onSizeChange;
     private GameManager game;
     void Start()

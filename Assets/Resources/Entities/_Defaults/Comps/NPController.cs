@@ -3,7 +3,7 @@ using System;
 
 public class NPController : EntityController
 {
-    [SerializeField] Behavior behavior = Behavior.Neutral;
+    //[SerializeField] Behavior behavior = Behavior.Neutral;
 
     public override void OnNetworkSpawn()
     {

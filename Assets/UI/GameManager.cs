@@ -10,13 +10,12 @@ using Unity.Netcode;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    public static Inventory inventory;
     void Awake()    { instance = this; }
-
     [SerializeField] Connector conn;
     [SerializeField] MenuScript menu;
     [SerializeField] MenuScript menuScript;
     [SerializeField] Animator animatorGameUI;
+    public Inventory inventory;
     [HideInInspector] public bool playerLives;
     private bool paused;
     private bool chatting;
