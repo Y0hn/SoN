@@ -8,13 +8,14 @@ public abstract class EntityController : NetworkBehaviour
 {
     [SerializeField] protected EntityStats stats;
 
-    protected bool attacking = false;
     protected Vector2 moveDir;
+    protected bool attacking;
     protected const float MIN_MOVE_TOL = 0.1f;
 
     public override void OnNetworkSpawn()
     {
-        
+        moveDir = Vector2.zero;
+        attacking = false;
     }
     protected virtual void Update()
     {
