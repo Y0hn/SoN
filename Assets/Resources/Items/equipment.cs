@@ -8,9 +8,9 @@ public class Equipment : Item
     public virtual string SpriteRef { get; }
     public enum Slot
     {
-        Head, Torso, Hands, Legs,
+        Head, Torso, Legs,
+        Body,
         WeaponL, WeaponR, 
-        Body, 
         WeaponBoth, NoPreference
     }
     public override string GetReferency

@@ -49,8 +49,6 @@ public class PlayerStats : EntityStats
     protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected GameManager game;
     protected Inventory inventUI;
-    protected Attack attack2;
-    protected Attack attack3;
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();

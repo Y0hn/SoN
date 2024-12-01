@@ -3,18 +3,23 @@ using System;
 
 public class NPController : EntityController
 {
-    [SerializeField] Behavior behavior = Behavior.Neutral;
-    protected WeaponClass wc;
-    protected ArmorClass ac;
-
+    /* Inhereted variables
+     *
+     *
+     */
+    
+    protected NextAction nextAction;
+    protected float nextDecisionTimer = 0f;
+    public bool ForceDecision { get; protected set; }
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        ((NPStats)stats).OnHit += delegate { ForceDecision = true; };
     }
     protected override void Update()
     {
         base.Update();
-        if (IsServer)
+        if (IsServer && (nextDecisionTimer < Time.time || ForceDecision))
             DecideNextMove();
     }
     protected override void AnimateMovement()
@@ -23,29 +28,31 @@ public class NPController : EntityController
     }
     protected virtual void DecideNextMove()
     {
+        float nextChange = 1f;
         float hp = stats.HP;
 
-        // ac / wc
-        // behavior
-        
-        // HERE IS DECIDING FACTOR ACORDING TO PARAMETERS ABOVE
+        switch (((NPStats)stats).WC)
+        {
+            default:
+                break;
+        }
+        switch (((NPStats)stats).DC)
+        {
+            default:
+                break;
+        }
+        switch (((NPStats)stats).Behave)
+        {
+            case NPStats.Behavior.Scared:       nextAction = NextAction.RunFromTarget; break;
+            case NPStats.Behavior.Berserk:      nextAction = NextAction.RunToTarget; break;
+            case NPStats.Behavior.Neutral:      nextAction = NextAction.StayOnPlace; break;
+            case NPStats.Behavior.Agressive:
+            case NPStats.Behavior.Defesive:
+                break;
+        }
+        if (ForceDecision)
+            ForceDecision = false;
+        nextDecisionTimer = Time.time + nextChange;
     }
-    protected void CallculateAC()
-    {
-        
-    }
-    protected void CallculateWC()
-    {
-
-    }
-    public enum Behavior 
-    {
-        Scared,     // unika pred target
-        Defesive,   // brani poziciu
-        Neutral,    // nerobi nic (idle)
-        Agressive,  // aktivne utoci na target
-        Berserk,    // --||-- neberie ohlad na nic ine
-    }
-    public enum ArmorClass  { None, Small, Medium, Heavy, Dedicated }
-    public enum WeaponClass { Light, Medium, Heavy, Ranged }
+    protected enum NextAction { GoToTarget, RunToTarget, AttackTarget, RunFromTarget, StayOnPlace }
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
 [CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Weapon"), Serializable] 
 public class Weapon : Equipment
 {
@@ -25,4 +26,30 @@ public class Weapon : Equipment
         }
         return eq;
     }
+    public Class CallculateWC()
+    {
+        List<float> vals = new();
+
+        for (int i = 0; i < vals.Count; i++)
+            vals.Add(attack[i].rate * attack[i].damage.amount);
+        
+        int index = vals.IndexOf(vals.Max());   // zsika najefektiktivnejsi utok zbrane
+        vals.Clear();
+        float r = attack[index].rate;
+
+        switch (attack[index].type)
+        {
+            case Attack.Type.BowSingle:
+            case Attack.Type.BowMulti:
+                return Class.Ranged;
+            default:
+                if      (r > 2f)
+                    return Class.Light;
+                else if (r > 1f)
+                    return Class.Medium;
+                else
+                    return Class.Heavy;
+        }
+    }
+    public enum Class { Light, Medium, Heavy, Ranged, AoE }
 }

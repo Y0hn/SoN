@@ -6,12 +6,6 @@ public class PlayerController : EntityController
 {
     /* Inhereted variables
      *
-     * [SF] protected Rigidbody2D rb;
-     * [SF] protected Animator animator;
-     * [SF] protected EntityStats stats;
-     * protected bool attacking = false;
-     * protected Vector2 moveDir;
-     * protected const float minC = 0.1f;
      *
      */
     [SerializeField] GameObject cam;

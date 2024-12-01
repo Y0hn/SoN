@@ -31,12 +31,14 @@ public abstract class EntityStats : NetworkBehaviour
                         public      NetworkVariable<byte> level = new(1);
                         public      NetworkVariable<bool> IsAlive = new(true);
                         protected   NetworkVariable<Attack> attack = new ();
+                        protected   NetworkVariable<WeaponIndex> weapE = new(new(-1), NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
 
     public float HP                 { get { return (float)hp.Value/(float)maxHp.Value; } }
     public NetworkObject NetObject  { get { return netObject; } }
     public Rigidbody2D RigidBody2D  { get { return rb; } }
-    public bool AttackBoth          { get { return attack.Value.bothHanded; } }
     public Animator Animator        { get { return animator.Animator; } }
+    public bool AttackBoth          { get { return attack.Value.bothHanded; } }
+    public bool Armed               { get { return equipment[(int)Equipment.Slot.WeaponL] != "" || "" !=  equipment[(int)Equipment.Slot.WeaponR]; } }
     protected float atTime = 0;
     protected const float timeToDespawn = 0f;
     private bool clampedDMG = true;
@@ -90,35 +92,6 @@ public abstract class EntityStats : NetworkBehaviour
         }
         defence = new(rase.naturalArmor);
     }
-    /*protected void SortEquipmentList()
-    {
-        int length = Enum.GetNames(typeof(Equipment.Slot)).Length;
-        List<Equipment> change = new();
-        Equipment e;
-        for (int n = 0; n < 2; n++)
-        {
-            for (int i = 0; i < length; i++)
-            {
-                if ("" != equipment[i].ToString())
-                {
-                    e = (Equipment)Item.GetItem(equipment[i].ToString());
-                    if (e.slot != (Equipment.Slot)i)
-                    {
-                        change.Add(e);
-                        equipment[i] = "";
-                    }
-                }
-                if ("" == equipment[i].ToString())
-                {
-                    e = change.Find(eq => eq.slot == (Equipment.Slot)i);
-                    if (e != null)
-                        equipment[i] = e.GetReferency;
-                }
-            }
-            if (change.Count == 0)
-                break;
-        }
-    }*/
     protected virtual void Update()
     {
 
@@ -140,9 +113,9 @@ public abstract class EntityStats : NetworkBehaviour
             
             switch (slot)
             {
-                case Equipment.Slot.Head:
-                case Equipment.Slot.Torso:
-                case Equipment.Slot.Legs:
+                case Equipment.Slot.Head:   // 0
+                case Equipment.Slot.Torso:  // 1
+                case Equipment.Slot.Legs:   // 2
                     if (IsServer)
                         if (referencia == "")
                             defence.Remove((Armor)Item.GetItem(previous));
@@ -152,13 +125,13 @@ public abstract class EntityStats : NetworkBehaviour
                             defence.Add(a);
                         }
                     break;
-                case Equipment.Slot.WeaponR:
-                case Equipment.Slot.WeaponL:
-                case Equipment.Slot.WeaponBoth:
+                case Equipment.Slot.WeaponL:    // 4
+                case Equipment.Slot.WeaponR:    // 5
                     Weapon w = (Weapon)value;
+
                     if (IsServer && referencia == "")
                         attack.Value = rase.attack;
-                    else if (referencia != "")
+                    if (referencia != "")
                     {
                         if (IsServer)
                             attack.Value = w.attack[0];
@@ -310,7 +283,34 @@ public abstract class EntityStats : NetworkBehaviour
         }
         return false;
     }
+    public Class CallculateDC()
+    {
+        if (armors.Count > 0)
+        {
+            float total = 0;
+            int count = 0;
 
+            foreach (Armor a in armors)
+                foreach (Armor.Resistance r in a.resists)
+                {
+                    total += (r.amount > 1) ? r.amount : r.amount * 100;
+                    count++;
+                }
+            total /= count; 
+            
+            if      (total < 40)
+                return Class.Small;
+            else if (total < 70)
+                return Class.Medium;
+            else if (count < 5)
+                return Class.Dedicated;
+            else
+                return Class.Heavy;
+        }
+        else
+            return Class.None;
+    }
+    public enum Class  { None, Small, Medium, Heavy, Dedicated }
 }
 [Serializable] public struct Attack : INetworkSerializable, IEquatable<Attack>
 {
@@ -354,6 +354,21 @@ public abstract class EntityStats : NetworkBehaviour
         serializer.SerializeValue(ref range);
         serializer.SerializeValue(ref rate);
         serializer.SerializeValue(ref type);
+    }
+}
+[Serializable] public struct WeaponIndex : INetworkSerializable
+{
+    public int eIndex;
+    public int aIndex;
+    public WeaponIndex(int e, int a = 0)
+    {
+        eIndex = e;
+        aIndex = a;
+    }
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref eIndex);
+        serializer.SerializeValue(ref aIndex);
     }
 }
 [Serializable] public struct Damage : INetworkSerializable, IEquatable<Damage>

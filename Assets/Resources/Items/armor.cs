@@ -5,7 +5,7 @@ using System;
 [CreateAssetMenu(fileName = "NewArmor", menuName = "Inventory/Armor"), Serializable] 
 public class Armor : Equipment
 {
-    public List<Resistance> rezists = new();
+    public List<Resistance> resists = new();
     
     public override string GetReferency
     {
@@ -17,7 +17,7 @@ public class Armor : Equipment
     }
     public List<Resistance> GetElemental(Damage.Type type)
     {
-        return rezists.FindAll(r => r.defenceType == type);
+        return resists.FindAll(r => r.defenceType == type);
     }
     [Serializable] public class Resistance
     {

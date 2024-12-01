@@ -7,7 +7,6 @@ using UnityEngine;
 public abstract class EntityController : NetworkBehaviour
 {
     [SerializeField] protected EntityStats stats;
-
     protected Vector2 moveDir;
     protected bool attacking;
     protected const float MIN_MOVE_TOL = 0.1f;
