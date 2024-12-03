@@ -55,6 +55,13 @@ public class NPController : EntityController
             ForceDecision = false;
         nextDecisionTimer = Time.time + nextChange;
     }
+    protected virtual void DoNextMove()
+    {
+        if (nextAction != NextAction.None)
+        {
+            nextAction = NextAction.None; 
+        }
+    }
     void DecideByTreshhold(float tHP, bool inRange, bool gotRange, out float tDecay)
     {
         float hp = stats.HP;
@@ -84,5 +91,5 @@ public class NPController : EntityController
             tDecay = 3;
         }
     }
-    protected enum NextAction { GoToTarget, RunToTarget, AttackTarget, RunFromTarget, StayOnPlace }
+    protected enum NextAction { GoToTarget, RunToTarget, AttackTarget, RunFromTarget, StayOnPlace, None }
 }
