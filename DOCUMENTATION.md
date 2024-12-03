@@ -47,6 +47,11 @@ $$
 https://en.wikipedia.org/wiki/List_of_Slavic_deities
 https://en.wikipedia.org/wiki/Nav_(Slavic_folklore)
 ```
+## NPCs
+### A* Pathfinding
+```
+https://arongranberg.com/astar/
+```
 ## Multiplayer:
 Setup:
 ```        
