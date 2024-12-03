@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using Pathfinding;
 
 public class NPController : EntityController
 {
@@ -8,6 +9,8 @@ public class NPController : EntityController
      *
      *
      */
+    [SerializeField] AIDestinationSetter destinationSetter;
+    [SerializeField] AIPath path;
     
     protected NextAction nextAction;
     protected float nextDecisionTimer = 0f;
@@ -20,9 +23,17 @@ public class NPController : EntityController
     }
     protected override void Update()
     {
+        if (!IsServer || path == null) return;
+
         base.Update();
         if (IsServer && (nextDecisionTimer < Time.time || ForceDecision))
             DecideNextMove();
+        if (path.desiredVelocity != Vector3.zero)
+        {
+            Vector2 move = new (path.desiredVelocity.x*1000, path.desiredVelocity.y*1000);
+            moveDir = move.normalized;
+            Debug.Log(moveDir.x + " " + moveDir.y);
+        }
     }
     protected override void AnimateMovement()
     {
