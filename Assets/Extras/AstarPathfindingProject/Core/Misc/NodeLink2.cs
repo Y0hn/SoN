@@ -21,7 +21,7 @@ namespace Pathfinding {
 	/// See: The example scene RecastExample2 contains a few links which you can take a look at to see how they are used.
 	/// </summary>
 	[AddComponentMenu("Pathfinding/Link2")]
-	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_node_link2.php")]
+	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_node_link2.php")][System.Obsolete]
 	public class NodeLink2 : GraphModifier {
 		protected static Dictionary<GraphNode, NodeLink2> reference = new Dictionary<GraphNode, NodeLink2>();
 		public static NodeLink2 GetNodeLink (GraphNode node) {
@@ -229,7 +229,8 @@ namespace Pathfinding {
 			OnDrawGizmos(false);
 		}
 
-		public void OnDrawGizmos (bool selected) {
+#pragma warning disable UNT0006 // Incorrect message signature
+        public void OnDrawGizmos (bool selected) {
 			Color color = selected ? GizmosColorSelected : GizmosColor;
 
 			if (StartTransform != null) {
@@ -248,8 +249,9 @@ namespace Pathfinding {
 				}
 			}
 		}
+#pragma warning restore UNT0006 // Incorrect message signature
 
-		internal static void SerializeReferences (Pathfinding.Serialization.GraphSerializationContext ctx) {
+        internal static void SerializeReferences (Pathfinding.Serialization.GraphSerializationContext ctx) {
 			var links = GetModifiersOfType<NodeLink2>();
 
 			ctx.writer.Write(links.Count);

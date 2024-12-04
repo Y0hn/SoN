@@ -12,6 +12,7 @@ namespace Pathfinding {
 	///
 	/// Hiding the internal methods cleans up the documentation and IntelliSense suggestions.
 	/// </summary>
+	[System.Obsolete]
 	public interface IGraphInternals {
 		string SerializedEditorSettings { get; set; }
 		void OnDestroy();
@@ -24,6 +25,7 @@ namespace Pathfinding {
 	}
 
 	/// <summary>Base class for all graphs</summary>
+	[System.Obsolete]
 	public abstract class NavGraph : IGraphInternals {
 		/// <summary>Reference to the AstarPath object in the scene</summary>
 		public AstarPath active;
@@ -393,6 +395,7 @@ namespace Pathfinding {
 	/// Mostly used by grid based graphs
 	/// </summary>
 	[System.Serializable]
+	[System.Obsolete]
 	public class GraphCollision {
 		/// <summary>
 		/// Collision shape to use.

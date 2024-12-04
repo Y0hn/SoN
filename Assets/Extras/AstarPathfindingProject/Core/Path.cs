@@ -9,12 +9,14 @@ namespace Pathfinding {
 	/// Provides additional traversal information to a path request.
 	/// See: turnbased (view in online documentation for working links)
 	/// </summary>
+	[System.Obsolete]
 	public interface ITraversalProvider {
 		bool CanTraverse(Path path, GraphNode node);
 		uint GetTraversalCost(Path path, GraphNode node);
 	}
 
 	/// <summary>Convenience class to access the default implementation of the ITraversalProvider</summary>
+	[System.Obsolete]
 	public static class DefaultITraversalProvider {
 		public static bool CanTraverse (Path path, GraphNode node) {
 			return node.Walkable && (path.enabledTags >> (int)node.Tag & 0x1) != 0;
@@ -26,6 +28,7 @@ namespace Pathfinding {
 	}
 
 	/// <summary>Base class for all path types</summary>
+	[System.Obsolete]
 	public abstract class Path : IPathInternals {
 #if ASTAR_POOL_DEBUG
 		private string pathTraceInfo = "";

@@ -10,6 +10,7 @@ namespace Pathfinding {
 	/// Axis Aligned Bounding Box Tree.
 	/// Holds a bounding box tree of triangles.
 	/// </summary>
+	[System.Obsolete]
 	public class BBTree : IAstarPooledObject {
 		/// <summary>Holds all tree nodes</summary>
 		BBTreeBox[] tree = null;

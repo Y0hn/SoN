@@ -17,6 +17,7 @@ using Pathfinding.Ionic.Zip;
 
 namespace Pathfinding.Serialization {
 	/// <summary>Holds information passed to custom graph serializers</summary>
+	[System.Obsolete]
 	public class GraphSerializationContext {
 		private readonly GraphNode[] id2NodeMapping;
 
@@ -160,6 +161,7 @@ namespace Pathfinding.Serialization {
 	///
 	/// See: AstarData
 	/// </summary>
+	[System.Obsolete]
 	public class AstarSerializer {
 		private AstarData data;
 

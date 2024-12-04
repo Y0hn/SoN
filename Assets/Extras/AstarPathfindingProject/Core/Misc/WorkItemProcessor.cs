@@ -11,6 +11,7 @@ namespace Pathfinding {
 	/// See: <see cref="AstarPath.UpdateGraphs"/>
 	/// See: <see cref="AstarPath.AddWorkItem"/>
 	/// </summary>
+	[System.Obsolete]
 	public struct AstarWorkItem {
 		/// <summary>
 		/// Init function.
@@ -90,6 +91,7 @@ namespace Pathfinding {
 	}
 
 	/// <summary>Interface to expose a subset of the WorkItemProcessor functionality</summary>
+	[System.Obsolete]
 	public interface IWorkItemContext {
 		/// <summary>
 		/// Call during work items to queue a flood fill.
@@ -134,7 +136,7 @@ namespace Pathfinding {
 		/// </summary>
 		void SetGraphDirty(NavGraph graph);
 	}
-
+	[System.Obsolete]
 	class WorkItemProcessor : IWorkItemContext {
 		/// <summary>Used to prevent waiting for work items to complete inside other work items as that will cause the program to hang</summary>
 		public bool workItemsInProgressRightNow { get; private set; }

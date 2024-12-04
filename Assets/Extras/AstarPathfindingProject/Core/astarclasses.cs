@@ -15,6 +15,7 @@ namespace Pathfinding {
 #endif
 
 	[System.Serializable]
+	[System.Obsolete]
 	/// <summary>Stores editor colors</summary>
 	public class AstarColor {
 		public Color _SolidColor;
@@ -154,6 +155,7 @@ namespace Pathfinding {
 	}
 
 	/// <summary>Nearest node constraint. Constrains which nodes will be returned by the <see cref="AstarPath.GetNearest"/> function</summary>
+	[System.Obsolete]
 	public class NNConstraint {
 		/// <summary>
 		/// Graphs treated as valid to search on.
@@ -291,6 +293,7 @@ namespace Pathfinding {
 	/// A PathNNConstraint can be assigned to the Path.nnConstraint field, the path will first search for the start node, then it will call <see cref="SetStart"/> and proceed with searching for the end node (nodes in the case of a MultiTargetPath).\n
 	/// The default PathNNConstraint will constrain the end point to lie inside the same area as the start point.
 	/// </summary>
+	[System.Obsolete]
 	public class PathNNConstraint : NNConstraint {
 		public static new PathNNConstraint Default {
 			get {
@@ -412,6 +415,7 @@ namespace Pathfinding {
 	}
 
 	/// <summary>Graphs which can be updated during runtime</summary>
+	[System.Obsolete]
 	public interface IUpdatableGraph {
 		/// <summary>
 		/// Updates an area using the specified <see cref="GraphUpdateObject"/>.
@@ -463,6 +467,7 @@ namespace Pathfinding {
 	/// See: AstarPath.UpdateGraphs
 	/// See: graph-updates (view in online documentation for working links)
 	/// </summary>
+	[System.Obsolete]
 	public class GraphUpdateObject {
 		/// <summary>
 		/// The bounds to update nodes within.
@@ -547,6 +552,7 @@ namespace Pathfinding {
 		/// The Pathfinding.NNConstraint.SuitableGraph function will be called on the NNConstraint to enable filtering of which graphs to update.\n
 		/// Note: As the Pathfinding.NNConstraint.SuitableGraph function is A* Pathfinding Project Pro only, this variable doesn't really affect anything in the free version.
 		/// </summary>
+		[System.Obsolete]
 		public NNConstraint nnConstraint = NNConstraint.None;
 
 		/// <summary>
@@ -884,6 +890,7 @@ namespace Pathfinding {
 	/// See: bitmasks (view in online documentation for working links)
 	/// </summary>
 	[System.Serializable]
+	[System.Obsolete]
 	public struct GraphMask {
 		/// <summary>Bitmask representing the mask</summary>
 		public int value;
@@ -961,10 +968,11 @@ namespace Pathfinding {
 	 * Example function:
 	 * \snippet MiscSnippets.cs OnPathDelegate
 	 */
+	[System.Obsolete]
 	public delegate void OnPathDelegate(Path p);
-
+	[System.Obsolete]
 	public delegate void OnGraphDelegate(NavGraph graph);
-
+	[System.Obsolete]
 	public delegate void OnScanDelegate(AstarPath script);
 
 	/// <summary>Deprecated:</summary>

@@ -12,6 +12,7 @@ namespace Pathfinding.Util {
 	/// callback (which includes a thread index).
 	///
 	/// Any exception that is thrown in the worker threads will be propagated out to the caller of the <see cref="Run"/> method.
+	[System.Obsolete]
 	/// </summary>
 	public class ParallelWorkQueue<T> {
 		/// <summary>

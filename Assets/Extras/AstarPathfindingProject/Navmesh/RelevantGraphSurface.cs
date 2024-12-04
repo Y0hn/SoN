@@ -10,6 +10,7 @@ namespace Pathfinding {
 	/// </summary>
 	[AddComponentMenu("Pathfinding/Navmesh/RelevantGraphSurface")]
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_relevant_graph_surface.php")]
+	[System.Obsolete]
 	public class RelevantGraphSurface : VersionedMonoBehaviour {
 		private static RelevantGraphSurface root;
 

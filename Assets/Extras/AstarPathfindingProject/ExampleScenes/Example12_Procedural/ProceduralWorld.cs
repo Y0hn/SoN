@@ -5,6 +5,7 @@ using System.Collections.Generic;
 namespace Pathfinding.Examples {
 	/// <summary>Example script for generating an infinite procedural world</summary>
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_examples_1_1_procedural_world.php")]
+	[System.Obsolete]
 	public class ProceduralWorld : MonoBehaviour {
 		public Transform target;
 
@@ -77,8 +78,9 @@ namespace Pathfinding.Examples {
 		/// <summary>All tiles</summary>
 		Dictionary<Int2, ProceduralTile> tiles = new Dictionary<Int2, ProceduralTile>();
 
-		// Use this for initialization
-		void Start () {
+        // Use this for initialization
+        [System.Obsolete]
+        void Start () {
 			// Calculate the closest tiles
 			// and then recalculate the graph
 			Update();

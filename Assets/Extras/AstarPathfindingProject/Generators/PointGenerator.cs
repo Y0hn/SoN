@@ -32,6 +32,7 @@ namespace Pathfinding {
 	/// </summary>
 	[JsonOptIn]
 	[Pathfinding.Util.Preserve]
+	[System.Obsolete]
 	public class PointGraph : NavGraph {
 		/// <summary>Childs of this transform are treated as nodes</summary>
 		[JsonMember]
@@ -228,6 +229,7 @@ namespace Pathfinding {
 		///
 		/// See: runtime-graphs (view in online documentation for working links)
 		/// </summary>
+		[System.Obsolete]
 		public PointNode AddNode (Int3 position) {
 			return AddNode(new PointNode(active), position);
 		}

@@ -5,6 +5,7 @@ using UnityEngine.Profiling;
 #endif
 
 namespace Pathfinding {
+	[System.Obsolete]
 	class PathReturnQueue {
 		/// <summary>
 		/// Holds all paths which are waiting to be flagged as completed.

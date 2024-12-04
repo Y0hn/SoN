@@ -1,6 +1,7 @@
 using UnityEngine;
 
 namespace Pathfinding.Util {
+	[System.Obsolete]
 	public class GraphGizmoHelper : IAstarPooledObject, System.IDisposable {
 		public RetainedGizmos.Hasher hasher { get; private set; }
 		Pathfinding.Util.RetainedGizmos gizmos;

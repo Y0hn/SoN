@@ -4,6 +4,7 @@ using Pathfinding.Serialization;
 
 namespace Pathfinding {
 	using Pathfinding.Util;
+	[System.Obsolete]
 
 	[CustomGraphEditor(typeof(GridGraph), "Grid Graph")]
 	public class GridGraphEditor : GraphEditor {

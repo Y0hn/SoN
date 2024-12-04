@@ -17,6 +17,7 @@ namespace Pathfinding {
 	/// An instance of this class is assigned to AstarPath.data, from it you can access all graphs loaded through the <see cref="graphs"/> variable.\n
 	/// This class also handles a lot of the high level serialization.
 	/// </summary>
+	[System.Obsolete]
 	public class AstarData {
 		/// <summary>Shortcut to AstarPath.active</summary>
 		public static AstarPath active {

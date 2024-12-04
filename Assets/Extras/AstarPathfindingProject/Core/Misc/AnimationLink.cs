@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Pathfinding {
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_animation_link.php")]
+	[System.Obsolete]
 	public class AnimationLink : NodeLink2 {
 		public string clip;
 		public float animSpeed = 1;

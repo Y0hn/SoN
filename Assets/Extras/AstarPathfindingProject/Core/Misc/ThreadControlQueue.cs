@@ -2,6 +2,7 @@ using System.Threading;
 
 namespace Pathfinding {
 	/// <summary>Queue of paths to be processed by the system</summary>
+	[System.Obsolete]
 	class ThreadControlQueue {
 		public class QueueTerminationException : System.Exception {
 		}

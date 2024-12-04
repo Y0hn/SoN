@@ -38,6 +38,7 @@ namespace Pathfinding.Util {
 	/// }
 	/// </code>
 	/// </summary>
+	[System.Obsolete]
 	public class RetainedGizmos {
 		/// <summary>Combines hashes into a single hash value</summary>
 		public struct Hasher {

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 
 namespace Pathfinding {
+	[System.Obsolete]
 	[CustomGraphEditor(typeof(PointGraph), "Point Graph")]
 	public class PointGraphEditor : GraphEditor {
 		static readonly GUIContent[] nearestNodeDistanceModeLabels = {

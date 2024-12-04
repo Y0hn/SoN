@@ -13,7 +13,7 @@ namespace Pathfinding {
 #else
 	using Thread = System.Threading.Thread;
 #endif
-
+	[System.Obsolete]
 	class GraphUpdateProcessor {
 		public event System.Action OnGraphsUpdated;
 

@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Pathfinding {
+	[System.Obsolete]
 	public class GraphEditor : GraphEditorBase {
 		public AstarPathEditor editor;
 

@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Pathfinding {
+	[System.Obsolete]
 	public class AstarUpdateWindow : EditorWindow {
 		static GUIStyle largeStyle;
 		static GUIStyle normalStyle;

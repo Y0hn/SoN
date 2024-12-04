@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Pathfinding {
 	/// <summary>Pools path objects to reduce load on the garbage collector</summary>
+	[System.Obsolete]
 	public static class PathPool {
 		static readonly Dictionary<Type, Stack<Path> > pool = new Dictionary<Type, Stack<Path> >();
 		static readonly Dictionary<Type, int> totalCreated = new Dictionary<Type, int>();

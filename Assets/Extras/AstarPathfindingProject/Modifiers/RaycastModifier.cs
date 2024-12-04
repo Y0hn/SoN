@@ -38,6 +38,7 @@ namespace Pathfinding {
 	[RequireComponent(typeof(Seeker))]
 	[System.Serializable]
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_raycast_modifier.php")]
+	[System.Obsolete]
 	public class RaycastModifier : MonoModifier {
 #if UNITY_EDITOR
 		[UnityEditor.MenuItem("CONTEXT/Seeker/Add Raycast Simplifier Modifier")]

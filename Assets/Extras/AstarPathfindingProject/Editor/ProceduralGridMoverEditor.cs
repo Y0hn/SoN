@@ -5,6 +5,7 @@ using System.Collections.Generic;
 namespace Pathfinding {
 	[CustomEditor(typeof(ProceduralGridMover))]
 	[CanEditMultipleObjects]
+	[System.Obsolete]
 	public class ProceduralGridMoverEditor : EditorBase {
 		GUIContent[] graphLabels = new GUIContent[32];
 

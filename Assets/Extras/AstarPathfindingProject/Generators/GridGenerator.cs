@@ -83,6 +83,7 @@ namespace Pathfinding {
 	/// </summary>
 	[JsonOptIn]
 	[Pathfinding.Util.Preserve]
+	[System.Obsolete]
 	public class GridGraph : NavGraph, IUpdatableGraph, ITransformedGraph {
 		/// <summary>This function will be called when this graph is destroyed</summary>
 		protected override void OnDestroy () {

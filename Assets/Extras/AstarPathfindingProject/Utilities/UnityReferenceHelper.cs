@@ -16,11 +16,13 @@ namespace Pathfinding {
 			return guid;
 		}
 
-		public void Awake () {
+        [System.Obsolete]
+        public void Awake () {
 			Reset();
 		}
 
-		public void Reset () {
+        [System.Obsolete]
+        public void Reset () {
 			if (string.IsNullOrEmpty(guid)) {
 				guid = Pathfinding.Util.Guid.NewGuid().ToString();
 				Debug.Log("Created new GUID - " + guid, this);

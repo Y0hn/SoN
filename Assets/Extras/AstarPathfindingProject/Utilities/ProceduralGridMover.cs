@@ -33,6 +33,7 @@ namespace Pathfinding {
 	/// Each erosion iteration requires expanding the region that is updated by 1 node.
 	/// </summary>
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_procedural_grid_mover.php")]
+	[System.Obsolete]
 	public class ProceduralGridMover : VersionedMonoBehaviour {
 		/// <summary>
 		/// Graph will be updated if the target is more than this number of nodes from the graph center.

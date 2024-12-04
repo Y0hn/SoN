@@ -12,7 +12,7 @@ namespace Pathfinding {
 #else
 	using Thread = System.Threading.Thread;
 #endif
-
+	[System.Obsolete]
 	public class PathProcessor {
 		public event System.Action<Path> OnPathPreSearch;
 		public event System.Action<Path> OnPathPostSearch;

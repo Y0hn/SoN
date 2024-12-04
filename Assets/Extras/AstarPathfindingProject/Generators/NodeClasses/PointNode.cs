@@ -9,6 +9,7 @@ namespace Pathfinding {
 	///
 	/// See: PointGraph
 	/// </summary>
+	[System.Obsolete]
 	public class PointNode : GraphNode {
 		/// <summary>
 		/// All connections from this node.

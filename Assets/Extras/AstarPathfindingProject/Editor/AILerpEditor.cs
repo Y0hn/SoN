@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Pathfinding {
+	[System.Obsolete]
 	[CustomEditor(typeof(AILerp), true)]
 	[CanEditMultipleObjects]
 	public class AILerpEditor : BaseAIEditor {

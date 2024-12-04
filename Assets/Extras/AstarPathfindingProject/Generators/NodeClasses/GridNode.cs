@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Pathfinding {
 	/// <summary>Node used for the GridGraph</summary>
+	[System.Obsolete]
 	public class GridNode : GridNodeBase {
 		public GridNode (AstarPath astar) : base(astar) {
 		}

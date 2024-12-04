@@ -24,6 +24,7 @@ namespace Pathfinding {
 	/// See: navmeshcutting (view in online documentation for working links)
 	/// </summary>
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_dynamic_grid_obstacle.php")]
+	[System.Obsolete]
 	public class DynamicGridObstacle : GraphModifier {
 		/// <summary>Collider to get bounds information from</summary>
 		Collider coll;

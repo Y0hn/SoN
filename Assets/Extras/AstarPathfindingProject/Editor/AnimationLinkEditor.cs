@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Collections.Generic;
 
 namespace Pathfinding {
+	[System.Obsolete]
 	[CustomEditor(typeof(AnimationLink))]
 	public class AnimationLinkEditor : Editor {
 		public override void OnInspectorGUI () {

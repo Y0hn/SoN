@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace Pathfinding {
 	using Pathfinding.Util;
 
+	[System.Obsolete]
 	public class NodeLink3Node : PointNode {
 		public NodeLink3 link;
 		public Vector3 portalA;
@@ -43,6 +44,7 @@ namespace Pathfinding {
 	/// </summary>
 	[AddComponentMenu("Pathfinding/Link3")]
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_node_link3.php")]
+	[System.Obsolete]
 	public class NodeLink3 : GraphModifier {
 		protected static Dictionary<GraphNode, NodeLink3> reference = new Dictionary<GraphNode, NodeLink3>();
 		public static NodeLink3 GetNodeLink (GraphNode node) {
@@ -290,7 +292,8 @@ namespace Pathfinding {
 			OnDrawGizmos(false);
 		}
 
-		public void OnDrawGizmos (bool selected) {
+#pragma warning disable UNT0006 // Incorrect message signature
+        public void OnDrawGizmos (bool selected) {
 			Color col = selected ? GizmosColorSelected : GizmosColor;
 
 			if (StartTransform != null) {
@@ -309,5 +312,6 @@ namespace Pathfinding {
 				}
 			}
 		}
-	}
+#pragma warning restore UNT0006 // Incorrect message signature
+    }
 }

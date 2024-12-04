@@ -15,6 +15,7 @@ namespace Pathfinding {
 	/// See: <see cref="Pathfinding.IAstarAI"/> (all movement scripts implement this interface)
 	/// </summary>
 	[RequireComponent(typeof(Seeker))]
+	[System.Obsolete]
 	public abstract class AIBase : VersionedMonoBehaviour {
 		/// <summary>\copydoc Pathfinding::IAstarAI::radius</summary>
 		public float radius = 0.5f;

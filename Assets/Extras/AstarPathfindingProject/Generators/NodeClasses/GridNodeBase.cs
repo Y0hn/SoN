@@ -3,6 +3,7 @@ using Pathfinding.Serialization;
 
 namespace Pathfinding {
 	/// <summary>Base class for GridNode and LevelGridNode</summary>
+	[System.Obsolete]
 	public abstract class GridNodeBase : GraphNode {
 		protected GridNodeBase (AstarPath astar) : base(astar) {
 		}

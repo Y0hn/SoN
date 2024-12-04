@@ -12,6 +12,7 @@ namespace Pathfinding {
 	using System.Linq;
 
 	/// <summary>Base class for RecastGraph and NavMeshGraph</summary>
+	[System.Obsolete]
 	public abstract class NavmeshBase : NavGraph, INavmesh, INavmeshHolder, ITransformedGraph {
 #if ASTAR_RECAST_LARGER_TILES
 		// Larger tiles

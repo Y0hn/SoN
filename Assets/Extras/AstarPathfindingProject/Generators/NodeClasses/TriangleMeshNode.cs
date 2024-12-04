@@ -3,6 +3,7 @@ using Pathfinding.Serialization;
 
 namespace Pathfinding {
 	/// <summary>Interface for something that holds a triangle based navmesh</summary>
+	[System.Obsolete]
 	public interface INavmeshHolder : ITransformedGraph, INavmesh {
 		/// <summary>Position of vertex number i in the world</summary>
 		Int3 GetVertex(int i);
@@ -20,6 +21,7 @@ namespace Pathfinding {
 	}
 
 	/// <summary>Node represented by a triangle</summary>
+	[System.Obsolete]
 	public class TriangleMeshNode : MeshNode {
 		public TriangleMeshNode (AstarPath astar) : base(astar) {}
 

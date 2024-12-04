@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace Pathfinding {
+	[System.Obsolete]
 	[CustomEditor(typeof(AstarPath))]
 	public class AstarPathEditor : Editor {
 		/// <summary>List of all graph editors available (e.g GridGraphEditor)</summary>
@@ -350,9 +351,8 @@ namespace Pathfinding {
 			return true;
 		}
 
-        /// <summary>Draws the main area in the inspector</summary>
-        [System.Obsolete]
-        void DrawMainArea () {
+		/// <summary>Draws the main area in the inspector</summary>
+		void DrawMainArea () {
 			CheckGraphEditors();
 
 			graphsArea.Begin();
