@@ -4,7 +4,10 @@ namespace Pathfinding.Legacy {
 	[CustomEditor(typeof(LegacyAIPath))]
 	[CanEditMultipleObjects]
 	public class LegacyAIPathEditor : BaseAIEditor {
-		protected override void Inspector () {
+        [System.Obsolete]
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
+
+        protected override void Inspector () {
 			base.Inspector();
 			var gravity = FindProperty("gravity");
 			if (!gravity.hasMultipleDifferentValues && !float.IsNaN(gravity.vector3Value.x)) {
@@ -13,5 +16,6 @@ namespace Pathfinding.Legacy {
 			}
 			LegacyEditorHelper.UpgradeDialog(targets, typeof(AIPath));
 		}
-	}
+#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
+    }
 }

@@ -15,7 +15,10 @@ namespace Pathfinding {
 
 		GraphUpdateScene[] scripts;
 
-		protected override void Inspector () {
+        [System.Obsolete]
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
+
+        protected override void Inspector () {
 			// Find all properties
 			var points = FindProperty("points");
 			var legacyMode = FindProperty("legacyMode");
@@ -103,8 +106,9 @@ namespace Pathfinding {
 				if (!Application.isPlaying || EditorApplication.isPaused) SceneView.RepaintAll();
 			}
 		}
+#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
 
-		void DrawPointsField () {
+        void DrawPointsField () {
 			EditorGUI.BeginChangeCheck();
 			PropertyField("points");
 			if (EditorGUI.EndChangeCheck()) {
@@ -154,7 +158,8 @@ namespace Pathfinding {
 			}
 		}
 
-		void DrawTagField () {
+        [System.Obsolete]
+        void DrawTagField () {
 			if (PropertyField("modifyTag")) {
 				var tagValue = FindProperty("setTag");
 				EditorGUI.indentLevel++;

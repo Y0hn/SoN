@@ -44,7 +44,10 @@ namespace Pathfinding {
 			}
 		}
 
-		protected override void Inspector () {
+        [System.Obsolete]
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
+
+        protected override void Inspector () {
 			var isAIPath = typeof(AIPath).IsAssignableFrom(target.GetType());
 
 			Section("Shape");
@@ -157,5 +160,6 @@ namespace Pathfinding {
 				EditorGUILayout.HelpBox("You are using both a Rigidbody and a Character Controller. Those components are not really designed for that. Please use only one of them.", MessageType.Warning);
 			}
 		}
-	}
+#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
+    }
 }

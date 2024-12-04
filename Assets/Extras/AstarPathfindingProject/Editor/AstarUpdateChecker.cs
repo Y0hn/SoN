@@ -106,7 +106,8 @@ namespace Pathfinding {
 			{ "URL:homepage", "http://arongranberg.com/astar/" }
 		};
 
-		static AstarUpdateChecker() {
+        [System.Obsolete]
+        static AstarUpdateChecker() {
 			// Add a callback so that we can parse the message when it has been downloaded
 			EditorApplication.update += UpdateCheckLoop;
 			EditorBase.getDocumentationURL = () => GetURL("documentation");
@@ -131,8 +132,9 @@ namespace Pathfinding {
 			return url ?? "";
 		}
 
-		/// <summary>Initiate a check for updates now, regardless of when the last check was done</summary>
-		public static void CheckForUpdatesNow () {
+        /// <summary>Initiate a check for updates now, regardless of when the last check was done</summary>
+        [System.Obsolete]
+        public static void CheckForUpdatesNow () {
 			lastUpdateCheck = System.DateTime.UtcNow.AddDays(-5);
 
 			// Remove the callback if it already exists
@@ -142,23 +144,25 @@ namespace Pathfinding {
 			EditorApplication.update += UpdateCheckLoop;
 		}
 
-		/// <summary>
-		/// Checking for updates...
-		/// Should be called from EditorApplication.update
-		/// </summary>
-		static void UpdateCheckLoop () {
+        /// <summary>
+        /// Checking for updates...
+        /// Should be called from EditorApplication.update
+        /// </summary>
+        [System.Obsolete]
+        static void UpdateCheckLoop () {
 			// Go on until the update check has been completed
 			if (!CheckForUpdates()) {
 				EditorApplication.update -= UpdateCheckLoop;
 			}
 		}
 
-		/// <summary>
-		/// Checks for updates if there was some time since last check.
-		/// It must be called repeatedly to ensure that the result is processed.
-		/// Returns: True if an update check is progressing (WWW request)
-		/// </summary>
-		static bool CheckForUpdates () {
+        /// <summary>
+        /// Checks for updates if there was some time since last check.
+        /// It must be called repeatedly to ensure that the result is processed.
+        /// Returns: True if an update check is progressing (WWW request)
+        /// </summary>
+        [System.Obsolete]
+        static bool CheckForUpdates () {
 			if (updateCheckDownload != null && updateCheckDownload.isDone) {
 				if (!string.IsNullOrEmpty(updateCheckDownload.error)) {
 					Debug.LogWarning("There was an error checking for updates to the A* Pathfinding Project\n" +
@@ -188,7 +192,8 @@ namespace Pathfinding {
 			return updateCheckDownload != null || minutesUntilUpdate < 10;
 		}
 
-		static void DownloadVersionInfo () {
+        [System.Obsolete]
+        static void DownloadVersionInfo () {
 			var script = AstarPath.active != null ? AstarPath.active : GameObject.FindObjectOfType(typeof(AstarPath)) as AstarPath;
 
 			if (script != null) {

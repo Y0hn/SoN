@@ -226,7 +226,10 @@ namespace Pathfinding {
 			return false;
 		}
 
-		public override void OnInspectorGUI () {
+        [System.Obsolete]
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
+
+        public override void OnInspectorGUI () {
 			// Do some loading and checking
 			if (!LoadStyles()) {
 				EditorGUILayout.HelpBox("The GUISkin 'AstarEditorSkin.guiskin' in the folder "+EditorResourceHelper.editorAssets+"/ was not found or some custom styles in it does not exist.\n"+
@@ -292,13 +295,14 @@ namespace Pathfinding {
 				EditorUtility.SetDirty(script);
 			}
 		}
+#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
 
-		/// <summary>
-		/// Loads GUISkin and sets up styles.
-		/// See: EditorResourceHelper.LocateEditorAssets
-		/// Returns: True if all styles were found, false if there was an error somewhere
-		/// </summary>
-		static bool LoadStyles () {
+        /// <summary>
+        /// Loads GUISkin and sets up styles.
+        /// See: EditorResourceHelper.LocateEditorAssets
+        /// Returns: True if all styles were found, false if there was an error somewhere
+        /// </summary>
+        static bool LoadStyles () {
 			if (stylesLoaded) return true;
 
 			// Dummy styles in case the loading fails
@@ -346,8 +350,9 @@ namespace Pathfinding {
 			return true;
 		}
 
-		/// <summary>Draws the main area in the inspector</summary>
-		void DrawMainArea () {
+        /// <summary>Draws the main area in the inspector</summary>
+        [System.Obsolete]
+        void DrawMainArea () {
 			CheckGraphEditors();
 
 			graphsArea.Begin();
@@ -645,7 +650,8 @@ namespace Pathfinding {
 			graphEditor.fadeArea.End();
 		}
 
-		public void OnSceneGUI () {
+        [System.Obsolete]
+        public void OnSceneGUI () {
 			script = target as AstarPath;
 
 			DrawSceneGUISettings();
@@ -682,7 +688,8 @@ namespace Pathfinding {
 			}
 		}
 
-		void DrawSceneGUISettings () {
+        [System.Obsolete]
+        void DrawSceneGUISettings () {
 			var darkSkin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Scene);
 
 			Handles.BeginGUI();
@@ -739,7 +746,8 @@ namespace Pathfinding {
 			return AssetDatabase.LoadAssetAtPath<TextAsset>(path);
 		}
 
-		void DrawSerializationSettings () {
+        [System.Obsolete]
+        void DrawSerializationSettings () {
 			serializationSettingsArea.Begin();
 			GUILayout.BeginHorizontal();
 
@@ -946,8 +954,9 @@ namespace Pathfinding {
 			// Pro only feature
 		}
 
-		/// <summary>Opens the A* Inspector and shows the section for editing tags</summary>
-		public static void EditTags () {
+        /// <summary>Opens the A* Inspector and shows the section for editing tags</summary>
+        [System.Obsolete]
+        public static void EditTags () {
 			AstarPath astar = GameObject.FindObjectOfType<AstarPath>();
 
 			if (astar != null) {
@@ -1363,7 +1372,8 @@ namespace Pathfinding {
 		}
 
 		[MenuItem("Edit/Pathfinding/Scan All Graphs %&s")]
-		public static void MenuScan () {
+        [System.Obsolete]
+        public static void MenuScan () {
 			if (AstarPath.active == null) {
 				AstarPath.active = FindObjectOfType<AstarPath>();
 				if (AstarPath.active == null) {

@@ -44,7 +44,10 @@ namespace Pathfinding {
 			return v;
 		}
 
-		public override void OnInspectorGUI (NavGraph target) {
+        [System.Obsolete]
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
+
+        public override void OnInspectorGUI (NavGraph target) {
 			var graph = target as GridGraph;
 
 			DrawFirstSection(graph);
@@ -62,8 +65,9 @@ namespace Pathfinding {
 			Separator();
 			DrawLastSection(graph);
 		}
+#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
 
-		bool IsHexagonal (GridGraph graph) {
+        bool IsHexagonal (GridGraph graph) {
 			return Mathf.Approximately(graph.isometricAngle, GridGraph.StandardIsometricAngle) && graph.neighbours == NumNeighbours.Six && graph.uniformEdgeCosts;
 		}
 
@@ -277,7 +281,8 @@ namespace Pathfinding {
 			GUILayout.EndHorizontal();
 		}
 
-		protected virtual void DrawMiddleSection (GridGraph graph) {
+        [System.Obsolete]
+        protected virtual void DrawMiddleSection (GridGraph graph) {
 			DrawNeighbours(graph);
 			DrawMaxClimb(graph);
 			DrawMaxSlope(graph);
@@ -331,7 +336,8 @@ namespace Pathfinding {
 			}
 		}
 
-		protected void DrawErosion (GridGraph graph) {
+        [System.Obsolete]
+        protected void DrawErosion (GridGraph graph) {
 			graph.erodeIterations = EditorGUILayout.IntField(new GUIContent("Erosion iterations", "Sets how many times the graph should be eroded. This adds extra margin to objects."), graph.erodeIterations);
 			graph.erodeIterations = graph.erodeIterations < 0 ? 0 : (graph.erodeIterations > 16 ? 16 : graph.erodeIterations); //Clamp iterations to [0,16]
 

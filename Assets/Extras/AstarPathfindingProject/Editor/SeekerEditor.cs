@@ -12,7 +12,10 @@ namespace Pathfinding {
 		GUIContent[] exactnessLabels = new [] { new GUIContent("Node Center (Snap To Node)"), new GUIContent("Original"), new GUIContent("Interpolate (deprecated)"), new GUIContent("Closest On Node Surface"), new GUIContent("Node Connection") };
 		string[] graphLabels = new string[32];
 
-		protected override void Inspector () {
+        [System.Obsolete]
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
+
+        protected override void Inspector () {
 			base.Inspector();
 
 			scripts.Clear();
@@ -137,5 +140,6 @@ namespace Pathfinding {
 			// Make sure we don't leak any memory
 			scripts.Clear();
 		}
-	}
+#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
+    }
 }
