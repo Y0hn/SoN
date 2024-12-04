@@ -21,6 +21,7 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected SpriteRenderer weaponR, weaponL;
     [SerializeField] protected NetworkAnimator animator;
     [SerializeField] protected Rigidbody2D rb;
+    [SerializeField] protected AITarget aiTeam = AITarget.Team_2;
     protected Defence defence;  // iba na servery/hoste Servery
 
     [SerializeField]    protected   NetworkList<FixedString64Bytes> equipment = new(/*null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner*/);    
@@ -421,4 +422,8 @@ public struct BodyEquipment
     {
         references = new();
     }
+}
+public enum AITarget 
+{
+    None, Player, Team_1, Team_2, Team_3, Boss
 }

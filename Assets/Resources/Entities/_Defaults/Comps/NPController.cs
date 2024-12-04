@@ -11,6 +11,7 @@ public class NPController : EntityController
      */
     [SerializeField] AIDestinationSetter destinationSetter;
     [SerializeField] AIPath path;
+    [SerializeField] NPSensor sensor;
     
     protected NextAction nextAction;
     protected float nextDecisionTimer = 0f;
@@ -26,13 +27,17 @@ public class NPController : EntityController
         if (!IsServer || path == null) return;
 
         base.Update();
-        if (IsServer && (nextDecisionTimer < Time.time || ForceDecision))
+        if (nextDecisionTimer < Time.time || ForceDecision)
             DecideNextMove();
         if (path.desiredVelocity != Vector3.zero)
         {
             Vector2 move = new (path.desiredVelocity.x*1000, path.desiredVelocity.y*1000);
             moveDir = move.normalized;
             //Debug.Log(moveDir.x + " " + moveDir.y);
+        }
+        if (sensor.TargetInRange)
+        {
+            destinationSetter.target = sensor.ClosestTarget;
         }
     }
     protected override void AnimateMovement()

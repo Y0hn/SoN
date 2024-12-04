@@ -1,5 +1,88 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &788308767628952904
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5269228574579820424}
+  - component: {fileID: 6993248804997903316}
+  - component: {fileID: 3277300298372082836}
+  m_Layer: 0
+  m_Name: Sensor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5269228574579820424
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788308767628952904}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3048762479830503385}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &6993248804997903316
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788308767628952904}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 5
+--- !u!114 &3277300298372082836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788308767628952904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8368504728eabac459952a67309e246e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  me: 3
+  coll: {fileID: 6993248804997903316}
 --- !u!1001 &4679617435991968507
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22,7 +105,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5630875124356528717, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 3336267000
+      value: 4105617475
       objectReference: {fileID: 0}
     - target: {fileID: 5630875124356528717, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
@@ -70,7 +153,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7691644660972815650, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 5269228574579820424}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4991143687992300023, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
       insertIndex: -1
@@ -199,6 +285,7 @@ MonoBehaviour:
   weaponL: {fileID: 1325576850034929809}
   animator: {fileID: 5663075166172191200}
   rb: {fileID: 1458412614070460213}
+  aiTeam: 3
   maxHp:
     m_InternalValue: 100
   speed:
@@ -223,6 +310,7 @@ MonoBehaviour:
   stats: {fileID: 2515504059740392027}
   destinationSetter: {fileID: 8712308378174085460}
   path: {fileID: 2119263292014263438}
+  sensor: {fileID: 3277300298372082836}
 --- !u!114 &1068958760059023542 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5630875124356528717, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
@@ -242,6 +330,11 @@ SpriteRenderer:
 --- !u!50 &1458412614070460213 stripped
 Rigidbody2D:
   m_CorrespondingSourceObject: {fileID: 6110265151130752462, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
+  m_PrefabInstance: {fileID: 4679617435991968507}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3048762479830503385 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7691644660972815650, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
   m_PrefabInstance: {fileID: 4679617435991968507}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &3798816729441822768 stripped

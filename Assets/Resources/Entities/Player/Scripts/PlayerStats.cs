@@ -54,6 +54,16 @@ public class PlayerStats : EntityStats
         base.OnNetworkSpawn();
         OwnerSubsOnNetValChanged();
     }
+    protected override void Update()
+    {
+        if (chatTimer != 0)
+            if (chatTimer <= Time.time)
+            {
+                chatField.SetActive(false);
+                chatBox.text = "";
+                chatTimer = 0;
+            }
+    }
     public override void OnNetworkDespawn()
     {
         if (!IsServer) return;
@@ -154,16 +164,7 @@ public class PlayerStats : EntityStats
         base.KilledEnemy(died);
         xp.Value += died.level.Value * 5 ;
     }
-    protected override void Update()
-    {
-        if (chatTimer != 0)
-            if (chatTimer <= Time.time)
-            {
-                chatField.SetActive(false);
-                chatBox.text = "";
-                chatTimer = 0;
-            }
-    }
+    
     [Rpc(SendTo.Server)] public void SetAttackTypeRpc(byte t)
     {
         t--;
