@@ -1,42 +1,52 @@
 using System.Collections.Generic;
-using Unity.Netcode;
-using Unity.VisualScripting;
+using System;
 using UnityEngine;
+using Unity.Netcode;
 
 public class NPSensor : NetworkBehaviour
 {
-    public bool TargetInRange {get; private set;}
-    public Transform ClosestTarget {get; private set;}
-    public AITarget me;
     [SerializeField] CircleCollider2D coll;
     List<Transform> inRange = new();
-    //const string ENTITY_TAG = "Entity";
-    void OnCollisionEnter2D(Collision2D collision)
+    public Transform ClosestTarget  {get; private set;}
+    public bool TargetInRange       {get; private set;}
+    public AITarget me              { get; set; }
+    public Action<Transform> targetChange;
+
+#pragma warning disable IDE0051 // Remove unused private members
+    void OnTriggerEnter2D(Collider2D other)
     {
-        if (IsServer /*&& collision.transform.tag == ENTITY_TAG*/)
+        if (IsServer && other.TryGetComponent(out EntityStats et) && et.TargetTeam != me)
         {
-            Debug.Log("Collision with sensor of " + transform.parent.name);
-            inRange.Add(collision.transform);
+            //Debug.Log("Collision with sensor of " + transform.parent.name);
+            inRange.Add(other.transform);
             FindClosestTarget();
+            targetChange.Invoke(ClosestTarget);
         }
     }
-    void OnCollisionExit2D(Collision2D collision)
+    void OnTriggerExit2D(Collider2D other)
     {
-        if (IsServer /*&& collision.transform.tag == ENTITY_TAG*/)
+        if (IsServer)
         {
-            inRange.Remove(collision.transform);
-            if (ClosestTarget == collision.transform)
+            inRange.Remove(other.transform);
+            if (ClosestTarget != null && ClosestTarget.Equals(other.transform))
+            {
                 FindClosestTarget();
+                targetChange.Invoke(ClosestTarget);
+            }
         }
     }
+#pragma warning restore IDE0051 // Remove unused private members
     void FindClosestTarget()
     {
         float d = float.PositiveInfinity;
         int i = 0, index = i;
 
         if      (inRange.Count == 0)
+        {
             SetTarget(null, false);
-        else if (inRange.Count > 1) // preskakuje akje len 1 zapis
+        }
+        else if (inRange.Count >= 1) // preskakuje akje len 1 zapis
+        {
             inRange.ForEach(iR => 
             {
                 Vector2 tP = iR.transform.position;
@@ -48,8 +58,13 @@ public class NPSensor : NetworkBehaviour
                 }
                 i++;
             });
-        SetTarget(inRange[i]);
-        
+
+            //try {
+                SetTarget(inRange[index]);/*
+            } catch {
+                Debug.LogWarning($"Exeption e i={i} inRange.Count={inRange.Count}");
+            }*/
+        }
     }
     public void SetTarget(Transform target, bool inRange = true)
     {

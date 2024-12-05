@@ -22,7 +22,6 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected NetworkAnimator animator;
     [SerializeField] protected Rigidbody2D rb;
     [SerializeField] protected AITarget aiTeam = AITarget.Team_2;
-    protected Defence defence;  // iba na servery/hoste Servery
 
     [SerializeField]    protected   NetworkList<FixedString64Bytes> equipment = new(/*null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner*/);    
     // Sprava sa ako Dictionary ale je to list
@@ -31,15 +30,16 @@ public abstract class EntityStats : NetworkBehaviour
                         public      NetworkVariable<float> speed = new();
                         public      NetworkVariable<byte> level = new(1);
                         public      NetworkVariable<bool> IsAlive = new(true);
-                        protected   NetworkVariable<Attack> attack = new ();
+                        protected   NetworkVariable<Attack> attack = new();
                         protected   NetworkVariable<WeaponIndex> weapE = new(new(-1), NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
-
     public float HP                 { get { return (float)hp.Value/(float)maxHp.Value; } }
     public NetworkObject NetObject  { get { return netObject; } }
     public Rigidbody2D RigidBody2D  { get { return rb; } }
+    public AITarget TargetTeam      { get { return aiTeam; } }
     public Animator Animator        { get { return animator.Animator; } }
     public bool AttackBoth          { get { return attack.Value.bothHanded; } }
     public bool Armed               { get { return equipment[(int)Equipment.Slot.WeaponL] != "" || "" !=  equipment[(int)Equipment.Slot.WeaponR]; } }
+    protected Defence defence;  // iba na servery/hoste
     protected float atTime = 0;
     protected const float timeToDespawn = 0f;
     private bool clampedDMG = true;
@@ -76,7 +76,7 @@ public abstract class EntityStats : NetworkBehaviour
         name = name.Split('(')[0].Trim();
         if (IsServer)
         {
-            attack.Value = rase.attack;
+            attack.Value = new(rase.attack);
 
             maxHp.Value = rase.maxHp;
             hp.Value = maxHp.Value;
@@ -89,9 +89,9 @@ public abstract class EntityStats : NetworkBehaviour
             for (; equipment.Count < length;)
                 equipment.Add("");
 
+            defence = new(rase.naturalArmor);
             IsAlive.Value = true;
         }
-        defence = new(rase.naturalArmor);
     }
     protected virtual void Update()
     {
@@ -161,7 +161,8 @@ public abstract class EntityStats : NetworkBehaviour
     public virtual bool TakeDamage(Damage damage)
     {
         if (!IsServer) 
-        { Debug.Log("Called from not server "); return false; }
+            return false;
+        /*Debug.Log("Called from not server ");*/ 
 
         int newDamage = defence.CalculateDMG(damage, clampedDMG);
         hp.Value -= newDamage;
@@ -327,7 +328,16 @@ public abstract class EntityStats : NetworkBehaviour
         this.range = range;
         this.rate = rate;
         this.type = type;
-    }    
+    }
+    public Attack (Attack attack)
+    {
+        this.bothHanded =  attack.bothHanded;
+        this.damage =  attack.damage;
+        this.range = attack.range;
+        this.rate =  attack.rate;
+        this.type =  attack.type;
+
+    }
     public enum Type
     {
         RaseUnnarmed, MeleeSlash, MeleeStab, BowSingle, BowMulti // Magi
@@ -355,6 +365,18 @@ public abstract class EntityStats : NetworkBehaviour
         serializer.SerializeValue(ref range);
         serializer.SerializeValue(ref rate);
         serializer.SerializeValue(ref type);
+    }
+    public override string ToString()
+    {
+        string s = "";
+
+        s += $"Both handed: {bothHanded} | ";
+        s += $"Damage: {damage} | ";
+        s += $"Range: {range} | ";
+        s += $"Rate: {rate} ac/s |";
+        s += $"Attack Type: {Enum.GetName(typeof(Type), type)}";
+
+        return s;
     }
 }
 [Serializable] public struct WeaponIndex : INetworkSerializable
@@ -401,6 +423,17 @@ public abstract class EntityStats : NetworkBehaviour
         return 
         type == other.type && 
         amount == other.amount;
+    }
+    public override string ToString()
+    {
+        string s = $"Type: {Enum.GetName(typeof(Type), type)} Amount: ";
+
+        if (amount > 1)
+            s += amount.ToString();
+        else
+            s += amount.ToString() + " %";
+
+        return s;
     }
 }
 public struct BodyEquipment

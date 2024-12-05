@@ -16,11 +16,14 @@ public class NPController : EntityController
     protected NextAction nextAction;
     protected float nextDecisionTimer = 0f;
     protected List<Transform> patrol = new();
-    public bool ForceDecision { get; protected set; }
+    public bool ForceDecision   { get; protected set; }
+    protected bool Moving       { get; set; }
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
         ((NPStats)stats).OnHit += delegate { ForceDecision = true; };
+        if (IsServer)
+            sensor.targetChange += SetTarget;
     }
     protected override void Update()
     {
@@ -29,15 +32,25 @@ public class NPController : EntityController
         base.Update();
         if (nextDecisionTimer < Time.time || ForceDecision)
             DecideNextMove();
-        if (path.desiredVelocity != Vector3.zero)
+        if (path.desiredVelocity != Vector3.zero && Moving)
         {
-            Vector2 move = new (path.desiredVelocity.x*1000, path.desiredVelocity.y*1000);
+            Vector2 move = new (path.desiredVelocity.x*100, path.desiredVelocity.y*100);
             moveDir = move.normalized;
             //Debug.Log(moveDir.x + " " + moveDir.y);
         }
-        if (sensor.TargetInRange)
+    }
+    protected virtual void SetTarget(Transform t)
+    {
+        if (t != null)
         {
             destinationSetter.target = sensor.ClosestTarget;
+            Moving = true;
+        }
+        else
+        {
+            destinationSetter.target = transform;
+            moveDir = Vector2.zero;
+            Moving = false;
         }
     }
     protected override void AnimateMovement()

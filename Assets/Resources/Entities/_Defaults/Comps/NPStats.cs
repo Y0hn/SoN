@@ -35,20 +35,25 @@ public class NPStats : EntityStats
      *  private bool clampedDMG = true;
      *  protected Defence defence;
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
-    [SerializeField] Behavior behavior = Behavior.Neutral;
-    public Weapon.Class WC   { get; protected set; }
-    public Defence.Class DC    { get; protected set; }
-    public Behavior Behave  { get { return behavior; } protected set => behavior = value; }
+    [SerializeField] protected Behavior behavior = Behavior.Neutral;
+    [SerializeField] protected NPSensor sensor;
+    public Defence.Class DC     { get; protected set; }
+    public Weapon.Class WC      { get; protected set; }
+    public Behavior Behave      { get { return behavior; } protected set => behavior = value; }
     public Action OnHit;
     public override void OnNetworkSpawn()
     {
-        base.OnNetworkPostSpawn();
+        base.OnNetworkSpawn();
     }
     protected override void EntitySetUp()
     {
         base.EntitySetUp();
-        CallculateWC();
-        CallculateDC();
+        if (IsServer)
+        {
+            CallculateWC();
+            CallculateDC();
+            sensor.me = aiTeam;
+        }
     }
     protected override void OnEquipmentUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
     {
@@ -70,14 +75,19 @@ public class NPStats : EntityStats
     }
     protected override void OnHpUpdate()
     {
-        float newHp = HP;
+        //float newHp = HP;
         base.OnHpUpdate();
         OnHit.Invoke();
     }
     public void CallculateWC()
     {
-        Weapon w = (Weapon)Item.GetItem(equipment[weapE.Value.eIndex].ToString());
-        WC = w.CallculateWC();
+        if (weapE.Value.eIndex >= 0)
+        {
+            Weapon w = (Weapon)Item.GetItem(equipment[weapE.Value.eIndex].ToString());
+            WC = w.CallculateWC();
+        }
+        else
+            WC = Weapon.Class.Medium;
     }
     public void CallculateDC()
     {
