@@ -17,7 +17,7 @@ public class NPStats : EntityStats
      *  [SF] protected NetworkAnimator animator;
      *  [SF] protected Rigidbody2D rb;
      *
-     *  [SF]    protected NetworkVariable<int> maxHp = new();
+     *  [SF] protected NetworkVariable<int> maxHp = new();
      *
      *  protected NetworkVariable<int> hp = new();
      *  protected NetworkVariable<Attack> attack = new ();
@@ -26,10 +26,13 @@ public class NPStats : EntityStats
      *  public NetworkVariable<float> speed = new();
      *  public NetworkVariable<byte> level = new(1);
      *
-     *  public float HP { get { return (float)hp.Value/(float)maxHp.Value; } }
-     *  public NetworkObject NetObject { get { return netObject; } }
-     *  public Animator Animator { get { return animator.Animator; } }
-     *  public Rigidbody2D RigidBody2D { get { return rb; } }
+     *  public float HP                 { get { return (float)hp.Value/(float)maxHp.Value; } }
+     *  public NetworkObject NetObject  { get { return netObject; } }
+     *  public Rigidbody2D RigidBody2D  { get { return rb; } }
+     *  public AITarget TargetTeam      { get { return aiTeam; } }
+     *  public Animator Animator        { get { return animator.Animator; } }
+     *  public bool AttackBoth          { get { return attack.Value.bothHanded; } }
+     *  public bool Armed               { get { return equipment[(int)Equipment.Slot.WeaponL] != "" || "" !=  equipment[(int)Equipment.Slot.WeaponR]; } }
      *
      *  protected const float timeToDespawn = 0f;
      *  private bool clampedDMG = true;
@@ -75,7 +78,6 @@ public class NPStats : EntityStats
     }
     protected override void OnHpUpdate()
     {
-        //float newHp = HP;
         base.OnHpUpdate();
         OnHit.Invoke();
     }

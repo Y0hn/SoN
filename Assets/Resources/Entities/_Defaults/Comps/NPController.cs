@@ -5,10 +5,12 @@ using Pathfinding;
 
 public class NPController : EntityController
 {
-    /* Inhereted variables
-     *
-     *
-     */
+    /* ZDEDENE ATRIBUTY
+     *  [SF] protected EntityStats stats;
+     *  protected Vector2 moveDir;
+     *  protected bool attacking;
+     *  protected const float MIN_MOVE_TOL = 0.1f;
+     *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
     [SerializeField] AIDestinationSetter destinationSetter;
     [SerializeField] AIPath path;
     [SerializeField] NPSensor sensor;
