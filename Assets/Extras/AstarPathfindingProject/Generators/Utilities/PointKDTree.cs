@@ -9,6 +9,7 @@ namespace Pathfinding {
 	///
 	/// See: https://en.wikipedia.org/wiki/K-d_tree
 	/// </summary>
+	[System.Obsolete]
 	public class PointKDTree {
 		// TODO: Make constant
 		public const int LeafSize = 10;

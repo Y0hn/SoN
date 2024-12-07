@@ -40,6 +40,20 @@ public class NPStats : EntityStats
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
     [SerializeField] protected Behavior behavior = Behavior.Neutral;
     [SerializeField] protected NPSensor sensor;
+    [SerializeField] protected float viewRange = 0;
+    [SerializeField] protected bool drawGizmo = false;
+    protected const float ATTACK_DISTANCE_PERCENTAGE = 0.3f;
+    public float TargetDistance { get { return Attack.range*2 /*- ATTACK_DISTANCE_PERCENTAGE*Attack.range*/; } }
+    protected Attack Attack     
+    { 
+        get 
+        { 
+            if (attack.Value.IsSet) 
+                return attack.Value; 
+            else
+                return rase.attack;
+        } 
+    }
     public Defence.Class DC     { get; protected set; }
     public Weapon.Class WC      { get; protected set; }
     public Behavior Behave      { get { return behavior; } protected set => behavior = value; }
@@ -56,6 +70,7 @@ public class NPStats : EntityStats
             CallculateWC();
             CallculateDC();
             sensor.me = aiTeam;
+
         }
     }
     protected override void OnEquipmentUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
@@ -95,6 +110,23 @@ public class NPStats : EntityStats
     {
         DC = defence.CallculateDC();
     }
+#pragma warning disable IDE0051 // Remove unused private members
+    void OnDrawGizmos()
+    {
+        if (drawGizmo)
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawWireSphere(transform.position, viewRange);
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(transform.position, TargetDistance);
+
+            Gizmos.color = Color.red;
+            Vector3 v = new(transform.position.x, transform.position.y + rase.attack.range, 0);
+            Gizmos.DrawWireSphere(v, rase.attack.range);
+        }
+    }
+#pragma warning restore IDE0051 // Remove unused private members
     public enum Behavior 
     {
         Scared,     // unika pred target

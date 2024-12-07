@@ -321,6 +321,7 @@ public abstract class EntityStats : NetworkBehaviour
     public float rate;
     public Type type;
     public bool bothHanded;
+    public bool IsSet { get { return range != 0 && rate != 0;} }
     public Attack (Damage damage, float range, float rate, Type type, bool both = false)
     {
         this.bothHanded = both;

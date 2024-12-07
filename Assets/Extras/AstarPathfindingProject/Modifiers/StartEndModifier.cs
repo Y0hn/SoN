@@ -15,6 +15,7 @@ namespace Pathfinding {
 	///
 	/// \ingroup modifiers
 	/// </summary>
+	[System.Obsolete]
 	public class StartEndModifier : PathModifier {
 		public override int Order { get { return 0; } }
 

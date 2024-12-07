@@ -1,5 +1,4 @@
 using UnityEngine;
-using System;
 using System.Collections.Generic;
 using Pathfinding;
 
@@ -18,42 +17,61 @@ public class NPController : EntityController
     protected NextAction nextAction;
     protected float nextDecisionTimer = 0f;
     protected List<Transform> patrol = new();
-    public bool ForceDecision   { get; protected set; }
-    protected bool Moving       { get; set; }
+    protected bool selfTarget;
+    public bool ForceDecision       { get; protected set; }
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
         ((NPStats)stats).OnHit += delegate { ForceDecision = true; };
         if (IsServer)
+        {
             sensor.targetChange += SetTarget;
+            path.endReachedDistance = ((NPStats)stats).TargetDistance;
+        }
     }
     protected override void Update()
     {
         if (!IsServer || path == null) return;
 
-        base.Update();
+
         if (nextDecisionTimer < Time.time || ForceDecision)
             DecideNextMove();
-        if (path.desiredVelocity != Vector3.zero && Moving)
+            
+        if (selfTarget && moveDir != Vector2.zero)
         {
-            Vector2 move = new (path.desiredVelocity.x*100, path.desiredVelocity.y*100);
-            moveDir = move.normalized;
-            //Debug.Log(moveDir.x + " " + moveDir.y);
+            moveDir = Vector2.zero;
+            attacking = false;   
         }
+        else if (!selfTarget && attacking && path.reachedEndOfPath)
+            Attack();
+        else if (!selfTarget)
+            FollowTarget();
+    }
+    protected override void Attack()
+    {
+        if (moveDir != Vector2.zero) moveDir = Vector2.zero;
+        base.Attack();
+    }
+    protected virtual void FollowTarget()
+    {
+        Vector2 move = new (path.desiredVelocity.x*100, path.desiredVelocity.y*100);
+        moveDir = move.normalized;
+        if (!attacking) attacking = true; 
     }
     protected virtual void SetTarget(Transform t)
     {
         if (t != null)
         {
             destinationSetter.target = sensor.ClosestTarget;
-            Moving = true;
+            selfTarget = false;
         }
         else
         {
             destinationSetter.target = transform;
             moveDir = Vector2.zero;
-            Moving = false;
+            selfTarget = true;
         }
+        attacking = false;
     }
     protected override void AnimateMovement()
     {

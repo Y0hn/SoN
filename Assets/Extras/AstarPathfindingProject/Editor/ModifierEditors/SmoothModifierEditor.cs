@@ -4,6 +4,7 @@ using UnityEditor;
 namespace Pathfinding {
 	[CustomEditor(typeof(SimpleSmoothModifier))]
 	[CanEditMultipleObjects]
+	[System.Obsolete]
 	public class SmoothModifierEditor : EditorBase {
 		protected override void Inspector () {
 			var smoothType = FindProperty("smoothType");

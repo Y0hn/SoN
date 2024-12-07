@@ -51,6 +51,9 @@ https://en.wikipedia.org/wiki/Nav_(Slavic_folklore)
 ### A* Pathfinding
 ```
 https://arongranberg.com/astar/
+https://youtu.be/jvtFUfJ6CP8
+https://youtu.be/uOobLo2y3KI
+
 ```
 ## Multiplayer:
 Setup:

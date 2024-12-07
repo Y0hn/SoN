@@ -6,6 +6,7 @@ namespace Pathfinding {
 	/// See: MonoModifier
 	/// Modifier
 	/// </summary>
+	[System.Obsolete]
 	public interface IPathModifier {
 		int Order { get; }
 
@@ -18,6 +19,7 @@ namespace Pathfinding {
 	/// See: MonoModifier
 	/// </summary>
 	[System.Serializable]
+	[System.Obsolete]
 	public abstract class PathModifier : IPathModifier {
 		[System.NonSerialized]
 		public Seeker seeker;
@@ -54,6 +56,7 @@ namespace Pathfinding {
 	/// See: Menubar -> Component -> Pathfinding -> Modifiers
 	/// </summary>
 	[System.Serializable]
+	[System.Obsolete]
 	public abstract class MonoModifier : VersionedMonoBehaviour, IPathModifier {
 		[System.NonSerialized]
 		public Seeker seeker;
