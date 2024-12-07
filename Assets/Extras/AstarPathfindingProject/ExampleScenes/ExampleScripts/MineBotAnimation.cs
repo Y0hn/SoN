@@ -16,6 +16,7 @@ namespace Pathfinding.Examples {
 	/// [Open online documentation to see images]
 	/// </summary>
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_examples_1_1_mine_bot_animation.php")]
+	[System.Obsolete]
 	public class MineBotAnimation : VersionedMonoBehaviour {
 		/// <summary>
 		/// Animation component.

@@ -5,6 +5,7 @@ namespace Pathfinding {
 	using Pathfinding.Util;
 	using Pathfinding.Serialization;
 
+	[System.Obsolete]
 	public interface INavmesh {
 		void GetNodes(System.Action<GraphNode> del);
 	}

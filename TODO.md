@@ -15,5 +15,6 @@ rasial attack speed
 ### Ranged
 ### Melee
 ### Kaiting
+### Patrol
 
 # LOOT SYSTEM

@@ -43,7 +43,7 @@ namespace Pathfinding {
 		/// [Open online documentation to see images]
 		/// </summary>
 		public float updateInterval;
-
+		[System.Obsolete]
 		internal class NavmeshUpdateSettings {
 			public NavmeshUpdateSettings(NavmeshBase graph) {}
 			public void OnRecalculatedTiles (NavmeshTile[] tiles) {}

@@ -14,6 +14,7 @@ namespace Pathfinding {
 	/// </summary>
 	[UniqueComponent(tag = "ai.destination")]
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_patrol.php")]
+#pragma warning disable CS0612 // Type or member is obsolete
 	public class Patrol : VersionedMonoBehaviour {
 		/// <summary>Target points to move to in order</summary>
 		public Transform[] targets;
@@ -24,8 +25,8 @@ namespace Pathfinding {
 		/// <summary>Current target index</summary>
 		int index;
 
-		IAstarAI agent;
-		float switchTime = float.PositiveInfinity;
+        IAstarAI agent;
+        float switchTime = float.PositiveInfinity;
 
 		protected override void Awake () {
 			base.Awake();
@@ -57,3 +58,5 @@ namespace Pathfinding {
 		}
 	}
 }
+
+#pragma warning restore CS0612 // Type or member is obsolete

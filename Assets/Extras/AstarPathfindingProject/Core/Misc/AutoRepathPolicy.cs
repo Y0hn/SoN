@@ -10,6 +10,7 @@ namespace Pathfinding {
 	/// See: \reflink{AILerp.autoRepath}
 	/// </summary>
 	[System.Serializable]
+	[System.Obsolete]
 	public class AutoRepathPolicy {
 		/// <summary>Policy mode for how often to recalculate an agent's path.</summary>
 		public enum Mode {

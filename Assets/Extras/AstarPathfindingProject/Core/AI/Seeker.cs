@@ -18,7 +18,7 @@ namespace Pathfinding {
 	/// </summary>
 	[AddComponentMenu("Pathfinding/Seeker")]
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_seeker.php")]
-	[System.Obsolete]
+#pragma warning disable CS0612 // Type or member is obsolete
 	public class Seeker : VersionedMonoBehaviour {
 		/// <summary>
 		/// Enables drawing of the last calculated path using Gizmos.
@@ -43,15 +43,15 @@ namespace Pathfinding {
 
 		/// <summary>Path modifier which tweaks the start and end points of a path</summary>
 		[HideInInspector]
-		public StartEndModifier startEndModifier = new StartEndModifier();
+        public StartEndModifier startEndModifier = new StartEndModifier();
 
-		/// <summary>
-		/// The tags which the Seeker can traverse.
-		///
-		/// Note: This field is a bitmask.
-		/// See: bitmasks (view in online documentation for working links)
-		/// </summary>
-		[HideInInspector]
+        /// <summary>
+        /// The tags which the Seeker can traverse.
+        ///
+        /// Note: This field is a bitmask.
+        /// See: bitmasks (view in online documentation for working links)
+        /// </summary>
+        [HideInInspector]
 		public int traversableTags = -1;
 
 		/// <summary>
@@ -506,3 +506,4 @@ namespace Pathfinding {
 		}
 	}
 }
+#pragma warning restore CS0612 // Type or member is obsolete
