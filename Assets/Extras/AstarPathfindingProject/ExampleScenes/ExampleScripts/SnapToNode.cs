@@ -8,6 +8,7 @@ using Pathfinding;
 /// </summary>
 [ExecuteInEditMode]
 [HelpURL("http://arongranberg.com/astar/docs/class_snap_to_node.php")]
+	[System.Obsolete]
 public class SnapToNode : MonoBehaviour {
 	void Update () {
 		if (transform.hasChanged && AstarPath.active != null) {

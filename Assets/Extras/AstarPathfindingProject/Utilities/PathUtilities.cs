@@ -11,6 +11,7 @@ namespace Pathfinding {
 	/// See: <see cref="Pathfinding.GraphUtilities"/>
 	/// \ingroup utils
 	/// </summary>
+	[System.Obsolete]
 	public static class PathUtilities {
 		/// <summary>
 		/// Returns if there is a walkable path from node1 to node2.

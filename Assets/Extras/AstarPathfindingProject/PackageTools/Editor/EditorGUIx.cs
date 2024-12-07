@@ -4,6 +4,7 @@ using UnityEditor;
 
 namespace Pathfinding {
 	/// <summary>Simple GUI utility functions</summary>
+	[System.Obsolete]
 	public static class GUIUtilityx {
 		static Stack<Color> colors = new Stack<Color>();
 
@@ -26,6 +27,7 @@ namespace Pathfinding {
 	/// - [your gui elements] (if BeginFade returns true)
 	/// - End
 	/// </summary>
+	[System.Obsolete]
 	public class FadeArea {
 		Rect lastRect;
 		float value;
@@ -142,6 +144,7 @@ namespace Pathfinding {
 		}
 	}
 	/// <summary>Handles fading effects and also some custom GUI functions such as LayerMaskField</summary>
+	[System.Obsolete]
 	public static class EditorGUILayoutx {
 		static Dictionary<int, string[]> layerNames = new Dictionary<int, string[]>();
 		static long lastUpdateTick;

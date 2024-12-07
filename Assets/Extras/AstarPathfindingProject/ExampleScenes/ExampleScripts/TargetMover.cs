@@ -11,6 +11,7 @@ namespace Pathfinding {
 	/// It is not meant to be pretty, but it does the job.
 	/// </summary>
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_target_mover.php")]
+	[System.Obsolete]
 	public class TargetMover : MonoBehaviour {
 		/// <summary>Mask for the raycast placement</summary>
 		public LayerMask mask;

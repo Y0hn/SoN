@@ -35,6 +35,7 @@ namespace Pathfinding {
 	/// TODO: Add field showing how many graph updates are being done right now
 	/// </summary>
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_astar_debugger.php")]
+	[System.Obsolete]
 	public class AstarDebugger : VersionedMonoBehaviour {
 		public int yOffset = 5;
 

@@ -15,6 +15,7 @@ namespace Pathfinding {
 	/// See: http://en.wikipedia.org/wiki/Binary_heap
 	/// See: https://en.wikipedia.org/wiki/D-ary_heap
 	/// </summary>
+	[System.Obsolete]
 	public class BinaryHeap {
 		/// <summary>Number of items in the tree</summary>
 		public int numberOfItems;

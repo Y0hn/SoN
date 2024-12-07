@@ -831,6 +831,7 @@ namespace Pathfinding {
 	}
 
 	/// <summary>Used for hiding internal methods of the Path class</summary>
+	[System.Obsolete]
 	internal interface IPathInternals {
 		PathHandler PathHandler { get; }
 		bool Pooled { get; set; }

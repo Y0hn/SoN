@@ -5,6 +5,7 @@ using System.Collections.Generic;
 namespace Pathfinding {
 	[CustomEditor(typeof(Seeker))]
 	[CanEditMultipleObjects]
+    [System.Obsolete]
 	public class SeekerEditor : EditorBase {
 		static bool tagPenaltiesOpen;
 		static List<Seeker> scripts = new List<Seeker>();

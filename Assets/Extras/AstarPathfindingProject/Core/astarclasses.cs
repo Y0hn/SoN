@@ -108,6 +108,7 @@ namespace Pathfinding {
 	///
 	/// [Open online documentation to see images]
 	/// </summary>
+	[System.Obsolete]
 	public struct GraphHitInfo {
 		/// <summary>
 		/// Start of the line/ray.
@@ -317,6 +318,7 @@ namespace Pathfinding {
 	/// Internal result of a nearest node query.
 	/// See: NNInfo
 	/// </summary>
+	[System.Obsolete]
 	public struct NNInfoInternal {
 		/// <summary>
 		/// Closest node found.
@@ -354,6 +356,7 @@ namespace Pathfinding {
 	}
 
 	/// <summary>Result of a nearest node query</summary>
+	[System.Obsolete]
 	public struct NNInfo {
 		/// <summary>Closest node</summary>
 		public readonly GraphNode node;
@@ -719,11 +722,13 @@ namespace Pathfinding {
 	}
 
 	/// <summary>Graph which has a well defined transformation from graph space to world space</summary>
+	[System.Obsolete]
 	public interface ITransformedGraph {
 		GraphTransform transform { get; }
 	}
 
 	/// <summary>Graph which supports the Linecast method</summary>
+	[System.Obsolete]
 	public interface IRaycastableGraph {
 		bool Linecast(Vector3 start, Vector3 end);
 		bool Linecast(Vector3 start, Vector3 end, GraphNode hint);

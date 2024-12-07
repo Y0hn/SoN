@@ -10,6 +10,7 @@ namespace Pathfinding {
 	/// See: http://digestingduck.blogspot.se/2010/03/simple-stupid-funnel-algorithm.html
 	/// See: FunnelModifier for the component that you can attach to objects to use the funnel algorithm.
 	/// </summary>
+	[System.Obsolete]
 	public class Funnel {
 		/// <summary>Funnel in which the path to the target will be</summary>
 		public struct FunnelPortals {

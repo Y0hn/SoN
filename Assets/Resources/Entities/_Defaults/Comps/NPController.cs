@@ -10,8 +10,10 @@ public class NPController : EntityController
      *  protected bool attacking;
      *  protected const float MIN_MOVE_TOL = 0.1f;
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
+#pragma warning disable CS0612 // Type or member is obsolete
     [SerializeField] AIDestinationSetter destinationSetter;
     [SerializeField] AIPath path;
+#pragma warning restore CS0612 // Type or member is obsolete
     [SerializeField] NPSensor sensor;
     
     protected NextAction nextAction;

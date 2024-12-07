@@ -8,6 +8,7 @@ namespace Pathfinding {
 	/// See: <see cref="Pathfinding.RichAI"/>
 	/// See: <see cref="Pathfinding.AILerp"/>
 	/// </summary>
+	[System.Obsolete]
 	public interface IAstarAI {
 		/// <summary>
 		/// Radius of the agent in world units.

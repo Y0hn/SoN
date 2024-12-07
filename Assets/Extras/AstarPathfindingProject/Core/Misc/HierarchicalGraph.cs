@@ -56,6 +56,7 @@ namespace Pathfinding {
 	/// See: <see cref="Pathfinding.PathUtilities.IsPathPossible"/>
 	/// See: <see cref="Pathfinding.NNConstraint"/>
 	/// See: <see cref="Pathfinding.GraphNode.Area"/>
+	[System.Obsolete]
 	/// </summary>
 	public class HierarchicalGraph {
 		const int Tiling = 16;

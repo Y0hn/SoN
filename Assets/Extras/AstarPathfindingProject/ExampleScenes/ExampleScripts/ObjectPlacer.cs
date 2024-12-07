@@ -4,6 +4,7 @@ using System.Collections;
 namespace Pathfinding.Examples {
 	/// <summary>Small sample script for placing obstacles</summary>
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_examples_1_1_object_placer.php")]
+	[System.Obsolete]
 	public class ObjectPlacer : MonoBehaviour {
 		/// <summary>
 		/// GameObject to place.

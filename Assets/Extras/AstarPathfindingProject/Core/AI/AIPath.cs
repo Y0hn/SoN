@@ -59,6 +59,7 @@ namespace Pathfinding {
 	/// It may take one or sometimes multiple frames for the path to be calculated, but finally the <see cref="OnPathComplete"/> method will be called and the current path that the AI is following will be replaced.
 	/// </summary>
 	[AddComponentMenu("Pathfinding/AI/AIPath (2D,3D)")]
+	[System.Obsolete]
 	public partial class AIPath : AIBase, IAstarAI {
 		/// <summary>
 		/// How quickly the agent accelerates.

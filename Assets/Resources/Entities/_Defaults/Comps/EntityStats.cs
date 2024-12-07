@@ -49,7 +49,6 @@ public abstract class EntityStats : NetworkBehaviour
         EntitySetUp();
         SubsOnNetValChanged();
 
-        attackPoint.position = new(attackPoint.position.x, attack.Value.range);
         hpBar.value = hp.Value;
     }
     protected virtual void SubsOnNetValChanged()
@@ -92,6 +91,7 @@ public abstract class EntityStats : NetworkBehaviour
             defence = new(rase.naturalArmor);
             IsAlive.Value = true;
         }
+        attackPoint.localPosition = new(attackPoint.localPosition.x, attack.Value.range);
     }
     protected virtual void Update()
     {
@@ -203,13 +203,12 @@ public abstract class EntityStats : NetworkBehaviour
     }
     [Rpc(SendTo.Server)] protected void AttackRpc()
     {
-
+        Debug.Log("SERVER RPC attack !");
         if      (Attack.MeleeAttack(attack.Value.type))
         {
             foreach(EntityStats et in MeleeAttack())
-                if (et.IsAlive.Value)
-                    if (et.TakeDamage(attack.Value.damage))    // pravdive ak target zomrie
-                        KilledEnemy(et);
+                if (et.IsAlive.Value && et.TakeDamage(attack.Value.damage))    // pravdive ak target zomrie
+                    KilledEnemy(et);
         }
         else if (Attack.RangedAttack(attack.Value.type))
         {
@@ -227,6 +226,7 @@ public abstract class EntityStats : NetworkBehaviour
                 if (stats != this)
                     targetStats.Add(stats);
 
+        Debug.Log("Melee Hitted " + targetStats.Count + " targets");
         return targetStats.ToArray();
     }
     [Rpc(SendTo.Server)] public virtual void PickedUpRpc(string reference)

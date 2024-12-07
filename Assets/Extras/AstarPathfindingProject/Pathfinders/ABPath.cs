@@ -11,6 +11,7 @@ namespace Pathfinding {
 	/// See: calling-pathfinding (view in online documentation for working links)
 	/// See: getstarted (view in online documentation for working links)
 	/// </summary>
+	[System.Obsolete]
 	public class ABPath : Path {
 		/// <summary>Start node of the path</summary>
 		public GraphNode startNode;

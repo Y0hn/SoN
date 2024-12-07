@@ -8,8 +8,10 @@ using WinRTLegacy;
 #endif
 
 namespace Pathfinding.Serialization {
+	[System.Obsolete]
 	public class JsonMemberAttribute : System.Attribute {
 	}
+	[System.Obsolete]
 	public class JsonOptInAttribute : System.Attribute {
 	}
 
@@ -18,6 +20,7 @@ namespace Pathfinding.Serialization {
 	/// It is not supposed to have lots of features, it is only intended to be able to serialize graph settings
 	/// well enough.
 	/// </summary>
+	[System.Obsolete]
 	public class TinyJsonSerializer {
 		System.Text.StringBuilder output = new System.Text.StringBuilder();
 
@@ -166,6 +169,7 @@ namespace Pathfinding.Serialization {
 	/// It is not supposed to have lots of features, it is only intended to be able to deserialize graph settings
 	/// well enough. Not much validation of the input is done.
 	/// </summary>
+	[System.Obsolete]
 	public class TinyJsonDeserializer {
 		System.IO.TextReader reader;
 		GameObject contextRoot;

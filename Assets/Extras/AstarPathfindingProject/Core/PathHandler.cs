@@ -11,6 +11,7 @@ namespace Pathfinding {
 	/// See: Pathfinding.PathHandler
 	/// See: https://en.wikipedia.org/wiki/A*_search_algorithm
 	/// </summary>
+	[System.Obsolete]
 	public class PathNode {
 		/// <summary>Reference to the actual graph node</summary>
 		public GraphNode node;
@@ -109,6 +110,7 @@ namespace Pathfinding {
 	}
 
 	/// <summary>Handles thread specific path data.</summary>
+	[System.Obsolete]
 	public class PathHandler {
 		/// <summary>
 		/// Current PathID.

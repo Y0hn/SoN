@@ -6,6 +6,7 @@ namespace Pathfinding {
 	/// <summary>Editor for GraphUpdateScene</summary>
 	[CustomEditor(typeof(GraphUpdateScene))]
 	[CanEditMultipleObjects]
+    [System.Obsolete]
 	public class GraphUpdateSceneEditor : EditorBase {
 		int selectedPoint = -1;
 
@@ -14,9 +15,6 @@ namespace Pathfinding {
 		static Color PointSelectedColor = new Color(1, 0.24F, 0, 1.0F);
 
 		GraphUpdateScene[] scripts;
-
-        [System.Obsolete]
-#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
 
         protected override void Inspector () {
 			// Find all properties
@@ -106,7 +104,6 @@ namespace Pathfinding {
 				if (!Application.isPlaying || EditorApplication.isPaused) SceneView.RepaintAll();
 			}
 		}
-#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
 
         void DrawPointsField () {
 			EditorGUI.BeginChangeCheck();

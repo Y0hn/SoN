@@ -13,6 +13,7 @@ namespace Pathfinding {
 	///
 	/// \ingroup utils
 	/// </summary>
+	[System.Obsolete]
 	public static class GraphUpdateUtilities {
 		/// <summary>
 		/// Updates graphs and checks if all nodes are still reachable from each other.

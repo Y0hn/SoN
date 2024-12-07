@@ -12,6 +12,7 @@ namespace Pathfinding {
 	///
 	/// See: Pathfinding.GraphUpdateObject.shape
 	/// </summary>
+	[System.Obsolete]
 	public class GraphUpdateShape {
 		Vector3[] _points;
 		Vector3[] _convexPoints;

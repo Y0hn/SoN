@@ -33,6 +33,7 @@ namespace Pathfinding {
 	/// So if you for example have a grid in the XY plane then the transform should have the rotation (-90,0,0).
 	/// </summary>
 	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_graph_update_scene.php")]
+	[System.Obsolete]
 	public class GraphUpdateScene : GraphModifier {
 		/// <summary>Points which define the region to update</summary>
 		public Vector3[] points;
@@ -299,8 +300,9 @@ namespace Pathfinding {
 			OnDrawGizmos(true);
 		}
 
-		/// <summary>Draws some gizmos</summary>
-		void OnDrawGizmos (bool selected) {
+        /// <summary>Draws some gizmos</summary>
+#pragma warning disable UNT0006 // Incorrect message signature
+        void OnDrawGizmos (bool selected) {
 			Color c = selected ? new Color(227/255f, 61/255f, 22/255f, 1.0f) : new Color(227/255f, 61/255f, 22/255f, 0.9f);
 
 			if (selected) {
@@ -368,12 +370,13 @@ namespace Pathfinding {
 				}
 			}
 		}
+#pragma warning restore UNT0006 // Incorrect message signature
 
-		/// <summary>
-		/// Disables legacy mode if it is enabled.
-		/// Legacy mode is automatically enabled for components when upgrading from an earlier version than 3.8.6.
-		/// </summary>
-		public void DisableLegacyMode () {
+        /// <summary>
+        /// Disables legacy mode if it is enabled.
+        /// Legacy mode is automatically enabled for components when upgrading from an earlier version than 3.8.6.
+        /// </summary>
+        public void DisableLegacyMode () {
 			if (legacyMode) {
 				legacyMode = false;
 				if (legacyUseWorldSpace) {

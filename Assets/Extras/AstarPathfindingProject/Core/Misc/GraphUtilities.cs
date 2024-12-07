@@ -14,6 +14,7 @@ namespace Pathfinding {
 	///
 	/// \ingroup utils
 	/// </summary>
+	[System.Obsolete]
 	public static class GraphUtilities {
 		/// <summary>
 		/// Convenience method to get a list of all segments of the contours of a graph.
