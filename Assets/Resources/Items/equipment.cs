@@ -13,6 +13,10 @@ public class Equipment : Item
         WeaponL, WeaponR, 
         WeaponBoth, NoPreference
     }
+    public new static Equipment GetItem (string referency)
+    {
+        return Resources.Load<Equipment>(referency);
+    }
     public override string GetReferency
     {
         get { return FileManager.ITEM_DEFAULT_PATH; }

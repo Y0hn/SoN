@@ -6,7 +6,10 @@ using System;
 public class Armor : Equipment
 {
     public List<Resistance> resists = new();
-    
+    public new static Armor GetItem (string referency)
+    {
+        return Resources.Load<Armor>(referency);
+    }
     public override string GetReferency
     {
         get { return FileManager.ARMORS_DEFAULT_PATH + "/" + name; }

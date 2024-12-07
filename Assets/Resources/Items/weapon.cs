@@ -6,6 +6,10 @@ using System.Linq;
 public class Weapon : Equipment
 {
     public List<Attack> attack;
+    public new static Weapon GetItem (string referency)
+    {
+        return Resources.Load<Weapon>(referency);
+    }
     public override string GetReferency
     {
         get { return FileManager.WEAPONS_DEFAULT_PATH + "/" + name; }

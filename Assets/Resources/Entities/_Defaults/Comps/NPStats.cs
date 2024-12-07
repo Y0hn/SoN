@@ -40,7 +40,7 @@ public class NPStats : EntityStats
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
     [SerializeField] protected Behavior behavior = Behavior.Neutral;
     [SerializeField] protected NPSensor sensor;
-    [SerializeField] protected float viewRange = 0;
+    [SerializeField] protected Equipment[] setUpEquipment;
     [SerializeField] protected bool drawGizmo = false;
     protected const float ATTACK_DISTANCE_PERCENTAGE = 0.3f;
     public float TargetDistance { get { return Attack.range*2 /*- ATTACK_DISTANCE_PERCENTAGE*Attack.range*/; } }
@@ -61,17 +61,27 @@ public class NPStats : EntityStats
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        EquipmentSetUp();
     }
     protected override void EntitySetUp()
     {
         base.EntitySetUp();
         if (IsServer)
         {
-            CallculateWC();
-            CallculateDC();
             sensor.me = aiTeam;
-
+            sensor.SetRange(rase.view);
         }
+    }
+    protected virtual void EquipmentSetUp()
+    {
+        foreach(Equipment e in setUpEquipment) Equip(e.GetReferency);
+        CallculateWC();
+        CallculateDC();
+    }
+    protected void Equip(string equip)
+    {
+        Equipment e = Equipment.GetItem(equip);
+        equipment[(int)e.slot] = e.GetReferency;
     }
     protected override void OnEquipmentUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
     {
@@ -110,13 +120,17 @@ public class NPStats : EntityStats
     {
         DC = defence.CallculateDC();
     }
+    public override void PickedUpRpc(string reference)
+    {
+        
+    }
 #pragma warning disable IDE0051 // Remove unused private members
     void OnDrawGizmos()
     {
         if (drawGizmo)
         {
             Gizmos.color = Color.magenta;
-            Gizmos.DrawWireSphere(transform.position, viewRange);
+            Gizmos.DrawWireSphere(transform.position, rase.view);
 
             Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(transform.position, TargetDistance);

@@ -163,9 +163,8 @@ public class PlayerStats : EntityStats
     {
         base.KilledEnemy(died);
         xp.Value += died.level.Value * 5 ;
-    }
-    
-    [Rpc(SendTo.Server)] public void SetAttackTypeRpc(byte t)
+    }    
+    [Rpc(SendTo.Server)] public override void SetAttackTypeRpc(byte t)
     {
         t--;
         List<Attack> a = ((Weapon)Item.GetItem(equipment[(int)Equipment.Slot.WeaponR].ToString())).attack;

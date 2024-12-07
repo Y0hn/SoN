@@ -128,6 +128,7 @@ public abstract class EntityStats : NetworkBehaviour
                     break;
                 case Equipment.Slot.WeaponL:    // 4
                 case Equipment.Slot.WeaponR:    // 5
+                case Equipment.Slot.WeaponBoth:
                     Weapon w = (Weapon)value;
 
                     if (IsServer && referencia == "")
@@ -139,7 +140,9 @@ public abstract class EntityStats : NetworkBehaviour
 
                         Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
                         weaponL.sprite = sprite;
+                        weaponL.color = w.color;
                         weaponR.sprite = sprite;
+                        weaponR.color = w.color;
     
                         bool 
                         R = w.slot == Equipment.Slot.WeaponR,                             
@@ -156,7 +159,10 @@ public abstract class EntityStats : NetworkBehaviour
             }
         }
         else
+        {
             Debug.LogWarning("Equipment corrupted");
+            equipment.SetDirty(true);
+        }
     }
     public virtual bool TakeDamage(Damage damage)
     {
@@ -229,9 +235,17 @@ public abstract class EntityStats : NetworkBehaviour
         Debug.Log("Melee Hitted " + targetStats.Count + " targets");
         return targetStats.ToArray();
     }
+    [Rpc(SendTo.Server)] public virtual void SetAttackTypeRpc(byte t)
+    {
+        t--;
+        List<Attack> a = ((Weapon)Item.GetItem(equipment[(int)Equipment.Slot.WeaponR].ToString())).attack;
+        if (a.Count > t)
+            attack.Value = a[t];
+    }
     [Rpc(SendTo.Server)] public virtual void PickedUpRpc(string reference)
     {
-
+        Equipment e = Equipment.GetItem(reference);
+        equipment[(int)e.slot] = e.GetReferency;
     }
 }
 [Serializable] public class Defence
