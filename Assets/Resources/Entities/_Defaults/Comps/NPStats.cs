@@ -74,6 +74,7 @@ public class NPStats : EntityStats
     }
     protected virtual void EquipmentSetUp()
     {
+        if (!IsServer) return;
         foreach(Equipment e in setUpEquipment) Equip(e.GetReferency);
         CallculateWC();
         CallculateDC();

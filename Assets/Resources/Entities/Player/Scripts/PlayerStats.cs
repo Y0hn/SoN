@@ -105,12 +105,6 @@ public class PlayerStats : EntityStats
             chatField.SetActive(true);
             chatTimer = Time.time + chatTime;
         };
-        attack.OnValueChanged += (Attack prevValue, Attack newValue) => 
-        { 
-            string refer = equipment[(int)Equipment.Slot.WeaponR].ToString();
-            if (refer != "")
-                inventUI.SetQuick(((Weapon)Item.GetItem(refer)).attack.IndexOf(newValue)+1);
-        };
     }
     protected void OwnerSubsOnNetValChanged()
     {
@@ -131,6 +125,12 @@ public class PlayerStats : EntityStats
             if (newValue < prevValue)
                 game.AnimateFace("got-hit");
             game.AnimateFace(HP);
+        };
+        attack.OnValueChanged += (Attack prevValue, Attack newValue) => 
+        { 
+            string refer = equipment[(int)Equipment.Slot.WeaponR].ToString();
+            if (refer != "")
+                inventUI.SetQuick(((Weapon)Item.GetItem(refer)).attack.IndexOf(newValue)+1);
         };
         inventory.OnListChanged += (NetworkListEvent<FixedString64Bytes> changeEvent)   => OnInventoryUpdate(changeEvent);
         IsAlive.OnValueChanged  += (bool prevValue, bool newValue)                      => game.SetPlayerUI(newValue);

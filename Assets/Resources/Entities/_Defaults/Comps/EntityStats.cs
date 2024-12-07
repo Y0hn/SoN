@@ -91,6 +91,12 @@ public abstract class EntityStats : NetworkBehaviour
             defence = new(rase.naturalArmor);
             IsAlive.Value = true;
         }
+        else // requesting changed Values from server
+        {
+            foreach (FixedString64Bytes e in equipment)
+                if (e != "")
+                    UpdateEquipment(Equipment.GetItem(e.ToString()));
+        }
         attackPoint.localPosition = new(attackPoint.localPosition.x, attack.Value.range);
     }
     protected virtual void Update()
@@ -104,64 +110,53 @@ public abstract class EntityStats : NetworkBehaviour
     } 
     protected virtual void OnEquipmentUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
     {
-        string referencia = changeEvent.Value.ToString();
-        string previous = changeEvent.PreviousValue.ToString();
+        string curr = changeEvent.Value.ToString();
+        string prev = changeEvent.PreviousValue.ToString();
+        Equipment.Slot slot = (Equipment.Slot)changeEvent.Index;
 
         if (changeEvent.Type == NetworkListEvent<FixedString64Bytes>.EventType.Value)
         {
-            Item value = Item.GetItem(referencia);
-            Equipment.Slot slot = (Equipment.Slot)changeEvent.Index;
-            
-            switch (slot)
+            if (IsServer && curr == "" )
             {
-                case Equipment.Slot.Head:   // 0
-                case Equipment.Slot.Torso:  // 1
-                case Equipment.Slot.Legs:   // 2
-                    if (IsServer)
-                        if (referencia == "")
-                            defence.Remove((Armor)Item.GetItem(previous));
-                        else
-                        {
-                            Armor a = (Armor)value;
-                            defence.Add(a);
-                        }
-                    break;
-                case Equipment.Slot.WeaponL:    // 4
-                case Equipment.Slot.WeaponR:    // 5
-                case Equipment.Slot.WeaponBoth:
-                    Weapon w = (Weapon)value;
-
-                    if (IsServer && referencia == "")
-                        attack.Value = rase.attack;
-                    if (referencia != "")
-                    {
-                        if (IsServer)
-                            attack.Value = w.attack[0];
-
-                        Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
-                        weaponL.sprite = sprite;
-                        weaponL.color = w.color;
-                        weaponR.sprite = sprite;
-                        weaponR.color = w.color;
-    
-                        bool 
-                        R = w.slot == Equipment.Slot.WeaponR,                             
-                        L = w.slot == Equipment.Slot.WeaponL, 
-                        B = w.slot == Equipment.Slot.WeaponBoth;
-    
-                        weaponR.gameObject.SetActive(R || B); 
-                        weaponL.gameObject.SetActive(L || B);
-    
-                        float atBlend = (R || B) ? 1 : -1;
-                        Animator.SetFloat("atBlend", atBlend);
-                    }
-                    break;
+                if      (Equipment.IsArmor(slot))
+                    defence.Remove(Armor.GetItem(prev));
+                else if (Equipment.IsWeapon(slot))
+                    attack.Value = rase.attack;
+            }
+            else
+            {
+                UpdateEquipment(Equipment.GetItem(curr));
             }
         }
         else
         {
             Debug.LogWarning("Equipment corrupted");
             equipment.SetDirty(true);
+        }
+    }
+    protected virtual void UpdateEquipment(Equipment equip)
+    {
+        if      (equip is Armor a)
+        {
+            defence.Add(a);
+        }
+        else if (equip is Weapon w)
+        {
+            if (IsServer) // !Armed
+                attack.Value = w.attack[0];
+            Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
+            weaponL.sprite = sprite;
+            weaponL.color = w.color;
+            weaponR.sprite = sprite;
+            weaponR.color = w.color;
+            bool 
+            R = w.slot == Equipment.Slot.WeaponR,                             
+            L = w.slot == Equipment.Slot.WeaponL, 
+            B = w.slot == Equipment.Slot.WeaponBoth;
+            weaponR.gameObject.SetActive(R || B); 
+            weaponL.gameObject.SetActive(L || B);
+            float atBlend = (R || B) ? 1 : -1;
+            Animator.SetFloat("atBlend", atBlend);
         }
     }
     public virtual bool TakeDamage(Damage damage)

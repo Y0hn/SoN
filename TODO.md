@@ -18,3 +18,5 @@ rasial attack speed
 ### Patrol
 
 # LOOT SYSTEM
+
+# PLAYER AFTER DAETH REAINMATION
