@@ -21,6 +21,7 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected SpriteRenderer weaponR, weaponL;
     [SerializeField] protected NetworkAnimator animator;
     [SerializeField] protected Rigidbody2D rb;
+    [SerializeField] protected Collider2D coll;
     [SerializeField] protected AITarget aiTeam = AITarget.Team_2;
 
     [SerializeField]    protected   NetworkList<FixedString64Bytes> equipment = new(/*null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner*/);    
@@ -32,7 +33,9 @@ public abstract class EntityStats : NetworkBehaviour
                         public      NetworkVariable<bool> IsAlive = new(true);
                         protected   NetworkVariable<Attack> attack = new();
                         protected   NetworkVariable<WeaponIndex> weapE = new(new(-1), NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
+#pragma warning disable IDE0004
     public float HP                 { get { return (float)hp.Value/(float)maxHp.Value; } }
+#pragma warning restore IDE0004
     public NetworkObject NetObject  { get { return netObject; } }
     public Rigidbody2D RigidBody2D  { get { return rb; } }
     public AITarget TargetTeam      { get { return aiTeam; } }
@@ -41,7 +44,7 @@ public abstract class EntityStats : NetworkBehaviour
     public bool Armed               { get { return equipment[(int)Equipment.Slot.WeaponL] != "" || "" !=  equipment[(int)Equipment.Slot.WeaponR]; } }
     protected Defence defence;  // iba na servery/hoste
     protected float atTime = 0;
-    protected const float timeToDespawn = 0f;
+    protected float timeToDespawn = 0f;
     private bool clampedDMG = true;
 
     public override void OnNetworkSpawn()
@@ -101,7 +104,8 @@ public abstract class EntityStats : NetworkBehaviour
     }
     protected virtual void Update()
     {
-
+        if (timeToDespawn != 0 && timeToDespawn < Time.time)
+            Despawn();
     }
     protected virtual void OnHpUpdate()
     {
@@ -193,8 +197,13 @@ public abstract class EntityStats : NetworkBehaviour
         if (IsServer && alive)
             hp.Value = maxHp.Value;
         hpBar.gameObject.SetActive(alive);
-        // Play animation 
-        gameObject.SetActive(alive);
+        Animator.SetBool("isAlive", alive);
+        if (!alive)
+            timeToDespawn = Time.time + 5f;
+    }
+    protected virtual void Despawn()
+    {
+        Destroy(gameObject);
     }
     [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot = Equipment.Slot.NoPreference)
     {
@@ -204,7 +213,7 @@ public abstract class EntityStats : NetworkBehaviour
     }
     [Rpc(SendTo.Server)] protected void AttackRpc()
     {
-        Debug.Log("SERVER RPC attack !");
+        //Debug.Log("SERVER RPC attack !");
         if      (Attack.MeleeAttack(attack.Value.type))
         {
             foreach(EntityStats et in MeleeAttack())
@@ -227,7 +236,7 @@ public abstract class EntityStats : NetworkBehaviour
                 if (stats != this)
                     targetStats.Add(stats);
 
-        Debug.Log("Melee Hitted " + targetStats.Count + " targets");
+        //Debug.Log("Melee Hitted " + targetStats.Count + " targets");
         return targetStats.ToArray();
     }
     [Rpc(SendTo.Server)] public virtual void SetAttackTypeRpc(byte t)

@@ -218,4 +218,7 @@ public class GameManager : MonoBehaviour
     public void Copy()      { GUIUtility.systemCopyBuffer = conn.codeText.text; animatorGameUI.SetTrigger("copy"); }
     public void AnimateFace(float state)    { animatorGameUI.SetFloat("state", state);  }
     public void AnimateFace(string action)  { animatorGameUI.SetTrigger(action);        }
+    public void AnimateUI(string name, float value) { animatorGameUI.SetFloat(name, value); }
+    public void AnimateUI(string name, bool value)  { animatorGameUI.SetBool(name,value);   }
+    public void AnimateUI(string name)              { animatorGameUI.SetTrigger(name);      }
 }

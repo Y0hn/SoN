@@ -56,18 +56,19 @@ public class PlayerStats : EntityStats
     }
     protected override void Update()
     {
-        if (chatTimer != 0)
-            if (chatTimer <= Time.time)
-            {
-                chatField.SetActive(false);
-                chatBox.text = "";
-                chatTimer = 0;
-            }
+        base.Update();
+        if (chatTimer != 0 && chatTimer <= Time.time)
+        {
+            chatField.SetActive(false);
+            chatBox.text = "";
+            chatTimer = 0;
+        }
     }
     public override void OnNetworkDespawn()
     {
         if (!IsServer) return;
 
+        // Save values
     }
     protected override void EntitySetUp()
     {
@@ -154,6 +155,19 @@ public class PlayerStats : EntityStats
             default:
                 break;
         }
+    }
+    protected override void SetLive(bool alive)
+    {
+        base.SetLive(alive);
+        if (IsOwner)
+        {
+            game.AnimateUI("isAlive", alive);
+        }
+    }
+    protected override void Despawn()
+    {
+        coll.enabled = false;
+        gameObject.SetActive(false);
     }
     public override bool AttackTrigger()
     {

@@ -284,6 +284,7 @@ MonoBehaviour:
   weaponL: {fileID: 1325576850034929809}
   animator: {fileID: 5663075166172191200}
   rb: {fileID: 1458412614070460213}
+  coll: {fileID: 6918256059355095030}
   aiTeam: 3
   maxHp:
     m_InternalValue: 100
@@ -295,6 +296,8 @@ MonoBehaviour:
     m_InternalValue: 1
   behavior: 3
   sensor: {fileID: 3277300298372082836}
+  setUpEquipment: []
+  drawGizmo: 0
 --- !u!114 &2122981765981785076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -369,6 +372,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!58 &6918256059355095030 stripped
+CircleCollider2D:
+  m_CorrespondingSourceObject: {fileID: 2374455253199967501, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
+  m_PrefabInstance: {fileID: 4679617435991968507}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &9011551950232759649 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4467044728157546394, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}

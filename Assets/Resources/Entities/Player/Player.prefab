@@ -562,6 +562,11 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 4306724166626459691, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
   m_PrefabInstance: {fileID: 2119994833956943712}
   m_PrefabAsset: {fileID: 0}
+--- !u!58 &4438436423646962285 stripped
+CircleCollider2D:
+  m_CorrespondingSourceObject: {fileID: 2374455253199967501, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
+  m_PrefabInstance: {fileID: 2119994833956943712}
+  m_PrefabAsset: {fileID: 0}
 --- !u!50 &5307415030544884398 stripped
 Rigidbody2D:
   m_CorrespondingSourceObject: {fileID: 6110265151130752462, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
@@ -666,6 +671,7 @@ MonoBehaviour:
   weaponL: {fileID: 2829688043214402226}
   animator: {fileID: 2596049322121240611}
   rb: {fileID: 5307415030544884398}
+  coll: {fileID: 4438436423646962285}
   aiTeam: 1
   maxHp:
     m_InternalValue: 100
