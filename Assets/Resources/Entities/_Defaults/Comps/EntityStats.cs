@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using TMPro;
+using Unity.VisualScripting;
 /// <summary>
 /// Drzi hodnoty pre entitu
 /// </summary>
@@ -34,19 +35,19 @@ public abstract class EntityStats : NetworkBehaviour
                         protected   NetworkVariable<Attack> attack = new();
                         protected   NetworkVariable<WeaponIndex> weapE = new(new(-1), NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
 #pragma warning disable IDE0004
-    public float HP                 { get { return (float)hp.Value/(float)maxHp.Value; } }
+    public float HP                 { get => (float)hp.Value/(float)maxHp.Value; }
 #pragma warning restore IDE0004
-    public NetworkObject NetObject  { get { return netObject; } }
-    public Rigidbody2D RigidBody2D  { get { return rb; } }
-    public AITarget TargetTeam      { get { return aiTeam; } }
-    public Animator Animator        { get { return animator.Animator; } }
-    public bool AttackBoth          { get { return attack.Value.bothHanded; } }
-    public bool Armed               { get { return equipment[(int)Equipment.Slot.WeaponL] != "" || "" !=  equipment[(int)Equipment.Slot.WeaponR]; } }
+    public NetworkObject NetObject  { get => netObject; }
+    public Rigidbody2D RigidBody2D  { get => rb; }
+    public AITarget TargetTeam      { get => aiTeam; }
+    public Animator Animator        { get => animator.Animator; }
+    public bool AttackBoth          { get => attack.Value.bothHanded; }
+    public bool Armed               { get => equipment[(int)Equipment.Slot.WeaponL] != "" || "" !=  equipment[(int)Equipment.Slot.WeaponR]; }
+    public virtual Quaternion Rotation      { get => transform.rotation; }
     protected Defence defence;  // iba na servery/hoste
     protected float atTime = 0;
     protected float timeToDespawn = 0f;
     private bool clampedDMG = true;
-
     public override void OnNetworkSpawn()
     {
         EntitySetUp();
@@ -68,7 +69,17 @@ public abstract class EntityStats : NetworkBehaviour
                 weaponR.gameObject.SetActive(false);
             }
             Animator.SetFloat("weapon", (float)newValue.type);
-            attackPoint.localPosition = new(attackPoint.localPosition.x, newValue.range);
+
+            if (IsServer && weapE.Value.eIndex > 0)
+            {
+                if (Attack.MeleeAttack(newValue.type))
+                    attackPoint.localPosition = new(attackPoint.localPosition.x, newValue.range);
+                else if (Attack.RangedAttack(newValue.type))
+                {
+                    Ranged r = Resources.Load<Ranged>(equipment[weapE.Value.eIndex].ToString());
+                    attackPoint.localPosition = new(attackPoint.localPosition.x, r.projSpawnDistance);
+                }
+            }
         };
         IsAlive.OnValueChanged  += (bool prev, bool alive)          => SetLive(alive);
         hp.OnValueChanged       += (int prevValue, int newValue)    => OnHpUpdate();
@@ -147,7 +158,14 @@ public abstract class EntityStats : NetworkBehaviour
         else if (equip is Weapon w)
         {
             if (IsServer) // !Armed
+            {
                 attack.Value = w.attack[0];
+                if (weapE.Value.eIndex < 0)
+                {
+                    sbyte eIndex = (sbyte)equip.slot;
+                    weapE.Value = new(eIndex);
+                }
+            }
             Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
             weaponL.sprite = sprite;
             weaponL.color = w.color;
@@ -160,7 +178,7 @@ public abstract class EntityStats : NetworkBehaviour
             weaponR.gameObject.SetActive(R || B); 
             weaponL.gameObject.SetActive(L || B);
             float atBlend = (R || B) ? 1 : -1;
-            Animator.SetFloat("atBlend", atBlend);
+            Animator.SetFloat("atBlend", atBlend);           
         }
     }
     public virtual bool TakeDamage(Damage damage)
@@ -211,7 +229,7 @@ public abstract class EntityStats : NetworkBehaviour
             slot = ((Equipment)Item.GetItem(reference)).slot;
         equipment[(int)slot] = reference;
     }
-    [Rpc(SendTo.Server)] protected void AttackRpc()
+    [Rpc(SendTo.Server)] protected virtual void AttackRpc()
     {
         //Debug.Log("SERVER RPC attack !");
         if      (Attack.MeleeAttack(attack.Value.type))
@@ -222,7 +240,22 @@ public abstract class EntityStats : NetworkBehaviour
         }
         else if (Attack.RangedAttack(attack.Value.type))
         {
+            if (weapE.Value.eIndex >= 0 && weapE.Value.aIndex >= 0)
+            {
+                Ranged r = Resources.Load<Ranged>(equipment[weapE.Value.eIndex].ToString());
 
+                //byte b = (byte)weapE.Value.aIndex;
+                GameObject p = r.GetProjectile;
+                Instantiate(p, attackPoint.position, Rotation);
+                //p.GetComponent<Projectile>().damage = attack.Value.damage;
+                NetworkObject netO = p.GetComponent<NetworkObject>();
+                if (!netO.IsSpawned)
+                    netO.Spawn();
+
+                DestroyImmediate(p, true);
+            }
+            else
+                Debug.Log(weapE.Value.ToString());
         }
         else 
             Debug.Log($"Player {name} attack type {Enum.GetName(typeof(Attack.Type), attack.Value.type)} not yet defined");
@@ -400,9 +433,9 @@ public abstract class EntityStats : NetworkBehaviour
 }
 [Serializable] public struct WeaponIndex : INetworkSerializable
 {
-    public int eIndex;
-    public int aIndex;
-    public WeaponIndex(int e, int a = 0)
+    public sbyte eIndex;
+    public sbyte aIndex;
+    public WeaponIndex(sbyte e, sbyte a = 0)
     {
         eIndex = e;
         aIndex = a;
@@ -411,6 +444,10 @@ public abstract class EntityStats : NetworkBehaviour
     {
         serializer.SerializeValue(ref eIndex);
         serializer.SerializeValue(ref aIndex);
+    }
+    public override string ToString()
+    {
+        return $"Weapon Index: equipIndex= {eIndex} attackIndex= {aIndex}";
     }
 }
 [Serializable] public struct Damage : INetworkSerializable, IEquatable<Damage>

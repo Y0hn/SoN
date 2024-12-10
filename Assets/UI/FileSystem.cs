@@ -4,7 +4,6 @@ using System.Xml.Serialization;
 using System.IO;
 using System;
 using UnityEngine;
-using Newtonsoft.Json;
 public static class FileManager
 {
     // FROM RECOURCES
@@ -14,7 +13,8 @@ public static class FileManager
     public const string ARMORS_DEFAULT_PATH = @"Items/armors";
     public const string WEAPONS_REF_DEFAULT_PATH = @"Items/textures/InGame";
     public const string ATTACKS_ICONS_PATH = @"UI/at_types";
-
+    public const string PROJECTILES_OBJECTS_PATH = @"Projectiles/";
+    
     // FROM APP DATA PATH
     private const string LOG_DEFAULT_PATH = @"";
     private const string SETTINGS_DEFAULT_PATH = @"/settings.xml";

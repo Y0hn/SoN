@@ -64,14 +64,15 @@ public class GameManager : MonoBehaviour
             return v;
         }
     }
-    public PlayerStats LocalPlayer  { get { return player; } }
-    public bool PlayerAble          { get { return !(paused || chatting || inventory.open); } }
+    public PlayerStats LocalPlayer  { get => player; } 
+    public bool PlayerAble          { get => !(paused || chatting || inventory.open); }
     public string PlayerName        { get { return inputFields["name"].text.Trim(); } set { inputFields["name"].text = value; } }
-    public static MenuScript UI     { get { return instance.menuScript; } }
+    public static MenuScript UI     { get => instance.menuScript; }
     public static bool IsServer     { get; private set; }
     void Start()
     {
         IsServer = NetworkManager.Singleton.IsServer;
+        uiPanels["mainCam"].SetActive(true);
         SetUpTextFields();
         SubscribeInput();
         SetGameUI();
@@ -86,8 +87,8 @@ public class GameManager : MonoBehaviour
                 new Vector3(Random.Range(-11, 10), 
                 Random.Range(-11, 10), -3), 
                 Quaternion.identity);
-            i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/sword-1");
-            i.GetComponent<Unity.Netcode.NetworkObject>().Spawn(true);
+            i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/sword-1"); // totaly worthless
+            i.GetComponent<NetworkObject>().Spawn(true);
             Destroy(i);
         }
     }

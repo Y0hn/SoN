@@ -43,7 +43,8 @@ public class NPStats : EntityStats
     [SerializeField] protected Equipment[] setUpEquipment;
     [SerializeField] protected bool drawGizmo = false;
     protected const float ATTACK_DISTANCE_PERCENTAGE = 0.3f;
-    public float TargetDistance { get { return Attack.range*2 /*- ATTACK_DISTANCE_PERCENTAGE*Attack.range*/; } }
+    public override Quaternion Rotation     { get => body.transform.rotation; }
+    public float TargetDistance             { get => Attack.range*2 /*- ATTACK_DISTANCE_PERCENTAGE*Attack.range*/; }
     protected Attack Attack     
     { 
         get 
@@ -109,7 +110,7 @@ public class NPStats : EntityStats
     }
     public void CallculateWC()
     {
-        if (weapE.Value.eIndex >= 0)
+        if (weapE.Value.eIndex > 0)
         {
             Weapon w = (Weapon)Item.GetItem(equipment[weapE.Value.eIndex].ToString());
             WC = w.CallculateWC();

@@ -37,6 +37,7 @@ public class Weapon : Equipment
         for (int i = 0; i < vals.Count; i++)
             vals.Add(attack[i].rate * attack[i].damage.amount);
         
+        if (vals.Count == 0) return Class.Light;
         int index = vals.IndexOf(vals.Max());   // zsika najefektiktivnejsi utok zbrane
         vals.Clear();
         float r = attack[index].rate;
