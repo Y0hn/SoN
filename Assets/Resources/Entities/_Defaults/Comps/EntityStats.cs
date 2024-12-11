@@ -69,6 +69,7 @@ public abstract class EntityStats : NetworkBehaviour
                 weaponR.gameObject.SetActive(false);
             }
             Animator.SetFloat("weapon", (float)newValue.type);
+            Animator.SetFloat("atSpeed", newValue.rate);
 
             if (IsServer && weapE.Value.eIndex > 0)
             {
@@ -178,7 +179,7 @@ public abstract class EntityStats : NetworkBehaviour
             weaponR.gameObject.SetActive(R || B); 
             weaponL.gameObject.SetActive(L || B);
             float atBlend = (R || B) ? 1 : -1;
-            Animator.SetFloat("atBlend", atBlend);           
+            Animator.SetFloat("atBlend", atBlend);   
         }
     }
     public virtual bool TakeDamage(Damage damage)
@@ -245,14 +246,14 @@ public abstract class EntityStats : NetworkBehaviour
                 Ranged r = Resources.Load<Ranged>(equipment[weapE.Value.eIndex].ToString());
 
                 //byte b = (byte)weapE.Value.aIndex;
-                GameObject p = r.GetProjectile;
-                Instantiate(p, attackPoint.position, Rotation);
-                //p.GetComponent<Projectile>().damage = attack.Value.damage;
-                NetworkObject netO = p.GetComponent<NetworkObject>();
-                if (!netO.IsSpawned)
-                    netO.Spawn();
-
-                DestroyImmediate(p, true);
+                GameObject p = Instantiate(r.GetProjectile, attackPoint.position, Rotation, body.transform);
+                Projectile pp = p.GetComponent<Projectile>();
+                pp.damage = attack.Value.damage;
+                pp.delay = 1/attack.Value.rate;
+                pp.graficDelay = 0.3f/attack.Value.rate;
+                pp.range = attack.Value.range;
+                
+                p.GetComponent<NetworkObject>().Spawn(true);
             }
             else
                 Debug.Log(weapE.Value.ToString());
