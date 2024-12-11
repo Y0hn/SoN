@@ -26,8 +26,9 @@ public class Projectile : NetworkBehaviour
     }
     void Update()
     {
-        if (timer[0] > 0 && Time.time >= timer[0])
+        if (timer[0] > 0 && Time.time >= timer[0])  // vystrelenie projektilu
         {
+            transform.SetParent(null);
             coll.enabled = true;
             force = transform.up;
             force *= FORCE;
@@ -35,9 +36,10 @@ public class Projectile : NetworkBehaviour
             rb.AddForce(force);
             timer[0] = 0;
         }
-        if (timer[1] > 0 && Time.time >= timer[1])
+        if (timer[1] > 0 && Time.time >= timer[1])  // vykreslenie textury
         {
             sprite.enabled = true;
+            timer[1] = 0;
         }
 
         if (coll.enabled && Vector2.Distance(startPos, transform.position) >= range)

@@ -246,14 +246,16 @@ public abstract class EntityStats : NetworkBehaviour
                 Ranged r = Resources.Load<Ranged>(equipment[weapE.Value.eIndex].ToString());
 
                 //byte b = (byte)weapE.Value.aIndex;
-                GameObject p = Instantiate(r.GetProjectile, attackPoint.position, Rotation, body.transform);
+                GameObject p = Instantiate(r.GetProjectile, attackPoint.position, Rotation);
                 Projectile pp = p.GetComponent<Projectile>();
                 pp.damage = attack.Value.damage;
-                pp.delay = 1/attack.Value.rate;
-                pp.graficDelay = 0.3f/attack.Value.rate;
+                pp.delay = 1/attack.Value.rate+0.2f;
+                pp.graficDelay = 0.5f/attack.Value.rate;
                 pp.range = attack.Value.range;
                 
-                p.GetComponent<NetworkObject>().Spawn(true);
+                NetworkObject netP = p.GetComponent<NetworkObject>();
+                netP.Spawn(true);
+                netP.TrySetParent(transform);
             }
             else
                 Debug.Log(weapE.Value.ToString());

@@ -16,6 +16,7 @@ public class NPController : EntityController
     protected NextAction nextAction;
     protected float nextDecisionTimer = 0f;
     protected List<Transform> patrol = new();
+    protected Vector2 viewDir = Vector2.zero;
     protected bool selfTarget;
     public bool ForceDecision       { get; protected set; }
     public override void OnNetworkSpawn()
@@ -38,11 +39,15 @@ public class NPController : EntityController
             
         if (selfTarget && moveDir != Vector2.zero)
         {
+            viewDir = Vector2.zero;
             moveDir = Vector2.zero;
             attacking = false;   
         }
         else if (!selfTarget && attacking && path.reachedEndOfPath)
+        {
+            //TurnForTarget();
             Attack();
+        }
         else if (!selfTarget)
             FollowTarget();
     }
@@ -51,8 +56,16 @@ public class NPController : EntityController
         if (moveDir != Vector2.zero) moveDir = Vector2.zero;
         base.Attack();
     }
+    protected virtual void TurnForTarget()
+    {
+        viewDir = sensor.ClosestTarget.position - transform.position;
+        viewDir = viewDir.normalized;
+        // float angle = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
+        // transform.rotation = Quaternion.Euler(0, 0, angle);
+    }
     protected virtual void FollowTarget()
     {
+        if (viewDir != Vector2.zero) viewDir = Vector2.zero;
         Vector2 move = new (path.desiredVelocity.x*100, path.desiredVelocity.y*100);
         moveDir = move.normalized;
         if (!attacking) attacking = true; 
@@ -75,6 +88,12 @@ public class NPController : EntityController
     protected override void AnimateMovement()
     {
         base.AnimateMovement();
+        
+        if (viewDir != Vector2.zero)
+        {
+            stats.Animator.SetFloat("horizontal", viewDir.x);
+            stats.Animator.SetFloat("vertical", viewDir.y);
+        }
     }
     protected virtual void DecideNextMove()
     {
