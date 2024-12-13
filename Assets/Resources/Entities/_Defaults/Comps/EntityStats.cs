@@ -19,6 +19,7 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected GameObject body;
     [SerializeField] protected NetworkObject netObject;
     [SerializeField] protected Transform attackPoint;
+    [SerializeField] protected Transform projectilePoint;
     [SerializeField] protected SpriteRenderer weaponR, weaponL;
     [SerializeField] protected NetworkAnimator animator;
     [SerializeField] protected Rigidbody2D rb;
@@ -39,10 +40,13 @@ public abstract class EntityStats : NetworkBehaviour
 #pragma warning restore IDE0004
     public NetworkObject NetObject  { get => netObject; }
     public Rigidbody2D RigidBody2D  { get => rb; }
+    public Vector2 ProjectilePoint  { get => projectilePoint.position; }
+    public Transform ProjPointTrans { get => projectilePoint; }
     public AITarget TargetTeam      { get => aiTeam; }
     public Animator Animator        { get => animator.Animator; }
     public bool AttackBoth          { get => attack.Value.bothHanded; }
     public bool Armed               { get => equipment[(int)Equipment.Slot.WeaponL] != "" || "" !=  equipment[(int)Equipment.Slot.WeaponR]; }
+    protected EntityController Conr { get => GetComponent<EntityController>(); }
     public virtual Quaternion Rotation      { get => transform.rotation; }
     protected Defence defence;  // iba na servery/hoste
     protected float atTime = 0;
@@ -252,6 +256,7 @@ public abstract class EntityStats : NetworkBehaviour
                 pp.delay = 1/attack.Value.rate+0.2f;
                 pp.graficDelay = 0.5f/attack.Value.rate;
                 pp.range = attack.Value.range;
+                pp.etc = Conr;
                 
                 NetworkObject netP = p.GetComponent<NetworkObject>();
                 netP.Spawn(true);

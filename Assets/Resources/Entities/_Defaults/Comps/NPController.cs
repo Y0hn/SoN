@@ -16,7 +16,6 @@ public class NPController : EntityController
     protected NextAction nextAction;
     protected float nextDecisionTimer = 0f;
     protected List<Transform> patrol = new();
-    protected Vector2 viewDir = Vector2.zero;
     protected bool selfTarget;
     public bool ForceDecision       { get; protected set; }
     public override void OnNetworkSpawn()
@@ -45,11 +44,13 @@ public class NPController : EntityController
         }
         else if (!selfTarget && attacking && path.reachedEndOfPath)
         {
-            //TurnForTarget();
+            TurnForTarget();
             Attack();
         }
         else if (!selfTarget)
+        {
             FollowTarget();
+        }
     }
     protected override void Attack()
     {

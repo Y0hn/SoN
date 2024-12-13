@@ -9,8 +9,13 @@ public abstract class EntityController : NetworkBehaviour
     [SerializeField] protected EntityStats stats;
     protected Vector2 moveDir;
     protected bool attacking;
+    protected Vector2 viewDir = Vector2.zero;
     protected const float MIN_MOVE_TOL = 0.1f;
 
+    public Vector2 View     { get => viewDir; }
+    public Vector2 Proj     { get => stats.ProjectilePoint; }
+    public float ViewAngle  { get => Mathf.Atan2(viewDir.x, viewDir.y); }
+    public EntityStats ets  { get => stats; }
     public override void OnNetworkSpawn()
     {
         moveDir = Vector2.zero;
