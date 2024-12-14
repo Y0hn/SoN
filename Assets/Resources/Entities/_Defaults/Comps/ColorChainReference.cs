@@ -4,37 +4,33 @@ using System;
 public class ColorChainReference : MonoBehaviour
 {
     [SerializeField] Color color = new(255,255,255,1);
-    public Color GetColor { get => color; }
+    Color oldColor;
     public event Action<Color> colorChanged;
+    void Awake()
+    {
+        oldColor = color;
+    }
+    void Update()
+    {
+        if (color != oldColor)  // for updates in animator
+        {
+            colorChanged?.Invoke(color);
+            oldColor = color;
+        }
+    }
     public void SetColor(Color color)
     {
         this.color = color;
+        oldColor = color;
         InvokeChange();
     }
     public void InvokeChange()
     {
-        //colorChanged.Invoke(color);
+        colorChanged?.Invoke(color);
     }
     public virtual Color Color
     {
         get { return color; }
         set { color = value; }
-    }
-}
-[CustomEditor(typeof(ColorChainReference))]
-public class MyButtonExampleEditor : Editor
-{
-    public override void OnInspectorGUI()
-    {
-        base.OnInspectorGUI();
-
-        // Referencia na cieľový objekt
-        ColorChainReference example = (ColorChainReference)target;
-
-        // Tlačidlo v inspektore
-        if (GUILayout.Button("Refresh color"))
-        {
-            example.InvokeChange();
-        }
     }
 }

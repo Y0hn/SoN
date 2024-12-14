@@ -56,7 +56,6 @@ public class PlayerStats : EntityStats
     }
     protected override void Update()
     {
-        base.Update();
         if (chatTimer != 0 && chatTimer <= Time.time)
         {
             chatField.SetActive(false);

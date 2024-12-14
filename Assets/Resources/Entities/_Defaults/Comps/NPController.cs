@@ -74,7 +74,7 @@ public class NPController : EntityController
         moveDir = move.normalized;
         if (!attacking) attacking = true; 
     }
-    protected virtual void SetTarget(Transform t)
+    public virtual void SetTarget(Transform t)
     {
         if (t != null)
         {

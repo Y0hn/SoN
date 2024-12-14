@@ -137,6 +137,10 @@ public class NPStats : EntityStats
     {
         
     }
+    public override void KilledEnemy(EntityStats died)
+    {
+        
+    }
 #pragma warning disable IDE0051 // Remove unused private members
     void OnDrawGizmos()
     {

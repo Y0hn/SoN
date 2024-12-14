@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using UnityEditor;
 using Unity.Netcode;
 
 public class NPSensor : NetworkBehaviour
@@ -31,8 +32,27 @@ public class NPSensor : NetworkBehaviour
             if (ClosestTarget != null && ClosestTarget.Equals(other.transform))
             {
                 FindClosestTarget();
+
                 targetChange.Invoke(ClosestTarget);
             }
+        }
+    }
+    public void ResetTargeting()
+    {
+        if (IsServer)
+        {
+            ClosestTarget = null;
+            string tt = "";
+            Collider2D[] colls = Physics2D.OverlapCircleAll(transform.position, coll.radius);
+
+            foreach (Collider2D c in colls)
+            {
+                tt += c.name + "  ";
+                OnTriggerEnter2D(c);
+            }
+            targetChange.Invoke(ClosestTarget);
+            
+            Debug.Log("Targeting Reset\nTargets: " + tt);
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members
@@ -68,11 +88,36 @@ public class NPSensor : NetworkBehaviour
     }
     public void SetTarget(Transform target, bool inRange = true)
     {
+        if (ClosestTarget != null)
+            ClosestTarget.GetComponent<EntityStats>().OnDeath -= ResetTargeting;
+
         ClosestTarget = target;
+
+        if (ClosestTarget != null)
+            target.GetComponent<EntityStats>().OnDeath += ResetTargeting;
+
         TargetInRange = inRange;
+        targetChange.Invoke(ClosestTarget);
     }
     public void SetRange(float r)
     {
         coll.radius = r;
+    }
+}
+[CustomEditor(typeof(NPSensor))]
+public class MyButtonExampleEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+
+        // Referencia na cieľový objekt
+        NPSensor example = (NPSensor)target;
+
+        // Tlačidlo v inspektore
+        if (GUILayout.Button("Reset Targeting"))
+        {
+            example.ResetTargeting();
+        }
     }
 }

@@ -47,12 +47,12 @@ public abstract class EntityStats : NetworkBehaviour
     public float ViewAngle              { get => Mathf.Atan2(View.x, View.y); }
     public bool AttackBoth              { get => attack.Value.bothHanded; }
     public bool Armed                   { get => equipment[(int)Equipment.Slot.WeaponL] != "" || "" !=  equipment[(int)Equipment.Slot.WeaponR]; }
-    
+    public Action OnDeath;
+
     protected Defence defence;  // iba na servery/hoste
     protected float timeToDespawn = 0f;
     protected float atTime = 0;
     private bool clampedDMG = true;
-
     public override void OnNetworkSpawn()
     {
         EntitySetUp();
@@ -227,8 +227,13 @@ public abstract class EntityStats : NetworkBehaviour
             hp.Value = maxHp.Value;
         hpBar.gameObject.SetActive(alive);
         Animator.SetBool("isAlive", alive);
+        coll.enabled = alive;
         if (!alive)
+        {
             timeToDespawn = Time.time + 5f;
+            
+            OnDeath?.Invoke();
+        }
     }
     protected virtual void Despawn()
     {

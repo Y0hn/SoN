@@ -11,8 +11,6 @@ public class PlayerController : EntityController
     [SerializeField] GameObject cam;
     [SerializedDictionary("Key", "Input"),SerializeField] SerializedDictionary<string, InputActionReference> input_actions;
     private GameManager game;
-    private Vector2 lastView;
-    private bool fromView;
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
@@ -25,7 +23,6 @@ public class PlayerController : EntityController
             input_actions["q2"].action.started += Q2;
             input_actions["q3"].action.started += Q3;
             cam.SetActive(true);
-            fromView = false;
         }
     }
     protected override void Update()
@@ -76,7 +73,7 @@ public class PlayerController : EntityController
     {
         if (!stats.IsAlive.Value)
         {
-            SetLiveServerRpc(OwnerClientId);
+            SetLiveRpc(/*OwnerClientId*/);
             return;
         }
         attacking = !context.canceled;
@@ -85,8 +82,9 @@ public class PlayerController : EntityController
     {
         base.Attack();
     }
-    [ServerRpc] protected void SetLiveServerRpc(ulong playerId)
+    [Rpc(SendTo.Server)] protected void SetLiveRpc(/*ulong playerId*/)
     {
-        NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerStats>().IsAlive.Value = true;
+        //NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerStats>().IsAlive.Value = true;
+        stats.IsAlive.Value = true;
     }
 }
