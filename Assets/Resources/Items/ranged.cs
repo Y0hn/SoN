@@ -5,7 +5,7 @@ using System;
 public class Ranged : Weapon
 {
     [SerializeField] string projectile;
-    public float projSpawnDistance = 0.5f;
+    public Vector2 projSpawnPosition;
     public GameObject GetProjectile
     {
         get => Resources.Load<GameObject>(FileManager.PROJECTILES_OBJECTS_PATH + projectile);

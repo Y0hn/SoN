@@ -1,8 +1,8 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Collections;
-
 public class NPStats : EntityStats
 {
     /*  ZDEDENE ATRIBUTY
@@ -44,7 +44,18 @@ public class NPStats : EntityStats
     [SerializeField] protected bool drawGizmo = false;
     protected const float ATTACK_DISTANCE_PERCENTAGE = 0.3f;
     public override Quaternion Rotation     { get => body.transform.rotation; }
-    public float TargetDistance             { get => Attack.range*2 /*- ATTACK_DISTANCE_PERCENTAGE*Attack.range*/; }
+    public float AttackDistance             
+    { 
+        get 
+        { 
+            if      (Attack.IsMelee) 
+                return Attack.range*2;
+            else if (Attack.IsRanged)
+                return Attack.range;
+            else
+                return 0f;
+        }
+    }
     protected Attack Attack     
     { 
         get 
@@ -131,16 +142,32 @@ public class NPStats : EntityStats
     {
         if (drawGizmo)
         {
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawWireSphere(transform.position, rase.view);
-
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(transform.position, TargetDistance);
-
-            Gizmos.color = Color.red;
-            Vector3 v = new(transform.position.x, transform.position.y + rase.attack.range, 0);
-            Gizmos.DrawWireSphere(v, rase.attack.range);
+            OnDrawGizmosSelected();
         }
+    }
+    void OnDrawGizmosSelected()
+    {
+        float view = rase.view; 
+        List<float> range = new()
+        {
+            Attack.range
+        };
+        
+        foreach (Equipment equipment in setUpEquipment)
+            if (equipment is Weapon w)
+                foreach (Attack a in w.attack)
+                {
+                    float r = a.IsRanged ? a.range : a.range*2;
+                    range.Add(r);
+                }
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, view);
+        Gizmos.color = Color.blue;
+        for (int i = 0; i < range.Count; i++)
+            Gizmos.DrawWireSphere(transform.position, range[i]);
+        Gizmos.color = Color.red;
+        Vector3 v = new(transform.position.x, transform.position.y + range[0], 0);
+        Gizmos.DrawWireSphere(v, rase.attack.range);        
     }
 #pragma warning restore IDE0051 // Remove unused private members
     public enum Behavior 

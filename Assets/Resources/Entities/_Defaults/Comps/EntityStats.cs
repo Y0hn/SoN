@@ -19,13 +19,12 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected GameObject body;
     [SerializeField] protected NetworkObject netObject;
     [SerializeField] protected Transform attackPoint;
-    [SerializeField] protected Transform projectilePoint;
     [SerializeField] protected SpriteRenderer weaponR, weaponL;
     [SerializeField] protected NetworkAnimator animator;
     [SerializeField] protected Rigidbody2D rb;
     [SerializeField] protected Collider2D coll;
     [SerializeField] protected AITarget aiTeam = AITarget.Team_2;
-
+    [SerializeField] protected EntityController controller;
     [SerializeField]    protected   NetworkList<FixedString64Bytes> equipment = new(/*null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner*/);    
     // Sprava sa ako Dictionary ale je to list
     [SerializeField]    protected   NetworkVariable<int> maxHp = new();
@@ -36,22 +35,24 @@ public abstract class EntityStats : NetworkBehaviour
                         protected   NetworkVariable<Attack> attack = new();
                         protected   NetworkVariable<WeaponIndex> weapE = new(new(-1), NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
 #pragma warning disable IDE0004
-    public float HP                 { get => (float)hp.Value/(float)maxHp.Value; }
+    public float HP                     { get => (float)hp.Value/(float)maxHp.Value; }
 #pragma warning restore IDE0004
-    public NetworkObject NetObject  { get => netObject; }
-    public Rigidbody2D RigidBody2D  { get => rb; }
-    public Vector2 ProjectilePoint  { get => projectilePoint.position; }
-    public Transform ProjPointTrans { get => projectilePoint; }
-    public AITarget TargetTeam      { get => aiTeam; }
-    public Animator Animator        { get => animator.Animator; }
-    public bool AttackBoth          { get => attack.Value.bothHanded; }
-    public bool Armed               { get => equipment[(int)Equipment.Slot.WeaponL] != "" || "" !=  equipment[(int)Equipment.Slot.WeaponR]; }
-    protected EntityController Conr { get => GetComponent<EntityController>(); }
-    public virtual Quaternion Rotation      { get => transform.rotation; }
+    public virtual Quaternion Rotation  { get => transform.rotation; }
+    public NetworkObject NetObject      { get => netObject; }
+    public Rigidbody2D RigidBody2D      { get => rb; }
+    public Transform AttackPoint        { get => attackPoint; }
+    public AITarget TargetTeam          { get => aiTeam; }
+    public Animator Animator            { get => animator.Animator; }
+    public Vector2 View                 { get => controller.View; }
+    public float ViewAngle              { get => Mathf.Atan2(View.x, View.y); }
+    public bool AttackBoth              { get => attack.Value.bothHanded; }
+    public bool Armed                   { get => equipment[(int)Equipment.Slot.WeaponL] != "" || "" !=  equipment[(int)Equipment.Slot.WeaponR]; }
+    
     protected Defence defence;  // iba na servery/hoste
-    protected float atTime = 0;
     protected float timeToDespawn = 0f;
+    protected float atTime = 0;
     private bool clampedDMG = true;
+
     public override void OnNetworkSpawn()
     {
         EntitySetUp();
@@ -82,7 +83,7 @@ public abstract class EntityStats : NetworkBehaviour
                 else if (Attack.RangedAttack(newValue.type))
                 {
                     Ranged r = Resources.Load<Ranged>(equipment[weapE.Value.eIndex].ToString());
-                    attackPoint.localPosition = new(attackPoint.localPosition.x, r.projSpawnDistance);
+                    attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
                 }
             }
         };
@@ -171,6 +172,11 @@ public abstract class EntityStats : NetworkBehaviour
                     weapE.Value = new(eIndex);
                 }
             }
+            if (w is Ranged)
+            {
+                Ranged r = Resources.Load<Ranged>(equipment[weapE.Value.eIndex].ToString());
+                attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
+            }
             Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
             weaponL.sprite = sprite;
             weaponL.color = w.color;
@@ -183,7 +189,7 @@ public abstract class EntityStats : NetworkBehaviour
             weaponR.gameObject.SetActive(R || B); 
             weaponL.gameObject.SetActive(L || B);
             float atBlend = (R || B) ? 1 : -1;
-            Animator.SetFloat("atBlend", atBlend);   
+            Animator.SetFloat("atBlend", atBlend);
         }
     }
     public virtual bool TakeDamage(Damage damage)
@@ -252,12 +258,8 @@ public abstract class EntityStats : NetworkBehaviour
                 //byte b = (byte)weapE.Value.aIndex;
                 GameObject p = Instantiate(r.GetProjectile, attackPoint.position, Rotation);
                 Projectile pp = p.GetComponent<Projectile>();
-                pp.damage = attack.Value.damage;
-                pp.delay = 1/attack.Value.rate+0.2f;
-                pp.graficDelay = 0.5f/attack.Value.rate;
-                pp.range = attack.Value.range;
-                pp.etc = Conr;
-                
+                pp.SetUp(1/attack.Value.rate+0.2f, 0.5f/attack.Value.rate, attack.Value.range, attack.Value.damage, this);
+
                 NetworkObject netP = p.GetComponent<NetworkObject>();
                 netP.Spawn(true);
                 netP.TrySetParent(transform);
@@ -380,7 +382,11 @@ public abstract class EntityStats : NetworkBehaviour
     public float rate;
     public Type type;
     public bool bothHanded;
-    public bool IsSet { get { return range != 0 && rate != 0;} }
+
+    public readonly bool IsMelee { get => MeleeAttack(type); }
+    public readonly bool IsRanged { get => RangedAttack(type); }
+    public readonly bool IsSet { get => range != 0 && rate != 0; }
+
     public Attack (Damage damage, float range, float rate, Type type, bool both = false)
     {
         this.bothHanded = both;

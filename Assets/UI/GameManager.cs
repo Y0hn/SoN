@@ -69,6 +69,7 @@ public class GameManager : MonoBehaviour
     public string PlayerName        { get { return inputFields["name"].text.Trim(); } set { inputFields["name"].text = value; } }
     public static MenuScript UI     { get => instance.menuScript; }
     public static bool IsServer     { get; private set; }
+#pragma warning disable IDE0051 // Remove unused private members
     void Start()
     {
         IsServer = NetworkManager.Singleton.IsServer;
@@ -87,11 +88,12 @@ public class GameManager : MonoBehaviour
                 new Vector3(Random.Range(-11, 10), 
                 Random.Range(-11, 10), -3), 
                 Quaternion.identity);
-            i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/sword-1"); // totaly worthless
+            i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/bow-1"); // totaly worthless
             i.GetComponent<NetworkObject>().Spawn(true);
             Destroy(i);
         }
     }
+#pragma warning restore IDE0051 // Remove unused private members
     void SetUpTextFields()
     {
         textFields["pName"].text = Application.productName;

@@ -268,7 +268,7 @@ MonoBehaviour:
   slowdownDistance: 0.6
   pickNextWaypointDist: 2
   endReachedDistance: 0.2
-  alwaysDrawGizmos: 1
+  alwaysDrawGizmos: 0
   slowWhenNotFacingTarget: 0
   whenCloseToDestination: 0
   constrainInsideGraph: 0
@@ -304,13 +304,13 @@ MonoBehaviour:
   body: {fileID: 9144688020410587472}
   netObject: {fileID: 1068958760059023542}
   attackPoint: {fileID: 3798816729441822768}
-  projectilePoint: {fileID: 2539297551117272905}
   weaponR: {fileID: 4862052444223724179}
   weaponL: {fileID: 1325576850034929809}
   animator: {fileID: 5663075166172191200}
   rb: {fileID: 1458412614070460213}
   coll: {fileID: 6918256059355095030}
   aiTeam: 3
+  controller: {fileID: 2122981765981785076}
   maxHp:
     m_InternalValue: 100
   speed:
@@ -358,11 +358,6 @@ SpriteRenderer:
 --- !u!50 &1458412614070460213 stripped
 Rigidbody2D:
   m_CorrespondingSourceObject: {fileID: 6110265151130752462, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
-  m_PrefabInstance: {fileID: 4679617435991968507}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &2539297551117272905 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7191178680983080370, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
   m_PrefabInstance: {fileID: 4679617435991968507}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &3048762479830503385 stripped

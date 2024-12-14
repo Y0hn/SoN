@@ -25,7 +25,7 @@ public class NPController : EntityController
         if (IsServer)
         {
             sensor.targetChange += SetTarget;
-            path.endReachedDistance = ((NPStats)stats).TargetDistance;
+            path.endReachedDistance = ((NPStats)stats).AttackDistance;
         }
     }
     protected override void Update()
@@ -34,7 +34,10 @@ public class NPController : EntityController
 
 
         if (nextDecisionTimer < Time.time || ForceDecision)
-            DecideNextMove();
+        {
+
+            //DecideNextMove();
+        }
             
         if (selfTarget && moveDir != Vector2.zero)
         {
@@ -95,7 +98,7 @@ public class NPController : EntityController
             stats.Animator.SetFloat("horizontal", viewDir.x);
             stats.Animator.SetFloat("vertical", viewDir.y);
         }
-    }
+    }/*
     protected virtual void DecideNextMove()
     {
         float nextChange = 1f;
@@ -122,13 +125,6 @@ public class NPController : EntityController
         if (ForceDecision)
             ForceDecision = false;
         nextDecisionTimer = Time.time + nextChange;
-    }
-    protected virtual void DoNextMove()
-    {
-        if (nextAction != NextAction.None)
-        {
-            nextAction = NextAction.None; 
-        }
     }
     void DecideByTreshhold(float tHP, bool inRange, bool gotRange, out float tDecay)
     {
@@ -158,6 +154,6 @@ public class NPController : EntityController
             nextAction = NextAction.StayOnPlace;
             tDecay = 3;
         }
-    }
+    }*/
     protected enum NextAction { GoToTarget, RunToTarget, AttackTarget, RunFromTarget, StayOnPlace, None }
 }

@@ -11,6 +11,8 @@ public class PlayerController : EntityController
     [SerializeField] GameObject cam;
     [SerializedDictionary("Key", "Input"),SerializeField] SerializedDictionary<string, InputActionReference> input_actions;
     private GameManager game;
+    private Vector2 lastView;
+    private bool fromView;
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
@@ -23,6 +25,7 @@ public class PlayerController : EntityController
             input_actions["q2"].action.started += Q2;
             input_actions["q3"].action.started += Q3;
             cam.SetActive(true);
+            fromView = false;
         }
     }
     protected override void Update()
@@ -33,10 +36,10 @@ public class PlayerController : EntityController
         {
             base.Update();
             moveDir = input_actions["move"].action.ReadValue<Vector2>();
+            viewDir = game.MousePos.normalized;
         }
         else if (moveDir != Vector2.zero)
             moveDir = Vector2.zero;
-        
 
         if (Input.GetKeyDown(KeyCode.P))
             DropRpc();        
@@ -48,50 +51,39 @@ public class PlayerController : EntityController
     {
         GameObject i = Instantiate(
         Resources.LoadAll<GameObject>("Items/ItemDrop")[0], 
-        new Vector3(Random.Range(-11, 10), 
-        Random.Range(-11, 10), -3), 
-        Quaternion.identity);
+            new Vector3(Random.Range(-11, 10), Random.Range(-11, 10), -3), 
+            Quaternion.identity);
         i.GetComponent<NetworkObject>().Spawn();
         i.GetComponent<ItemDrop>().SetItemRpc("Items/weapons/sword-1");
     }
     protected override void FixedUpdate()
     {
-        if (!IsOwner) return;
-        
+        if (!IsOwner) return;        
         AnimateMovement();
+    }
+    protected override void AnimateMovement()
+    {
+        if (attacking)
+        {
+            stats.Animator.SetFloat("horizontal", viewDir.x);
+            stats.Animator.SetFloat("vertical", viewDir.y);
+            stats.RigidBody2D.linearVelocity = Vector2.zero;
+            stats.Animator.SetBool("move", false);
+        }
+        base.AnimateMovement();
     }
     public void Fire(InputAction.CallbackContext context)
     {
         if (!stats.IsAlive.Value)
         {
-            //Debug.Log(name + " called RespawnServerRpc()");
             SetLiveServerRpc(OwnerClientId);
             return;
         }
-
-        Vector2 pos = game.MousePos.normalized;
-        pos = RoundVector(pos, 1);
-        string p = "";
-        
-        if      (pos.x < 0)
-            p += "L";
-        else if (pos.x > 0)
-            p += "R";
-        if      (pos.y < 0)
-            p += "D";
-        else if (pos.y > 0)
-            p += "U";
-        /*
-        if (p != "")
-            Debug.Log(p + "pos: " + $"[{pos.x},{pos.y}]");*/
-
         attacking = !context.canceled;
     }
     protected override void Attack()
     {
         base.Attack();
-        /*if (IsOwner)
-            GameManager.instance.AnimateFace("hit");*/
     }
     [ServerRpc] protected void SetLiveServerRpc(ulong playerId)
     {

@@ -11,11 +11,7 @@ public abstract class EntityController : NetworkBehaviour
     protected bool attacking;
     protected Vector2 viewDir = Vector2.zero;
     protected const float MIN_MOVE_TOL = 0.1f;
-
     public Vector2 View     { get => viewDir; }
-    public Vector2 Proj     { get => stats.ProjectilePoint; }
-    public float ViewAngle  { get => Mathf.Atan2(viewDir.x, viewDir.y); }
-    public EntityStats ets  { get => stats; }
     public override void OnNetworkSpawn()
     {
         moveDir = Vector2.zero;
@@ -33,8 +29,7 @@ public abstract class EntityController : NetworkBehaviour
     }
     protected virtual void AnimateMovement()
     {
-        if (stats.Animator == null)
-            return;
+        if (stats.Animator == null) return;
         if (moveDir.magnitude > MIN_MOVE_TOL)
         {
             if (!stats.Animator.GetBool("move"))
@@ -64,12 +59,12 @@ public abstract class EntityController : NetworkBehaviour
             stats.Animator.SetTrigger("attack");
         }
     }
-    protected Vector2 RoundVector(Vector2 v, byte d = 1)
+    /*protected Vector2 RoundVector(Vector2 v, byte d = 1)
     {
         return new(Round(v.x,d), Round(v.y,d));
     }
     protected float Round(float f, byte d = 1)
     {
         return Mathf.Round(f*d)/(float)d;
-    }
+    }*/
 }

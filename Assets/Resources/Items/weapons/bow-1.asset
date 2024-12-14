@@ -15,16 +15,17 @@ MonoBehaviour:
   title: Bow
   description: 
   iconRef: Items/textures/bow-1
-  color: {r: 1, g: 1, b: 1, a: 1}
-  rarity: {r: 1, g: 1, b: 1, a: 1}
+  color: {r: 0.4056604, g: 0.3347655, b: 0.18178178, a: 1}
+  rarity: {r: 0.8352941, g: 0.5176471, b: 0.1254902, a: 1}
   slot: 4
   sprite: bow-1
   attack:
   - damage:
       type: 2
       amount: 5
-    range: 5
+    range: 4
     rate: 0.5
     type: 3
     bothHanded: 0
-  projectile: Projectile
+  projectile: arrow
+  projSpawnPosition: {x: 0.3, y: 0.5}
