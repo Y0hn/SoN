@@ -39,19 +39,21 @@ public class PlayerController : EntityController
             moveDir = Vector2.zero;
 
         if (Input.GetKeyDown(KeyCode.P))
-            DropRpc();        
+            DropRpc();    
     }
     void Q1(InputAction.CallbackContext context) { ((PlayerStats)stats).SetAttackTypeRpc(1); }
     void Q2(InputAction.CallbackContext context) { ((PlayerStats)stats).SetAttackTypeRpc(2); }
     void Q3(InputAction.CallbackContext context) { ((PlayerStats)stats).SetAttackTypeRpc(3); }
     [Rpc(SendTo.Server)] void DropRpc()
     {
-        GameObject i = Instantiate(
-        Resources.LoadAll<GameObject>("Items/ItemDrop")[0], 
-            new Vector3(Random.Range(-11, 10), Random.Range(-11, 10), -3), 
-            Quaternion.identity);
+        Vector2 pos = new (transform.position.x + Random.Range(-5, 6), transform.position.y + Random.Range(-5, 6));
+        GameObject i = Instantiate(Resources.Load<GameObject>("Items/ItemDrop"), pos, Quaternion.identity);
+        switch (Random.Range(1, 3))
+        {
+            case 1: i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/sword-1");    break;
+            case 2: i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/bow-1");      break;
+        } 
         i.GetComponent<NetworkObject>().Spawn();
-        i.GetComponent<ItemDrop>().SetItemRpc("Items/weapons/sword-1");
     }
     protected override void FixedUpdate()
     {

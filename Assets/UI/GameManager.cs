@@ -79,20 +79,6 @@ public class GameManager : MonoBehaviour
         SetGameUI();
         FileManager.LoadSettings();
     }
-    void Update()   // Single Player DEBUG
-    {
-        if (Input.GetKeyDown(KeyCode.P) && player.IsServer)
-        {
-            GameObject i = Instantiate(
-                Resources.LoadAll<GameObject>("Items/ItemDrop")[0], 
-                new Vector3(Random.Range(-11, 10), 
-                Random.Range(-11, 10), -3), 
-                Quaternion.identity);
-            i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/bow-1"); // totaly worthless
-            i.GetComponent<NetworkObject>().Spawn(true);
-            Destroy(i);
-        }
-    }
 #pragma warning restore IDE0051 // Remove unused private members
     void SetUpTextFields()
     {

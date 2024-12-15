@@ -53,6 +53,7 @@ public class PlayerStats : EntityStats
     {
         base.OnNetworkSpawn();
         OwnerSubsOnNetValChanged();
+        TryLoadServerData();
     }
     protected override void Update()
     {
@@ -63,11 +64,16 @@ public class PlayerStats : EntityStats
             chatTimer = 0;
         }
     }
+    protected override void TryLoadServerData()
+    {
+        
+    }
     public override void OnNetworkDespawn()
     {
         if (!IsServer) return;
 
-        // Save values
+        // Ulozi hodnoty na servery
+        FileManager.SaveClientData(this);
     }
     protected override void EntitySetUp()
     {
@@ -128,9 +134,12 @@ public class PlayerStats : EntityStats
         };
         attack.OnValueChanged += (Attack prevValue, Attack newValue) => 
         { 
-            string refer = equipment[(int)Equipment.Slot.WeaponR].ToString();
-            if (refer != "")
-                inventUI.SetQuick(((Weapon)Item.GetItem(refer)).attack.IndexOf(newValue)+1);
+            Debug.Log("Attack value chnged to: " + newValue.ToString());
+            inventUI.SetAttack((Equipment.Slot)weapE.Value.eIndex);
+        };
+        weapE.OnValueChanged += (WeaponIndex prevValue, WeaponIndex newValue) =>
+        {
+            inventUI.SetQuick(newValue.aIndex);
         };
         inventory.OnListChanged += (NetworkListEvent<FixedString64Bytes> changeEvent)   => OnInventoryUpdate(changeEvent);
         IsAlive.OnValueChanged  += (bool prevValue, bool newValue)                      => game.SetPlayerUI(newValue);
@@ -180,9 +189,11 @@ public class PlayerStats : EntityStats
     [Rpc(SendTo.Server)] public override void SetAttackTypeRpc(byte t)
     {
         t--;
-        List<Attack> a = ((Weapon)Item.GetItem(equipment[(int)Equipment.Slot.WeaponR].ToString())).attack;
-        if (a.Count > t)
+        List<Attack> a = Weapon.GetItem(equipment[weapE.Value.eIndex].ToString()).attack;
+        if (0 <= t && t < a.Count)
             attack.Value = a[t];
+        else 
+            Debug.Log($"[{t}] attack is outside of range (0 - {a.Count})");
     }
     [Rpc(SendTo.Server)] public override void PickedUpRpc(string refItem)
     {

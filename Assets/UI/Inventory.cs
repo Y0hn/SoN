@@ -45,13 +45,11 @@ public class Inventory : MonoBehaviour
     [SerializeField] InputActionReference input;
     [SerializeField] Vector2 pixelSize = new(1200, 500);
     [SerializeField] bool onGizmos = true;
-    [SerializeField] Color activeColor;
-    [SerializeField] Color pasiveColor;
+    [SerializeField] List<ActiveAttackSlot> acSlots;
     
     // INVENTORY
     List<ItemSlot> itemSlots = new();
     [SerializedDictionary("Slot", "SlotObject"), SerializeField]    SerializedDictionary<Equipment.Slot, EquipmentSlot> equipSlots = new();
-    [SerializedDictionary("Name", "Image"), SerializeField]         SerializedDictionary<string, Image> activeSlots = new();   /* OBSAH */ 
     private event Action onSizeChange;
     private GameManager game;
     void Start()
@@ -77,12 +75,8 @@ public class Inventory : MonoBehaviour
     }
     void SetQuicks()
     {
-        activeSlots["q1-a"].gameObject.SetActive(false);
-        activeSlots["q2-a"].gameObject.SetActive(false);
-        activeSlots["q3-a"].gameObject.SetActive(false);
-        activeSlots["q1"].color = pasiveColor;
-        activeSlots["q2"].color = pasiveColor;
-        activeSlots["q3"].color = pasiveColor;
+        foreach (var slot in acSlots)
+            slot.Set();
     }
     void Sizing()
     {
@@ -250,42 +244,80 @@ public class Inventory : MonoBehaviour
         if (equipSlots.Keys.Contains(equip.slot))
         {
             equipSlots[equip.slot].Item = equip;
-            if (equip is Weapon)
+            if (equip is Weapon w)
             {
-                Weapon w = (Weapon)equip;
-                string r1 = FileManager.GetAttackRefferency(w.attack[0].type);
-                string r2 = FileManager.GetAttackRefferency(w.attack[1].type);
-                activeSlots["q1-a"].sprite = Resources.Load<Sprite>(r1);
-                activeSlots["q2-a"].sprite = Resources.Load<Sprite>(r2);
-                activeSlots["q1-a"].gameObject.SetActive(true);
-                activeSlots["q2-a"].gameObject.SetActive(true);
+                for (int i = 0; i < w.attack.Count && i < acSlots.Count; i++)
+                    acSlots[i].Set(w.attack[i].type);
+                
+                if (acSlots.Find(s => s.active) == null)
+                    SetQuick(0);
             }
             game.LocalPlayer.SetEquipmentRpc(equip.GetReferency, equip.slot);
         }
     }
     public void UnEquip(EquipmentSlot equip)
     {
-        if (!equipSlots.Keys.Contains(equip.slot)) return;
         Item eq = equip.Item;
         if (FreeSpace)
         {
             equip.Item = null;
             game.LocalPlayer.SetEquipmentRpc("", equip.slot);
             Add(eq.GetReferency);
-        }
-        if (eq is Weapon)
-        {
-            activeSlots["q1-a"].gameObject.SetActive(false);
-            activeSlots["q2-a"].gameObject.SetActive(false);
-            activeSlots["q1"].color = pasiveColor;
-            activeSlots["q2"].color = pasiveColor;
+
+            if (eq is Weapon w)            
+                for(int i = 0; i < acSlots.Count; i++)
+                {
+                    if (acSlots[i].slot == w.slot)
+                    {
+                        acSlots[i].Set();
+                    }
+                }
         }
     }
-    private int last = 1;
+    private int last = 0;
     public void SetQuick(int i)
     {
-        activeSlots["q"+last].color = pasiveColor;
-        activeSlots["q"+i].color = activeColor;
+        acSlots[last].SetActive(false);
+        acSlots[i].SetActive(true);
         last = i;
+    }
+    public void SetAttack(Equipment.Slot slot)
+    {
+        acSlots.FindIndex(ac => ac.slot == slot);
+        //.SetActive(true);
+    }
+    [Serializable] public class ActiveAttackSlot
+    {
+        public string name;
+        [HideInInspector] public Equipment.Slot slot;
+        [field:SerializeField] Image edge;
+        [field:SerializeField] Image background;
+        [field:SerializeField] Image foreground;
+
+        static Color 
+            activeC = new (50f/255f, 103f/255f, 30f/255f), 
+            passiveC = new(64f/255f,  64f/255f, 64f/255f);
+        [HideInInspector] public bool active, show;
+        public void Set(Attack.Type aType)
+        {
+            string aref = FileManager.GetAttackRefferency(aType);
+            foreground.sprite = Resources.Load<Sprite>(aref);
+            Set(true);
+        }
+        public void Set(bool show = false)
+        {
+            foreground.gameObject.SetActive(show);
+            this.show = show;
+            if (!show)
+                SetActive(false);
+        }
+        public void SetActive(bool active = true)
+        {
+            if (active)
+                edge.color = activeC;
+            else
+                edge.color = passiveC;
+            this.active = active;
+        }
     }
 }

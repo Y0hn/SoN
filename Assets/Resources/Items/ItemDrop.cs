@@ -8,7 +8,7 @@ public class ItemDrop : NetworkBehaviour
     [SerializeField] NetworkObject netObj;
     [SerializeField] SpriteRenderer texture;
     [SerializeField] CircleCollider2D colli;
-    [SerializeField] public Item item;
+    [SerializeField] private Item item;
     [SerializeField] bool tester = false;
     private static List<World.ItemOnFoor> itemsOnFoor = new();     // iba na Servery
     private World.ItemOnFoor itFoor;
@@ -38,15 +38,14 @@ public class ItemDrop : NetworkBehaviour
     }
     private void Register()
     {
-        if (!IsServer)  return;
+        if (!IsServer || itFoor != null)  return;
         itFoor = new (transform.position, item.GetReferency);
         itemsOnFoor.Add(itFoor);
     }
     public override void OnNetworkDespawn()
     {
-        if (IsServer)
-            itemsOnFoor.Remove(itFoor);
-        
+        if (IsServer && itFoor != null)
+            itemsOnFoor.Remove(itFoor);       
     }
 #pragma warning disable IDE0051 // Remove unused private members
     void OnDrawGizmos()

@@ -25,9 +25,9 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected Collider2D coll;
     [SerializeField] protected AITarget aiTeam = AITarget.Team_2;
     [SerializeField] protected EntityController controller;
-    [SerializeField]    protected   NetworkList<FixedString64Bytes> equipment = new(/*null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner*/);    
-    // Sprava sa ako Dictionary ale je to list
     [SerializeField]    protected   NetworkVariable<int> maxHp = new();
+                        protected   NetworkList<FixedString64Bytes> equipment = new(/*null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner*/);    
+                        // je to list ale sprava sa ako Dictionary
                         protected   NetworkVariable<int> hp = new();
                         public      NetworkVariable<float> speed = new();
                         public      NetworkVariable<byte> level = new(1);
@@ -63,7 +63,24 @@ public abstract class EntityStats : NetworkBehaviour
     protected virtual void SubsOnNetValChanged()
     {
         if (IsServer)
+        {
+            attack.OnValueChanged += (Attack prevValue, Attack newValue) => 
+            {
+                if (weapE.Value.eIndex > 0)
+                {
+                    if      (Attack.MeleeAttack(newValue.type))
+                    {
+                        attackPoint.localPosition = new(attackPoint.localPosition.x, newValue.range);
+                    }
+                    else if (Attack.RangedAttack(newValue.type))
+                    {
+                        Ranged r = Resources.Load<Ranged>(equipment[weapE.Value.eIndex].ToString());
+                        attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
+                    }
+                }
+            };
             maxHp.OnValueChanged += (int prevValue, int newValue) => hp.Value = maxHp.Value;
+        }
 
         equipment.OnListChanged += (NetworkListEvent<FixedString64Bytes> listEvent) => OnEquipmentUpdate(listEvent);
         attack.OnValueChanged   += (Attack prevValue, Attack newValue) => 
@@ -75,17 +92,6 @@ public abstract class EntityStats : NetworkBehaviour
             }
             Animator.SetFloat("weapon", (float)newValue.type);
             Animator.SetFloat("atSpeed", newValue.rate);
-
-            if (IsServer && weapE.Value.eIndex > 0)
-            {
-                if (Attack.MeleeAttack(newValue.type))
-                    attackPoint.localPosition = new(attackPoint.localPosition.x, newValue.range);
-                else if (Attack.RangedAttack(newValue.type))
-                {
-                    Ranged r = Resources.Load<Ranged>(equipment[weapE.Value.eIndex].ToString());
-                    attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
-                }
-            }
         };
         IsAlive.OnValueChanged  += (bool prev, bool alive)          => SetLive(alive);
         hp.OnValueChanged       += (int prevValue, int newValue)    => OnHpUpdate();
@@ -148,6 +154,11 @@ public abstract class EntityStats : NetworkBehaviour
             {
                 UpdateEquipment(Equipment.GetItem(curr));
             }
+
+            string eq = "Equipment Update/n";
+            for (int i = 0; i < equipment.Count; i++)
+                eq += $"{i}. Equiped= {equipment[i]!=""} Path= {equipment[i]}/n";
+            Debug.Log(eq);
         }
         else
         {
@@ -234,6 +245,10 @@ public abstract class EntityStats : NetworkBehaviour
             
             OnDeath?.Invoke();
         }
+    }
+    protected virtual void TryLoadServerData()
+    {
+
     }
     protected virtual void Despawn()
     {

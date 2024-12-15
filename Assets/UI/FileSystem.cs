@@ -135,7 +135,7 @@ public static class FileManager
                 refer += "bow-triple";
                 break;
         }
-        Debug.Log("Returning at ref on: " + refer);
+        //Debug.Log("Returning at ref on: " + refer);
         return refer;
     }
     public enum MessageType { LOG, RECORD, ERROR, WARNING }
@@ -152,7 +152,11 @@ public static class FileManager
             case MessageType.WARNING:
                 Debug.LogError("[RECORDED] " + message);
                 break;
-      }
+        }
+    }
+    public static void SaveClientData(EntityStats stats)
+    {
+
     }
 }
 [Serializable] public class Settings

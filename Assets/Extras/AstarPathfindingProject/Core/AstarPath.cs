@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Pathfinding;
 #if UNITY_5_5_OR_NEWER
 using UnityEngine.Profiling;
+using System;
+
 #endif
 
 #if NETFX_CORE
@@ -24,7 +26,7 @@ using Thread = System.Threading.Thread;
 /// \ingroup relevant
 /// </summary>
 [HelpURL("http://arongranberg.com/astar/docs/class_astar_path.php")]
-[System.Obsolete]
+#pragma warning disable CS0612
 public class AstarPath : VersionedMonoBehaviour {
 	/// <summary>The version number for the A* %Pathfinding Project</summary>
 	public static readonly System.Version Version = new System.Version(4, 2, 17);
@@ -676,6 +678,7 @@ public class AstarPath : VersionedMonoBehaviour {
 	/// This is useful if you want to do changes to the graphs in the editor outside of play mode, but cannot be sure that the graphs have been deserialized yet.
 	/// In play mode this method does nothing.
 	/// </summary>
+	[Obsolete]
 	public static void FindAstarPath () {
 		if (Application.isPlaying) return;
 		if (active == null) active = GameObject.FindObjectOfType<AstarPath>();
@@ -1218,7 +1221,9 @@ public class AstarPath : VersionedMonoBehaviour {
 	/// Also starts threads if using multithreading
 	/// See: <see cref="OnAwakeSettings"/>
 	/// </summary>
-	protected override void Awake () {
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
+	[Obsolete]
+    protected override void Awake () {
 		base.Awake();
 		// Very important to set this. Ensures the singleton pattern holds
 		active = this;
@@ -1260,9 +1265,10 @@ public class AstarPath : VersionedMonoBehaviour {
 			Scan();
 		}
 	}
+#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
 
-	/// <summary>Initializes the <see cref="pathProcessor"/> field</summary>
-	void InitializePathProcessor () {
+    /// <summary>Initializes the <see cref="pathProcessor"/> field</summary>
+    void InitializePathProcessor () {
 		int numThreads = CalculateThreadCount(threadCount);
 
 		// Outside of play mode everything is synchronous, so no threads are used.
@@ -2161,4 +2167,5 @@ public class AstarPath : VersionedMonoBehaviour {
 
 		return nearestNode;
 	}
+#pragma warning restore CS0612
 }
