@@ -132,15 +132,15 @@ public class PlayerStats : EntityStats
                 game.AnimateFace("got-hit");
             game.AnimateFace(HP);
         };
-        attack.OnValueChanged += (Attack prevValue, Attack newValue) => 
+        /*attack.OnValueChanged += (Attack prevValue, Attack newValue) => 
         { 
             Debug.Log("Attack value chnged to: " + newValue.ToString());
             inventUI.SetAttack((Equipment.Slot)weapE.Value.eIndex);
         };
-        weapE.OnValueChanged += (WeaponIndex prevValue, WeaponIndex newValue) =>
+        /*weapE.OnValueChanged += (WeaponIndex prevValue, WeaponIndex newValue) =>
         {
-            inventUI.SetQuick(newValue.aIndex);
-        };
+            
+        };*/
         inventory.OnListChanged += (NetworkListEvent<FixedString64Bytes> changeEvent)   => OnInventoryUpdate(changeEvent);
         IsAlive.OnValueChanged  += (bool prevValue, bool newValue)                      => game.SetPlayerUI(newValue);
     }
@@ -186,14 +186,10 @@ public class PlayerStats : EntityStats
         base.KilledEnemy(died);
         xp.Value += died.level.Value * 5 ;
     }    
-    [Rpc(SendTo.Server)] public override void SetAttackTypeRpc(byte t)
+    [Rpc(SendTo.Server)] public override void SetAttackTypeRpc(byte b)
     {
-        t--;
-        List<Attack> a = Weapon.GetItem(equipment[weapE.Value.eIndex].ToString()).attack;
-        if (0 <= t && t < a.Count)
-            attack.Value = a[t];
-        else 
-            Debug.Log($"[{t}] attack is outside of range (0 - {a.Count})");
+        b--;
+        game.inventory.Quick(b);
     }
     [Rpc(SendTo.Server)] public override void PickedUpRpc(string refItem)
     {

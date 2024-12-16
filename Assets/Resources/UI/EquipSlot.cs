@@ -13,6 +13,8 @@ public class EquipmentSlot : ItemSlot
     */
     [SerializeField] Image placeHolder;
     [SerializeField] public Equipment.Slot slot;
+    static Color ghostC = new Color(1, 1, 1, 0.5f);
+    bool isGhost;
     protected override void ItemUpdate()
     {
         base.ItemUpdate();
@@ -24,5 +26,20 @@ public class EquipmentSlot : ItemSlot
         placeHolder.gameObject.SetActive(empty);
         button.interactable = !empty;
         icon.enabled = !empty;
+        isGhost = false;
+    }
+    public void SetTransparent(bool isTransparent)
+    {
+        if      (!isGhost && isTransparent)
+        {
+            icon.color *= ghostC;
+            isGhost = true;
+        }
+        else if (isGhost && !isTransparent)
+        {
+            icon.color = Item.color;
+            isGhost = false;
+        }
+        // inak sa nemusi menit
     }
 }

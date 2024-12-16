@@ -46,6 +46,7 @@ public class Inventory : MonoBehaviour
     [SerializeField] Vector2 pixelSize = new(1200, 500);
     [SerializeField] bool onGizmos = true;
     [SerializeField] List<ActiveAttackSlot> acSlots;
+    [SerializeField] AttackSlot[] atSlots;
     
     // INVENTORY
     List<ItemSlot> itemSlots = new();
@@ -77,6 +78,8 @@ public class Inventory : MonoBehaviour
     {
         foreach (var slot in acSlots)
             slot.Set();
+        foreach (var atS in atSlots)
+            atS.UnsetAttacks();
     }
     void Sizing()
     {
@@ -239,85 +242,67 @@ public class Inventory : MonoBehaviour
             }
         }
     }
-    public void Equip(Equipment equip)  
+
+    public void Equip (Equipment eq)
     {
-        if (equipSlots.Keys.Contains(equip.slot))
+        if (equipSlots.Keys.Contains(eq.slot))
         {
-            equipSlots[equip.slot].Item = equip;
-            if (equip is Weapon w)
+            equipSlots[eq.slot].Item = eq;
+            if (eq is Weapon w)
             {
-                for (int i = 0; i < w.attack.Count && i < acSlots.Count; i++)
-                    acSlots[i].Set(w.attack[i].type);
-                
-                if (acSlots.Find(s => s.active) == null)
-                    SetQuick(0);
+                int i = -1;
+                switch (w.slot)
+                {
+                    case Equipment.Slot.WeaponL:    i = 1; break;
+                    case Equipment.Slot.WeaponR:    i = 0; break;
+                    case Equipment.Slot.WeaponBoth: 
+                        i = 0;
+                        equipSlots[eq.slot].Item = eq;
+                        equipSlots[eq.slot].SetTransparent(true);
+                        break;
+                }
+                if (i >= 0)
+                    atSlots[i].SetAttacks(w.attack);
             }
-            game.LocalPlayer.SetEquipmentRpc(equip.GetReferency, equip.slot);
+            game.LocalPlayer.SetEquipmentRpc(eq.GetReferency, eq.slot);
         }
     }
-    public void UnEquip(EquipmentSlot equip)
+    public void UnEquip (EquipmentSlot equip)
     {
-        Item eq = equip.Item;
+        Equipment eq = (Equipment)equip.Item;
         if (FreeSpace)
         {
             equip.Item = null;
-            game.LocalPlayer.SetEquipmentRpc("", equip.slot);
             Add(eq.GetReferency);
 
-            if (eq is Weapon w)            
-                for(int i = 0; i < acSlots.Count; i++)
+            if (eq is Weapon w)
+            {
+                 int i = -1;
+                switch (w.slot)
                 {
-                    if (acSlots[i].slot == w.slot)
-                    {
-                        acSlots[i].Set();
-                    }
+                    case Equipment.Slot.WeaponL:    i = 1; break;
+                    case Equipment.Slot.WeaponR:    i = 0; break;
+                    case Equipment.Slot.WeaponBoth: 
+                        i = 0;
+                        equipSlots[eq.slot].Item = eq;
+                        equipSlots[eq.slot].SetTransparent(true);
+                        break;
                 }
-        }
-    }
-    private int last = 0;
-    public void SetQuick(int i)
-    {
-        acSlots[last].SetActive(false);
-        acSlots[i].SetActive(true);
-        last = i;
-    }
-    public void SetAttack(Equipment.Slot slot)
-    {
-        acSlots.FindIndex(ac => ac.slot == slot);
-        //.SetActive(true);
-    }
-    [Serializable] public class ActiveAttackSlot
-    {
-        public string name;
-        [HideInInspector] public Equipment.Slot slot;
-        [field:SerializeField] Image edge;
-        [field:SerializeField] Image background;
-        [field:SerializeField] Image foreground;
+                if (i >= 0)
+                    atSlots[i].UnsetAttacks();
+            }   
 
-        static Color 
-            activeC = new (50f/255f, 103f/255f, 30f/255f), 
-            passiveC = new(64f/255f,  64f/255f, 64f/255f);
-        [HideInInspector] public bool active, show;
-        public void Set(Attack.Type aType)
-        {
-            string aref = FileManager.GetAttackRefferency(aType);
-            foreground.sprite = Resources.Load<Sprite>(aref);
-            Set(true);
+            game.LocalPlayer.SetEquipmentRpc("", equip.slot);
         }
-        public void Set(bool show = false)
+    }
+    public bool Quick(byte b)
+    {
+        if (/*-1 je iba sByte*/b < acSlots.Count && !acSlots[b].active && acSlots[b].show)
         {
-            foreground.gameObject.SetActive(show);
-            this.show = show;
-            if (!show)
-                SetActive(false);
+            acSlots.Find(acS => acS.active).SetActive(false);
+            acSlots[b].SetActive(true);
+            return true;
         }
-        public void SetActive(bool active = true)
-        {
-            if (active)
-                edge.color = activeC;
-            else
-                edge.color = passiveC;
-            this.active = active;
-        }
+        return false;
     }
 }
