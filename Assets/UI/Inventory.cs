@@ -45,12 +45,14 @@ public class Inventory : MonoBehaviour
     [SerializeField] InputActionReference input;
     [SerializeField] Vector2 pixelSize = new(1200, 500);
     [SerializeField] bool onGizmos = true;
-    [SerializeField] List<ActiveAttackSlot> acSlots;
-    [SerializeField] AttackSlot[] atSlots;
+    [SerializeField] List<AttackSlot.Active> acSlots;
+    [SerializeField] AttackSlotScript[] atSlots;
     
     // INVENTORY
     List<ItemSlot> itemSlots = new();
-    [SerializedDictionary("Slot", "SlotObject"), SerializeField]    SerializedDictionary<Equipment.Slot, EquipmentSlot> equipSlots = new();
+    
+    [SerializedDictionary("Slot", "SlotObject"), SerializeField]    
+    SerializedDictionary<Equipment.Slot, EquipmentSlot> equipSlots = new();
     private event Action onSizeChange;
     private GameManager game;
     void Start()
@@ -77,7 +79,7 @@ public class Inventory : MonoBehaviour
     void SetQuicks()
     {
         foreach (var slot in acSlots)
-            slot.Set();
+            slot.Setup();
         foreach (var atS in atSlots)
             atS.UnsetAttacks();
     }
@@ -304,5 +306,29 @@ public class Inventory : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    public void SetActiveAttackType(Attack.Type type, bool active = true)
+    {
+        int b = acSlots.FindAll(acS => acS.show).Count;
+
+        // vypne posledny utok poslednej zbrane
+        if (b == acSlots.Count)
+        {
+            bool disabled = false;
+            for (int i = atSlots.Length-1; 0 < i && !disabled; i--)
+                disabled = atSlots[i].SetActive();
+        }
+    }
+    private void ActiveAttackRefresh()
+    {
+        //int ii = 0;
+        for (int i = 0; i < atSlots.Length; i++)
+        {
+            foreach (var atS in atSlots[i].GetActive())
+            {
+                //acSlots[ii].Set(atSlots[i].)
+            }
+        }
     }
 }

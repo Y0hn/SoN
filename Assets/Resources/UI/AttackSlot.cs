@@ -4,11 +4,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 
-public class AttackSlot : MonoBehaviour
+public class AttackSlotScript : MonoBehaviour
 {
-    [SerializeField] List<PassiveAttackSlot> attackSlots;
-    //[SerializeField] SerializedDictionary<string, Button> buttons;
-
+    [SerializeField] List<AttackSlot.Passive> attackSlots;
     public void SetAttacks(List<Attack> attacks)
     {
         for (int i = 0; i < attackSlots.Count; i++)
@@ -19,7 +17,7 @@ public class AttackSlot : MonoBehaviour
             }
             else
             {
-                attackSlots[i].Set(false);
+                attackSlots[i].Setup(false);
             }
         } 
         gameObject.SetActive(true);
@@ -38,78 +36,103 @@ public class AttackSlot : MonoBehaviour
             
         return selected;
     }
+    public List<AttackSlot.Passive> GetActive()
+    {
+        return attackSlots.FindAll(atS => atS.active);
+    }
+    public bool SetActive(int id = -1, bool active = false)
+    {
+        if (id < 0) id = attackSlots.Count-1;
+        bool prev = attackSlots[id].active;
+        attackSlots[id].SetActive(active);
+        return prev != active;
+    }
 }
-[Serializable] public class PassiveAttackSlot
+[Serializable] public abstract class AttackSlot
 {
     public string name;
     [field:SerializeField] protected Image background;
     [field:SerializeField] protected Image foreground;
-    [field:SerializeField] private Image placeHolder;
-    [field:SerializeField] private Button button;
-
-    static Color 
-        activeC = new (74f/255f, 60f/255f, 27f/255f), 
-        passiveC = new(58f/255f, 39f/255f, 25f/255f);
     [HideInInspector] public bool active, show;
-    public virtual void Set(Attack.Type aType, bool active = false)
-    {
-        string aref = FileManager.GetAttackRefferency(aType);
-        foreground.sprite = Resources.Load<Sprite>(aref);
-        button.onClick.RemoveAllListeners();
-        button.onClick.AddListener(delegate { OnButtonClick(aType); });
-        SetActive(active);
-        Set(true);
-    }
-    public virtual void Set(bool show = false)
-    {
-        foreground.enabled = show;
-        placeHolder.enabled = show;
-        button.interactable = show;
-        if (!show)
-            SetActive(false);
+    public abstract void Setup(bool show = false);
+    public abstract void SetActive(bool active = true);
 
-        this.show = show;
-    }
-    public virtual void SetActive(bool active = true)
+    [Serializable] public class Passive : AttackSlot
     {
-        if (active)
-            background.color = activeC;
-        else
-            background.color = passiveC;
+        [field:SerializeField] protected Image placeHolder;
+        [field:SerializeField] protected Button button;
 
-        this.active = active;
-    }
-    private void OnButtonClick(Attack.Type type)
-    {
+        private static Color 
+            activeC = new (190f/255f,  72f/255f, 31f/255f),      // #BE481F
+            passiveC = new(149f/255f, 100f/255f, 65f/255f);      // #956441
+        public void Set(Attack.Type aType, bool active = false)
+        {
+            string aref = FileManager.GetAttackRefferency(aType);
+            foreground.sprite = Resources.Load<Sprite>(aref);
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(delegate { OnButtonClick(aType); });
+            SetActive(active);
+            Setup(true);
+        }
+        /// <summary>
+        /// Vypina/Zapina zobrazovanie utoku v ramceku
+        /// </summary>
+        /// <param name="show">zap/vyp</param>
+        public override void Setup(bool show = false)
+        {
+            foreground.enabled = show;
+            placeHolder.enabled = show;
+            button.interactable = show;
+            if (!show)
+                SetActive(false);
 
+            this.show = show;
+        }
+        public override void SetActive(bool active = true)
+        {
+            if (active)
+                background.color = activeC;
+            else
+                background.color = passiveC;
+
+            this.active = active;
+        }
+        /// <summary>
+        /// Nastavi aktivny utok pre danu zbran ako tento utok
+        /// </summary>
+        /// <param name="type">Typ utoku zbrane</param>
+        private void OnButtonClick(Attack.Type type)
+        {
+            GameManager.instance.inventory.SetActiveAttackType(type);
+        }
     }
-}
-[Serializable] public class ActiveAttackSlot : PassiveAttackSlot
-{
-    [HideInInspector] public Equipment.Slot slot;
-    [field:SerializeField] protected Image edge;
-    static Color 
-        activeC = new (50f/255f, 103f/255f, 30f/255f), 
-        passiveC = new(64f/255f,  64f/255f, 64f/255f);
-    public void Set(Attack.Type aType)
+    [Serializable] public class Active : AttackSlot
     {
-        string aref = FileManager.GetAttackRefferency(aType);
-        foreground.sprite = Resources.Load<Sprite>(aref);
-        Set(true);
-    }
-    public override void Set(bool show = false)
-    {
-        foreground.gameObject.SetActive(show);
-        this.show = show;
-        if (!show)
-            SetActive(false);
-    }
-    public override void SetActive(bool active = true)
-    {
-        if (active)
-            edge.color = activeC;
-        else
-            edge.color = passiveC;
-        this.active = active;
+        [HideInInspector] public Equipment.Slot slot;
+        [field:SerializeField] protected Image edge;
+        private static Color 
+            activeC = new (50f/255f, 103f/255f, 30f/255f),      // #32671e
+            passiveC = new(64f/255f,  64f/255f, 64f/255f);      // #404040
+        public void Set(Attack.Type aType)
+        {
+            string aref = FileManager.GetAttackRefferency(aType);
+            foreground.sprite = Resources.Load<Sprite>(aref);
+            Setup (true);
+        }
+        public override void Setup (bool show = false)
+        {
+            foreground.gameObject.SetActive(show);
+            this.show = show;
+            if (!show)
+                SetActive(false);
+        }
+        public override void SetActive (bool active = true)
+        {
+            if (active)
+                edge.color = activeC;
+            else
+                edge.color = passiveC;
+            this.active = active;
+        }
     }
 }
