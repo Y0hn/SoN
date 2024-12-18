@@ -6,6 +6,9 @@ using UnityEngine;
 using System;
 using TMPro;
 using System.Linq;
+/// <summary>
+/// Uklada inventar hraca lokalne
+/// </summary>
 public class Inventory : MonoBehaviour
 {
     public static Inventory instance;
@@ -318,17 +321,19 @@ public class Inventory : MonoBehaviour
             bool disabled = false;
             for (int i = atSlots.Length-1; 0 < i && !disabled; i--)
                 disabled = atSlots[i].SetActive();
-        }
+        }        
+
+        ActiveAttackRefresh();
     }
     private void ActiveAttackRefresh()
     {
-        //int ii = 0;
-        for (int i = 0; i < atSlots.Length; i++)
-        {
-            foreach (var atS in atSlots[i].GetActive())
-            {
-                //acSlots[ii].Set(atSlots[i].)
-            }
-        }
+        int ii = 0;
+        for (int i = 0; i < atSlots.Length && ii < acSlots.Count; i++)
+            foreach (var aS in atSlots[i].GetActive())
+                if (aS.active)
+                {
+                    acSlots[ii].SetActive(aS.active);
+                    ii++;
+                }
     }
 }
