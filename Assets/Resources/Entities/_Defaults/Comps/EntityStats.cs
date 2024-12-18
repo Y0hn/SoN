@@ -155,10 +155,10 @@ public abstract class EntityStats : NetworkBehaviour
                 UpdateEquipment(Equipment.GetItem(curr));
             }
 
-            string eq = "Equipment Update/n";
+            string eq = "Equipment Update\n";
             for (int i = 0; i < equipment.Count; i++)
-                eq += $"{i}. Equiped= {equipment[i]!=""} Path= {equipment[i]}/n";
-            Debug.Log(eq);
+                eq += $"{i}. Equiped= {equipment[i]!=""} | Path= {equipment[i]}\n";
+            Debug.Log(eq + $"\n Event.Value= {curr}");
         }
         else
         {

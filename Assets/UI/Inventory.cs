@@ -6,6 +6,7 @@ using UnityEngine;
 using System;
 using TMPro;
 using System.Linq;
+
 /// <summary>
 /// Uklada inventar hraca lokalne
 /// </summary>
@@ -48,8 +49,8 @@ public class Inventory : MonoBehaviour
     [SerializeField] InputActionReference input;
     [SerializeField] Vector2 pixelSize = new(1200, 500);
     [SerializeField] bool onGizmos = true;
-    [SerializeField] List<AttackSlot.Active> acSlots;
-    [SerializeField] AttackSlotScript[] atSlots;
+    [SerializeField] List<AttackSlotActive> acSlots;
+    [SerializeField] PassiveAttackSlotScript[] atSlots;
     
     // INVENTORY
     List<ItemSlot> itemSlots = new();
@@ -81,8 +82,8 @@ public class Inventory : MonoBehaviour
     }
     void SetQuicks()
     {
-        foreach (var slot in acSlots)
-            slot.Setup();
+        foreach (AttackSlotActive slot in acSlots)
+            slot.SetShow();
         foreach (var atS in atSlots)
             atS.UnsetAttacks();
     }
@@ -282,7 +283,7 @@ public class Inventory : MonoBehaviour
 
             if (eq is Weapon w)
             {
-                 int i = -1;
+                int i = -1;
                 switch (w.slot)
                 {
                     case Equipment.Slot.WeaponL:    i = 1; break;
@@ -300,6 +301,7 @@ public class Inventory : MonoBehaviour
             game.LocalPlayer.SetEquipmentRpc("", equip.slot);
         }
     }
+    
     public bool Quick(byte b)
     {
         if (/*-1 je iba sByte*/b < acSlots.Count && !acSlots[b].active && acSlots[b].show)
@@ -311,29 +313,50 @@ public class Inventory : MonoBehaviour
         return false;
     }
 
-    public void SetActiveAttackType(Attack.Type type, bool active = true)
+    public void SetActiveAttackType(sbyte id, bool active = true)
     {
+        bool already = acSlots.Find(acS => acS.id == id) != null;
         int b = acSlots.FindAll(acS => acS.show).Count;
 
-        // vypne posledny utok poslednej zbrane
-        if (b == acSlots.Count)
-        {
-            bool disabled = false;
-            for (int i = atSlots.Length-1; 0 < i && !disabled; i--)
-                disabled = atSlots[i].SetActive();
-        }        
+        if (!already)
+        {            
+            // ziska slot ktory zavolal metodu
+            AttackSlotPassive change = null;
+            for (int i = 0; i < atSlots.Length && change == null; i++)
+                change = atSlots[i].GetSlot(id);
 
-        ActiveAttackRefresh();
-    }
-    private void ActiveAttackRefresh()
-    {
-        int ii = 0;
-        for (int i = 0; i < atSlots.Length && ii < acSlots.Count; i++)
-            foreach (var aS in atSlots[i].GetActive())
-                if (aS.active)
+            if (active)
+            {
+                // vypne posledny utok poslednej zbrane a prepne ho do 
+                if (b >= acSlots.Count)
                 {
-                    acSlots[ii].SetActive(aS.active);
-                    ii++;
+                    for (int i = atSlots.Length-1; 0 < i; i--)
+                    {
+                        int index = atSlots[i].ShutLastActive();
+                        if (index >= 0)
+                            acSlots.Find(acS => acS.id == id).SetShow();
+                    }
+                    b--;
                 }
+                acSlots[b].Set(change.attackType, id);
+            }
+            else
+            {
+                change.SetActive(active);
+                acSlots.Find(acS => acS.id == id).SetShow();
+            }
+            
+            // zoradi utoky od najmensieho id po najvacsie
+            for (int i = 0, y = 0; i < atSlots.Length && y < acSlots.Count; i++)
+                foreach (var aS in atSlots[i].GetActive())
+                {
+                    acSlots[y].Set(aS.attackType, id);
+                    y++;
+                }
+            
+            // ak neni aktivny utok nastavi prvy utok ako aktivny
+            if (acSlots.Find(acS => acS.active) == null)
+                acSlots[0].SetActive();
+        }
     }
 }
