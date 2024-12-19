@@ -41,9 +41,14 @@ public class PlayerController : EntityController
         if (Input.GetKeyDown(KeyCode.P))
             DropRpc();    
     }
-    void Q1(InputAction.CallbackContext context) { ((PlayerStats)stats).SetAttackTypeRpc(1); }
-    void Q2(InputAction.CallbackContext context) { ((PlayerStats)stats).SetAttackTypeRpc(2); }
-    void Q3(InputAction.CallbackContext context) { ((PlayerStats)stats).SetAttackTypeRpc(3); }
+    void Q1(InputAction.CallbackContext context) { Q(1); }
+    void Q2(InputAction.CallbackContext context) { Q(2); }
+    void Q3(InputAction.CallbackContext context) { Q(3); }
+    void Q (byte id)
+    {
+        id--;
+        game.inventory.Quick(id);
+    }
     [Rpc(SendTo.Server)] void DropRpc()
     {
         Vector2 pos = new (transform.position.x + Random.Range(-5, 6), transform.position.y + Random.Range(-5, 6));

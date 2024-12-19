@@ -3,18 +3,26 @@ using UnityEngine;
 using System;
 [Serializable] public abstract class AttackSlot
 {
-    public sbyte id;
+    public byte id;
     [field:SerializeField] protected Image background;
     [field:SerializeField] protected Image foreground;
-    [HideInInspector] public bool active = false, show = false;
-    public abstract void SetShow(bool show = false);
-    public abstract void SetActive(bool active = true);
+    [HideInInspector] public Attack.Type attackType;
+    /*[HideInInspector]*/ public bool active = false, show = false;
+    public virtual void SetShow(bool show = false)
+    {
+        this.show = show;
+        if (!show)
+            SetActive(show);
+    }
+    public virtual void SetActive(bool active = true)
+    {
+        this.active = active;
+    }
 }
 [Serializable] public class AttackSlotPassive : AttackSlot
 {
     [field:SerializeField] protected Image placeHolder;
     [field:SerializeField] protected Button button;
-    [HideInInspector] public Attack.Type attackType;
     private static Color 
         activeC = new (190f/255f,  72f/255f, 31f/255f),      // #BE481F
         passiveC = new(149f/255f, 100f/255f, 65f/255f);      // #956441
@@ -27,7 +35,7 @@ using System;
         attackType = aType;
         SetActive(active);
         SetShow(true);
-        Debug.Log("Active attcak slot setted \naref= " + aref);
+        //Debug.Log("Active attcak slot setted \naref= " + aref);
     }
     /// <summary>
     /// Vypina/Zapina zobrazovanie utoku v ramceku
@@ -35,20 +43,19 @@ using System;
     /// <param name="show">zap/vyp</param>
     public override void SetShow(bool show = false)
     {
+        base.SetShow(show);
         foreground.enabled = show;
         placeHolder.enabled = show;
         button.interactable = show;
-        if (!show)
-            SetActive(false);
-        this.show = show;
     }
     public override void SetActive(bool active = true)
     {
+        if (!show && active) return;
+        base.SetActive(active);
         if (active)
             background.color = activeC;
         else
             background.color = passiveC;
-        this.active = active;
     }
     /// <summary>
     /// Nastavi aktivny utok pre danu zbran ako tento utok
@@ -64,33 +71,57 @@ using System;
 {
     [HideInInspector] public Equipment.Slot slot;
     [field:SerializeField] protected Image edge;
+    private static Action<bool> ChangeActive;
     private static Color 
         activeC = new (50f/255f, 103f/255f, 30f/255f),      // #32671e
         passiveC = new(64f/255f,  64f/255f, 64f/255f);      // #404040
-    public void Set(Attack.Type aType, sbyte id)
+    public WeaponIndex Weapon 
+    { 
+        get 
+        { 
+            sbyte 
+                attack = (sbyte)(id%10), 
+                weapon = (sbyte)(id-attack);
+            attack--;
+            weapon = weapon == 1 ? (sbyte)Equipment.Slot.WeaponR : (sbyte)Equipment.Slot.WeaponL;
+            return new(weapon, attack);
+        } 
+    }
+    public void Set(Attack.Type aType, byte id)
     {
         string aref = FileManager.GetAttackRefferency(aType);
         foreground.sprite = Resources.Load<Sprite>(aref);
+        attackType = aType;
         this.id = id;
         SetShow(true);
-        Debug.Log("Active attcak slot setted \naref= " + aref);
+        //Debug.Log("Active attcak slot setted \naref= " + aref);
+    }
+    public void Select()
+    {
+        SetActive(!active);
+        GameManager.instance.LocalPlayer.SetWeaponIndex(id);
     }
     public override void SetShow (bool show = false)
     {
+        base.SetShow(show);
         foreground.gameObject.SetActive(show);
-        this.show = show;
-        if (!show)
-        {
-            //id = -1;  vytvara Stack ovorflow
-            SetActive(false);
-        }
     }
     public override void SetActive (bool active = true)
     {
+        if (!show && active) return;
+        base.SetActive(active);
+
         if (active)
+        {
             edge.color = activeC;
+            ChangeActive?.Invoke(!active);
+            ChangeActive += SetActive;
+        }
         else
+        {
             edge.color = passiveC;
-        this.active = active;
+            ChangeActive -= SetActive;
+        }
+        //sDebug.Log($"SetActive active= {active} => this.active= {this.active}");
     }
 }

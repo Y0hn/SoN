@@ -57,6 +57,8 @@ public class PlayerStats : EntityStats
     }
     protected override void Update()
     {
+        if (timeToDespawn != 0 && timeToDespawn < Time.time)
+            Despawn();
         if (chatTimer != 0 && chatTimer <= Time.time)
         {
             chatField.SetActive(false);
@@ -104,7 +106,10 @@ public class PlayerStats : EntityStats
         base.SubsOnNetValChanged();
         if (IsServer)
             xpMax.OnValueChanged += (int prev, int newValue) => level.Value++;
-        playerName.OnValueChanged += (FixedString32Bytes prevValue, FixedString32Bytes newValue) => { nameTag.text = newValue.ToString(); };
+        playerName.OnValueChanged += (FixedString32Bytes prevValue, FixedString32Bytes newValue) => 
+        { 
+            nameTag.text = newValue.ToString(); 
+        };
         message.OnValueChanged += (FixedString128Bytes prevValue, FixedString128Bytes newMess) => 
         {
             chatBox.text = newMess.ToString();
@@ -137,9 +142,9 @@ public class PlayerStats : EntityStats
             Debug.Log("Attack value chnged to: " + newValue.ToString());
             inventUI.SetAttack((Equipment.Slot)weapE.Value.eIndex);
         };
-        /*weapE.OnValueChanged += (WeaponIndex prevValue, WeaponIndex newValue) =>
+        weapE.OnValueChanged += (WeaponIndex prevValue, WeaponIndex newValue) =>
         {
-            
+            game.inventory.Quick(newValue);
         };*/
         inventory.OnListChanged += (NetworkListEvent<FixedString64Bytes> changeEvent)   => OnInventoryUpdate(changeEvent);
         IsAlive.OnValueChanged  += (bool prevValue, bool newValue)                      => game.SetPlayerUI(newValue);
@@ -164,6 +169,7 @@ public class PlayerStats : EntityStats
                 break;
         }
     }
+    
     protected override void SetLive(bool alive)
     {
         base.SetLive(alive);
@@ -172,11 +178,19 @@ public class PlayerStats : EntityStats
             game.AnimateUI("isAlive", alive);
         }
     }
-    protected override void Despawn()
+    protected void Despawn()
     {
         coll.enabled = false;
         gameObject.SetActive(false);
     }
+    public virtual void SetWeaponIndex (byte id)
+    {
+        sbyte 
+            att = (sbyte)(id % 10 - 1),
+            wea = id/10 == 1 ? (sbyte)Equipment.Slot.WeaponR : (sbyte)Equipment.Slot.WeaponR;
+        SetWeaponIndex(att, wea);
+    }
+
     public override bool AttackTrigger()
     {
         return base.AttackTrigger();
@@ -186,10 +200,9 @@ public class PlayerStats : EntityStats
         base.KilledEnemy(died);
         xp.Value += died.level.Value * 5 ;
     }    
-    [Rpc(SendTo.Server)] public override void SetAttackTypeRpc(byte b)
+    [Rpc(SendTo.Server)] public override void SetAttackTypeRpc(sbyte b)
     {
-        b--;
-        game.inventory.Quick(b);
+        base.SetAttackTypeRpc(b);
     }
     [Rpc(SendTo.Server)] public override void PickedUpRpc(string refItem)
     {

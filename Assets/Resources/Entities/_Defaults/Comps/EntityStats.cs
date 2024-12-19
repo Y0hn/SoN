@@ -36,11 +36,12 @@ public abstract class EntityStats : NetworkBehaviour
                         protected   NetworkVariable<WeaponIndex> weapE = new(new(-1), NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
 #pragma warning disable IDE0004
     public float HP                     { get => (float)hp.Value/(float)maxHp.Value; }
-#pragma warning restore IDE0004
+#pragma warning restore IDE000
     public virtual Quaternion Rotation  { get => transform.rotation; }
     public NetworkObject NetObject      { get => netObject; }
     public Rigidbody2D RigidBody2D      { get => rb; }
     public Transform AttackPoint        { get => attackPoint; }
+    public Weapon EquipedWeapon         { get => Resources.Load<Weapon>(equipment[weapE.Value.eIndex].ToString()); }
     public AITarget TargetTeam          { get => aiTeam; }
     public Animator Animator            { get => animator.Animator; }
     public Vector2 View                 { get => controller.View; }
@@ -66,23 +67,32 @@ public abstract class EntityStats : NetworkBehaviour
         {
             attack.OnValueChanged += (Attack prevValue, Attack newValue) => 
             {
-                if (weapE.Value.eIndex > 0)
+                if      (Attack.MeleeAttack(newValue.type))
                 {
-                    if      (Attack.MeleeAttack(newValue.type))
-                    {
-                        attackPoint.localPosition = new(attackPoint.localPosition.x, newValue.range);
-                    }
-                    else if (Attack.RangedAttack(newValue.type))
-                    {
-                        Ranged r = Resources.Load<Ranged>(equipment[weapE.Value.eIndex].ToString());
-                        attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
-                    }
+                    attackPoint.localPosition = new(attackPoint.localPosition.x, newValue.range);
+                }
+                else if (Attack.RangedAttack(newValue.type))
+                {
+                    Ranged r = (Ranged)EquipedWeapon;
+                    attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
                 }
             };
-            maxHp.OnValueChanged += (int prevValue, int newValue) => hp.Value = maxHp.Value;
+            weapE.OnValueChanged += (WeaponIndex prevValue, WeaponIndex newValue) =>
+            {
+                if (newValue.Holding)
+                    attack.Value = Weapon.GetItem(equipment[newValue.eIndex].ToString()).attack[newValue.aIndex];
+                else
+                    attack.Value = rase.attack;
+            };
+            maxHp.OnValueChanged += (int prevValue, int newValue) => 
+            {
+                hp.Value = maxHp.Value;
+            };
         }
-
-        equipment.OnListChanged += (NetworkListEvent<FixedString64Bytes> listEvent) => OnEquipmentUpdate(listEvent);
+        equipment.OnListChanged += (NetworkListEvent<FixedString64Bytes> listEvent) => 
+        {
+            OnEquipmentUpdate(listEvent);
+        };
         attack.OnValueChanged   += (Attack prevValue, Attack newValue) => 
         {
             if (newValue.type == Attack.Type.RaseUnnarmed)
@@ -101,7 +111,7 @@ public abstract class EntityStats : NetworkBehaviour
         name = name.Split('(')[0].Trim();
         if (IsServer)
         {
-            attack.Value = new(rase.attack);
+            weapE.Value = new(-1);
 
             maxHp.Value = rase.maxHp;
             hp.Value = maxHp.Value;
@@ -117,18 +127,12 @@ public abstract class EntityStats : NetworkBehaviour
             defence = new(rase.naturalArmor);
             IsAlive.Value = true;
         }
-        else // requesting changed Values from server
-        {
-            foreach (FixedString64Bytes e in equipment)
-                if (e != "")
-                    UpdateEquipment(Equipment.GetItem(e.ToString()));
-        }
         attackPoint.localPosition = new(attackPoint.localPosition.x, attack.Value.range);
     }
     protected virtual void Update()
     {
-        if (timeToDespawn != 0 && timeToDespawn < Time.time)
-            Despawn();
+        if (IsServer && timeToDespawn != 0 && timeToDespawn < Time.time)
+            netObject.Despawn();
     }
     protected virtual void OnHpUpdate()
     {
@@ -143,22 +147,23 @@ public abstract class EntityStats : NetworkBehaviour
 
         if (changeEvent.Type == NetworkListEvent<FixedString64Bytes>.EventType.Value)
         {
-            if (IsServer && curr == "" )
+            // Server prida/uberie defence
+            if (IsServer && Equipment.IsArmor(slot))
             {
-                if      (Equipment.IsArmor(slot))
+                if      (curr == "")
                     defence.Remove(Armor.GetItem(prev));
-                else if (Equipment.IsWeapon(slot))
-                    attack.Value = rase.attack;
+                else
+                    defence.Add(Armor.GetItem(curr));
             }
-            else
+            else if (Equipment.IsWeapon(slot) && !weapE.Value.Holding)
             {
-                UpdateEquipment(Equipment.GetItem(curr));
+                UpdateWeapon(Weapon.GetItem(curr));
             }
 
-            string eq = "Equipment Update\n";
+            /*string eq = "Equipment Update\n";
             for (int i = 0; i < equipment.Count; i++)
                 eq += $"{i}. Equiped= {equipment[i]!=""} | Path= {equipment[i]}\n";
-            Debug.Log(eq + $"\n Event.Value= {curr}");
+            Debug.Log(eq + $"\n Event.Value= {curr}");*/
         }
         else
         {
@@ -166,43 +171,23 @@ public abstract class EntityStats : NetworkBehaviour
             equipment.SetDirty(true);
         }
     }
-    protected virtual void UpdateEquipment(Equipment equip)
+    protected virtual void UpdateWeapon(Weapon w)
     {
-        if      (equip is Armor a)
-        {
-            defence.Add(a);
-        }
-        else if (equip is Weapon w)
-        {
-            if (IsServer) // !Armed
-            {
-                attack.Value = w.attack[0];
-                if (weapE.Value.eIndex < 0)
-                {
-                    sbyte eIndex = (sbyte)equip.slot;
-                    weapE.Value = new(eIndex);
-                }
-            }
-            if (w is Ranged)
-            {
-                Ranged r = Resources.Load<Ranged>(equipment[weapE.Value.eIndex].ToString());
-                attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
-            }
-            Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
-            weaponL.sprite = sprite;
-            weaponL.color = w.color;
-            weaponR.sprite = sprite;
-            weaponR.color = w.color;
-            bool 
+        Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
+        weaponL.sprite = sprite;
+        weaponL.color = w.color;
+        weaponR.sprite = sprite;
+        weaponR.color = w.color;
+        bool 
             R = w.slot == Equipment.Slot.WeaponR,                             
             L = w.slot == Equipment.Slot.WeaponL, 
             B = w.slot == Equipment.Slot.WeaponBoth;
-            weaponR.gameObject.SetActive(R || B); 
-            weaponL.gameObject.SetActive(L || B);
-            float atBlend = (R || B) ? 1 : -1;
-            Animator.SetFloat("atBlend", atBlend);
-        }
+        weaponR.gameObject.SetActive(R || B); 
+        weaponL.gameObject.SetActive(L || B);
+        float atBlend = (R || B) ? 1 : -1;
+        Animator.SetFloat("atBlend", atBlend);
     }
+    
     public virtual bool TakeDamage(Damage damage)
     {
         if (!IsServer) 
@@ -232,6 +217,14 @@ public abstract class EntityStats : NetworkBehaviour
     {
 
     }
+    
+    public virtual void SetWeaponIndex (sbyte attack, sbyte weapon= -1)
+    {
+        if      (weapon < 0 && 0 <= attack)
+            weapE.Value = new (weapE.Value.eIndex, attack);
+        else if (0 <= weapon && 0 <= attack)
+            weapE.Value = new (weapon, attack);
+    }
     protected virtual void SetLive(bool alive)
     {
         if (IsServer && alive)
@@ -250,10 +243,36 @@ public abstract class EntityStats : NetworkBehaviour
     {
 
     }
-    protected virtual void Despawn()
+    protected virtual EntityStats[] MeleeAttack()
     {
-        Destroy(gameObject);
+        List<EntityStats> targetStats = new();
+        Collider2D[] targets = Physics2D.OverlapCircleAll(attackPoint.position, attack.Value.range /*, layer mask */);
+        foreach (Collider2D target in targets)
+            if (target.TryGetComponent(out EntityStats stats))
+                if (stats != this)
+                    targetStats.Add(stats);
+
+        //Debug.Log("Melee Hitted " + targetStats.Count + " targets");
+        return targetStats.ToArray();
     }
+    protected virtual void RangedAttack()
+    {
+        if (weapE.Value.eIndex >= 0 && weapE.Value.aIndex >= 0)
+        {
+            Ranged r = Resources.Load<Ranged>(equipment[weapE.Value.eIndex].ToString());
+            //byte b = (byte)weapE.Value.aIndex;
+            GameObject p = Instantiate(r.GetProjectile, attackPoint.position, Rotation);
+            Projectile pp = p.GetComponent<Projectile>();
+            pp.SetUp(1/attack.Value.rate+0.2f, 0.5f/attack.Value.rate, attack.Value.range, attack.Value.damage, this);
+            NetworkObject netP = p.GetComponent<NetworkObject>();
+            netP.Spawn(true);
+            netP.TrySetParent(transform);
+        }
+        else
+            Debug.Log(weapE.Value.ToString());
+    }
+    
+    // RPSs
     [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot = Equipment.Slot.NoPreference)
     {
         if (slot == Equipment.Slot.NoPreference && reference != "")
@@ -271,41 +290,15 @@ public abstract class EntityStats : NetworkBehaviour
         }
         else if (Attack.RangedAttack(attack.Value.type))
         {
-            if (weapE.Value.eIndex >= 0 && weapE.Value.aIndex >= 0)
-            {
-                Ranged r = Resources.Load<Ranged>(equipment[weapE.Value.eIndex].ToString());
-
-                //byte b = (byte)weapE.Value.aIndex;
-                GameObject p = Instantiate(r.GetProjectile, attackPoint.position, Rotation);
-                Projectile pp = p.GetComponent<Projectile>();
-                pp.SetUp(1/attack.Value.rate+0.2f, 0.5f/attack.Value.rate, attack.Value.range, attack.Value.damage, this);
-
-                NetworkObject netP = p.GetComponent<NetworkObject>();
-                netP.Spawn(true);
-                netP.TrySetParent(transform);
-            }
-            else
-                Debug.Log(weapE.Value.ToString());
+            RangedAttack();
         }
         else 
             Debug.Log($"Player {name} attack type {Enum.GetName(typeof(Attack.Type), attack.Value.type)} not yet defined");
     }
-    protected virtual EntityStats[] MeleeAttack()
-    {
-        List<EntityStats> targetStats = new();
-        Collider2D[] targets = Physics2D.OverlapCircleAll(attackPoint.position, attack.Value.range /*, layer mask */);
-        foreach (Collider2D target in targets)
-            if (target.TryGetComponent(out EntityStats stats))
-                if (stats != this)
-                    targetStats.Add(stats);
-
-        //Debug.Log("Melee Hitted " + targetStats.Count + " targets");
-        return targetStats.ToArray();
-    }
-    [Rpc(SendTo.Server)] public virtual void SetAttackTypeRpc(byte t)
+    [Rpc(SendTo.Server)] public virtual void SetAttackTypeRpc(sbyte t)
     {
         t--;
-        List<Attack> a = ((Weapon)Item.GetItem(equipment[(int)Equipment.Slot.WeaponR].ToString())).attack;
+        List<Attack> a = ((Weapon)Item.GetItem(equipment[weapE.Value.eIndex].ToString())).attack;
         if (a.Count > t)
             attack.Value = a[t];
     }
@@ -469,6 +462,7 @@ public abstract class EntityStats : NetworkBehaviour
 {
     public sbyte eIndex;
     public sbyte aIndex;
+    public bool Holding { get => eIndex >= 0 && 0 <= aIndex;}
     public WeaponIndex(sbyte e, sbyte a = 0)
     {
         eIndex = e;
@@ -546,7 +540,4 @@ public struct BodyEquipment
         references = new();
     }
 }
-public enum AITarget 
-{
-    None, Player, Team_1, Team_2, Team_3, Boss
-}
+public enum AITarget { None, Player, Team_1, Team_2, Team_3, Boss }

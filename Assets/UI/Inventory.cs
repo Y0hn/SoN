@@ -82,8 +82,8 @@ public class Inventory : MonoBehaviour
     }
     void SetQuicks()
     {
-        foreach (AttackSlotActive slot in acSlots)
-            slot.SetShow();
+        foreach (AttackSlotActive acSlot in acSlots)
+            acSlot.SetShow();
         foreach (var atS in atSlots)
             atS.UnsetAttacks();
     }
@@ -295,68 +295,71 @@ public class Inventory : MonoBehaviour
                         break;
                 }
                 if (i >= 0)
+                {
                     atSlots[i].UnsetAttacks();
-            }   
-
+                    ReloadAttacks();
+                }
+            }
             game.LocalPlayer.SetEquipmentRpc("", equip.slot);
         }
     }
     
-    public bool Quick(byte b)
+    public void Quick(byte b)
     {
-        if (/*-1 je iba sByte*/b < acSlots.Count && !acSlots[b].active && acSlots[b].show)
-        {
-            acSlots.Find(acS => acS.active).SetActive(false);
-            acSlots[b].SetActive(true);
-            return true;
-        }
-        return false;
+        if (!acSlots[b].active)
+            acSlots[b].Select();
     }
 
-    public void SetActiveAttackType(sbyte id, bool active = true)
+    public void SetActiveAttackType(byte id, bool active)
     {
         bool already = acSlots.Find(acS => acS.id == id) != null;
         int b = acSlots.FindAll(acS => acS.show).Count;
+        //Debug.Log($"Called set attack id= {id}, active= {active}, already= {already}, b= {b}");
 
-        if (!already)
-        {            
-            // ziska slot ktory zavolal metodu
-            AttackSlotPassive change = null;
-            for (int i = 0; i < atSlots.Length && change == null; i++)
-                change = atSlots[i].GetSlot(id);
-
-            if (active)
+        // ziska slot ktory zavolal metodu
+        AttackSlotPassive change = null;
+        for (int i = 0; i < atSlots.Length && change == null; i++)
+            change = atSlots[i].GetSlot(id);
+        
+        // vypne posledny utok poslednej zbrane
+        if      (active && !already && b == acSlots.Count)
+        {
+            for (int i = atSlots.Length-1; 0 < i; i--)
             {
-                // vypne posledny utok poslednej zbrane a prepne ho do 
-                if (b >= acSlots.Count)
-                {
-                    for (int i = atSlots.Length-1; 0 < i; i--)
-                    {
-                        int index = atSlots[i].ShutLastActive();
-                        if (index >= 0)
-                            acSlots.Find(acS => acS.id == id).SetShow();
-                    }
-                    b--;
-                }
-                acSlots[b].Set(change.attackType, id);
+                int index = atSlots[i].ShutLastActive();
+                if (index >= 0)
+                    acSlots.Find(acS => acS.id == id).SetShow();
             }
-            else
-            {
-                change.SetActive(active);
-                acSlots.Find(acS => acS.id == id).SetShow();
-            }
-            
-            // zoradi utoky od najmensieho id po najvacsie
-            for (int i = 0, y = 0; i < atSlots.Length && y < acSlots.Count; i++)
-                foreach (var aS in atSlots[i].GetActive())
-                {
-                    acSlots[y].Set(aS.attackType, id);
-                    y++;
-                }
-            
-            // ak neni aktivny utok nastavi prvy utok ako aktivny
-            if (acSlots.Find(acS => acS.active) == null)
-                acSlots[0].SetActive();
         }
+
+        // ak je zapnuty a ma sa vypnut tak sa vypne
+        else if (!active && already)
+        {
+            acSlots.Find(acS => acS.id == id).SetShow();
+            change.SetActive(active);
+        }
+        
+        ReloadAttacks();
+    }
+    private void ReloadAttacks()
+    {
+        // vypne vsetky (aj aktivne) utoky v aktivnych slotoch
+        for (int i = 0; i < acSlots.Count; i++)
+            acSlots[i].SetShow();
+
+        // nastavi aktivne utoky od najmensieho id po najvacsie
+        int ii = 0;
+        for (int i = 0; i < atSlots.Length;i++)
+            foreach (AttackSlotPassive aS in atSlots[i].GetActive())
+            {
+                acSlots[ii].Set(aS.attackType, aS.id);
+                ii++;
+            }
+        
+        // ak neni aktivny utok nastavi prvy utok ako aktivny
+        if (acSlots.Find(acS => acS.show) != null && null == acSlots.Find(acS => acS.active))
+            acSlots[0].SetActive();
+
+        Debug.Log("Active slots count " + ii);
     }
 }
