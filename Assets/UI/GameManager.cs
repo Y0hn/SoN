@@ -201,6 +201,7 @@ public class GameManager : MonoBehaviour
 
         //uiPanels["menuUI"].SetActive(false);
         menu.SetUpUI(false);
+        inventory.ReloadAttacks();
 
         playerLives = lives;
     }

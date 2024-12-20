@@ -94,7 +94,11 @@ public class NPStats : EntityStats
     protected void Equip(string equip)
     {
         Equipment e = Equipment.GetItem(equip);
-        equipment[(int)e.slot] = e.GetReferency;
+        sbyte slot = (sbyte)e.slot;
+        equipment[slot] = e.GetReferency;
+
+        if (e is Weapon && !weapE.Value.Holding)
+            weapE.Value = new(slot);
     }
     protected override void OnEquipmentUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
     {

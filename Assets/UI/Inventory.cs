@@ -6,6 +6,7 @@ using UnityEngine;
 using System;
 using TMPro;
 using System.Linq;
+using Unity.VisualScripting;
 
 /// <summary>
 /// Uklada inventar hraca lokalne
@@ -310,7 +311,7 @@ public class Inventory : MonoBehaviour
             acSlots[b].Select();
     }
 
-    public void SetActiveAttackType(byte id, bool active)
+    public void SetActiveAttackType(sbyte id, bool active)
     {
         bool already = acSlots.Find(acS => acS.id == id) != null;
         int b = acSlots.FindAll(acS => acS.show).Count;
@@ -341,7 +342,7 @@ public class Inventory : MonoBehaviour
         
         ReloadAttacks();
     }
-    private void ReloadAttacks()
+    public void ReloadAttacks()
     {
         // vypne vsetky (aj aktivne) utoky v aktivnych slotoch
         for (int i = 0; i < acSlots.Count; i++)
@@ -355,11 +356,12 @@ public class Inventory : MonoBehaviour
                 acSlots[ii].Set(aS.attackType, aS.id);
                 ii++;
             }
-        
-        // ak neni aktivny utok nastavi prvy utok ako aktivny
-        if (acSlots.Find(acS => acS.show) != null && null == acSlots.Find(acS => acS.active))
-            acSlots[0].SetActive();
 
-        Debug.Log("Active slots count " + ii);
+        // ak je miesto nastavi unarmened utok
+        if (acSlots.FindAll(acS => acS.show).Count < acSlots.Count)
+        {
+            acSlots[ii].Set(Attack.Type.RaseUnnarmed, -1);
+        }
+        //Debug.Log("Active slots count " + ii);
     }
 }

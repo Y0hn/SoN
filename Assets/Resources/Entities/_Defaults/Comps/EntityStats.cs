@@ -95,7 +95,24 @@ public abstract class EntityStats : NetworkBehaviour
         };
         attack.OnValueChanged   += (Attack prevValue, Attack newValue) => 
         {
-            if (newValue.type == Attack.Type.RaseUnnarmed)
+            if (newValue.type != Attack.Type.RaseUnnarmed)
+            {
+                Weapon w = EquipedWeapon;
+                Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
+                weaponL.sprite = sprite;
+                weaponL.color = w.color;
+                weaponR.sprite = sprite;
+                weaponR.color = w.color;
+                bool 
+                    R = w.slot == Equipment.Slot.WeaponR,                             
+                    L = w.slot == Equipment.Slot.WeaponL, 
+                    B = w.slot == Equipment.Slot.WeaponBoth;
+                weaponR.gameObject.SetActive(R || B); 
+                weaponL.gameObject.SetActive(L || B);
+                float atBlend = (R || B) ? 1 : -1;
+                Animator.SetFloat("atBlend", atBlend);
+            }
+            else
             {
                 weaponL.gameObject.SetActive(false);
                 weaponR.gameObject.SetActive(false);
@@ -111,7 +128,7 @@ public abstract class EntityStats : NetworkBehaviour
         name = name.Split('(')[0].Trim();
         if (IsServer)
         {
-            weapE.Value = new(-1);
+            attack.Value = new (rase.attack);
 
             maxHp.Value = rase.maxHp;
             hp.Value = maxHp.Value;
@@ -155,11 +172,6 @@ public abstract class EntityStats : NetworkBehaviour
                 else
                     defence.Add(Armor.GetItem(curr));
             }
-            else if (Equipment.IsWeapon(slot) && !weapE.Value.Holding)
-            {
-                UpdateWeapon(Weapon.GetItem(curr));
-            }
-
             /*string eq = "Equipment Update\n";
             for (int i = 0; i < equipment.Count; i++)
                 eq += $"{i}. Equiped= {equipment[i]!=""} | Path= {equipment[i]}\n";
@@ -170,24 +182,7 @@ public abstract class EntityStats : NetworkBehaviour
             Debug.LogWarning("Equipment corrupted");
             equipment.SetDirty(true);
         }
-    }
-    protected virtual void UpdateWeapon(Weapon w)
-    {
-        Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
-        weaponL.sprite = sprite;
-        weaponL.color = w.color;
-        weaponR.sprite = sprite;
-        weaponR.color = w.color;
-        bool 
-            R = w.slot == Equipment.Slot.WeaponR,                             
-            L = w.slot == Equipment.Slot.WeaponL, 
-            B = w.slot == Equipment.Slot.WeaponBoth;
-        weaponR.gameObject.SetActive(R || B); 
-        weaponL.gameObject.SetActive(L || B);
-        float atBlend = (R || B) ? 1 : -1;
-        Animator.SetFloat("atBlend", atBlend);
-    }
-    
+    }    
     public virtual bool TakeDamage(Damage damage)
     {
         if (!IsServer) 
@@ -224,6 +219,8 @@ public abstract class EntityStats : NetworkBehaviour
             weapE.Value = new (weapE.Value.eIndex, attack);
         else if (0 <= weapon && 0 <= attack)
             weapE.Value = new (weapon, attack);
+        else if (attack < 0)
+            weapE.Value = new (-1, -1);
     }
     protected virtual void SetLive(bool alive)
     {

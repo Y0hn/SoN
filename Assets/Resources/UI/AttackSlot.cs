@@ -3,7 +3,7 @@ using UnityEngine;
 using System;
 [Serializable] public abstract class AttackSlot
 {
-    public byte id;
+    public sbyte id;
     [field:SerializeField] protected Image background;
     [field:SerializeField] protected Image foreground;
     [HideInInspector] public Attack.Type attackType;
@@ -87,19 +87,24 @@ using System;
             return new(weapon, attack);
         } 
     }
-    public void Set(Attack.Type aType, byte id)
+    public void Set(Attack.Type aType, sbyte id)
     {
         string aref = FileManager.GetAttackRefferency(aType);
         foreground.sprite = Resources.Load<Sprite>(aref);
         attackType = aType;
         this.id = id;
         SetShow(true);
+
+        // ak neni ziadni iny utok aktivny
+        if (ChangeActive == null)
+            Select();
         //Debug.Log("Active attcak slot setted \naref= " + aref);
     }
     public void Select()
     {
         SetActive(!active);
-        GameManager.instance.LocalPlayer.SetWeaponIndex(id);
+        if (active)
+            GameManager.instance.LocalPlayer.SetWeaponIndex(id);
     }
     public override void SetShow (bool show = false)
     {

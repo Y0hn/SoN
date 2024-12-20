@@ -3,7 +3,6 @@ using Unity.Netcode;
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
-using System.Collections.Generic;
 public class PlayerStats : EntityStats
 {
     /*  ZDEDENE ATRIBUTY
@@ -183,11 +182,15 @@ public class PlayerStats : EntityStats
         coll.enabled = false;
         gameObject.SetActive(false);
     }
-    public virtual void SetWeaponIndex (byte id)
+    public virtual void SetWeaponIndex (sbyte id)
     {
-        sbyte 
-            att = (sbyte)(id % 10 - 1),
-            wea = id/10 == 1 ? (sbyte)Equipment.Slot.WeaponR : (sbyte)Equipment.Slot.WeaponR;
+        sbyte att, wea= -1;
+
+        att = (sbyte)(id % 10 - 1);
+        if (0 <= att)
+            wea = id/10 == 1 ? (sbyte)Equipment.Slot.WeaponR : (sbyte)Equipment.Slot.WeaponL;
+        
+        //Debug.Log($"Setting weapon index to new(att= {att} | wea= {wea})");
         SetWeaponIndex(att, wea);
     }
 
