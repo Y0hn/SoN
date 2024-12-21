@@ -19,6 +19,7 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected GameObject body;
     [SerializeField] protected NetworkObject netObject;
     [SerializeField] protected Transform attackPoint;
+    [SerializeField] protected ColorChainReference color;
     [SerializeField] protected SpriteRenderer weaponR, weaponL;
     [SerializeField] protected NetworkAnimator animator;
     [SerializeField] protected Rigidbody2D rb;
@@ -36,7 +37,7 @@ public abstract class EntityStats : NetworkBehaviour
                         protected   NetworkVariable<WeaponIndex> weapE = new(new(-1), NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
 #pragma warning disable IDE0004
     public float HP                     { get => (float)hp.Value/(float)maxHp.Value; }
-#pragma warning restore IDE000
+#pragma warning restore IDE0004
     public virtual Quaternion Rotation  { get => transform.rotation; }
     public NetworkObject NetObject      { get => netObject; }
     public Rigidbody2D RigidBody2D      { get => rb; }
@@ -45,6 +46,7 @@ public abstract class EntityStats : NetworkBehaviour
     public AITarget TargetTeam          { get => aiTeam; }
     public Animator Animator            { get => animator.Animator; }
     public Vector2 View                 { get => controller.View; }
+    public Color Color                  { get => color.Color; }
     public float ViewAngle              { get => Mathf.Atan2(View.x, View.y); }
     public bool AttackBoth              { get => attack.Value.bothHanded; }
     public bool Armed                   { get => equipment[(int)Equipment.Slot.WeaponL] != "" || "" !=  equipment[(int)Equipment.Slot.WeaponR]; }

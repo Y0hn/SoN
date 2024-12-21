@@ -74,7 +74,8 @@ using System;
     private static Action<bool> ChangeActive;
     private static Color 
         activeC = new (50f/255f, 103f/255f, 30f/255f),      // #32671e
-        passiveC = new(64f/255f,  64f/255f, 64f/255f);      // #404040
+        passiveC = new(64f/255f,  64f/255f, 64f/255f),      // #404040
+        defaultC = new(1f,1f,1f);                           // #ffffff
     public WeaponIndex Weapon 
     { 
         get 
@@ -91,6 +92,10 @@ using System;
     {
         string aref = FileManager.GetAttackRefferency(aType);
         foreground.sprite = Resources.Load<Sprite>(aref);
+        if (id > 0)
+            foreground.color = defaultC;
+        else
+            foreground.color = GameManager.instance.LocalPlayer.Color;
         attackType = aType;
         this.id = id;
         SetShow(true);

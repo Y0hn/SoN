@@ -155,11 +155,13 @@ public class NPStats : EntityStats
     }
     void OnDrawGizmosSelected()
     {
-        float view = rase.view; 
-        List<float> range = new()
+        float view = 0f;
+        List<float> range = new();
+        if (rase != null) 
         {
-            Attack.range
-        };
+            view = rase.view;
+            range.Add(Attack.range);
+        }
         
         foreach (Equipment equipment in setUpEquipment)
             if (equipment is Weapon w)
@@ -169,13 +171,17 @@ public class NPStats : EntityStats
                     range.Add(r);
                 }
         Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(transform.position, view);
+        if (view > 0)
+            Gizmos.DrawWireSphere(transform.position, view);
         Gizmos.color = Color.blue;
         for (int i = 0; i < range.Count; i++)
             Gizmos.DrawWireSphere(transform.position, range[i]);
         Gizmos.color = Color.red;
-        Vector3 v = new(transform.position.x, transform.position.y + range[0], 0);
-        Gizmos.DrawWireSphere(v, rase.attack.range);        
+        if (range.Count > 0)
+        {
+            Vector3 v = new(transform.position.x, transform.position.y + range[0], 0);
+            Gizmos.DrawWireSphere(v, rase.attack.range);        
+        }
     }
 #pragma warning restore IDE0051 // Remove unused private members
     public enum Behavior 
