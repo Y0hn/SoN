@@ -206,8 +206,12 @@ public class GameManager : MonoBehaviour
 
         playerLives = lives;
     }
-    public void Copy()      { GUIUtility.systemCopyBuffer = conn.codeText.text; animatorGameUI.SetTrigger("copy"); }
-    public void AnimateFace(float state)            { animatorGameUI.SetFloat("faceState", state);  }
+    public void Copy()
+    { 
+        GUIUtility.systemCopyBuffer = conn.codeText.text; 
+        animatorGameUI.SetTrigger("copy"); 
+    }
+    public void AnimateFace(float state)            { animatorGameUI.SetFloat("faceState", Mathf.Floor(state*10)/10f);  }
     public void AnimateFace(string action)          { animatorGameUI.SetTrigger(action);            }
     public void AnimateUI(string name, float value) { animatorGameUI.SetFloat(name, value);         }
     public void AnimateUI(string name, bool value)  { animatorGameUI.SetBool(name,value);           }

@@ -22,10 +22,6 @@ public class ColorChainReference : MonoBehaviour
     {
         this.color = color;
         oldColor = color;
-        InvokeChange();
-    }
-    public void InvokeChange()
-    {
         colorChanged?.Invoke(color);
     }
     public virtual Color Color

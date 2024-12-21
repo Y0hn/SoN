@@ -37,6 +37,7 @@ public class PlayerStats : EntityStats
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
     [SerializeField] GameObject chatField;
     [SerializeField] TMP_Text chatBox;
+    [SerializeField] Camera cam;
     //public RpcParams OwnerRPC { get { return RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp); } }
     float chatTimer; const float chatTime = 5.0f;
     Slider xpBar;       // UI nastavene len pre Ownera
@@ -56,8 +57,6 @@ public class PlayerStats : EntityStats
     }
     protected override void Update()
     {
-        if (timeToDespawn != 0 && timeToDespawn < Time.time)
-            Despawn();
         if (chatTimer != 0 && chatTimer <= Time.time)
         {
             chatField.SetActive(false);
@@ -136,17 +135,15 @@ public class PlayerStats : EntityStats
                 game.AnimateFace("got-hit");
             game.AnimateFace(HP);
         };
-        /*attack.OnValueChanged += (Attack prevValue, Attack newValue) => 
-        { 
-            Debug.Log("Attack value chnged to: " + newValue.ToString());
-            inventUI.SetAttack((Equipment.Slot)weapE.Value.eIndex);
-        };
-        weapE.OnValueChanged += (WeaponIndex prevValue, WeaponIndex newValue) =>
+        inventory.OnListChanged += (NetworkListEvent<FixedString64Bytes> changeEvent) => 
         {
-            game.inventory.Quick(newValue);
-        };*/
-        inventory.OnListChanged += (NetworkListEvent<FixedString64Bytes> changeEvent)   => OnInventoryUpdate(changeEvent);
-        IsAlive.OnValueChanged  += (bool prevValue, bool newValue)                      => game.SetPlayerUI(newValue);
+            OnInventoryUpdate(changeEvent);
+        };
+        IsAlive.OnValueChanged  += (bool prevValue, bool newValue) => 
+        {
+            cam.gameObject.SetActive(newValue);
+            game.SetPlayerUI(newValue);
+        };
     }
     protected void OnInventoryUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)  // iba lokalne
     {        
@@ -176,11 +173,6 @@ public class PlayerStats : EntityStats
         {
             game.AnimateUI("isAlive", alive);
         }
-    }
-    protected void Despawn()
-    {
-        coll.enabled = false;
-        gameObject.SetActive(false);
     }
     public virtual void SetWeaponIndex (sbyte id)
     {
