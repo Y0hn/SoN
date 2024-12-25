@@ -16,6 +16,7 @@ rasial attack speed
 # 2/5 TYPES OF ENEMIES 
 ## ENEMY AI
 ### Kaiting
+### AFTER DEATH DISABLE
 
 ### Patrol
 
@@ -26,3 +27,5 @@ rasial attack speed
 # ENEMY AFTER PLAYER KILL
 
 # BOW UPGRADE ANIMATION
+
+# BOW REWARD XP

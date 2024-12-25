@@ -13,10 +13,9 @@ public class GameManager : MonoBehaviour
     void Awake()    { instance = this; }
     [SerializeField] Connector conn;
     [SerializeField] MenuScript menu;
+    [SerializeField] SkillTree skillTree;
     [SerializeField] MenuScript menuScript;
     [SerializeField] Animator animatorGameUI;
-    public Inventory inventory;
-    [HideInInspector] public bool playerLives;
     private bool paused;
     private bool chatting;
     private PlayerStats player;
@@ -52,6 +51,8 @@ public class GameManager : MonoBehaviour
         {"equipment"},
         {"point"},
     */
+    [HideInInspector] public bool playerLives;
+    public Inventory inventory;
     public Vector2 MousePos
     { 
         get 
@@ -177,6 +178,11 @@ public class GameManager : MonoBehaviour
 
         menu.SetUpUI(!active);
         uiPanels["mainCam"].SetActive(!active);
+    }
+    public void LevelUP(byte level, byte skillPoints)
+    {
+        byte avaliableSkillPoints = (byte)(level - skillPoints);
+        skillTree.LevelUP(avaliableSkillPoints);
     }
     public void SetPlayerUI(bool lives = true)
     {

@@ -39,9 +39,10 @@ public class PlayerStats : EntityStats
     [SerializeField] TMP_Text chatBox;
     [SerializeField] Camera cam;
     //public RpcParams OwnerRPC { get { return RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp); } }
-    float chatTimer; const float chatTime = 5.0f;
-    Slider xpBar;       // UI nastavene len pre Ownera
-    int xpMin = 0;
+    protected float chatTimer; const float chatTime = 5.0f;
+    protected Slider xpBar;       // UI nastavene len pre Ownera
+    protected int xpMin = 0;
+    protected byte usedSkillPointCouter;
     protected NetworkVariable<int> xp = new(0);
     protected NetworkVariable<int> xpMax = new(10, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
@@ -143,6 +144,10 @@ public class PlayerStats : EntityStats
         {
             cam.gameObject.SetActive(newValue);
             game.SetPlayerUI(newValue);
+        };
+        level.OnValueChanged += (byte prevValue, byte newValue) =>
+        {
+            game.LevelUP(newValue, usedSkillPointCouter);
         };
     }
     protected void OnInventoryUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)  // iba lokalne
