@@ -30,8 +30,7 @@ public class NPController : EntityController
     }
     protected override void Update()
     {
-        if (!IsServer || path == null) return;
-
+        if (!IsServer || path == null || !stats.IsAlive.Value) return;
 
         if (nextDecisionTimer < Time.time || ForceDecision)
         {

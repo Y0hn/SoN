@@ -69,7 +69,8 @@ public class Projectile : NetworkBehaviour
     {
         if (IsServer && other.TryGetComponent(out EntityStats et) && et != shooter)
         {
-            et.TakeDamage(damage);
+            if (et.TakeDamage(damage))
+                shooter.KilledEnemy(et);
             networkObject.Despawn();
         }
     }

@@ -193,7 +193,9 @@ public abstract class EntityStats : NetworkBehaviour
 
         int newDamage = defence.CalculateDMG(damage, clampedDMG);
         hp.Value -= newDamage;
-        Debug.Log($"Damage {damage.amount} from redused by Rezists to {newDamage}");
+        
+        // if (FileManager.debug)
+        //Debug.Log($"Damage {damage.amount} from redused by Rezists to {newDamage}");
         
         if (hp.Value <= 0)
             IsAlive.Value = false;
