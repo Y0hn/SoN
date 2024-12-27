@@ -56,6 +56,7 @@ public abstract class EntityStats : NetworkBehaviour
     protected float timeToDespawn = 0f;
     protected float atTime = 0;
     private bool clampedDMG = true;
+    public const float RANGED_ANIMATION_DUR = 1.5f, MELEE_ANIMATION_DUR = 1;
     public override void OnNetworkSpawn()
     {
         EntitySetUp();
@@ -97,6 +98,10 @@ public abstract class EntityStats : NetworkBehaviour
         };
         attack.OnValueChanged   += (Attack prevValue, Attack newValue) => 
         {
+            bool 
+                R = false, 
+                L = false, 
+                B = false;
             if (newValue.type != Attack.Type.RaseUnnarmed)
             {
                 Weapon w = EquipedWeapon;
@@ -105,25 +110,32 @@ public abstract class EntityStats : NetworkBehaviour
                 weaponL.color = w.color;
                 weaponR.sprite = sprite;
                 weaponR.color = w.color;
-                bool 
-                    R = w.slot == Equipment.Slot.WeaponR,                             
-                    L = w.slot == Equipment.Slot.WeaponL, 
-                    B = w.slot == Equipment.Slot.WeaponBoth;
-                weaponR.gameObject.SetActive(R || B); 
-                weaponL.gameObject.SetActive(L || B);
+                R = w.slot == Equipment.Slot.WeaponR;
+                L = w.slot == Equipment.Slot.WeaponL;
+                B = w.slot == Equipment.Slot.WeaponBoth;
+            }
+
+            weaponR.gameObject.SetActive(R || B); 
+            weaponL.gameObject.SetActive(L || B);
+            if (IsOwner)
+            {
                 float atBlend = (R || B) ? 1 : -1;
                 Animator.SetFloat("atBlend", atBlend);
             }
-            else
-            {
-                weaponL.gameObject.SetActive(false);
-                weaponR.gameObject.SetActive(false);
-            }
-            Animator.SetFloat("weapon", (float)newValue.type);
-            Animator.SetFloat("atSpeed", newValue.rate);
         };
         IsAlive.OnValueChanged  += (bool prev, bool alive)          => SetLive(alive);
         hp.OnValueChanged       += (int prevValue, int newValue)    => OnHpUpdate();
+    }
+    protected virtual void OwnerSubsOnNetValChanged()
+    {
+        attack.OnValueChanged += (Attack old, Attack now) =>
+        {
+            Animator.SetFloat("weapon", (float)now.type);
+
+            float rate = now.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
+            rate /= now.rate;
+            Animator.SetFloat("atSpeed", rate);
+        };
     }
     protected virtual void EntitySetUp()
     {
@@ -264,13 +276,13 @@ public abstract class EntityStats : NetworkBehaviour
             //byte b = (byte)weapE.Value.aIndex;
             GameObject p = Instantiate(r.GetProjectile, attackPoint.position, Rotation);
             Projectile pp = p.GetComponent<Projectile>();
-            pp.SetUp(1/attack.Value.rate+0.2f, 0.5f/attack.Value.rate, attack.Value.range, attack.Value.damage, this);
+            pp.SetUp(attack.Value.rate, attack.Value.range, attack.Value.damage, this);
             NetworkObject netP = p.GetComponent<NetworkObject>();
             netP.Spawn(true);
             netP.TrySetParent(transform);
         }
         else
-            Debug.Log(weapE.Value.ToString());
+            Debug.Log("cannot do a ranged attack with " + weapE.Value.ToString());
     }
     
     // RPSs

@@ -116,9 +116,10 @@ public class PlayerStats : EntityStats
             chatTimer = Time.time + chatTime;
         };
     }
-    protected void OwnerSubsOnNetValChanged()
+    protected override void OwnerSubsOnNetValChanged()
     {
         if (!IsOwner) return;
+        base.OwnerSubsOnNetValChanged();
         xp.OnValueChanged += (int prevValue, int newValue) => 
         { 
             if (newValue < xpMax.Value)

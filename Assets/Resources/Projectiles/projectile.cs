@@ -75,10 +75,11 @@ public class Projectile : NetworkBehaviour
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members
-    public void SetUp(float fireDelay, float showDelay, float range, Damage damage, EntityStats entityStats)
+    public void SetUp(float attackRate, float range, Damage damage, EntityStats entityStats)
     {
-        delay = fireDelay;
-        graficDelay = showDelay;
+        float timeToAnimate = EntityStats.RANGED_ANIMATION_DUR/attackRate;
+        delay = timeToAnimate * (65f/60f/EntityStats.RANGED_ANIMATION_DUR);
+        graficDelay = timeToAnimate * 0.5f;
         this.range = range;
         this.damage = damage;
         shooter = entityStats;
