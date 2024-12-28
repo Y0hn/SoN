@@ -125,12 +125,24 @@ public abstract class EntityStats : NetworkBehaviour
                 Animator.SetFloat("atBlend", atBlend);
             }
         };
-        IsAlive.OnValueChanged  += (bool prev, bool alive)          => SetLive(alive);
+        IsAlive.OnValueChanged  += (bool prev, bool alive)          => 
+        {
+            if (IsServer && alive)
+                hp.Value = maxHp.Value;
+            hpBar.gameObject.SetActive(alive);
+            coll.enabled = alive;
+            if (!alive)
+            {
+                timeToDespawn = Time.time + 5f;
+
+                OnDeath?.Invoke();
+            }
+        };
         hp.OnValueChanged       += (int prevValue, int newValue)    => OnHpUpdate();
     }
     protected virtual void OwnerSubsOnNetValChanged()
     {
-        // Server or Owner
+        // Server / Owner
         attack.OnValueChanged += (Attack old, Attack now) =>
         {
             Animator.SetFloat("weapon", (float)now.type);
@@ -138,6 +150,10 @@ public abstract class EntityStats : NetworkBehaviour
             float speed = now.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
             speed /= now.AttackTime;
             Animator.SetFloat("atSpeed", speed);
+        };
+        IsAlive.OnValueChanged += (bool old, bool now) =>
+        {            
+            Animator.SetBool("isAlive", now);
         };
     }
     protected virtual void EntitySetUp()
@@ -200,11 +216,11 @@ public abstract class EntityStats : NetworkBehaviour
             equipment.SetDirty(true);
         }
     }    
+    
     public virtual bool TakeDamage(Damage damage)
     {
         if (!IsServer) 
             return false;
-        /*Debug.Log("Called from not server ");*/ 
 
         int newDamage = defence.CalculateDMG(damage, clampedDMG);
         hp.Value -= newDamage;
@@ -231,7 +247,6 @@ public abstract class EntityStats : NetworkBehaviour
     {
 
     }
-    
     public virtual void SetWeaponIndex (sbyte attack, sbyte weapon= -1)
     {
         if      (weapon < 0 && 0 <= attack)
@@ -241,20 +256,7 @@ public abstract class EntityStats : NetworkBehaviour
         else if (attack < 0)
             weapE.Value = new (-1, -1);
     }
-    protected virtual void SetLive(bool alive)
-    {
-        if (IsServer && alive)
-            hp.Value = maxHp.Value;
-        hpBar.gameObject.SetActive(alive);
-        Animator.SetBool("isAlive", alive);
-        coll.enabled = alive;
-        if (!alive)
-        {
-            timeToDespawn = Time.time + 5f;
-            
-            OnDeath?.Invoke();
-        }
-    }
+    
     protected virtual void TryLoadServerData()
     {
 

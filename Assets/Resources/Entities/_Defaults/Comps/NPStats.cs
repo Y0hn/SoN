@@ -144,6 +144,12 @@ public class NPStats : EntityStats
     {
         DC = defence.CallculateDC();
     }
+    
+    
+    public override bool TakeDamage(Damage damage)
+    {
+        return base.TakeDamage(damage);
+    }
     public override void PickedUpRpc(string reference)
     {
         

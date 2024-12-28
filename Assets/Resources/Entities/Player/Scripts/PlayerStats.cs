@@ -142,6 +142,7 @@ public class PlayerStats : EntityStats
         };
         IsAlive.OnValueChanged  += (bool prevValue, bool newValue) => 
         {
+            game.AnimateUI("isAlive", newValue);
             cam.gameObject.SetActive(newValue);
             game.SetPlayerUI(newValue);
         };
@@ -168,15 +169,6 @@ public class PlayerStats : EntityStats
             case NetworkListEvent<FixedString64Bytes>.EventType.Insert:
             default:
                 break;
-        }
-    }
-    
-    protected override void SetLive(bool alive)
-    {
-        base.SetLive(alive);
-        if (IsOwner)
-        {
-            game.AnimateUI("isAlive", alive);
         }
     }
     public virtual void SetWeaponIndex (sbyte id)
