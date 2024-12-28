@@ -25,6 +25,7 @@ public class NPController : EntityController
         if (IsServer)
         {
             sensor.targetChange += SetTarget;
+            stats.OnDeath += sensor.DisableSensor;
             path.endReachedDistance = ((NPStats)stats).AttackDistance;
         }
     }

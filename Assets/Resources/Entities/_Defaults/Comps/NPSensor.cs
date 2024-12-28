@@ -37,6 +37,7 @@ public class NPSensor : NetworkBehaviour
             }
         }
     }
+#pragma warning restore IDE0051 // Remove unused private members
     public void ResetTargeting()
     {
         if (IsServer)
@@ -55,7 +56,13 @@ public class NPSensor : NetworkBehaviour
             Debug.Log("Targeting Reset\nTargets: " + tt);
         }
     }
-#pragma warning restore IDE0051 // Remove unused private members
+    public void DisableSensor()
+    {
+        coll.enabled = false;
+        ClosestTarget = null;
+        inRange.Clear();
+        targetChange.Invoke(ClosestTarget);
+    }
     void FindClosestTarget()
     {
         float d = float.PositiveInfinity;

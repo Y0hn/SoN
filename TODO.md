@@ -12,7 +12,6 @@ rasial attack speed
 ### ENEMY AI
 ```
 Kaiting
-AFTER DEATH DISABLE
 ENEMY AFTER PLAYER KILL
 SHOOTING INACURACY
 Patrol
