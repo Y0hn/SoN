@@ -1,6 +1,5 @@
-
-# SKILL TREE
-## CONTENTS:
+# TO DO LIST
+### SKILL TREE
 ```
 health
 own heath show
@@ -10,19 +9,15 @@ rasial rezists
 rasial movement speed
 rasial attack speed
 ```
-
-# BOSS
-
-# 2/5 TYPES OF ENEMIES 
-## ENEMY AI
-### Kaiting
-### AFTER DEATH DISABLE
-
-### Patrol
-
-# LOOT SYSTEM
-
-# PLAYER AFTER DAETH REAINMATION
-
-# ENEMY AFTER PLAYER KILL
-# SHOOTING INACURACY
+### ENEMY AI
+```
+Kaiting
+AFTER DEATH DISABLE
+ENEMY AFTER PLAYER KILL
+SHOOTING INACURACY
+Patrol
+BOSS
+```
+### 2/5 TYPES OF ENEMIES 
+### LOOT SYSTEM
+### PLAYER AFTER DEATH REAINMATION

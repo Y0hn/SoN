@@ -75,13 +75,14 @@ public class Projectile : NetworkBehaviour
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members
-    public void SetUp(float attackRate, float range, Damage damage, EntityStats entityStats)
+    public void SetUp(Attack attack, EntityStats entityStats)
     {
-        float timeToAnimate = EntityStats.RANGED_ANIMATION_DUR/attackRate;
-        delay = timeToAnimate * (65f/60f/EntityStats.RANGED_ANIMATION_DUR);
-        graficDelay = timeToAnimate * 0.5f;
-        this.range = range;
-        this.damage = damage;
+        delay = attack.AttackTime   * 2/3;
+        graficDelay = delay         * 1/3;
+        damage = attack.damage;
+        range = attack.range;
         shooter = entityStats;
+
+        Debug.Log($"Shoted projectile \nwith attack: {attack}");
     }
 }

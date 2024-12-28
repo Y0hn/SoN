@@ -61,6 +61,7 @@ public abstract class EntityStats : NetworkBehaviour
     {
         EntitySetUp();
         SubsOnNetValChanged();
+        OwnerSubsOnNetValChanged(); 
 
         hpBar.value = hp.Value;
     }
@@ -106,6 +107,7 @@ public abstract class EntityStats : NetworkBehaviour
             {
                 Weapon w = EquipedWeapon;
                 Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
+                Debug.Log($"Setted weapon sprite to \"{w.SpriteRef}\"");
                 weaponL.sprite = sprite;
                 weaponL.color = w.color;
                 weaponR.sprite = sprite;
@@ -128,13 +130,14 @@ public abstract class EntityStats : NetworkBehaviour
     }
     protected virtual void OwnerSubsOnNetValChanged()
     {
+        // Server or Owner
         attack.OnValueChanged += (Attack old, Attack now) =>
         {
             Animator.SetFloat("weapon", (float)now.type);
 
-            float rate = now.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
-            rate /= now.rate;
-            Animator.SetFloat("atSpeed", rate);
+            float speed = now.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
+            speed /= now.AttackTime;
+            Animator.SetFloat("atSpeed", speed);
         };
     }
     protected virtual void EntitySetUp()
@@ -276,7 +279,7 @@ public abstract class EntityStats : NetworkBehaviour
             //byte b = (byte)weapE.Value.aIndex;
             GameObject p = Instantiate(r.GetProjectile, attackPoint.position, Rotation);
             Projectile pp = p.GetComponent<Projectile>();
-            pp.SetUp(attack.Value.rate, attack.Value.range, attack.Value.damage, this);
+            pp.SetUp(attack.Value, this);
             NetworkObject netP = p.GetComponent<NetworkObject>();
             netP.Spawn(true);
             netP.TrySetParent(transform);
@@ -409,9 +412,10 @@ public abstract class EntityStats : NetworkBehaviour
     public Type type;
     public bool bothHanded;
 
-    public readonly bool IsMelee { get => MeleeAttack(type); }
-    public readonly bool IsRanged { get => RangedAttack(type); }
-    public readonly bool IsSet { get => range != 0 && rate != 0; }
+    public readonly float AttackTime { get => 1/rate; }
+    public readonly bool IsMelee    { get => MeleeAttack(type); }
+    public readonly bool IsRanged   { get => RangedAttack(type); }
+    public readonly bool IsSet      { get => range != 0 && rate != 0; }
 
     public Attack (Damage damage, float range, float rate, Type type, bool both = false)
     {
@@ -464,8 +468,9 @@ public abstract class EntityStats : NetworkBehaviour
 
         s += $"Both handed: {bothHanded} | ";
         s += $"Damage: {damage} | ";
-        s += $"Range: {range} | ";
-        s += $"Rate: {rate} ac/s |";
+        s += $"Range: {range} tiles | ";
+        s += $"Rate: {rate} ac/s | ";
+        s += $"Time: {AttackTime} s | ";
         s += $"Attack Type: {Enum.GetName(typeof(Type), type)}";
 
         return s;

@@ -53,7 +53,6 @@ public class PlayerStats : EntityStats
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        OwnerSubsOnNetValChanged();
         TryLoadServerData();
     }
     protected override void Update()

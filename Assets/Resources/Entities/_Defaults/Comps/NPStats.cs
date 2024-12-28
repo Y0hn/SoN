@@ -84,6 +84,11 @@ public class NPStats : EntityStats
             sensor.SetRange(rase.view);
         }
     }
+    protected override void OwnerSubsOnNetValChanged()
+    {
+        if (!IsServer) return;
+        base.OwnerSubsOnNetValChanged();
+    }
     protected virtual void EquipmentSetUp()
     {
         if (!IsServer) return;
@@ -99,6 +104,8 @@ public class NPStats : EntityStats
 
         if (e is Weapon && !weapE.Value.Holding)
             weapE.Value = new(slot);
+
+        Debug.Log($"Equipment {e.name} equiped");
     }
     protected override void OnEquipmentUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
     {

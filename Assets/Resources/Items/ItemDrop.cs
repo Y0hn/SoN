@@ -31,9 +31,8 @@ public class ItemDrop : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         if (item == null) return;
-
-        Item = item;
-        
+        name = name.Split('(')[0];
+        Item = item;        
         Register();
     }
     private void Register()
@@ -41,6 +40,7 @@ public class ItemDrop : NetworkBehaviour
         if (!IsServer || itFoor != null)  return;
         itFoor = new (transform.position, item.GetReferency);
         itemsOnFoor.Add(itFoor);
+        name = name.Split('-')[0] + "-" + item.name;
     }
     public override void OnNetworkDespawn()
     {
