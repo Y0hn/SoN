@@ -15,6 +15,11 @@ public class PassiveAttackSlotScript : MonoBehaviour
         } 
         gameObject.SetActive(true);
     }
+    public void Click(int id)
+    {
+        if (0 <= id && id < attackSlots.FindAll(atS => atS.show).Count)
+            attackSlots[id].OnButtonClick();
+    }
     public void UnsetAttacks()
     {
         SetAttacks(new());
@@ -39,11 +44,16 @@ public class PassiveAttackSlotScript : MonoBehaviour
     }
     public bool SetActive(int id = -1, bool active = false)
     {
-        if (id < 0) id = attackSlots.Count-1;
-        if (id < 0)
+        if      (id == -1) 
+            id = attackSlots.Count-1;
+        else if (id == -2)
+            id = GetActive().Count;
+
+        if (0 <= id && id < attackSlots.FindAll(atS => atS.show).Count)
         {
             bool prev = attackSlots[id].active;
             attackSlots[id].SetActive(active);
+            Debug.Log($"Setted [{id}] Active to \"{active}\"");
             return prev != active;
         }
         return false;

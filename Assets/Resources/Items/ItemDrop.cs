@@ -68,7 +68,7 @@ public class ItemDrop : NetworkBehaviour
 #pragma warning restore IDE0051 // Remove unused private members
     [Rpc(SendTo.Server)] public void PickedUpRpc()
     {
-        Debug.Log($"Item {name} picked up");
+        //Debug.Log($"Item {name} picked up");
         Item = null;
         // nasledne sa objekt znici
     }

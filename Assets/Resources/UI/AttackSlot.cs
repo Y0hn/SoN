@@ -61,7 +61,7 @@ using System;
     /// Nastavi aktivny utok pre danu zbran ako tento utok
     /// </summary>
     /// <param name="type">Typ utoku zbrane</param>
-    private void OnButtonClick()
+    public void OnButtonClick()
     {
         SetActive(!active);
         GameManager.instance.inventory.SetActiveAttackType(id, active);
@@ -88,10 +88,12 @@ using System;
             return new(weapon, attack);
         } 
     }
+    private string aRef;
+    public string Identity { get => aRef; }
     public void Set(Attack.Type aType, sbyte id)
     {
-        string aref = FileManager.GetAttackRefferency(aType);
-        foreground.sprite = Resources.Load<Sprite>(aref);
+        aRef = FileManager.GetAttackRefferency(aType);
+        foreground.sprite = Resources.Load<Sprite>(aRef);
         if (id > 0)
             foreground.color = defaultC;
         else

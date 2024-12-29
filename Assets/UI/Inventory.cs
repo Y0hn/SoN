@@ -228,7 +228,7 @@ public class Inventory : MonoBehaviour
         else
             a += " cannot be added to inventory";
     
-        Debug.Log(a);
+        //Debug.Log(a);
         return add;
     }
     public void Remove(string refItem)
@@ -255,23 +255,34 @@ public class Inventory : MonoBehaviour
         if (equipSlots.Keys.Contains(eq.slot))
         {
             equipSlots[eq.slot].Item = eq;
+
+            game.LocalPlayer.SetEquipmentRpc(eq.GetReferency, eq.slot);
             if (eq is Weapon w)
             {
-                int i = -1;
+                int hand = -1;
                 switch (w.slot)
                 {
-                    case Equipment.Slot.WeaponL:    i = 1; break;
-                    case Equipment.Slot.WeaponR:    i = 0; break;
+                    case Equipment.Slot.WeaponL:    hand = 1; break;
+                    case Equipment.Slot.WeaponR:    hand = 0; break;
                     case Equipment.Slot.WeaponBoth: 
-                        i = 0;
+                        hand = 0;
                         equipSlots[eq.slot].Item = eq;
                         equipSlots[eq.slot].SetTransparent(true);
                         break;
                 }
-                if (i >= 0)
-                    atSlots[i].SetAttacks(w.attack);
+                if (hand >= 0)
+                    atSlots[hand].SetAttacks(w.attack);
+
+                // Auto sett attack
+                int free = acSlots.Count - acSlots.FindAll(acS => acS.show).Count; 
+                //Debug.Log($"acSlots.Count = {acSlots.Count} & acSlots.FindAll(acS => acS.show).Count = {acSlots.FindAll(acS => acS.show).Count}");   
+
+                // nastavi prny volny            
+                for (int slot = 0; slot < free; slot++)
+                    atSlots[hand].Click(slot);
+                if (0 < free)
+                    ReloadAttacks();
             }
-            game.LocalPlayer.SetEquipmentRpc(eq.GetReferency, eq.slot);
         }
     }
     public void UnEquip (EquipmentSlot equip)
@@ -282,6 +293,7 @@ public class Inventory : MonoBehaviour
             equip.Item = null;
             Add(eq.GetReferency);
 
+            game.LocalPlayer.SetEquipmentRpc("", equip.slot);
             if (eq is Weapon w)
             {
                 int i = -1;
@@ -292,7 +304,7 @@ public class Inventory : MonoBehaviour
                     case Equipment.Slot.WeaponBoth: 
                         i = 0;
                         equipSlots[eq.slot].Item = eq;
-                        equipSlots[eq.slot].SetTransparent(true);
+                        equipSlots[eq.slot].SetTransparent(false);
                         break;
                 }
                 if (i >= 0)
@@ -301,7 +313,6 @@ public class Inventory : MonoBehaviour
                     ReloadAttacks();
                 }
             }
-            game.LocalPlayer.SetEquipmentRpc("", equip.slot);
         }
     }
     
@@ -344,11 +355,14 @@ public class Inventory : MonoBehaviour
     }
     public void ReloadAttacks()
     {
+        // ziska prechadzjuci aktivny utok
+        string prev = acSlots.Find(acS => acS.active)?.Identity;
+
         // vypne vsetky (aj aktivne) utoky v aktivnych slotoch
         for (int i = 0; i < acSlots.Count; i++)
             acSlots[i].SetShow();
 
-        // nastavi aktivne utoky od najmensieho id po najvacsie
+        // nastavi aktivnym utokom parametre od najmensieho po najvacsi pasivny utok
         int ii = 0;
         for (int i = 0; i < atSlots.Length;i++)
             foreach (AttackSlotPassive aS in atSlots[i].GetActive())
@@ -362,6 +376,8 @@ public class Inventory : MonoBehaviour
         {
             acSlots[ii].Set(Attack.Type.RaseUnnarmed, -1);
         }
-        //Debug.Log("Active slots count " + ii);
+
+        // ak je stale povodny utok zapnuty tak zostane zapnuty
+        acSlots.Find(acS => acS.Identity == prev)?.SetActive();
     }
 }

@@ -84,7 +84,14 @@ public abstract class EntityStats : NetworkBehaviour
             weapE.OnValueChanged += (WeaponIndex prevValue, WeaponIndex newValue) =>
             {
                 if (newValue.Holding)
-                    attack.Value = Weapon.GetItem(equipment[newValue.eIndex].ToString()).attack[newValue.aIndex];
+                {
+                    try {
+                        attack.Value = Weapon.GetItem(equipment[newValue.eIndex].ToString()).attack[newValue.aIndex];
+                    } catch (Exception ex) {
+                        Debug.LogWarning("Equipment not set\n" + ex.Message);
+                    }
+
+                }
                 else
                     attack.Value = rase.attack;
             };
@@ -107,7 +114,7 @@ public abstract class EntityStats : NetworkBehaviour
             {
                 Weapon w = EquipedWeapon;
                 Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
-                Debug.Log($"Setted weapon sprite to \"{w.SpriteRef}\"");
+                //Debug.Log($"Setted weapon sprite to \"{w.SpriteRef}\"");
                 weaponL.sprite = sprite;
                 weaponL.color = w.color;
                 weaponR.sprite = sprite;
