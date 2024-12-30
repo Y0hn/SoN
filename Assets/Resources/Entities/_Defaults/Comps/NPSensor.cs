@@ -111,6 +111,7 @@ public class NPSensor : NetworkBehaviour
         coll.radius = r;
     }
 }
+#if UNITY_EDITOR
 [CustomEditor(typeof(NPSensor))]
 public class MyButtonExampleEditor : Editor
 {
@@ -128,3 +129,4 @@ public class MyButtonExampleEditor : Editor
         }
     }
 }
+#endif
