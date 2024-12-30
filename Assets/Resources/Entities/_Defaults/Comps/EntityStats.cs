@@ -6,7 +6,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using TMPro;
-using Unity.VisualScripting;
 /// <summary>
 /// Drzi hodnoty pre entitu
 /// </summary>
@@ -33,7 +32,7 @@ public abstract class EntityStats : NetworkBehaviour
                         public      NetworkVariable<float> speed = new();
                         public      NetworkVariable<byte> level = new(1);
                         public      NetworkVariable<bool> IsAlive = new(true);
-                        protected   NetworkVariable<Attack> attack = new();
+                        protected   NetworkVariable<Attack> weaponAttack = new();
                         protected   NetworkVariable<WeaponIndex> weapE = new(new(-1), NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
 #pragma warning disable IDE0004
     public float HP                     { get => (float)hp.Value/(float)maxHp.Value; }
@@ -48,14 +47,35 @@ public abstract class EntityStats : NetworkBehaviour
     public Vector2 View                 { get => controller.View; }
     public Color Color                  { get => color.Color; }
     public float ViewAngle              { get => Mathf.Atan2(View.x, View.y); }
-    public bool AttackBoth              { get => attack.Value.bothHanded; }
+    public bool AttackBoth              { get => weaponAttack.Value.bothHanded; }
     public bool Armed                   { get => equipment[(int)Equipment.Slot.WeaponL] != "" || "" !=  equipment[(int)Equipment.Slot.WeaponR]; }
+    public virtual Defence Defence      
+    { 
+        get 
+        { 
+            if (IsServer) 
+                return defence; 
+            else
+                return new();
+        } 
+    }
+    public virtual Attack Attack        
+    { 
+        get 
+        {
+            if (IsServer)
+                return weaponAttack.Value;
+            else
+                return new();
+        }
+    }
     public Action OnDeath;
 
     protected Defence defence;  // iba na servery/hoste
+
     protected float timeToDespawn = 0f;
     protected float atTime = 0;
-    private bool clampedDMG = true;
+    //private bool clampedDMG = true;
     public const float RANGED_ANIMATION_DUR = 1.5f, MELEE_ANIMATION_DUR = 1;
     public override void OnNetworkSpawn()
     {
@@ -69,7 +89,7 @@ public abstract class EntityStats : NetworkBehaviour
     {
         if (IsServer)
         {
-            attack.OnValueChanged += (Attack prevValue, Attack newValue) => 
+            weaponAttack.OnValueChanged += (Attack prevValue, Attack newValue) => 
             {
                 if      (Attack.MeleeAttack(newValue.type))
                 {
@@ -86,14 +106,14 @@ public abstract class EntityStats : NetworkBehaviour
                 if (newValue.Holding)
                 {
                     try {
-                        attack.Value = Weapon.GetItem(equipment[newValue.eIndex].ToString()).attack[newValue.aIndex];
+                        weaponAttack.Value = Weapon.GetItem(equipment[newValue.eIndex].ToString()).attack[newValue.aIndex];
                     } catch (Exception ex) {
                         Debug.LogWarning("Equipment not set\n" + ex.Message);
                     }
 
                 }
                 else
-                    attack.Value = rase.attack;
+                    weaponAttack.Value = rase.attack;
             };
             maxHp.OnValueChanged += (int prevValue, int newValue) => 
             {
@@ -104,7 +124,7 @@ public abstract class EntityStats : NetworkBehaviour
         {
             OnEquipmentUpdate(listEvent);
         };
-        attack.OnValueChanged   += (Attack prevValue, Attack newValue) => 
+        weaponAttack.OnValueChanged   += (Attack prevValue, Attack newValue) => 
         {
             bool 
                 R = false, 
@@ -150,7 +170,7 @@ public abstract class EntityStats : NetworkBehaviour
     protected virtual void OwnerSubsOnNetValChanged()
     {
         // Server / Owner
-        attack.OnValueChanged += (Attack old, Attack now) =>
+        weaponAttack.OnValueChanged += (Attack old, Attack now) =>
         {
             Animator.SetFloat("weapon", (float)now.type);
 
@@ -168,7 +188,7 @@ public abstract class EntityStats : NetworkBehaviour
         name = name.Split('(')[0].Trim();
         if (IsServer)
         {
-            attack.Value = new (rase.attack);
+            weaponAttack.Value = new (rase.attack);
 
             maxHp.Value = rase.maxHp;
             hp.Value = maxHp.Value;
@@ -184,7 +204,7 @@ public abstract class EntityStats : NetworkBehaviour
             defence = new(rase.naturalArmor);
             IsAlive.Value = true;
         }
-        attackPoint.localPosition = new(attackPoint.localPosition.x, attack.Value.range);
+        attackPoint.localPosition = new(attackPoint.localPosition.x, weaponAttack.Value.range);
     }
     protected virtual void Update()
     {
@@ -229,7 +249,7 @@ public abstract class EntityStats : NetworkBehaviour
         if (!IsServer) 
             return false;
 
-        int newDamage = defence.CalculateDMG(damage, clampedDMG);
+        int newDamage = defence.CalculateDMG(damage);
         hp.Value -= newDamage;
         
         // if (FileManager.debug)
@@ -245,7 +265,7 @@ public abstract class EntityStats : NetworkBehaviour
         if (Time.time >= atTime)
         {
             AttackRpc();
-            atTime = Time.time + 1/attack.Value.rate;
+            atTime = Time.time + 1/weaponAttack.Value.rate;
             return true;
         }
         return false;
@@ -271,7 +291,7 @@ public abstract class EntityStats : NetworkBehaviour
     protected virtual EntityStats[] MeleeAttack()
     {
         List<EntityStats> targetStats = new();
-        Collider2D[] targets = Physics2D.OverlapCircleAll(attackPoint.position, attack.Value.range /*, layer mask */);
+        Collider2D[] targets = Physics2D.OverlapCircleAll(attackPoint.position, weaponAttack.Value.range /*, layer mask */);
         foreach (Collider2D target in targets)
             if (target.TryGetComponent(out EntityStats stats))
                 if (stats != this)
@@ -288,7 +308,7 @@ public abstract class EntityStats : NetworkBehaviour
             //byte b = (byte)weapE.Value.aIndex;
             GameObject p = Instantiate(r.GetProjectile, attackPoint.position, Rotation);
             Projectile pp = p.GetComponent<Projectile>();
-            pp.SetUp(attack.Value, this);
+            pp.SetUp(Attack, this);
             NetworkObject netP = p.GetComponent<NetworkObject>();
             netP.Spawn(true);
             netP.TrySetParent(transform);
@@ -307,25 +327,18 @@ public abstract class EntityStats : NetworkBehaviour
     [Rpc(SendTo.Server)] protected virtual void AttackRpc()
     {
         //Debug.Log("SERVER RPC attack !");
-        if      (Attack.MeleeAttack(attack.Value.type))
+        if      (Attack.MeleeAttack(Attack.type))
         {
             foreach(EntityStats et in MeleeAttack())
-                if (et.IsAlive.Value && et.TakeDamage(attack.Value.damage))    // pravdive ak target zomrie
+                if (et.IsAlive.Value && et.TakeDamage(Attack.damage))    // pravdive ak target zomrie
                     KilledEnemy(et);
         }
-        else if (Attack.RangedAttack(attack.Value.type))
+        else if (Attack.RangedAttack(Attack.type))
         {
             RangedAttack();
         }
         else 
-            Debug.Log($"Player {name} attack type {Enum.GetName(typeof(Attack.Type), attack.Value.type)} not yet defined");
-    }
-    [Rpc(SendTo.Server)] public virtual void SetAttackTypeRpc(sbyte t)
-    {
-        t--;
-        List<Attack> a = ((Weapon)Item.GetItem(equipment[weapE.Value.eIndex].ToString())).attack;
-        if (a.Count > t)
-            attack.Value = a[t];
+            Debug.Log($"Player {name} attack type {Enum.GetName(typeof(Attack.Type), Attack.type)} not yet defined");
     }
     [Rpc(SendTo.Server)] public virtual void PickedUpRpc(string reference)
     {
@@ -345,20 +358,39 @@ public abstract class EntityStats : NetworkBehaviour
         armors = new();
         Add(armor);
     }
-    public int CalculateDMG(Damage damage, bool clamp = true)
+    public int CalculateDMG(Damage damage, Armor.Resistance additionalRezists = null, bool clamp = true)
+    {
+        List<Armor.Resistance> list = GetElementalResistances(damage.type);
+        if (additionalRezists != null)
+            list.Add(additionalRezists);
+        ResistanceCalculator(ref list, out float sum, out float per);
+        return DamageCalculator(damage.amount, sum, per, clamp);
+    }
+    private List<Armor.Resistance> GetElementalResistances(Damage.Type type)
+    {
+        List<Armor.Resistance> list = new();        
+        armors.ForEach(a=> list.AddRange(a.GetElemental(type)));
+        return list;
+    }
+    private void ResistanceCalculator(ref List<Armor.Resistance> resistances, out float sumary, out float percentil)
     {
         float sum = 0f, per = 0f;
 
-        armors.ForEach(a=> a.GetElemental(damage.type).ForEach(r=>  // vyberie len 1 damage type
+        resistances.ForEach(r=>
         {   if (r.amount < 1)
-                per = (per < r.amount && r.amount < 1) ? r.amount: per;     // scita Pocetny rezisty
+                per = (per < r.amount && r.amount < 1) ? r.amount: per;     // scita Pocetne rezisty
             else
-                sum += (r.amount > 1) ? r.amount : 0f;                      // najvacsi percentualny Rezist
-        }));
-        per *= damage.amount;  // nastavi ciselnu vysku 
+                sum += (r.amount > 1) ? r.amount : 0f;                      // najvacsi percentualne Rezisty
+        });
 
-
-        int recieved = Mathf.RoundToInt(damage.amount - (sum + per));
+        // out sa neda pouzit v Lambda expresii
+        sumary = sum;
+        percentil = per;
+    }
+    private int DamageCalculator(int damageAmount, float sum, float percentil, bool clamp)
+    {
+        percentil *= damageAmount;  // nastavi ciselnu vysku 
+        int recieved = Mathf.RoundToInt(damageAmount - (sum + percentil));
         if (clamp)
             recieved = Math.Clamp(recieved, 0, int.MaxValue);
         return recieved;
@@ -455,6 +487,10 @@ public abstract class EntityStats : NetworkBehaviour
     {
         return Type.BowSingle == t || t == Type.BowMulti;
     }
+    public void AddDamage(Damage damage)
+    {
+        damage.Add(damage);
+    }
     public bool Equals (Attack other)
     {
         return
@@ -514,6 +550,11 @@ public abstract class EntityStats : NetworkBehaviour
         this.type = type;
         this.amount = amount;
     }
+    public void Add(Damage damage)
+    {
+        if (type == damage.type)
+            amount += damage.amount;
+    }
     [Serializable] public enum Type
     {
         // STANDARD
@@ -545,26 +586,6 @@ public abstract class EntityStats : NetworkBehaviour
             s += amount.ToString() + " %";
 
         return s;
-    }
-}
-public struct BodyEquipment
-{
-    public Dictionary<Equipment.Slot, string> references;/* = new()
-    {
-        {Equipment.Slot.WeaponL,    ""},
-        {Equipment.Slot.WeaponR,    ""},
-        {Equipment.Slot.WeaponBoth, ""},
-        //references.Add(Equipment.Slot.NoPreference,"");
-
-        {Equipment.Slot.Head,       ""},
-        {Equipment.Slot.Torso,      ""},
-        {Equipment.Slot.Body,       ""},
-        {Equipment.Slot.Legs,       ""}
-    };*/
-
-    public BodyEquipment(string s)
-    {
-        references = new();
     }
 }
 public enum AITarget { None, Player, Team_1, Team_2, Team_3, Boss }

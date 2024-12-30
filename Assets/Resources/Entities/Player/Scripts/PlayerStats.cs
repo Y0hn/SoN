@@ -43,13 +43,31 @@ public class PlayerStats : EntityStats
     protected Slider xpBar;       // UI nastavene len pre Ownera
     protected int xpMin = 0;
     protected byte usedSkillPointCouter;
-    protected NetworkVariable<int> xp = new(0);
-    protected NetworkVariable<int> xpMax = new(10, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
-    public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected GameManager game;
     protected Inventory inventUI;
+            protected NetworkVariable<int> xp = new(0);
+            protected NetworkVariable<int> xpMax = new(10, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+            protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
+            protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+            public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    
+    protected SkillTree skillTree;
+   
+    public override Attack Attack 
+    { 
+        get { 
+            Attack a = new(base.Attack);
+            if (a.IsSet)
+                a.AddDamage(skillTree.GetDamage(base.Attack.damage.type)); 
+            return a;
+        } 
+    }
+    public override Defence Defence
+    {
+        get {
+            return base.Defence;
+        }
+    }
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -94,6 +112,7 @@ public class PlayerStats : EntityStats
         }
         chatTimer = 0;
         chatBox.text = "";
+        skillTree = new();
         chatField.SetActive(false);
         name = playerName.Value.ToString();
         nameTag.text = name;
@@ -182,7 +201,22 @@ public class PlayerStats : EntityStats
         //Debug.Log($"Setting weapon index to new(att= {att} | wea= {wea})");
         SetWeaponIndex(att, wea);
     }
+    public override bool TakeDamage(Damage damage)
+    {
+        if (!IsServer) 
+            return false;
 
+        int newDamage = defence.CalculateDMG(damage, skillTree.GetResist(damage.type));
+        hp.Value -= newDamage;
+        
+        // if (FileManager.debug)
+        //Debug.Log($"Damage {damage.amount} from redused by Rezists to {newDamage}");
+        
+        if (hp.Value <= 0)
+            IsAlive.Value = false;
+
+        return !IsAlive.Value;
+    }
     public override bool AttackTrigger()
     {
         return base.AttackTrigger();
@@ -192,10 +226,6 @@ public class PlayerStats : EntityStats
         base.KilledEnemy(died);
         xp.Value += died.level.Value * 5 ;
     }    
-    [Rpc(SendTo.Server)] public override void SetAttackTypeRpc(sbyte b)
-    {
-        base.SetAttackTypeRpc(b);
-    }
     [Rpc(SendTo.Server)] public override void PickedUpRpc(string refItem)
     {
         inventory.Add(refItem);

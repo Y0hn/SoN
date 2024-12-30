@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     void Awake()    { instance = this; }
     [SerializeField] Connector conn;
     [SerializeField] MenuScript menu;
-    [SerializeField] SkillTree skillTree;
+    [SerializeField] SkillPanel skillTree;
     [SerializeField] MenuScript menuScript;
     [SerializeField] Animator animatorGameUI;
     private bool paused;

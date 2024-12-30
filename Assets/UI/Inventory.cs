@@ -378,6 +378,6 @@ public class Inventory : MonoBehaviour
         }
 
         // ak je stale povodny utok zapnuty tak zostane zapnuty
-        acSlots.Find(acS => acS.Identity == prev)?.SetActive();
+        acSlots.Find(acS => acS.Identity == prev)?.Select();
     }
 }

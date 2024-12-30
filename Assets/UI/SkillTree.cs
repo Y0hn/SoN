@@ -1,6 +1,10 @@
+using Unity.Netcode;
 using UnityEngine;
+using System.Collections.Generic;
+using System;
 using TMPro;
-public class SkillTree : MonoBehaviour
+using Unity.Collections;
+public class SkillPanel : MonoBehaviour
 {
     [SerializeField] TMP_Text skillCounterText;
     [SerializeField] Transform skills;

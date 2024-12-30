@@ -56,12 +56,12 @@ public class NPStats : EntityStats
                 return 0f;
         }
     }
-    protected Attack Attack     
+    public override Attack Attack     
     { 
         get 
         { 
-            if (attack.Value.IsSet) 
-                return attack.Value; 
+            if (weaponAttack.Value.IsSet) 
+                return weaponAttack.Value; 
             else
                 return rase.attack;
         } 

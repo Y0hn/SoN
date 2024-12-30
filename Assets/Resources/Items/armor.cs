@@ -26,5 +26,10 @@ public class Armor : Equipment
     {
         public float amount;
         [SerializeField] public Damage.Type defenceType;
+        public Resistance (Damage.Type type, float amount)
+        {
+            defenceType = type;
+            this.amount = amount;
+        }
     }
 }
