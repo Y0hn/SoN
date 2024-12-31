@@ -66,6 +66,7 @@ public class GameManager : MonoBehaviour
         }
     }
     public PlayerStats LocalPlayer  { get => player; } 
+    public SkillPanel SkillTree     { get => skillTree; }
     public bool PlayerAble          { get => !(paused || chatting || inventory.open); }
     public string PlayerName        { get { return inputFields["name"].text.Trim(); } set { inputFields["name"].text = value; } }
     public static MenuScript UI     { get => instance.menuScript; }
