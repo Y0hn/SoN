@@ -1,7 +1,10 @@
 using UnityEngine;
 using TMPro;
+using System;
 public class SkillPanel : MonoBehaviour
 {
+    public Action<bool> OnAvailablePoints;
+    public bool AvailablePoints => 0 < freePointCouter;
     [SerializeField] TMP_Text skillCounterText;
     [SerializeField] Transform skills;
     [SerializeField] HoldButton button;
@@ -12,6 +15,7 @@ public class SkillPanel : MonoBehaviour
 
     Vector2[] limits = new Vector2[2];
     Vector2 startMouse;
+    byte usedPointsCounter = 0, freePointCouter = 0;
     void Awake()
     {
         button.onEnterHold += delegate
@@ -19,6 +23,7 @@ public class SkillPanel : MonoBehaviour
             startMouse = game.MousePos;
         };
         CalculateLimits();
+        skillCounterText.text = freePointCouter.ToString();
     }
     void FixedUpdate()
     {
@@ -40,9 +45,18 @@ public class SkillPanel : MonoBehaviour
             Mathf.Round(transform.position.y+limitPosition.x-limitOffset.x), 
             Mathf.Round(transform.position.y+limitPosition.y-limitOffset.y));
     }
-    public void LevelUP (byte skillCounter)
+    public void LevelUP (byte level)
     {
-        skillCounterText.text = skillCounter.ToString();
+        freePointCouter = (byte)(level - usedPointsCounter);
+        skillCounterText.text = freePointCouter.ToString();
+        OnAvailablePoints?.Invoke(AvailablePoints);
+    }
+    public void SkillPointAplied()
+    {
+        usedPointsCounter++;
+        freePointCouter--;
+        skillCounterText.text = freePointCouter.ToString();
+        OnAvailablePoints?.Invoke(AvailablePoints);
     }
     public void MoveSkills (Vector2 moveBy)
     {

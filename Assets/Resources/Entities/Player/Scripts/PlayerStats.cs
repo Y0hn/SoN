@@ -42,7 +42,6 @@ public class PlayerStats : EntityStats
     protected float chatTimer; const float chatTime = 5.0f;
     protected Slider xpBar;       // UI nastavene len pre Ownera
     protected int xpMin = 0;
-    protected byte usedSkillPointCouter;
     protected GameManager game;
     protected Inventory inventUI;
             protected NetworkVariable<int> xp = new(0);
@@ -51,7 +50,7 @@ public class PlayerStats : EntityStats
             protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
             public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     
-    protected SkillTree skillTree;
+    protected SkillTree skillTree;  // iba na servery
    
     public override Attack Attack 
     { 
@@ -167,7 +166,7 @@ public class PlayerStats : EntityStats
         };
         level.OnValueChanged += (byte prevValue, byte newValue) =>
         {
-            game.LevelUP(newValue, usedSkillPointCouter);
+            game.LevelUP(newValue);
         };
     }
     protected void OnInventoryUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)  // iba lokalne
@@ -229,5 +228,13 @@ public class PlayerStats : EntityStats
     [Rpc(SendTo.Server)] public override void PickedUpRpc(string refItem)
     {
         inventory.Add(refItem);
+    }
+    [Rpc(SendTo.Server)] public virtual void AddSkillRpc(SkillTree.Skill skill)
+    {
+        skillTree.Add(skill);
+    }
+    [Rpc(SendTo.Server)] public void AddXPRpc(int xp)
+    {
+        this.xp.Value += xp;
     }
 }

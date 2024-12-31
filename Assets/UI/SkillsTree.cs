@@ -71,6 +71,10 @@ using Unity.Netcode;
     [Serializable] public class Skill : INetworkSerializable
     {
         public string name;
+        public Skill ()
+        {
+            name = "";
+        }
         public Skill (string n)
         {
             name = n;
@@ -83,10 +87,15 @@ using Unity.Netcode;
     [Serializable] public class Health : Skill
     {
         public int amount;
+        public Health ()
+        {
+            amount = 0;
+        }
         public Health (string n, int a) : base (n)
         {
             amount = a;
         }
+
         public override void NetworkSerialize<T>(BufferSerializer<T> serializer)
         {
             base.NetworkSerialize(serializer);
@@ -105,7 +114,11 @@ using Unity.Netcode;
         /* offence nieje nikdy v percentach
         */
         public Damage.Type condition;
-
+        public Combat ()
+        {
+            amount = 0;
+            condition = Damage.Type.bludgeoning;
+        }
         public Combat (string n, float a, Damage.Type c) : base (n)
         {
             amount = a;

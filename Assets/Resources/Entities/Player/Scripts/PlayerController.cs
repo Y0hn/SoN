@@ -39,7 +39,9 @@ public class PlayerController : EntityController
             moveDir = Vector2.zero;
 
         if (Input.GetKeyDown(KeyCode.P))
-            DropRpc();    
+            DropRpc();
+        else if (Input.GetKeyDown(KeyCode.L))
+            ((PlayerStats)stats).AddXPRpc(100);
     }
     void Q1(InputAction.CallbackContext context) { Q(1); }
     void Q2(InputAction.CallbackContext context) { Q(2); }

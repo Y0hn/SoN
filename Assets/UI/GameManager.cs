@@ -180,10 +180,9 @@ public class GameManager : MonoBehaviour
         menu.SetUpUI(!active);
         uiPanels["mainCam"].SetActive(!active);
     }
-    public void LevelUP(byte level, byte skillPoints)
+    public void LevelUP(byte level)
     {
-        byte avaliableSkillPoints = (byte)(level - skillPoints);
-        skillTree.LevelUP(avaliableSkillPoints);
+        skillTree.LevelUP(level);
     }
     public void SetPlayerUI(bool lives = true)
     {

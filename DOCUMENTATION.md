@@ -6,6 +6,12 @@ As an underworld
 The phrase Nawia (Polish) or Nav (used across Slavic tongues) was also utilised as a name for the Slavonic underworld, ruled by the god Veles, enclosed away from the world either by a living sea or river, according to some beliefs located deep underground. According to Ruthenian folklore, Veles lived on a swamp in the centre of Nav, where he sat on a golden throne at the base of the Cosmic Tree, wielding a sword. Symbolically, the Nav has also been described as a huge green plain—pasture, onto which Veles guides souls. The entrance to Nav was guarded by a Zmey. It was believed the souls would later be reborn on earth. It is highly likely that these folk beliefs were the inspiration behind the neopagan idea of Jav, Prav and Nav in the literary forgery known as the Book of Veles.
 ```
 source: wiki
+
+Additions:
+```
+https://www.thecollector.com/slavic-mythology-creatures-myths/
+```
+
 # GAME MECHANICS
 
 ### Inventory autosize
