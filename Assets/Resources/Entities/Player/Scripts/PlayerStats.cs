@@ -143,7 +143,7 @@ public class PlayerStats : EntityStats
                 xpBar.value = xp.Value; 
             else
             {
-                xpMax.Value += xp.Value + level.Value * 100;
+                xpMax.Value += xpMax.Value + level.Value * 100;
                 xpBar.minValue = xp.Value;
                 xpBar.maxValue = xpMax.Value;
             }
