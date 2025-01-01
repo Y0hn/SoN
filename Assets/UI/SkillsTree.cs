@@ -104,15 +104,13 @@ using Unity.Netcode;
     }
     [Serializable] public class Combat : Skill
     {
+        /// <summary>
+        /// + ak offence
+        /// - ak defence 
+        /// </summary>
         public float amount;   
-        // + ak offence
-        // - ak defence
-
-        // |amount| > 1 => pocetny
-        // |amount| < 1 => percentny
-
-        /* offence nieje nikdy v percentach
-        */
+        // |amount| > 1 => pocetny 
+        // |amount| < 1 => percentny    (offence nieje nikdy v percentach)
         public Damage.Type condition;
         public Combat ()
         {
@@ -128,6 +126,18 @@ using Unity.Netcode;
         {
             base.NetworkSerialize(serializer);
             serializer.SerializeValue(ref amount);
+        }
+    }
+    [Serializable] public class Utility : Skill
+    {
+        public Function function;
+
+        public enum Function
+        {
+            None, 
+            ViewOwnHP, ViewOwnAttack,
+            ViewOthersHP, ViewOthersAttack,
+            LightTargetedSence, TargetedSence
         }
     }
 }

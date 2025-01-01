@@ -3,7 +3,7 @@ using TMPro;
 using System;
 public class SkillPanel : MonoBehaviour
 {
-    public Action<bool> OnAvailablePoints;
+    public event Action<bool> OnChangeAvailablePoints;
     public bool AvailablePoints => 0 < freePointCouter;
     [SerializeField] TMP_Text skillCounterText;
     [SerializeField] Transform skills;
@@ -24,6 +24,7 @@ public class SkillPanel : MonoBehaviour
         };
         CalculateLimits();
         skillCounterText.text = freePointCouter.ToString();
+        //OnChangeAvailablePoints += (bool change) => { Debug.Log($"OnChangeAvailablePoints.Invoked({change})"); };
     }
     void FixedUpdate()
     {
@@ -49,14 +50,14 @@ public class SkillPanel : MonoBehaviour
     {
         freePointCouter = (byte)(level - usedPointsCounter);
         skillCounterText.text = freePointCouter.ToString();
-        OnAvailablePoints?.Invoke(AvailablePoints);
+        OnChangeAvailablePoints?.Invoke(AvailablePoints);
     }
     public void SkillPointAplied()
     {
         usedPointsCounter++;
         freePointCouter--;
         skillCounterText.text = freePointCouter.ToString();
-        OnAvailablePoints?.Invoke(AvailablePoints);
+        OnChangeAvailablePoints?.Invoke(AvailablePoints);
     }
     public void MoveSkills (Vector2 moveBy)
     {
