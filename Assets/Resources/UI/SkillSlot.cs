@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using UnityEditor.Playables;
 
 public class SkillSlot : MonoBehaviour
 {
@@ -11,13 +12,14 @@ public class SkillSlot : MonoBehaviour
     [SerializeField] SkillCreator skillCreator;
     [SerializeField] Button button;
     [SerializeField] Image icon;
+    [SerializeField] Image moddifier;
     [SerializeField] Image background;
     [SerializeField] List<SkillSlot> dependentcySkills;
     [SerializeField] bool needsAllDependecies = false;
     
     private static Dictionary<string, Color> pallete = new()
     {
-        { "unavailableIc",  new (128f/255f, 128f/255f, 128f/255f, 0.5f ) },  // disabled //rgba(76, 76, 76, 0)
+        { "unavailableIc",  new (128f/255f, 128f/255f, 128f/255f, 0.5f ) },  // disabled //rgba(76, 76, 76, 0.5)
         { "unavailableBG",  new (  0f/255f,   0f/255f,   0f/255f, 1f   ) },  // disabled //rgba(76, 76, 76, 0)
 
         { "nextInLine",     new (255f/255f, 255f/255f, 255f/255f, 1f   ) },  // enabled  //rgba(204, 204, 204, 0.75)
@@ -27,29 +29,54 @@ public class SkillSlot : MonoBehaviour
 
         { "aquired",        new ( 89f/255f,  89f/255f,  89f/255f, 1f   ) },  // disabled //rgba(89, 89, 89, 1)
     };    
-    private Color[] defaultColors = new Color[2];
+    private Color[] defaultColors;
     private SkillTree.Skill skill;
     private GameManager game;
 
     private bool DependenciesFullfiled 
     {
         get =>
-            (needsAllDependecies && (dependentcySkills.Find(dS => dS.isPurchased) != null)) 
+            (!needsAllDependecies && (dependentcySkills.Find(dS => dS.isPurchased) != null)) 
                 || 
-            (!needsAllDependecies && (dependentcySkills.FindAll(dS => dS.isPurchased).Count == dependentcySkills.Count))
+            (needsAllDependecies && (dependentcySkills.FindAll(dS => dS.isPurchased).Count == dependentcySkills.Count))
                 || 
             dependentcySkills.Count == 0 ;  // zacitocny skill
     }
     void Start()
     {
-        button.interactable = false;
+        defaultColors = new Color[3];
         button.onClick.AddListener(ActivateSkill);
         skill = skillCreator.Skill;
+        game = GameManager.instance;
+        if (game != null)
+            game.SkillTree.OnChangeAvailablePoints += PurchableSkill;
+        ResetGrafic();
+        SetGraficColor(pallete["unavailableIc"], pallete["unavailableBG"], pallete["unavailableIc"]);
+        SetInteractable(false);
+    }
+    /*void OnDrawGizmos()
+    {
+        Start();
+    }*/
+    void ResetGrafic()
+    {
+        string[] s = FileManager.GetSkillRefferency(skillCreator.skillType);
+        icon.sprite = Resources.Load<Sprite>(s[0]);
+
+        icon.enabled = true;
+        background.enabled = true;
         defaultColors[1] = icon.color;
         defaultColors[0] = background.color;
-        game = GameManager.instance;
-        game.SkillTree.OnChangeAvailablePoints += PurchableSkill;
-        SetGraficColor(pallete["unavailableIc"], pallete["unavailableBG"]);
+
+        if (s.Length > 1 && skillCreator.skillType != SkillCreator.SkillType.Utility)
+        {
+            moddifier.sprite = Resources.Load<Sprite>(s[1]);
+            defaultColors[2] = moddifier.color;
+            moddifier.enabled = true;
+        }
+        else
+            moddifier.enabled = false;
+
     }
     /// <summary>
     /// Adds skill to Player Skill Tree and Enables Dependent skills
@@ -57,7 +84,7 @@ public class SkillSlot : MonoBehaviour
     void ActivateSkill()
     {
         isPurchased = true;
-        button.interactable = false;
+        SetInteractable(false);
 
         game.LocalPlayer.AddSkillRpc(skill);
         game.SkillTree.SkillPointAplied();
@@ -72,23 +99,30 @@ public class SkillSlot : MonoBehaviour
         // ak aspon jedna zavislost je splnena
         if (!isPurchased && DependenciesFullfiled)
         {
-            button.interactable = enable;
+            SetInteractable(enable);
             if (enable)
                 SetGraficColor(pallete["nextInLine"]);
             else
-                SetGraficColor(pallete["unafordableIc"], pallete["unafordableBG"]);
+                SetGraficColor(pallete["unafordableIc"], pallete["unafordableBG"], pallete["unafordableIc"]);
         }
+    }
+    void SetInteractable(bool interactable)
+    {
+        icon.raycastTarget = interactable;
+        button.interactable = interactable;
+        background.raycastTarget = interactable;
     }
     void SetGraficColor(Color color)
     {
-        SetGraficColor(color, color);
+        SetGraficColor(color, color, color);
     }
-    void SetGraficColor(Color colorIcon, Color colorBG)
+    void SetGraficColor(Color colorIcon, Color colorBG, Color colorMod)
     {
         background.color = colorBG * defaultColors[0];
+        moddifier.color = colorMod * defaultColors[2];
         icon.color = colorIcon * defaultColors[1];
     }
-    [Serializable] class SkillCreator
+    [Serializable] public class SkillCreator
     {
         public SkillType skillType;
         public string name;
@@ -105,8 +139,9 @@ public class SkillSlot : MonoBehaviour
                         int a = Mathf.RoundToInt(amount);
                         skill = new SkillTree.Health(name, a);
                         break;
-                    case SkillType.Attack:
-                        skill = new SkillTree.Combat(name, amount, condition);
+                    case SkillType.AttackDamage:
+                    case SkillType.AttackRate:
+                        skill = new SkillTree.ModAttack(name, amount, condition, skillType == SkillType.AttackRate);
                         break;
                     case SkillType.Protection:
                         float am = -amount;
@@ -114,7 +149,7 @@ public class SkillSlot : MonoBehaviour
                         break;
                     case SkillType.Utility:
                     default: 
-                        skill = new(name);
+                        skill = new SkillTree.Utility(name);
                         break;
                 }
                 return skill;
@@ -122,7 +157,7 @@ public class SkillSlot : MonoBehaviour
         }
         public enum SkillType
         {
-            Utility, Health, Protection, Attack
+            Utility, Health, Protection, AttackDamage, AttackRate, MovementSpeed
         }
     }
 }

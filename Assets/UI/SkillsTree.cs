@@ -127,11 +127,36 @@ using Unity.Netcode;
             base.NetworkSerialize(serializer);
             serializer.SerializeValue(ref amount);
         }
+    }/*
+    [Serializable] public class ModArmor : Combat
+    {
+        
+    }*/
+    [Serializable] public class ModAttack : Combat
+    {
+        public bool rate;
+        public ModAttack ()
+        {
+            rate = false;
+        }
+        public ModAttack (string n, float a, Damage.Type c, bool r) : base (n, a, c)
+        {
+            rate = r;
+        }
+        public override void NetworkSerialize<T>(BufferSerializer<T> serializer)
+        {
+            base.NetworkSerialize(serializer);
+            serializer.SerializeValue(ref rate);
+        }
     }
     [Serializable] public class Utility : Skill
     {
         public Function function;
 
+        public Utility (string name)
+        {
+
+        }
         public enum Function
         {
             None, 

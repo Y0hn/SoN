@@ -4,6 +4,7 @@ using System.Xml.Serialization;
 using System.IO;
 using System;
 using UnityEngine;
+using System.Linq;
 public static class FileManager
 {
     // FROM RECOURCES
@@ -14,6 +15,8 @@ public static class FileManager
     public const string WEAPONS_REF_DEFAULT_PATH = @"Items/textures/InGame";
     public const string ATTACKS_ICONS_PATH = @"UI/at_types";
     public const string PROJECTILES_OBJECTS_PATH = @"Projectiles/";
+    public const string SKILLS_ICONS_PATH = @"UI/skills/";
+
     
     // FROM APP DATA PATH
     private const string LOG_DEFAULT_PATH = @"";
@@ -137,6 +140,39 @@ public static class FileManager
         }
         //Debug.Log("Returning at ref on: " + refer);
         return refer;
+    }
+    public static string[] GetSkillRefferency(SkillSlot.SkillCreator.SkillType type)
+    {
+        List<string> list = new();
+
+        switch (type)
+        {
+            case SkillSlot.SkillCreator.SkillType.Utility:
+                list.Add(SKILLS_ICONS_PATH + "utility");             
+                break;
+            case SkillSlot.SkillCreator.SkillType.Health: 
+                list.Add(SKILLS_ICONS_PATH + "healthUP");
+                list.Add(SKILLS_ICONS_PATH + "valueUP");                    
+                break;
+            case SkillSlot.SkillCreator.SkillType.Protection: 
+                list.Add(SKILLS_ICONS_PATH + "shieldUP");
+                list.Add(SKILLS_ICONS_PATH + "valueUP");                    
+                break;
+            case SkillSlot.SkillCreator.SkillType.AttackDamage: 
+                list.Add(SKILLS_ICONS_PATH + "attacks");
+                list.Add(SKILLS_ICONS_PATH + "valueUP");                
+                break;
+            case SkillSlot.SkillCreator.SkillType.AttackRate: 
+                list.Add(SKILLS_ICONS_PATH + "attacks");
+                list.Add(SKILLS_ICONS_PATH + "rateUPC");
+                break;            
+            case SkillSlot.SkillCreator.SkillType.MovementSpeed:
+                list.Add(SKILLS_ICONS_PATH + "speedUP");
+                list.Add(SKILLS_ICONS_PATH + "valueUP");
+                break;
+        }
+
+        return list.ToArray();
     }
     public enum MessageType { LOG, RECORD, ERROR, WARNING }
     public static void Log(string message, MessageType type = MessageType.LOG)
