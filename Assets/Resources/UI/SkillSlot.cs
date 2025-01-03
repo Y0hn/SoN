@@ -30,7 +30,7 @@ public class SkillSlot : MonoBehaviour
         { "aquired",        new ( 89f/255f,  89f/255f,  89f/255f, 1f   ) },  // disabled //rgba(89, 89, 89, 1)
     };    
     private Color[] defaultColors;
-    private SkillTree.Skill skill;
+    public SkillTree.Skill Skill => skillCreator.Skill;
     private GameManager game;
 
     private bool DependenciesFullfiled 
@@ -46,7 +46,6 @@ public class SkillSlot : MonoBehaviour
     {
         defaultColors = new Color[3];
         button.onClick.AddListener(ActivateSkill);
-        skill = skillCreator.Skill;
         game = GameManager.instance;
         if (game != null)
             game.SkillTree.OnChangeAvailablePoints += PurchableSkill;
@@ -54,29 +53,38 @@ public class SkillSlot : MonoBehaviour
         SetGraficColor(pallete["unavailableIc"], pallete["unavailableBG"], pallete["unavailableIc"]);
         SetInteractable(false);
     }
-    /*void OnDrawGizmos()
+    void OnDrawGizmos()
     {
-        Start();
-    }*/
-    void ResetGrafic()
-    {
+        /*skillCreator.name = name;
+        if (skillCreator.skillType == SkillCreator.SkillType.Utility) return;
         string[] s = FileManager.GetSkillRefferency(skillCreator.skillType);
         icon.sprite = Resources.Load<Sprite>(s[0]);
-
-        icon.enabled = true;
-        background.enabled = true;
-        defaultColors[1] = icon.color;
-        defaultColors[0] = background.color;
-
         if (s.Length > 1 && skillCreator.skillType != SkillCreator.SkillType.Utility)
         {
             moddifier.sprite = Resources.Load<Sprite>(s[1]);
-            defaultColors[2] = moddifier.color;
             moddifier.enabled = true;
         }
         else
-            moddifier.enabled = false;
+            moddifier.enabled = false;*/
+    }
+    void ResetGrafic()
+    {
+        icon.enabled = true;
+        background.enabled = true;
+        defaultColors[0] = background.color;
+        defaultColors[1] = icon.color;
+        defaultColors[2] = moddifier.color;
 
+        if (skillCreator.skillType != SkillCreator.SkillType.Utility)
+        {
+            string[] s = FileManager.GetSkillRefferency(skillCreator.skillType);
+            icon.sprite = Resources.Load<Sprite>(s[0]);
+            if (s.Length > 1)
+            {
+                moddifier.sprite = Resources.Load<Sprite>(s[1]);
+                moddifier.enabled = true;
+            }
+        }       
     }
     /// <summary>
     /// Adds skill to Player Skill Tree and Enables Dependent skills
@@ -86,7 +94,7 @@ public class SkillSlot : MonoBehaviour
         isPurchased = true;
         SetInteractable(false);
 
-        game.LocalPlayer.AddSkillRpc(skill);
+        game.LocalPlayer.AddSkillRpc(Skill);
         game.SkillTree.SkillPointAplied();
         SetGraficColor(pallete["aquired"]);
     }
@@ -122,12 +130,17 @@ public class SkillSlot : MonoBehaviour
         moddifier.color = colorMod * defaultColors[2];
         icon.color = colorIcon * defaultColors[1];
     }
+    public void LoadSkill()
+    {
+        ActivateSkill();
+    }
     [Serializable] public class SkillCreator
     {
         public SkillType skillType;
         public string name;
         [SerializeField] float amount;
         [SerializeField] Damage.Type condition;
+        [SerializeField] SkillTree.Utility.Function utilFunction;
         public SkillTree.Skill Skill 
         {
             get
@@ -149,7 +162,7 @@ public class SkillSlot : MonoBehaviour
                         break;
                     case SkillType.Utility:
                     default: 
-                        skill = new SkillTree.Utility(name);
+                        skill = new SkillTree.Utility(name, utilFunction);
                         break;
                 }
                 return skill;

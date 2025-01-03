@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System;
+using System.Collections.Generic;
 public class SkillPanel : MonoBehaviour
 {
     public event Action<bool> OnChangeAvailablePoints;
@@ -73,5 +74,16 @@ public class SkillPanel : MonoBehaviour
                         $"Base ({transform.position.x},{transform.position.y})\n" +
                         $"Limits: \n0 => ({limits[0].x},{limits[0].y}) \n1 => ({limits[1].x},{limits[1].y})");*/
         }
+    }
+    public void LoadSkills(SkillTree.Skill[] loadSkills)
+    {
+        List<string> skills= new();
+        foreach (SkillTree.Skill skill in loadSkills)
+            skills.Add(skill.name);
+
+        SkillSlot[] sSlots = GetComponentsInChildren<SkillSlot>();
+        foreach (SkillSlot s in sSlots)
+            if (skills.Contains(s.name))
+                s.LoadSkill();
     }
 }

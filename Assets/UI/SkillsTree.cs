@@ -153,16 +153,22 @@ using Unity.Netcode;
     {
         public Function function;
 
-        public Utility (string name)
+        public Utility ()
         {
 
+        }
+        public Utility (string n, Function f) : base (n)
+        {
+            function = f;
         }
         public enum Function
         {
             None, 
-            ViewOwnHP, ViewOwnAttack,
-            ViewOthersHP, ViewOthersAttack,
-            LightTargetedSence, TargetedSence
+            ViewOwnHP, ViewOwnMeleeAttack, ViewOwnRangedAttack,
+            ViewOthersHP, ViewOthersMeleeAttack, ViewOthersRangedAttack,
+            NightVision, 
+            VisionSizeIncrease, 
+            ViewCorruptionAndBecomeImune
         }
     }
 }
