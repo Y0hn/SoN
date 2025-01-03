@@ -12,6 +12,7 @@ public class SkillSlot : MonoBehaviour
     [SerializeField] SkillCreator skillCreator;
     [SerializeField] Button button;
     [SerializeField] Image icon;
+    [SerializeField] Image value;
     [SerializeField] Image moddifier;
     [SerializeField] Image background;
     [SerializeField] List<SkillSlot> dependentcySkills;
@@ -44,7 +45,7 @@ public class SkillSlot : MonoBehaviour
     }
     void Start()
     {
-        defaultColors = new Color[3];
+        defaultColors = new Color[4];
         button.onClick.AddListener(ActivateSkill);
         game = GameManager.instance;
         if (game != null)
@@ -53,45 +54,31 @@ public class SkillSlot : MonoBehaviour
         SetGraficColor(pallete["unavailableIc"], pallete["unavailableBG"], pallete["unavailableIc"]);
         SetInteractable(false);
     }
-    void OnDrawGizmos()
-    {
-        /*skillCreator.name = name;
-        if (skillCreator.skillType == SkillCreator.SkillType.Utility) return;
-        string[] s = FileManager.GetSkillRefferency(skillCreator.skillType);
-        icon.sprite = Resources.Load<Sprite>(s[0]);
-        if (s.Length > 1 && skillCreator.skillType != SkillCreator.SkillType.Utility)
-        {
-            moddifier.sprite = Resources.Load<Sprite>(s[1]);
-            moddifier.enabled = true;
-        }
-        else
-            moddifier.enabled = false;*/
-    }
     void ResetGrafic()
     {
         icon.enabled = true;
+        moddifier.enabled = true;
         background.enabled = true;
         defaultColors[0] = background.color;
         defaultColors[1] = icon.color;
         defaultColors[2] = moddifier.color;
+        defaultColors[3] = value.color;
 
         if (skillCreator.skillType != SkillCreator.SkillType.Utility)
         {
             string[] s = FileManager.GetSkillRefferency(skillCreator.skillType);
             icon.sprite = Resources.Load<Sprite>(s[0]);
             if (s.Length > 1)
-            {
                 moddifier.sprite = Resources.Load<Sprite>(s[1]);
-                moddifier.enabled = true;
-            }
         }       
     }
     /// <summary>
     /// Adds skill to Player Skill Tree and Enables Dependent skills
     /// </summary>
-    void ActivateSkill()
+    public void ActivateSkill()
     {
         isPurchased = true;
+        moddifier.enabled = false;
         SetInteractable(false);
 
         game.LocalPlayer.AddSkillRpc(Skill);
@@ -129,10 +116,6 @@ public class SkillSlot : MonoBehaviour
         background.color = colorBG * defaultColors[0];
         moddifier.color = colorMod * defaultColors[2];
         icon.color = colorIcon * defaultColors[1];
-    }
-    public void LoadSkill()
-    {
-        ActivateSkill();
     }
     [Serializable] public class SkillCreator
     {

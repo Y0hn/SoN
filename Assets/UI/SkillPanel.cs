@@ -84,6 +84,6 @@ public class SkillPanel : MonoBehaviour
         SkillSlot[] sSlots = GetComponentsInChildren<SkillSlot>();
         foreach (SkillSlot s in sSlots)
             if (skills.Contains(s.name))
-                s.LoadSkill();
+                s.ActivateSkill();
     }
 }
