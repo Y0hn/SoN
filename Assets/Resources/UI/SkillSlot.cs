@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using UnityEditor.Playables;
+using Unity.Android.Gradle;
 
 public class SkillSlot : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class SkillSlot : MonoBehaviour
     [SerializeField] Image value;
     [SerializeField] Image moddifier;
     [SerializeField] Image background;
-    [SerializeField] List<SkillSlot> dependentcySkills;
+    [SerializeField] List<SkillSlot> dependentcySkills = new();
     [SerializeField] bool needsAllDependecies = false;
     
     private static Dictionary<string, Color> pallete = new()
@@ -36,12 +37,18 @@ public class SkillSlot : MonoBehaviour
 
     private bool DependenciesFullfiled 
     {
-        get =>
-            (!needsAllDependecies && (dependentcySkills.Find(dS => dS.isPurchased) != null)) 
-                || 
-            (needsAllDependecies && (dependentcySkills.FindAll(dS => dS.isPurchased).Count == dependentcySkills.Count))
-                || 
-            dependentcySkills.Count == 0 ;  // zacitocny skill
+        get
+        {
+            if (dependentcySkills != null)
+                return
+                    dependentcySkills == null || dependentcySkills.Count == 0  // zacitocny skill
+                        || 
+                    (!needsAllDependecies && (dependentcySkills.Find(dS => dS.isPurchased) != null)) 
+                        || 
+                    (needsAllDependecies && (dependentcySkills.FindAll(dS => dS.isPurchased).Count == dependentcySkills.Count));
+            else
+                return false;
+        }
     }
     void Start()
     {
@@ -63,14 +70,6 @@ public class SkillSlot : MonoBehaviour
         defaultColors[1] = icon.color;
         defaultColors[2] = moddifier.color;
         defaultColors[3] = value.color;
-
-        if (skillCreator.skillType != SkillCreator.SkillType.Utility)
-        {
-            string[] s = FileManager.GetSkillRefferency(skillCreator.skillType);
-            icon.sprite = Resources.Load<Sprite>(s[0]);
-            if (s.Length > 1)
-                moddifier.sprite = Resources.Load<Sprite>(s[1]);
-        }       
     }
     /// <summary>
     /// Adds skill to Player Skill Tree and Enables Dependent skills
@@ -79,12 +78,20 @@ public class SkillSlot : MonoBehaviour
     {
         isPurchased = true;
         moddifier.enabled = false;
+        value.enabled = false;
         SetInteractable(false);
 
         game.LocalPlayer.AddSkillRpc(Skill);
         game.SkillTree.SkillPointAplied();
         SetGraficColor(pallete["aquired"]);
+        TryActivateUtility();
     }
+    void TryActivateUtility(bool active = true)
+    {
+        if (Skill is SkillTree.Utility u)
+            game.EnableUtility(new (u.function, active));
+    }
+
     /// <summary>
     /// Sets Skill (un)available to get by spending point
     /// </summary>

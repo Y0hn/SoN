@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
 using Unity.Netcode;
+using System.Collections.Generic;
+using System;
 /// <summary>
 /// Managing Game and PLayerUI - has 'instance'
 /// </summary>
@@ -52,6 +54,9 @@ public class GameManager : MonoBehaviour
         {"point"},
     */
     [HideInInspector] public bool playerLives;
+    Dictionary<SkillTree.Utility.Function, bool> Utils = new();
+    /*[SerializedDictionary("Utility", "Aquired")]public SerializedDictionary*/ 
+    public event Action<UtilitySkill> UtilityUpdate;
     public Inventory inventory;
     public Vector2 MousePos
     { 
@@ -78,7 +83,9 @@ public class GameManager : MonoBehaviour
         uiPanels["mainCam"].SetActive(true);
         SetUpTextFields();
         SubscribeInput();
+        SetUpUtility();
         SetGameUI();
+        
         FileManager.LoadSettings();
     }
 #pragma warning restore IDE0051 // Remove unused private members
@@ -97,6 +104,13 @@ public class GameManager : MonoBehaviour
 
         buttons["copy"].onClick.AddListener(Copy);
         buttons["quit"].onClick.AddListener(Quit);
+    }
+    void SetUpUtility()
+    {
+        foreach (SkillTree.Utility.Function uti in Enum.GetValues(typeof(SkillTree.Utility.Function)))
+        {
+            EnableUtility(new (uti));
+        }
     }
     void OC_Pause(InputAction.CallbackContext context)
     {
@@ -180,9 +194,19 @@ public class GameManager : MonoBehaviour
         menu.SetUpUI(!active);
         uiPanels["mainCam"].SetActive(!active);
     }
+    
     public void LevelUP(byte level)
     {
         skillTree.LevelUP(level);
+    }
+    public void EnableUtility(UtilitySkill utility)
+    {
+        if (Utils.ContainsKey(utility.function))
+            Utils[utility.function] = utility.aquired;
+        else
+            Utils.Add(utility.function, utility.aquired);
+
+        UtilityUpdate?.Invoke(utility);
     }
     public void SetPlayerUI(bool lives = true)
     {
@@ -217,6 +241,9 @@ public class GameManager : MonoBehaviour
         GUIUtility.systemCopyBuffer = conn.codeText.text; 
         animatorGameUI.SetTrigger("copy"); 
     }
+    
+
+    // ANIMATION //
     public void AnimateFace(float state)            { animatorGameUI.SetFloat("faceState", Mathf.Floor(state*10)/10f);  }
     public void AnimateFace(string action)          { animatorGameUI.SetTrigger(action);            }
     public void AnimateUI(string name, float value) { animatorGameUI.SetFloat(name, value);         }

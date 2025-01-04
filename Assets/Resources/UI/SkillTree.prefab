@@ -899,9 +899,25 @@ PrefabInstance:
       value: U-9
       objectReference: {fileID: 0}
     - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: needsAllDependecies
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: skillCreator.utilFunction
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: dependentcySkills.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[0]'
+      value: 
+      objectReference: {fileID: 5635926157622789068}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2682804878932010461}
     - target: {fileID: 4604676410746645415, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: m_Color.b
       value: 0.17908801
@@ -1343,9 +1359,25 @@ PrefabInstance:
       value: U-7
       objectReference: {fileID: 0}
     - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: needsAllDependecies
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: skillCreator.utilFunction
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: dependentcySkills.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8845422646144488488}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[1]'
+      value: 
+      objectReference: {fileID: 8693436471845933830}
     - target: {fileID: 4604676410746645415, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: m_Color.b
       value: 0.44
@@ -2013,6 +2045,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2774583480476656577, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
   m_PrefabInstance: {fileID: 1360359263072555561}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &9114701184248091583 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7826442400530334102, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
+  m_PrefabInstance: {fileID: 1360359263072555561}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bb93628396b6dd469822becaff3ef6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1412812066533327831
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2296,6 +2339,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2774583480476656577, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
   m_PrefabInstance: {fileID: 1457004145208185488}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8693436471845933830 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7826442400530334102, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
+  m_PrefabInstance: {fileID: 1457004145208185488}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bb93628396b6dd469822becaff3ef6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1555237162488111851
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2559,6 +2613,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2774583480476656577, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
   m_PrefabInstance: {fileID: 1611262743682864574}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8845422646144488488 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7826442400530334102, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
+  m_PrefabInstance: {fileID: 1611262743682864574}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bb93628396b6dd469822becaff3ef6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1657553173532546243
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2838,6 +2903,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2774583480476656577, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
   m_PrefabInstance: {fileID: 1990317201893490449}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8575448623270035079 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7826442400530334102, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
+  m_PrefabInstance: {fileID: 1990317201893490449}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bb93628396b6dd469822becaff3ef6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2061962505377491245
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3399,6 +3475,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2774583480476656577, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
   m_PrefabInstance: {fileID: 2498318152503050842}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5635926157622789068 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7826442400530334102, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
+  m_PrefabInstance: {fileID: 2498318152503050842}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bb93628396b6dd469822becaff3ef6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2559879941339785762
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3666,6 +3753,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2774583480476656577, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
   m_PrefabInstance: {fileID: 2571759213004391787}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5705394996142507261 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7826442400530334102, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
+  m_PrefabInstance: {fileID: 2571759213004391787}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bb93628396b6dd469822becaff3ef6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2592693123497371313
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3812,6 +3910,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2774583480476656577, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
   m_PrefabInstance: {fileID: 2592693123497371313}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5721264006388393767 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7826442400530334102, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
+  m_PrefabInstance: {fileID: 2592693123497371313}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bb93628396b6dd469822becaff3ef6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2787485042279048701
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4138,6 +4247,18 @@ PrefabInstance:
       propertyPath: skillCreator.utilFunction
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: dependentcySkills.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[0]'
+      value: 
+      objectReference: {fileID: 5721264006388393767}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[1]'
+      value: 
+      objectReference: {fileID: 6370418155044124485}
     - target: {fileID: 4604676410746645415, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: m_Color.b
       value: 0.5653683
@@ -4526,6 +4647,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2774583480476656577, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
   m_PrefabInstance: {fileID: 3816060071858681555}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6370418155044124485 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7826442400530334102, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
+  m_PrefabInstance: {fileID: 3816060071858681555}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bb93628396b6dd469822becaff3ef6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &4040468287540208832
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5130,6 +5262,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
+--- !u!114 &2896408807489604852 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7826442400530334102, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
+  m_PrefabInstance: {fileID: 4949182844721270114}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bb93628396b6dd469822becaff3ef6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &7074674987267518115 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2774583480476656577, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
@@ -5413,6 +5556,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
+--- !u!114 &2682804878932010461 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7826442400530334102, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
+  m_PrefabInstance: {fileID: 5306972329703105611}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bb93628396b6dd469822becaff3ef6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &8009488998059575178 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2774583480476656577, guid: 04a3e1dce64003b40a178ed57122d17c, type: 3}
@@ -5435,13 +5589,17 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: dependentcySkills.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: 'dependentcySkills.Array.data[0]'
       value: 
       objectReference: {fileID: 3143554180874906903}
     - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: 'dependentcySkills.Array.data[1]'
       value: 
-      objectReference: {fileID: 1076006066541916105}
+      objectReference: {fileID: 3143554180874906903}
     - target: {fileID: 4604676410746645415, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: m_Color.b
       value: 0.40067452
@@ -5744,6 +5902,18 @@ PrefabInstance:
       propertyPath: skillCreator.utilFunction
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: dependentcySkills.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[0]'
+      value: 
+      objectReference: {fileID: 5705394996142507261}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[1]'
+      value: 
+      objectReference: {fileID: 8575448623270035079}
     - target: {fileID: 2467331457659746760, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: m_SizeDelta.x
       value: 80
@@ -7045,6 +7215,18 @@ PrefabInstance:
       propertyPath: skillCreator.utilFunction
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: dependentcySkills.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1076006066541916105}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[1]'
+      value: 
+      objectReference: {fileID: 9114701184248091583}
     - target: {fileID: 4604676410746645415, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: m_Color.b
       value: 0.333009
@@ -8221,6 +8403,18 @@ PrefabInstance:
       propertyPath: skillCreator.utilFunction
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: dependentcySkills.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[0]'
+      value: 
+      objectReference: {fileID: 9114701184248091583}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2896408807489604852}
     - target: {fileID: 4604676410746645415, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: m_Color.b
       value: 0.66768736
@@ -8371,9 +8565,25 @@ PrefabInstance:
       value: U-8
       objectReference: {fileID: 0}
     - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: needsAllDependecies
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: skillCreator.utilFunction
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: dependentcySkills.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8693436471845933830}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[1]'
+      value: 
+      objectReference: {fileID: 5635926157622789068}
     - target: {fileID: 2467331457659746760, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: m_SizeDelta.x
       value: 110
@@ -8524,6 +8734,18 @@ PrefabInstance:
       propertyPath: skillCreator.utilFunction
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: dependentcySkills.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8575448623270035079}
+    - target: {fileID: 863628202249632188, guid: 76121f6deba1471419319d79ea465218, type: 3}
+      propertyPath: 'dependentcySkills.Array.data[1]'
+      value: 
+      objectReference: {fileID: 5721264006388393767}
     - target: {fileID: 4604676410746645415, guid: 76121f6deba1471419319d79ea465218, type: 3}
       propertyPath: m_Color.b
       value: 0.69803923
