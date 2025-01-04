@@ -477,7 +477,7 @@ public abstract class EntityStats : NetworkBehaviour
     }
     public enum Type
     {
-        RaseUnnarmed, MeleeSlash, MeleeStab, BowSingle, BowMulti // Magi
+        RaseUnnarmed, MeleeSlash, MeleeStab, BowSingle, BowMulti, BatSwing // Magi
     }
     public static bool MeleeAttack(Type t)
     {

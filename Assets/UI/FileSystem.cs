@@ -137,6 +137,9 @@ public static class FileManager
             case Attack.Type.BowMulti:
                 refer += "bow-triple";
                 break;
+            case Attack.Type.BatSwing:
+                refer += "bat-swing";
+                break;
         }
         //Debug.Log("Returning at ref on: " + refer);
         return refer;
