@@ -108,9 +108,13 @@ public abstract class EntityStats : NetworkBehaviour
                     try {
                         weaponAttack.Value = Weapon.GetItem(equipment[newValue.eIndex].ToString()).attack[newValue.aIndex];
                     } catch (Exception ex) {
-                        Debug.LogWarning("Equipment not set\n" + ex.Message);
+                        string eqs = "";
+                        for (int i = 0; i < equipment.Count; i++)
+                        {
+                            eqs += $"\n[{i}.]" + equipment[i].ToString();
+                        }
+                        Debug.LogWarning($"Equipment not set on\nWeaponIndex[{newValue}]\nEquipment: {eqs}\n" + ex.Message);
                     }
-
                 }
                 else
                     weaponAttack.Value = rase.attack;
@@ -201,7 +205,7 @@ public abstract class EntityStats : NetworkBehaviour
             for (; equipment.Count < length;)
                 equipment.Add("");
 
-            defence = new(rase.naturalArmor);
+            defence = new(rase.resists);
             IsAlive.Value = true;
         }
         attackPoint.localPosition = new(attackPoint.localPosition.x, weaponAttack.Value.range);
@@ -224,18 +228,18 @@ public abstract class EntityStats : NetworkBehaviour
 
         if (changeEvent.Type == NetworkListEvent<FixedString64Bytes>.EventType.Value)
         {
-            // Server prida/uberie defence
+            /* Server prida/uberie defence
             if (IsServer && Equipment.IsArmor(slot))
             {
                 if      (curr == "")
                     defence.Remove(Armor.GetItem(prev));
                 else
                     defence.Add(Armor.GetItem(curr));
-            }
-            /*string eq = "Equipment Update\n";
+            }*/
+            string eq = "Equipment Update\n";
             for (int i = 0; i < equipment.Count; i++)
                 eq += $"{i}. Equiped= {equipment[i]!=""} | Path= {equipment[i]}\n";
-            Debug.Log(eq + $"\n Event.Value= {curr}");*/
+            Debug.Log(eq + $"\n Event.Value= {curr}");
         }
         else
         {
@@ -320,9 +324,13 @@ public abstract class EntityStats : NetworkBehaviour
     // RPSs
     [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot = Equipment.Slot.NoPreference)
     {
-        if (slot == Equipment.Slot.NoPreference && reference != "")
-            slot = ((Equipment)Item.GetItem(reference)).slot;
+        /*if (slot == Equipment.Slot.NoPreference && reference != "")
+        {
+            Equipment i = Equipment.GetItem(reference)
+            slot = i.slot;
+        }*/
         equipment[(int)slot] = reference;
+        Debug.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
     }
     [Rpc(SendTo.Server)] protected virtual void AttackRpc()
     {
@@ -345,247 +353,5 @@ public abstract class EntityStats : NetworkBehaviour
         Equipment e = Equipment.GetItem(reference);
         equipment[(int)e.slot] = e.GetReferency;
     }
+    public enum AITarget { None, Player, Team_1, Team_2, Team_3, Boss }
 }
-[Serializable] public class Defence
-{
-    List<Armor> armors;
-    public Defence()
-    {
-        armors = new();
-    }
-    public Defence(Armor armor)
-    {
-        armors = new();
-        Add(armor);
-    }
-    public int CalculateDMG(Damage damage, Armor.Resistance additionalRezists = null, bool clamp = true)
-    {
-        List<Armor.Resistance> list = GetElementalResistances(damage.type);
-        if (additionalRezists != null)
-            list.Add(additionalRezists);
-        ResistanceCalculator(ref list, out float sum, out float per);
-        return DamageCalculator(damage.amount, sum, per, clamp);
-    }
-    private List<Armor.Resistance> GetElementalResistances(Damage.Type type)
-    {
-        List<Armor.Resistance> list = new();        
-        armors.ForEach(a=> list.AddRange(a.GetElemental(type)));
-        return list;
-    }
-    private void ResistanceCalculator(ref List<Armor.Resistance> resistances, out float sumary, out float percentil)
-    {
-        float sum = 0f, per = 0f;
-
-        resistances.ForEach(r=>
-        {   if (r.amount < 1)
-                per = (per < r.amount && r.amount < 1) ? r.amount: per;     // scita Pocetne rezisty
-            else
-                sum += (r.amount > 1) ? r.amount : 0f;                      // najvacsi percentualne Rezisty
-        });
-
-        // out sa neda pouzit v Lambda expresii
-        sumary = sum;
-        percentil = per;
-    }
-    private int DamageCalculator(int damageAmount, float sum, float percentil, bool clamp)
-    {
-        percentil *= damageAmount;  // nastavi ciselnu vysku 
-        int recieved = Mathf.RoundToInt(damageAmount - (sum + percentil));
-        if (clamp)
-            recieved = Math.Clamp(recieved, 0, int.MaxValue);
-        return recieved;
-    }
-    public bool Add(Armor a, bool over = false)
-    {
-        if (!armors.Contains(a))
-        {
-            Armor ar = armors.Find(ar=> ar.slot == a.slot);
-            if (ar != null || over)
-                armors.Remove(ar);
-            armors.Add(a);
-            return true;
-        }
-        return false;
-    }
-    public bool Remove(Armor a)
-    {
-        if (armors.Contains(a))
-        {
-            armors.Remove(a);
-            return true;
-        }
-        return false;
-    }
-    public Class CallculateDC()
-    {
-        if (armors.Count > 0)
-        {
-            float total = 0;
-            int count = 0;
-
-            foreach (Armor a in armors)
-                foreach (Armor.Resistance r in a.resists)
-                {
-                    total += (r.amount > 1) ? r.amount : r.amount * 100;
-                    count++;
-                }
-            total /= count; 
-            
-            if      (total < 40)
-                return Class.Small;
-            else if (total < 70)
-                return Class.Medium;
-            else if (count < 5)
-                return Class.Dedicated;
-            else
-                return Class.Heavy;
-        }
-        else
-            return Class.None;
-    }
-    public enum Class  { None, Small, Medium, Heavy, Dedicated }
-}
-[Serializable] public struct Attack : INetworkSerializable, IEquatable<Attack>
-{
-    public Damage damage;
-    public float range;
-    public float rate;
-    public Type type;
-    public bool bothHanded;
-
-    public readonly float AttackTime { get => 1/rate; }
-    public readonly bool IsMelee    { get => MeleeAttack(type); }
-    public readonly bool IsRanged   { get => RangedAttack(type); }
-    public readonly bool IsSet      { get => range != 0 && rate != 0; }
-
-    public Attack (Damage damage, float range, float rate, Type type, bool both = false)
-    {
-        this.bothHanded = both;
-        this.damage = damage;
-        this.range = range;
-        this.rate = rate;
-        this.type = type;
-    }
-    public Attack (Attack attack)
-    {
-        this.bothHanded =  attack.bothHanded;
-        this.damage =  attack.damage;
-        this.range = attack.range;
-        this.rate =  attack.rate;
-        this.type =  attack.type;
-
-    }
-    public enum Type
-    {
-        RaseUnnarmed, MeleeSlash, MeleeStab, BowSingle, BowMulti, BatSwing // Magi
-    }
-    public static bool MeleeAttack(Type t)
-    {
-        return Type.RaseUnnarmed == t || t == Type.MeleeSlash || Type.MeleeStab == t;
-    }
-    public static bool RangedAttack(Type t)
-    {
-        return Type.BowSingle == t || t == Type.BowMulti;
-    }
-    public void AddDamage(Damage damage)
-    {
-        damage.Add(damage);
-    }
-    public bool Equals (Attack other)
-    {
-        return
-        other.type.Equals(type) &&
-        other.rate.Equals(rate) &&
-        other.range.Equals(range) && 
-        other.damage.Equals(damage);
-    }
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref bothHanded);
-        serializer.SerializeValue(ref damage);
-        serializer.SerializeValue(ref range);
-        serializer.SerializeValue(ref rate);
-        serializer.SerializeValue(ref type);
-    }
-    public override string ToString()
-    {
-        string s = "";
-
-        s += $"Both handed: {bothHanded} | ";
-        s += $"Damage: {damage} | ";
-        s += $"Range: {range} tiles | ";
-        s += $"Rate: {rate} ac/s | ";
-        s += $"Time: {AttackTime} s | ";
-        s += $"Attack Type: {Enum.GetName(typeof(Type), type)}";
-
-        return s;
-    }
-}
-[Serializable] public struct WeaponIndex : INetworkSerializable
-{
-    public sbyte eIndex;
-    public sbyte aIndex;
-    public bool Holding { get => eIndex >= 0 && 0 <= aIndex;}
-    public WeaponIndex(sbyte e, sbyte a = 0)
-    {
-        eIndex = e;
-        aIndex = a;
-    }
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref eIndex);
-        serializer.SerializeValue(ref aIndex);
-    }
-    public override string ToString()
-    {
-        return $"Weapon Index: equipIndex= {eIndex} attackIndex= {aIndex}";
-    }
-}
-[Serializable] public struct Damage : INetworkSerializable, IEquatable<Damage>
-{
-    public Type type;
-    public int amount;
-    public Damage (Type type, int amount)
-    {
-        this.type = type;
-        this.amount = amount;
-    }
-    public void Add(Damage damage)
-    {
-        if (type == damage.type)
-            amount += damage.amount;
-    }
-    [Serializable] public enum Type
-    {
-        // STANDARD
-        bludgeoning, slashing, piercing, 
-        // ELEMENTAL
-        cold, fire, holy, lightning, dark, acid,
-        //  OVER TIME
-        poison    
-    }
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref type);
-        serializer.SerializeValue(ref amount);
-    }
-
-    public bool Equals(Damage other)
-    {
-        return 
-        type == other.type && 
-        amount == other.amount;
-    }
-    public override string ToString()
-    {
-        string s = $"Type: {Enum.GetName(typeof(Type), type)} Amount: ";
-
-        if (amount > 1)
-            s += amount.ToString();
-        else
-            s += amount.ToString() + " %";
-
-        return s;
-    }
-}
-public enum AITarget { None, Player, Team_1, Team_2, Team_3, Boss }

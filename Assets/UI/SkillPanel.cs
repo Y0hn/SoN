@@ -17,8 +17,10 @@ public class SkillPanel : MonoBehaviour
     Vector2[] limits = new Vector2[2];
     Vector2 startMouse;
     byte usedPointsCounter = 0, freePointCouter = 0;
-    void Awake()
+    void Start()
     {
+        freePointCouter = 0; 
+        usedPointsCounter = 0;
         button.onEnterHold += delegate
         {
             startMouse = game.MousePos;

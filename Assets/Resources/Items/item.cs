@@ -30,4 +30,13 @@ public abstract class Item : ScriptableObject, IEquatable<Item>
         iconRef == other.iconRef && 
         description == other.description;
     }
+    public override string ToString()
+    {
+        return 
+            $"Item [{title}]\n" +
+            $"desc: {description}\n" +
+            $"IconColor: {color}\n" +
+            $"Rarity color: {rarity}\n" +
+            $"Icon Referency: \"{iconRef}\"";
+    }
 }

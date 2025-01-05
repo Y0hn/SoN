@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 [CreateAssetMenu(fileName = "NewRase", menuName = "Entity/Rase"), Serializable] public class Rase : ScriptableObject
 {
     // public GameObject body;
@@ -7,5 +8,5 @@ using System;
     public int maxHp = 100;
     public float view = 5;
     public Attack attack = new(new Damage(Damage.Type.bludgeoning, 1), 1, 1, Attack.Type.MeleeSlash);
-    public Armor naturalArmor;
+    public List<Resistance> resists = new();
 }

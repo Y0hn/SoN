@@ -8,8 +8,8 @@ public class Equipment : Item
     public virtual string SpriteRef { get; }
     public enum Slot
     {
-        Head, Torso, Legs,
-        Body,
+        //Head, Torso, Legs,
+        //Body,
         WeaponL, WeaponR, WeaponBoth, NoPreference
     }
     public new static Equipment GetItem (string referency)
@@ -20,7 +20,7 @@ public class Equipment : Item
     {
         get { return FileManager.ITEM_DEFAULT_PATH; }
     }
-    public static bool IsArmor(Slot slot)   { return slot == Slot.Head || slot == Slot.Torso || slot == Slot.Legs || slot == Slot.Body; }
+    //public static bool IsArmor(Slot slot)   { return slot == Slot.Head || slot == Slot.Torso || slot == Slot.Legs || slot == Slot.Body; }
     public static bool IsWeapon(Slot slot)  { return slot == Slot.WeaponL || slot == Slot.WeaponR || slot == Slot.WeaponBoth || slot == Slot.NoPreference; }
     public override void Use(ItemSlot iS)
     {
@@ -44,5 +44,22 @@ public class Equipment : Item
             eq = slot == e.slot;
         }
         return eq;
+    }
+    public override string ToString()
+    {
+        return 
+            base.ToString() + "\n" +
+            $"Slot: {slot}\n" + 
+            $"Sprite Referency: \"{SpriteRef}\"";
+    }
+}
+[Serializable] public class Resistance
+{
+    public float amount;
+    [SerializeField] public Damage.Type defenceType;
+    public Resistance (Damage.Type type, float amount)
+    {
+        defenceType = type;
+        this.amount = amount;
     }
 }

@@ -111,19 +111,7 @@ public class NPStats : EntityStats
     {
         base.OnEquipmentUpdate(changeEvent);
         Equipment.Slot slot = (Equipment.Slot)changeEvent.Index;
-        
-        switch (slot)
-            {
-                case Equipment.Slot.Head:   // 0
-                case Equipment.Slot.Torso:  // 1
-                case Equipment.Slot.Legs:   // 2
-                    DC = defence.CallculateDC();
-                    break;
-                case Equipment.Slot.WeaponL:    // 4
-                case Equipment.Slot.WeaponR:    // 5
-                    CallculateWC();
-                    break;
-            }
+        CallculateWC();
     }
     protected override void OnHpUpdate()
     {

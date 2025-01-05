@@ -10,4 +10,11 @@ public class Ranged : Weapon
     {
         get => Resources.Load<GameObject>(FileManager.PROJECTILES_OBJECTS_PATH + projectile);
     }
+    public override string ToString()
+    {
+        return 
+            base.ToString() + "\n" +
+            $"Projectile Referency \"{projectile}\"\n" +
+            $"Projectile spawn position [{projSpawnPosition.x},{projSpawnPosition.y}]\n";
+    }
 }

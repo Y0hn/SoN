@@ -60,11 +60,11 @@ using Unity.Netcode;
         }
         return new ();
     }
-    public Armor.Resistance GetResist(Damage.Type type) 
+    public Resistance GetResist(Damage.Type type) 
     { 
         if (defence.ContainsKey(type))
         {
-            return new Armor.Resistance(type, Mathf.Abs(defence[type]));
+            return new Resistance(type, Mathf.Abs(defence[type]));
         }
         return null;
     }

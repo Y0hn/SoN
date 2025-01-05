@@ -1,6 +1,5 @@
 using Unity.Collections;
 using Unity.Netcode;
-using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
 public class PlayerStats : EntityStats
@@ -197,7 +196,7 @@ public class PlayerStats : EntityStats
         if (0 <= att)
             wea = id/10 == 1 ? (sbyte)Equipment.Slot.WeaponR : (sbyte)Equipment.Slot.WeaponL;
         
-        //Debug.Log($"Setting weapon index to new(att= {att} | wea= {wea})");
+        Debug.Log($"Setting weapon index to new(att= {att} | wea= {wea})");
         SetWeaponIndex(att, wea);
     }
     public override bool TakeDamage(Damage damage)

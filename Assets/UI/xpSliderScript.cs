@@ -54,7 +54,7 @@ public class XpSliderScript : MonoBehaviour
             else
                 valueChangedDOWN = false;
         }
-        Debug.Log($"Update \nUP[{valueChangedUP}] \nDOWN[{valueChangedDOWN}] \nmaxValueQ[{maxValueQ.Count}]\nSlider [{SliderValue}] <{slider.minValue}, {slider.maxValue}>");
+        //Debug.Log($"Update \nUP[{valueChangedUP}] \nDOWN[{valueChangedDOWN}] \nmaxValueQ[{maxValueQ.Count}]\nSlider [{SliderValue}] <{slider.minValue}, {slider.maxValue}>");
     }
     public void AddMax(float newMax)
     {

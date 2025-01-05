@@ -11,7 +11,7 @@ public static class FileManager
     public const string TEXTURE_DEFAULT_PATH = @"Items/textures";
     public const string ITEM_DEFAULT_PATH = @"Items";
     public const string WEAPONS_DEFAULT_PATH = @"Items/weapons";
-    public const string ARMORS_DEFAULT_PATH = @"Items/armors";
+    //public const string ARMORS_DEFAULT_PATH = @"Items/armors";
     public const string WEAPONS_REF_DEFAULT_PATH = @"Items/textures/InGame";
     public const string ATTACKS_ICONS_PATH = @"UI/at_types";
     public const string PROJECTILES_OBJECTS_PATH = @"Projectiles/";

@@ -56,5 +56,13 @@ public class Weapon : Equipment
                     return Class.Heavy;
         }
     }
+    public override string ToString()
+    {
+        string atts = "";
+        attack.ForEach(att => atts += att.ToString() + "\n");
+        return 
+            base.ToString() + "\n" +
+            $"Attacks: \n( {atts} \n)";
+    }
     public enum Class { Light, Medium, Heavy, Ranged, AoE }
 }

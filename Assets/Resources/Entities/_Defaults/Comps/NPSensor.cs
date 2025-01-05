@@ -10,7 +10,7 @@ public class NPSensor : NetworkBehaviour
     List<Transform> inRange = new();
     public Transform ClosestTarget  {get; private set;}
     public bool TargetInRange       {get; private set;}
-    public AITarget me              { get; set; }
+    public EntityStats.AITarget me              { get; set; }
     public Action<Transform> targetChange;
 
 #pragma warning disable IDE0051 // Remove unused private members
