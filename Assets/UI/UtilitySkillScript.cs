@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class UtilitySkillScript : MonoBehaviour
 {
     [SerializeField] SkillTree.Utility.Function condition;
-    [SerializeField] bool loadCurrentOnStart = true;
+    //[SerializeField] bool loadCurrentOnStart = true;
     [SerializeField] bool refreshOnChange = true;
     [SerializeField] bool defaultState = false;
     [SerializeField] List<GameObject> gameObjects;

@@ -40,12 +40,11 @@ public class PlayerStats : EntityStats
     [SerializeField] Camera cam;
     //public RpcParams OwnerRPC { get { return RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp); } }
     protected float chatTimer; const float chatTime = 5.0f;
-    protected Slider xpBar;       // UI nastavene len pre Ownera
-    protected int xpMin = 0;
+    protected XpSliderScript xpBar;       // UI nastavene len pre Ownera
     protected GameManager game;
     protected Inventory inventUI;
             protected NetworkVariable<int> xp = new(0);
-            protected NetworkVariable<int> xpMax = new(10, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+            protected NetworkVariable<int> xpMax = new(10, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
             protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
             protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
             public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -101,11 +100,11 @@ public class PlayerStats : EntityStats
             game = GameManager.instance;
             inventUI = GameManager.instance.inventory;
             hpBar.gameObject.SetActive(false);
-            hpBar = game.GetBar("hp");
-            xpBar = game.GetBar("xp");
-            xpBar.minValue = xpMin;
-            xpBar.maxValue = xpMax.Value;
-            xpBar.value = xp.Value;
+            hpBar = game.GetHpBar();
+            xpBar = game.GetXpBar();
+            xpMax.Value = 100;
+            xpBar.AddMax(xpMax.Value);
+            xpBar.SliderValue = xp.Value;
 
             playerName.Value = game.PlayerName;
         }
@@ -139,14 +138,15 @@ public class PlayerStats : EntityStats
         base.OwnerSubsOnNetValChanged();
         xp.OnValueChanged += (int prevValue, int newValue) => 
         { 
-            if (newValue < xpMax.Value)
-                xpBar.value = xp.Value; 
-            else
+            xpBar.SliderValue = newValue; 
+            if (xpMax.Value <= newValue)
             {
                 xpMax.Value += xpMax.Value + level.Value * 100;
-                xpBar.minValue = xp.Value;
-                xpBar.maxValue = xpMax.Value;
             }
+        };
+        xpMax.OnValueChanged += (int prevValue, int newValue) =>
+        {
+            xpBar.AddMax(xpMax.Value);
         };
         hp.OnValueChanged += (int prevValue, int newValue) => 
         {
@@ -235,6 +235,7 @@ public class PlayerStats : EntityStats
     }
     [Rpc(SendTo.Server)] public void AddXPRpc(int xp)
     {
+        Debug.Log("XP added to player");
         this.xp.Value += xp;
     }
 }

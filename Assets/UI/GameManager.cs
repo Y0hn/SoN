@@ -163,16 +163,14 @@ public class GameManager : MonoBehaviour
         SetGameUI(false);
         conn.Quit(player.OwnerClientId);
     }
-    public Slider GetBar(string bar)
+    public Slider GetHpBar()
     {
-        switch (bar)
-        {
-            case "xp":      return uiPanels["playerUIxpBar"].GetComponent<Slider>();
-            case "hp":
-            case "health":
-            default:        return uiPanels["playerUIhpBar"].GetComponent<Slider>();
-        }
+        return uiPanels["playerUIhpBar"].GetComponent<Slider>();
     }
+    public XpSliderScript GetXpBar()
+    {
+        return uiPanels["playerUIxpBar"].GetComponent<XpSliderScript>();
+    } 
     public void PlayerSpawned(PlayerStats plStats)
     {
         player = plStats;
