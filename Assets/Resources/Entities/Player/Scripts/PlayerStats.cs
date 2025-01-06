@@ -43,7 +43,7 @@ public class PlayerStats : EntityStats
     protected GameManager game;
     protected Inventory inventUI;
             protected NetworkVariable<int> xp = new(0);
-            protected NetworkVariable<int> xpMax = new(10, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
+            protected NetworkVariable<int> xpMax = new(10, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
             protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
             protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
             public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -102,8 +102,8 @@ public class PlayerStats : EntityStats
             hpBar = game.GetHpBar();
             xpBar = game.GetXpBar();
             xpMax.Value = 100;
-            xpBar.AddMax(xpMax.Value);
             xpBar.SliderValue = xp.Value;
+            xpBar.LevelUP(level.Value, xpMax.Value);
 
             playerName.Value = game.PlayerName;
         }
@@ -119,7 +119,17 @@ public class PlayerStats : EntityStats
     {
         base.SubsOnNetValChanged();
         if (IsServer)
+        {
             xpMax.OnValueChanged += (int prev, int newValue) => level.Value++;
+            xp.OnValueChanged += (int prevValue, int newValue) => 
+            {
+                if (xpMax.Value <= newValue)
+                {
+                    int add = level.Value * 10;
+                    xpMax.Value += xpMax.Value + add;
+                }
+            };
+        }
         playerName.OnValueChanged += (FixedString32Bytes prevValue, FixedString32Bytes newValue) => 
         { 
             nameTag.text = newValue.ToString(); 
@@ -138,18 +148,15 @@ public class PlayerStats : EntityStats
         xp.OnValueChanged += (int prevValue, int newValue) => 
         { 
             xpBar.SliderValue = newValue; 
-            if (xpMax.Value <= newValue)
-            {
-                xpMax.Value += xpMax.Value + level.Value * 100;
-            }
+            
         };
-        xpMax.OnValueChanged += (int prevValue, int newValue) =>
+        /*xpMax.OnValueChanged += (int prevValue, int newValue) =>
         {
             xpBar.AddMax(xpMax.Value);
-        };
-        hp.OnValueChanged += (int prevValue, int newValue) => 
+        };*/
+        hp.OnValueChanged += (int prev, int now) => 
         {
-            if (newValue < prevValue)
+            if (now < prev)
                 game.AnimateFace("got-hit");
             game.AnimateFace(HP);
         };
@@ -157,15 +164,15 @@ public class PlayerStats : EntityStats
         {
             OnInventoryUpdate(changeEvent);
         };
-        IsAlive.OnValueChanged  += (bool prevValue, bool newValue) => 
+        IsAlive.OnValueChanged  += (bool perv, bool now) => 
         {
-            game.AnimateUI("isAlive", newValue);
-            cam.gameObject.SetActive(newValue);
-            game.SetPlayerUI(newValue);
+            game.AnimateUI("isAlive", now);
+            cam.gameObject.SetActive(now);
+            game.SetPlayerUI(now);
         };
-        level.OnValueChanged += (byte prevValue, byte newValue) =>
+        level.OnValueChanged += (byte prev, byte now) =>
         {
-            game.LevelUP(newValue);
+            xpBar.LevelUP(now, xpMax.Value);
         };
     }
     protected void OnInventoryUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)  // iba lokalne
@@ -196,7 +203,7 @@ public class PlayerStats : EntityStats
         if (0 <= att)
             wea = id/10 == 1 ? (sbyte)Equipment.Slot.WeaponR : (sbyte)Equipment.Slot.WeaponL;
         
-        Debug.Log($"Setting weapon index to new(att= {att} | wea= {wea})");
+        //Debug.Log($"Setting weapon index to new(att= {att} | wea= {wea})");
         SetWeaponIndex(att, wea);
     }
     public override bool TakeDamage(Damage damage)

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class XpSliderScript : MonoBehaviour
 {
+    [SerializeField] GameManager game;
     [SerializeField] Slider slider;
     [SerializeField] bool xpBar;
     public float SliderValue 
@@ -17,9 +18,12 @@ public class XpSliderScript : MonoBehaviour
         } 
     }
     float sliderValue;
+    Queue<byte> levelUPs = new();
     Queue<float> maxValueQ = new();
     bool valueChangedUP = false, valueChangedDOWN = false;
+    bool QueuedLevelUP => 1 < maxValueQ.Count;
     float Update => (maxValueQ.Peek() - slider.minValue) / 150f ;
+#pragma warning disable IDE0051 // Remove unused private members
     void Start()
     {
         sliderValue = 0f;
@@ -39,10 +43,11 @@ public class XpSliderScript : MonoBehaviour
             else
                 valueChangedUP = false;
 
-            if (1 < maxValueQ.Count && maxValueQ.Peek() <= slider.value)
+            if (QueuedLevelUP && maxValueQ.Peek() <= slider.value)
             {
                 slider.minValue = maxValueQ.Dequeue();
                 slider.maxValue = maxValueQ.Peek();
+                game.LevelUP(levelUPs.Dequeue());
             }
         }   
         else if (valueChangedDOWN)
@@ -56,10 +61,19 @@ public class XpSliderScript : MonoBehaviour
         }
         //Debug.Log($"Update \nUP[{valueChangedUP}] \nDOWN[{valueChangedDOWN}] \nmaxValueQ[{maxValueQ.Count}]\nSlider [{SliderValue}] <{slider.minValue}, {slider.maxValue}>");
     }
-    public void AddMax(float newMax)
+    public void LevelUP(byte level, float nMax)
     {
         if (maxValueQ.Count < 1)
-            slider.maxValue = newMax;
-        maxValueQ.Enqueue(newMax);
+            slider.maxValue = nMax;
+            
+        if (levelUPs.Count < 1)
+            game.LevelUP(1);
+
+        maxValueQ.Enqueue(nMax);
+        level++;
+        levelUPs.Enqueue(level);
+
+        Debug.Log("Level UP queued to " + level);
     }
+#pragma warning restore IDE0051 // Remove unused private members
 }

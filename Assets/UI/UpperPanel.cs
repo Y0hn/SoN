@@ -8,7 +8,7 @@ public class UpperPanel : MonoBehaviour
     SerializedDictionary<SwitchTo, Button> buttons = new();
     private SwitchTo lastSwitch = SwitchTo.None;
     [SerializeField] GameObject skillTree;
-    void Awake()
+    void Start()
     {
         buttons[SwitchTo.Inventory].onClick.AddListener(delegate { SwitchBetween(SwitchTo.Inventory); });
         buttons[SwitchTo.SkillTree].onClick.AddListener(delegate { SwitchBetween(SwitchTo.SkillTree); });

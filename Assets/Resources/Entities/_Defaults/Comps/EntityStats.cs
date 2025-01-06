@@ -124,10 +124,7 @@ public abstract class EntityStats : NetworkBehaviour
                 hp.Value = maxHp.Value;
             };
         }
-        equipment.OnListChanged += (NetworkListEvent<FixedString64Bytes> listEvent) => 
-        {
-            OnEquipmentUpdate(listEvent);
-        };
+        equipment.OnListChanged += OnEquipmentUpdate;
         weaponAttack.OnValueChanged   += (Attack prevValue, Attack newValue) => 
         {
             bool 
@@ -156,7 +153,7 @@ public abstract class EntityStats : NetworkBehaviour
                 Animator.SetFloat("atBlend", atBlend);
             }
         };
-        IsAlive.OnValueChanged  += (bool prev, bool alive)          => 
+        IsAlive.OnValueChanged  += (bool prev, bool alive) => 
         {
             if (IsServer && alive)
                 hp.Value = maxHp.Value;
@@ -169,7 +166,7 @@ public abstract class EntityStats : NetworkBehaviour
                 OnDeath?.Invoke();
             }
         };
-        hp.OnValueChanged       += (int prevValue, int newValue)    => OnHpUpdate();
+        hp.OnValueChanged += OnHpUpdate;
     }
     protected virtual void OwnerSubsOnNetValChanged()
     {
@@ -215,37 +212,24 @@ public abstract class EntityStats : NetworkBehaviour
         if (IsServer && timeToDespawn != 0 && timeToDespawn < Time.time)
             netObject.Despawn();
     }
-    protected virtual void OnHpUpdate()
+    protected virtual void OnHpUpdate(int prev, int now)
     {
         float value = HP;
         hpBar.value = value;
     } 
     protected virtual void OnEquipmentUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
     {
-        string curr = changeEvent.Value.ToString();
-        string prev = changeEvent.PreviousValue.ToString();
-        Equipment.Slot slot = (Equipment.Slot)changeEvent.Index;
-
-        if (changeEvent.Type == NetworkListEvent<FixedString64Bytes>.EventType.Value)
-        {
-            /* Server prida/uberie defence
-            if (IsServer && Equipment.IsArmor(slot))
-            {
-                if      (curr == "")
-                    defence.Remove(Armor.GetItem(prev));
-                else
-                    defence.Add(Armor.GetItem(curr));
-            }*/
-            string eq = "Equipment Update\n";
-            for (int i = 0; i < equipment.Count; i++)
-                eq += $"{i}. Equiped= {equipment[i]!=""} | Path= {equipment[i]}\n";
-            Debug.Log(eq + $"\n Event.Value= {curr}");
-        }
-        else
+        if (changeEvent.Type != NetworkListEvent<FixedString64Bytes>.EventType.Value)
         {
             Debug.LogWarning("Equipment corrupted");
             equipment.SetDirty(true);
         }
+        /*
+        string eq = "Equipment Update\n";
+        for (int i = 0; i < equipment.Count; i++)
+            eq += $"[{i}.] Equiped= {equipment[i]!=""} | Path= {equipment[i]}\n";
+        Debug.Log(eq + $"\n Event.Value= {curr}");
+        */
     }    
     
     public virtual bool TakeDamage(Damage damage)

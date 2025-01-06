@@ -12,12 +12,18 @@ using System;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    /*public static async Awaitable<GameManager> GetGameManager()
+    {
+        //await new WaitUntil(() => weaponSelected == true);
+        while (instance != null);
+        return instance;
+    }*/
     void Awake()    { instance = this; }
-    [SerializeField] Connector conn;
-    [SerializeField] MenuScript menu;
     [SerializeField] SkillPanel skillTree;
-    [SerializeField] MenuScript menuScript;
-    [SerializeField] Animator animatorGameUI;
+    [SerializeField] MenuScript menu;
+    [SerializeField] Connector conn;
+    [SerializeField] Animator anima;
+    [SerializeField] UpperPanel uPl;
     private bool paused;
     private bool chatting;
     private PlayerStats player;
@@ -74,9 +80,9 @@ public class GameManager : MonoBehaviour
     public SkillPanel SkillTree     { get => skillTree; }
     public bool PlayerAble          { get => !(paused || chatting || inventory.open); }
     public string PlayerName        { get { return inputFields["name"].text.Trim(); } set { inputFields["name"].text = value; } }
-    public static MenuScript UI     { get => instance.menuScript; }
+    public static MenuScript UI     { get => instance.menu; }
     public static bool IsServer     { get; private set; }
-#pragma warning disable IDE0051 // Remove unused private members
+//#pragma warning disable IDE0051 // Remove unused private members
     void Start()
     {
         IsServer = NetworkManager.Singleton.IsServer;
@@ -88,7 +94,7 @@ public class GameManager : MonoBehaviour
         
         FileManager.LoadSettings();
     }
-#pragma warning restore IDE0051 // Remove unused private members
+//#pragma warning restore IDE0051 // Remove unused private members
     void SetUpTextFields()
     {
         textFields["pName"].text = Application.productName;
@@ -181,8 +187,6 @@ public class GameManager : MonoBehaviour
     {
         uiPanels["deathScreen"].SetActive(false);
         uiPanels["playerUI"].SetActive(active);
-        
-        uiPanels["invUI"].SetActive(active);
 
         uiPanels["pauseUI"].SetActive(false);
         paused = false;
@@ -196,6 +200,7 @@ public class GameManager : MonoBehaviour
     public void LevelUP(byte level)
     {
         skillTree.LevelUP(level);
+        Debug.Log("Player leveled UP to " + level);
     }
     public void EnableUtility(UtilitySkill utility)
     {
@@ -221,7 +226,6 @@ public class GameManager : MonoBehaviour
         uiPanels["mainCam"].SetActive(!lives);
 
         uiPanels["playerUI"].SetActive(lives);
-        uiPanels["invUI"].SetActive(lives);
         
         uiPanels["pauseUI"].SetActive(false);
         paused = false;
@@ -229,6 +233,7 @@ public class GameManager : MonoBehaviour
         chatting = false;
 
         //uiPanels["menuUI"].SetActive(false);
+        uPl.Reset();
         menu.SetUpUI(false);
         inventory.ReloadAttacks();
 
@@ -237,14 +242,14 @@ public class GameManager : MonoBehaviour
     public void Copy()
     { 
         GUIUtility.systemCopyBuffer = conn.codeText.text; 
-        animatorGameUI.SetTrigger("copy"); 
+        anima.SetTrigger("copy"); 
     }
     
 
     // ANIMATION //
-    public void AnimateFace(float state)            { animatorGameUI.SetFloat("faceState", Mathf.Floor(state*10)/10f);  }
-    public void AnimateFace(string action)          { animatorGameUI.SetTrigger(action);            }
-    public void AnimateUI(string name, float value) { animatorGameUI.SetFloat(name, value);         }
-    public void AnimateUI(string name, bool value)  { animatorGameUI.SetBool(name,value);           }
-    public void AnimateUI(string name)              { animatorGameUI.SetTrigger(name);              }
+    public void AnimateFace(float state)            => anima.SetFloat("faceState", Mathf.Floor(state*10)/10f);
+    public void AnimateFace(string action)          => anima.SetTrigger(action);   
+    public void AnimateUI(string name, float value) => anima.SetFloat(name, value);
+    public void AnimateUI(string name, bool value)  => anima.SetBool(name,value);  
+    public void AnimateUI(string name)              => anima.SetTrigger(name);     
 }

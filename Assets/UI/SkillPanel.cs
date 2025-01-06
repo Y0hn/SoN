@@ -17,7 +17,7 @@ public class SkillPanel : MonoBehaviour
     Vector2[] limits = new Vector2[2];
     Vector2 startMouse;
     byte usedPointsCounter = 0, freePointCouter = 0;
-    void Start()
+    void Awake()
     {
         freePointCouter = 0; 
         usedPointsCounter = 0;
@@ -54,6 +54,7 @@ public class SkillPanel : MonoBehaviour
         freePointCouter = (byte)(level - usedPointsCounter);
         skillCounterText.text = freePointCouter.ToString();
         OnChangeAvailablePoints?.Invoke(AvailablePoints);
+        Debug.Log("After level up to " + level + " AvailablePoints= " + AvailablePoints);
     }
     public void SkillPointAplied()
     {

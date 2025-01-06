@@ -54,12 +54,12 @@ public class SkillSlot : MonoBehaviour
     {
         defaultColors = new Color[4];
         button.onClick.AddListener(ActivateSkill);
-        game = GameManager.instance;
-        if (game != null)
-            game.SkillTree.OnChangeAvailablePoints += PurchableSkill;
         ResetGrafic();
         SetGraficColor(pallete["unavailableIc"], pallete["unavailableBG"], pallete["unavailableIc"]);
         SetInteractable(false);
+        //game = await GameManager.GetGameManager();
+        game = GameManager.instance;
+        game.SkillTree.OnChangeAvailablePoints += PurchableSkill;
     }
     void ResetGrafic()
     {

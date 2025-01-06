@@ -113,9 +113,9 @@ public class NPStats : EntityStats
         Equipment.Slot slot = (Equipment.Slot)changeEvent.Index;
         CallculateWC();
     }
-    protected override void OnHpUpdate()
+    protected override void OnHpUpdate(int prev, int now)
     {
-        base.OnHpUpdate();
+        base.OnHpUpdate(prev, now);
         OnHit.Invoke();
     }
     public void CallculateWC()
