@@ -70,9 +70,7 @@ public abstract class EntityStats : NetworkBehaviour
         }
     }
     public Action OnDeath;
-
     protected Defence defence;  // iba na servery/hoste
-
     protected float timeToDespawn = 0f;
     protected float atTime = 0;
     //private bool clampedDMG = true;

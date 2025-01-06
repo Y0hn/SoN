@@ -9,7 +9,27 @@ public class MenuScript : MonoBehaviour
     [SerializeField] Connector conn;
     [SerializeField] Animator animator;
     [SerializeField] Toggle onlineToggle;
+    [SerializeField] AudioMixer[] audioMixers;
     public bool Online { get => onlineToggle.isOn; set => onlineToggle.isOn = value; }
+    public float[] Audios 
+    {
+        get 
+        { 
+            float[] f = new float[audioMixers.Length];
+            for (int i = 0; i < f.Length; i++)
+            {
+                f[i] = audioMixers[i].SliderValue;
+            }
+            return f;
+        }
+        set
+        {
+            for (int i = 0; i < value.Length; i++)
+            {
+                audioMixers[i].SliderValue = value[i];
+            }
+        }
+    }
 
     [SerializedDictionary("Name", "Button"), SerializeField]
     private SerializedDictionary<string, Button> buttons = new();
@@ -146,6 +166,8 @@ public class MenuScript : MonoBehaviour
     {
         if (navLayer > 0)
         {
+            if (navLayer == 3)
+                FileManager.RegeneradeSettings();
             // Chod o layer vyssie
             navLayer /= 10;
             animator.SetInteger("layer", navLayer);

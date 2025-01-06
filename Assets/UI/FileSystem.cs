@@ -83,7 +83,7 @@ public static class FileManager
     private static Settings settings = new();
     public static void RegeneradeSettings() // Called on ConnectToSever/SettingsClose
     {
-        settings = new Settings(true);
+        settings = new Settings();
         TextWriter writer = null;
         try
         {
@@ -93,8 +93,7 @@ public static class FileManager
         }
         finally
         {
-            if (writer != null)
-                writer.Close();
+            writer?.Close();
         }
     }
     public static void LoadSettings()
@@ -112,8 +111,8 @@ public static class FileManager
             }
             finally
             {
-                if (reader != null)
-                    reader.Close();
+                reader?.Close();
+                Debug.Log("Settings loaded:\n"+settings);
             }
         }
     }
@@ -200,40 +199,42 @@ public static class FileManager
 }
 [Serializable] public class Settings
 {
-    public string playerName;
     public bool online;
+    public string playerName;
     public string lastConnection;
+    public float[] audioSliders;
     // ...
     public Settings()
     {
-        lastConnection = "";
-        playerName = "";
-        online = true;
-    }
-    public Settings(bool get = true)
-    {
-        if (get)
-        {
-            lastConnection = Connector.instance.codeText.text;
-            playerName = GameManager.instance.PlayerName;
-            online = GameManager.UI.Online;
-        }
-        else
-        {
-            lastConnection = "";
-            playerName = "";
-            online = true;
-        }
+        lastConnection = Connector.instance.codeText.text;
+        playerName = GameManager.instance.PlayerName;
+        audioSliders = GameManager.UI.Audios;
+        online = GameManager.UI.Online;
     }
     public void SetSettings(Settings settings)
     {
-        this.playerName = settings.playerName;
-        this.online = settings.online;
-        this.lastConnection = settings.lastConnection;
-
+        online = settings.online;
+        playerName = settings.playerName;
+        lastConnection = settings.lastConnection;
+        audioSliders = settings.audioSliders;
+        
         Connector.instance.codeText.text = lastConnection;
         GameManager.instance.PlayerName = playerName;
+        GameManager.UI.Audios = audioSliders;
         GameManager.UI.Online = online;
+    }
+    public override string ToString()
+    {
+        string auL = "[ ";
+        foreach (var au in audioSliders)
+            auL += au + " | ";
+        auL+= " ]";
+
+        return
+            $"Player NameTag= {playerName}\n"+
+            $"Last played online= {online}\n"+
+            $"Last game Connected= {lastConnection}\n"+
+            $"Auidos list: {auL}";
     }
 }
 [Serializable] public class World
