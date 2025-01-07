@@ -9,8 +9,12 @@ public class MenuScript : MonoBehaviour
     [SerializeField] Connector conn;
     [SerializeField] Animator animator;
     [SerializeField] Toggle onlineToggle;
+    [SerializeField] Toggle fullScToggle;
+    [SerializeField] QualityScript quality;
     [SerializeField] AudioMixer[] audioMixers;
-    public bool Online { get => onlineToggle.isOn; set => onlineToggle.isOn = value; }
+    public bool Online { get => onlineToggle.isOn;  set => onlineToggle.isOn = value;   }
+    public bool FullSc { get => fullScToggle.isOn;  set => fullScToggle.isOn = value;   }
+    public int Quality { get => quality.Q;          set => quality.Q = value;           }
     public float[] Audios 
     {
         get 
@@ -30,7 +34,6 @@ public class MenuScript : MonoBehaviour
             }
         }
     }
-
     [SerializedDictionary("Name", "Button"), SerializeField]
     private SerializedDictionary<string, Button> buttons = new();
     /* OBSAH
@@ -134,6 +137,15 @@ public class MenuScript : MonoBehaviour
         MainMenuNav(0);
         if (!active)
             animator.SetTrigger("reset");
+
+        fullScToggle.onValueChanged.AddListener(
+            delegate (bool on) 
+            { 
+                Screen.fullScreen = on; 
+            }
+        );
+
+        
     }
     void SetTextFields()
     {
@@ -166,7 +178,7 @@ public class MenuScript : MonoBehaviour
     {
         if (navLayer > 0)
         {
-            if (navLayer == 3)
+            if (navLayer == 3/* || 2 == navLayer*/)
                 FileManager.RegeneradeSettings();
             // Chod o layer vyssie
             navLayer /= 10;
@@ -226,19 +238,26 @@ public class MenuScript : MonoBehaviour
         string player = inputFields["playerName"].text.Trim();
 
         if (player == "")
+        {
             textFields["UserNameError"].text = "Type your name";
+        }
         else if (player.Length < 2)
+        {
             textFields["UserNameError"].text = "Name must be longer";
+        }
         else
         {
             textFields["UserNameError"].text = "";
             check = true;
-        }          
+        }
 
+        if (check)
+            FileManager.RegeneradeSettings();
         return check;
     }
     void StartConnection(bool online, bool load = false)
     {
+        FileManager.RegeneradeSettings();
         if (!load)
         {
             conn.StartConnection(online);
@@ -250,6 +269,7 @@ public class MenuScript : MonoBehaviour
     }
     bool ConnectionCheck()
     {
+        //FileManager.RegeneradeSettings();
         string ipCode = inputFields["ipCode"].text.Trim();
         bool check = conn.JoinConnection(ipCode, out string e);
 

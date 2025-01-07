@@ -94,6 +94,7 @@ public static class FileManager
         finally
         {
             writer?.Close();
+            Debug.Log("Settings regenerated:\n"+settings);
         }
     }
     public static void LoadSettings()
@@ -200,40 +201,60 @@ public static class FileManager
 [Serializable] public class Settings
 {
     public bool online;
+    public bool fullSc;
+    public int quality;
     public string playerName;
     public string lastConnection;
-    public float[] audioSliders;
+    public float[] audioS;
     // ...
     public Settings()
     {
-        lastConnection = Connector.instance.codeText.text;
-        playerName = GameManager.instance.PlayerName;
-        audioSliders = GameManager.UI.Audios;
-        online = GameManager.UI.Online;
+        try {
+            lastConnection = Connector.instance.codeText.text;
+            playerName = GameManager.instance.PlayerName;
+            quality = GameManager.UI.Quality;
+            audioS = GameManager.UI.Audios;
+            online = GameManager.UI.Online;
+            fullSc = GameManager.UI.FullSc;
+        } catch (Exception ex) {
+            Debug.LogWarning($"Setting Creation Error \nExeption: {ex.Message}\nSource: {ex.Source}");
+            // Revert to defaults Settings
+        }
     }
     public void SetSettings(Settings settings)
     {
         online = settings.online;
+        fullSc = settings.fullSc;
+        audioS = settings.audioS;
+        quality = settings.quality;
         playerName = settings.playerName;
         lastConnection = settings.lastConnection;
-        audioSliders = settings.audioSliders;
         
         Connector.instance.codeText.text = lastConnection;
         GameManager.instance.PlayerName = playerName;
-        GameManager.UI.Audios = audioSliders;
+        GameManager.UI.Audios = audioS;
+        GameManager.UI.Quality = quality;
         GameManager.UI.Online = online;
+        GameManager.UI.FullSc = fullSc;
     }
     public override string ToString()
     {
         string auL = "[ ";
-        foreach (var au in audioSliders)
-            auL += au + " | ";
-        auL+= " ]";
+        for (int i = 0; i < audioS.Length; i++)
+        {
+            auL += audioS[i];
+            if (i < audioS.Length -1 )
+                auL+=" | ";
+            else
+                auL+= " ]";
+        }
 
         return
             $"Player NameTag= {playerName}\n"+
             $"Last played online= {online}\n"+
             $"Last game Connected= {lastConnection}\n"+
+            $"Quality setting= {quality}\n"+
+            $"Fullscreen= {fullSc}\n"+
             $"Auidos list: {auL}";
     }
 }
