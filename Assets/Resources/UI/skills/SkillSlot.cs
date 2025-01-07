@@ -57,7 +57,6 @@ public class SkillSlot : MonoBehaviour
         ResetGrafic();
         SetGraficColor(pallete["unavailableIc"], pallete["unavailableBG"], pallete["unavailableIc"]);
         SetInteractable(false);
-        //game = await GameManager.GetGameManager();
         game = GameManager.instance;
         game.SkillTree.OnChangeAvailablePoints += PurchableSkill;
     }
@@ -110,8 +109,8 @@ public class SkillSlot : MonoBehaviour
     }
     void SetInteractable(bool interactable)
     {
-        icon.raycastTarget = interactable;
         button.interactable = interactable;
+        background.raycastTarget = interactable;
         background.raycastTarget = interactable;
     }
     void SetGraficColor(Color color)

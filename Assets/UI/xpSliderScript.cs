@@ -65,9 +65,6 @@ public class XpSliderScript : MonoBehaviour
     {
         if (maxValueQ.Count < 1)
             slider.maxValue = nMax;
-            
-        if (levelUPs.Count < 1)
-            game.LevelUP(1);
 
         maxValueQ.Enqueue(nMax);
         level++;

@@ -93,7 +93,8 @@ public class PlayerStats : EntityStats
     protected override void EntitySetUp()
     {
         base.EntitySetUp();
-
+        if (IsServer)
+            level.Value= 0;
         if (IsOwner)
         {
             game = GameManager.instance;
@@ -101,9 +102,9 @@ public class PlayerStats : EntityStats
             hpBar.gameObject.SetActive(false);
             hpBar = game.GetHpBar();
             xpBar = game.GetXpBar();
-            xpMax.Value = 100;
+            xpMax.Value = 50;
             xpBar.SliderValue = xp.Value;
-            xpBar.LevelUP(level.Value, xpMax.Value);
+            xpBar.LevelUP(1, xpMax.Value);
 
             playerName.Value = game.PlayerName;
         }
@@ -125,7 +126,8 @@ public class PlayerStats : EntityStats
             {
                 if (xpMax.Value <= newValue)
                 {
-                    int add = level.Value * 10;
+                    // prida potrebne exp do dalsieho levelu
+                    int add = (level.Value+1) * 10;
                     xpMax.Value += xpMax.Value + add;
                 }
             };
@@ -172,7 +174,7 @@ public class PlayerStats : EntityStats
         };
         level.OnValueChanged += (byte prev, byte now) =>
         {
-            xpBar.LevelUP(now, xpMax.Value);
+            xpBar.LevelUP((byte)(now+1), xpMax.Value);
         };
     }
     protected void OnInventoryUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)  // iba lokalne
