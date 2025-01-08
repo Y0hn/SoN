@@ -8,6 +8,7 @@ public class UtilitySkillScript : MonoBehaviour
     //[SerializeField] bool loadCurrentOnStart = true;
     [SerializeField] bool refreshOnChange = true;
     [SerializeField] bool defaultState = false;
+    [SerializeField] bool requestStateOnStart = false;
     [SerializeField] List<GameObject> gameObjects;
     GameManager game;
     void Start()
@@ -15,7 +16,11 @@ public class UtilitySkillScript : MonoBehaviour
         game = GameManager.instance;
         if (refreshOnChange)
             game.UtilityUpdate += UtilityUpdate;
-        SetGameObjects(defaultState);        
+
+        if (requestStateOnStart)
+            SetGameObjects(game.IsUtilityEnabled(condition));
+        else
+            SetGameObjects(defaultState);                
     }
     void UtilityUpdate(UtilitySkill skill)
     {

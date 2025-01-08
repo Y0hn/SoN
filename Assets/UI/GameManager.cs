@@ -211,6 +211,13 @@ public class GameManager : MonoBehaviour
 
         UtilityUpdate?.Invoke(utility);
     }
+    public bool IsUtilityEnabled (SkillTree.Utility.Function f)
+    {
+        bool b = false;
+        if (!Utils.ContainsKey(f))
+            Utils.Add(f, b);
+        return Utils[f];
+    }
     public void SetPlayerUI(bool lives = true)
     {
         if (!lives)

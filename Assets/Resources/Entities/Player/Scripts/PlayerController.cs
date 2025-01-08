@@ -40,8 +40,8 @@ public class PlayerController : EntityController
 
         if (Input.GetKeyDown(KeyCode.P))
             DropRpc();
-        else if (Input.GetKeyDown(KeyCode.L))
-            ((PlayerStats)stats).AddXPRpc(100);
+        else if (Input.GetKey(KeyCode.L))
+            ((PlayerStats)stats).AddXPRpc(10000);
     }
     void Q1(InputAction.CallbackContext context) { Q(1); }
     void Q2(InputAction.CallbackContext context) { Q(2); }

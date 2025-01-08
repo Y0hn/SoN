@@ -7,6 +7,7 @@ public class Projectile : NetworkBehaviour
     [SerializeField] SpriteRenderer sprite;
     [SerializeField] Rigidbody2D rb;
     [SerializeField] Collider2D coll;
+    [SerializeField] LineDrawer line;
 
     EntityStats shooter;
     Damage damage;
