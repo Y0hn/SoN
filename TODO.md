@@ -20,7 +20,7 @@ BOSS
 ### DONE 2/5 TYPES OF ENEMIES 
 Skeleton
 Zombie
-
+Bakuk
 Baba Jaga
 Kikimora
 ### LOOT SYSTEM
