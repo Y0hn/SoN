@@ -336,7 +336,7 @@ public abstract class EntityStats : NetworkBehaviour
     /// </summary>
     [Rpc(SendTo.Server)] protected virtual void AttackRpc()
     {
-        foreach(EntityStats et in Attack.Trigger())                 // ak ranged tak count = 0
+        foreach(EntityStats et in Attack.Trigger(this))                 // ak ranged tak count = 0
             if (et.IsAlive.Value && et.TakeDamage(Attack.damage))    // pravdive ak target zomrie
                 KilledEnemy(et);
     }

@@ -19,10 +19,8 @@ public class NPController : EntityController
     protected bool selfTarget;
 
     public bool ForceDecision       { get; protected set; }
-    protected Vector2 TargetPosition => 
-        sensor.ClosestTarget.position + 
-            new (Random.inRange(-0.5f,0.5f),
-                Random.inRange(-0.5f,0.5f));
+    protected Vector3 TargetPosition => 
+        sensor.ClosestTarget.position /*+ new Vector3(Random.Range(-0.5f,0.5f), Random.Range(-0.5f,0.5f))*/;
 
 
     public override void OnNetworkSpawn()

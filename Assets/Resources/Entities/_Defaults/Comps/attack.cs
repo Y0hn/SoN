@@ -1,5 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
+using System.Collections.Generic;
 using System;
 [Serializable] public struct Attack : INetworkSerializable, IEquatable<Attack>
 {
@@ -56,7 +57,7 @@ using System;
         if (IsMelee)
             MeleeTrigger(ref self, ref etS);
         else // if ranged
-            RangedAttack(ref self);
+            RangedTrigger(ref self);
 
         return etS;
     }
@@ -66,7 +67,7 @@ using System;
     /// <returns>vráti pole získaných entít</returns>
     void MeleeTrigger(ref EntityStats self, ref List<EntityStats> list)
     {
-        Collider2D[] targets = Physics2D.OverlapCircleAll(attackPoint.position, weaponAttack.Value.range /*, layer mask */);
+        Collider2D[] targets = Physics2D.OverlapCircleAll(self.AttackPoint.position, self.Attack.range /*, layer mask */);
         foreach (Collider2D target in targets)
             if (target.TryGetComponent(out EntityStats stats))
                 if (stats != self)
@@ -77,11 +78,11 @@ using System;
 	/// </summary>
     void RangedTrigger(ref EntityStats self)
     {
-        Ranged r = self.EquipedWeapon;
+        Ranged r = (Ranged)self.EquipedWeapon;
         //byte b = (byte)weapE.Value.aIndex;
-        GameObject p = Instantiate(r.GetProjectile, attackPoint.position, Rotation);
+        GameObject p = GameObject.Instantiate(r.GetProjectile, self.AttackPoint.position, self.Rotation);
         Projectile pp = p.GetComponent<Projectile>();
-        pp.SetUp(Attack, self);
+        pp.SetUp(self.Attack, self);
         NetworkObject netP = p.GetComponent<NetworkObject>();
         netP.Spawn(true);
         netP.TrySetParent(self.transform);
