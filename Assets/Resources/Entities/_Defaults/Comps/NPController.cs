@@ -17,7 +17,14 @@ public class NPController : EntityController
     protected float nextDecisionTimer = 0f;
     protected List<Transform> patrol = new();
     protected bool selfTarget;
+
     public bool ForceDecision       { get; protected set; }
+    protected Vector2 TargetPosition => 
+        sensor.ClosestTarget.position + 
+            new (Random.inRange(-0.5f,0.5f),
+                Random.inRange(-0.5f,0.5f));
+
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -62,7 +69,7 @@ public class NPController : EntityController
     }
     protected virtual void TurnForTarget()
     {
-        viewDir = sensor.ClosestTarget.position - transform.position;
+        viewDir = TargetPosition - transform.position;
         viewDir = viewDir.normalized;
         // float angle = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
         // transform.rotation = Quaternion.Euler(0, 0, angle);
