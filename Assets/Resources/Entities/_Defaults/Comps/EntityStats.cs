@@ -314,7 +314,7 @@ public abstract class EntityStats : NetworkBehaviour
     {
 
     }
-    
+
     // RPSs
     /// <summary>
     /// Pridáva/Odoberā zbrame
@@ -343,7 +343,7 @@ public abstract class EntityStats : NetworkBehaviour
     /// <summary>
     /// Zbiera a equipuje zbrane
     /// </summary>
-    /// <param name="reference"></param>
+    /// <param name="reference"></param>tile.Stop();
     [Rpc(SendTo.Server)] public virtual void PickedUpRpc(string reference)
     {
         Equipment e = Equipment.GetItem(reference);

@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
+using Unity.VisualScripting;
 
 public class Projectile : NetworkBehaviour
 {
@@ -7,7 +8,7 @@ public class Projectile : NetworkBehaviour
     [SerializeField] SpriteRenderer sprite;
     [SerializeField] Rigidbody2D rb;
     [SerializeField] Collider2D coll;
-    [SerializeField] LineDrawer line;
+    [SerializeField] Transform line;
 
     EntityStats shooter;
     Damage damage;
@@ -18,6 +19,7 @@ public class Projectile : NetworkBehaviour
     private Vector2 startPos = Vector2.positiveInfinity;
     private Vector3 force;
     private float[] timer = { -1, -1};
+    private float RangeLimit => range*2;
     const float FORCE = 1000;
 
     public override void OnNetworkSpawn()
@@ -28,6 +30,7 @@ public class Projectile : NetworkBehaviour
         
         timer[0] = Time.time + delay;
         timer[1] = Time.time + graficDelay;
+        line.gameObject.SetActive(false);
     }
 #pragma warning disable IDE0051 // Remove unused private members
     void Update()
@@ -44,12 +47,16 @@ public class Projectile : NetworkBehaviour
         }
         else if (timer[1] > 0 && Time.time >= timer[1])  // vykreslenie textury
         {
+            line.localScale = new (line.localScale.x,RangeLimit);
             sprite.enabled = true;
             timer[1] = 0;
         }
-        else if (coll.enabled && Vector2.Distance(startPos, transform.position) >= range*2)  // range limit
+        else if (coll.enabled)  // range limit
         {
-            networkObject.Despawn();
+            float distance = Vector2.Distance(startPos, transform.position);
+            if (distance >= RangeLimit)
+                Stop();
+            line.localScale = new (line.localScale.x,distance);
         }
     }
     void FixedUpdate()
@@ -85,5 +92,9 @@ public class Projectile : NetworkBehaviour
         shooter = entityStats;
 
         Debug.Log($"Shoted projectile \nwith attack: {attack}");
+    }
+    public void Stop()
+    {
+        networkObject.Despawn();
     }
 }

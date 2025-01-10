@@ -42,8 +42,8 @@ public class PlayerStats : EntityStats
     protected XpSliderScript xpBar;       // UI nastavene len pre Ownera
     protected GameManager game;
     protected Inventory inventUI;
-            protected NetworkVariable<int> xp = new(0);
-            protected NetworkVariable<int> xpMax = new(10, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
+            protected NetworkVariable<uint> xp = new(0);
+            protected NetworkVariable<uint> xpMax = new(10, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
             protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
             protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
             public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -121,14 +121,14 @@ public class PlayerStats : EntityStats
         base.SubsOnNetValChanged();
         if (IsServer)
         {
-            xpMax.OnValueChanged += (int prev, int newValue) => level.Value++;
-            xp.OnValueChanged += (int prevValue, int newValue) => 
+            xpMax.OnValueChanged += (uint prev, uint newValue) => level.Value++;
+            xp.OnValueChanged += (uint prevValue, uint newValue) => 
             {
                 if (xpMax.Value <= newValue)
                 {
                     // prida potrebne exp do dalsieho levelu
                     int add = (level.Value+1) * 10;
-                    xpMax.Value += xpMax.Value + add;
+                    xpMax.Value += (uint)(xpMax.Value + add);
                 }
             };
         }
@@ -147,7 +147,7 @@ public class PlayerStats : EntityStats
     {
         if (!IsOwner) return;
         base.OwnerSubsOnNetValChanged();
-        xp.OnValueChanged += (int prevValue, int newValue) => 
+        xp.OnValueChanged += (uint prevValue, uint newValue) => 
         { 
             xpBar.SliderValue = newValue; 
             
@@ -231,7 +231,7 @@ public class PlayerStats : EntityStats
     public override void KilledEnemy(EntityStats died)
     {
         base.KilledEnemy(died);
-        xp.Value += died.level.Value * 5 ;
+        xp.Value += (uint)(died.level.Value * 100);
     }    
     [Rpc(SendTo.Server)] public override void PickedUpRpc(string refItem)
     {
@@ -241,9 +241,9 @@ public class PlayerStats : EntityStats
     {
         skillTree.Add(skill);
     }
-    [Rpc(SendTo.Server)] public void AddXPRpc(int xp)
+    [Rpc(SendTo.Server)] public void AddLvlRpc()
     {
-        Debug.Log("XP added to player");
-        this.xp.Value += xp;
+        //Debug.Log("XP added to player");
+        xp.Value = xpMax.Value;
     }
 }

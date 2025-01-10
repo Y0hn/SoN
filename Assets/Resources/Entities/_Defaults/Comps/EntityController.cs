@@ -8,7 +8,7 @@ public abstract class EntityController : NetworkBehaviour
 {
     [SerializeField] protected EntityStats stats;
     protected Vector2 moveDir;
-    protected bool attacking;
+    protected bool attacking, wasAttacking;
     protected Vector2 viewDir = Vector2.zero;
     protected const float MIN_MOVE_TOL = 0.1f;
     public Vector2 View     { get => viewDir; }
@@ -19,8 +19,10 @@ public abstract class EntityController : NetworkBehaviour
     }
     protected virtual void Update()
     {
-        if (attacking)
+        if      (attacking)
             Attack();
+        else if (wasAttacking)
+            AttackInterupt();
     }
     protected virtual void FixedUpdate()
     {
@@ -49,14 +51,26 @@ public abstract class EntityController : NetworkBehaviour
     }
     protected virtual void Attack()
     {
+        stats.Animator.SetBool("interupAttck", false);
         if (stats.AttackTrigger())
         {
+            wasAttacking = true;
             if (stats.AttackBoth)
             {
                 float atBlend = stats.Animator.GetFloat("atBlend") * -1;
                 stats.Animator.SetFloat("atBlend", atBlend);
             }
             stats.Animator.SetTrigger("attack");
+        }
+    }
+    protected virtual void AttackInterupt()
+    {
+        wasAttacking = false;
+        if (stats.TryInteruptAttack())
+        {
+            stats.Animator.ResetTrigger("attack");
+            stats.Animator.SetBool("interupAttck", true);
+            Debug.Log("Attack interupted");
         }
     }
     /*protected Vector2 RoundVector(Vector2 v, byte d = 1)
