@@ -83,6 +83,9 @@ public abstract class EntityStats : NetworkBehaviour
 
         hpBar.value = hp.Value;
     }
+    /// <summary>
+    /// Zavolane v netSpawne, zabezpecuje synchronizaciu hodnot/vlastnosti componentov, ktore vidia vsetci
+    /// </summary>
     protected virtual void SubsOnNetValChanged()
     {
         if (IsServer)
@@ -166,6 +169,9 @@ public abstract class EntityStats : NetworkBehaviour
         };
         hp.OnValueChanged += OnHpUpdate;
     }
+    /// <summary>
+    /// Zabezpecuje synchronizaciu zmeny hodnoty/vlastnosti componentov, ktore su dôleźité iba pre majitela/server alebo spúšťa animacie
+    /// </summary>
     protected virtual void OwnerSubsOnNetValChanged()
     {
         // Server / Owner
@@ -182,6 +188,9 @@ public abstract class EntityStats : NetworkBehaviour
             Animator.SetBool("isAlive", now);
         };
     }
+	/// <summary>
+	/// Nataví zakladné vlastnosti entity
+	/// </summary>
     protected virtual void EntitySetUp()
     {
         name = name.Split('(')[0].Trim();
@@ -205,16 +214,28 @@ public abstract class EntityStats : NetworkBehaviour
         }
         attackPoint.localPosition = new(attackPoint.localPosition.x, weaponAttack.Value.range);
     }
+    /// <summary>
+    /// Spúšta sa kazdy frame a stará sa o despawn po smrti
+    /// </summary>
     protected virtual void Update()
     {
         if (IsServer && timeToDespawn != 0 && timeToDespawn < Time.time)
             netObject.Despawn();
     }
+    /// <summary>
+    /// Spúšta sa po každej zmene životov, 
+    /// </summary>
+    /// <param name="prev"></param>
+    /// <param name="now"></param>
     protected virtual void OnHpUpdate(int prev, int now)
     {
         float value = HP;
         hpBar.value = value;
     } 
+    /// <summary>
+    /// Spúšťa sa po každej zmene zbrane
+    /// </summary>
+    /// <param name="changeEvent"></param>
     protected virtual void OnEquipmentUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
     {
         if (changeEvent.Type != NetworkListEvent<FixedString64Bytes>.EventType.Value)
@@ -229,7 +250,11 @@ public abstract class EntityStats : NetworkBehaviour
         Debug.Log(eq + $"\n Event.Value= {curr}");
         */
     }    
-    
+    /// <summary>
+    /// Uberie hodnotu ublíženia zo źivotov podla obrany proti konkretnemu typu
+    /// </summary>
+    /// <param name="damage"></param>
+    /// <returns></returns>
     public virtual bool TakeDamage(Damage damage)
     {
         if (!IsServer) 
@@ -246,6 +271,10 @@ public abstract class EntityStats : NetworkBehaviour
 
         return !IsAlive.Value;
     }
+    /// <summary>
+    /// Posle serveru prikaz na utok
+    /// </summary>
+    /// <returns>vrati ci sa je mozne utocit</returns>
     public virtual bool AttackTrigger()
     {
         if (Time.time >= atTime)
@@ -256,10 +285,19 @@ public abstract class EntityStats : NetworkBehaviour
         }
         return false;
     }
+    /// <summary>
+    /// Vykoná sa po zabití entity
+    /// </summary>
+    /// <param name="died">koho som zabil</param>
     public virtual void KilledEnemy(EntityStats died)
     {
 
     }
+    /// <summary>
+    /// Nastaví aktualnu zbran a jej utok alebo iba zmení jej útok
+    /// </summary>
+    /// <param name="attack"></param>
+    /// <param name="weapon"></param>
     public virtual void SetWeaponIndex (sbyte attack, sbyte weapon= -1)
     {
         if      (weapon < 0 && 0 <= attack)
@@ -269,41 +307,20 @@ public abstract class EntityStats : NetworkBehaviour
         else if (attack < 0)
             weapE.Value = new (-1, -1);
     }
-    
+    /// <summary>
+    /// Vyziada si uložené dáta 
+    /// </summary>
     protected virtual void TryLoadServerData()
     {
 
     }
-    protected virtual EntityStats[] MeleeAttack()
-    {
-        List<EntityStats> targetStats = new();
-        Collider2D[] targets = Physics2D.OverlapCircleAll(attackPoint.position, weaponAttack.Value.range /*, layer mask */);
-        foreach (Collider2D target in targets)
-            if (target.TryGetComponent(out EntityStats stats))
-                if (stats != this)
-                    targetStats.Add(stats);
-
-        //Debug.Log("Melee Hitted " + targetStats.Count + " targets");
-        return targetStats.ToArray();
-    }
-    protected virtual void RangedAttack()
-    {
-        if (weapE.Value.eIndex >= 0 && weapE.Value.aIndex >= 0)
-        {
-            Ranged r = Resources.Load<Ranged>(equipment[weapE.Value.eIndex].ToString());
-            //byte b = (byte)weapE.Value.aIndex;
-            GameObject p = Instantiate(r.GetProjectile, attackPoint.position, Rotation);
-            Projectile pp = p.GetComponent<Projectile>();
-            pp.SetUp(Attack, this);
-            NetworkObject netP = p.GetComponent<NetworkObject>();
-            netP.Spawn(true);
-            netP.TrySetParent(transform);
-        }
-        else
-            Debug.Log("cannot do a ranged attack with " + weapE.Value.ToString());
-    }
     
     // RPSs
+    /// <summary>
+    /// Pridáva/Odoberā zbrame
+    /// </summary>
+    /// <param name="reference"></param>
+    /// <param name="slot"></param>
     [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot = Equipment.Slot.NoPreference)
     {
         /*if (slot == Equipment.Slot.NoPreference && reference != "")
@@ -314,22 +331,19 @@ public abstract class EntityStats : NetworkBehaviour
         equipment[(int)slot] = reference;
         Debug.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
     }
+    /// <summary>
+    /// Utocí za entitu podla typu útoku
+    /// </summary>
     [Rpc(SendTo.Server)] protected virtual void AttackRpc()
     {
-        //Debug.Log("SERVER RPC attack !");
-        if      (Attack.MeleeAttack(Attack.type))
-        {
-            foreach(EntityStats et in MeleeAttack())
-                if (et.IsAlive.Value && et.TakeDamage(Attack.damage))    // pravdive ak target zomrie
-                    KilledEnemy(et);
-        }
-        else if (Attack.RangedAttack(Attack.type))
-        {
-            RangedAttack();
-        }
-        else 
-            Debug.Log($"Player {name} attack type {Enum.GetName(typeof(Attack.Type), Attack.type)} not yet defined");
+        foreach(EntityStats et in Attack.Trigger())                 // ak ranged tak count = 0
+            if (et.IsAlive.Value && et.TakeDamage(Attack.damage))    // pravdive ak target zomrie
+                KilledEnemy(et);
     }
+    /// <summary>
+    /// Zbiera a equipuje zbrane
+    /// </summary>
+    /// <param name="reference"></param>
     [Rpc(SendTo.Server)] public virtual void PickedUpRpc(string reference)
     {
         Equipment e = Equipment.GetItem(reference);

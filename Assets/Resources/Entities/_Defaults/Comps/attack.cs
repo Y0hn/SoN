@@ -43,10 +43,50 @@ using System;
     {
         return Type.BowSingle == t || t == Type.BowMulti;
     }
+
+
     public void AddDamage(Damage damage)
     {
         damage.Add(damage);
     }
+    public List<EntityStats> Trigger(EntityStats self)
+    {
+        List<EntityStats> etS = new();
+
+        if (IsMelee)
+            MeleeTrigger(ref self, ref etS);
+        else // if ranged
+            RangedAttack(ref self);
+
+        return etS;
+    }
+	/// <summary>
+    /// Získa vśetky entity okrem seba, ktoré sú v dosahu (beźí na servery)
+    /// </summary>
+    /// <returns>vráti pole získaných entít</returns>
+    void MeleeTrigger(ref EntityStats self, ref List<EntityStats> list)
+    {
+        Collider2D[] targets = Physics2D.OverlapCircleAll(attackPoint.position, weaponAttack.Value.range /*, layer mask */);
+        foreach (Collider2D target in targets)
+            if (target.TryGetComponent(out EntityStats stats))
+                if (stats != self)
+                    list.Add(stats);
+    }
+	/// <summary>
+	/// Z strelnej zbrane získa projektil, ktorý spawne a nastaví mu hodnoty
+	/// </summary>
+    void RangedTrigger(ref EntityStats self)
+    {
+        Ranged r = self.EquipedWeapon;
+        //byte b = (byte)weapE.Value.aIndex;
+        GameObject p = Instantiate(r.GetProjectile, attackPoint.position, Rotation);
+        Projectile pp = p.GetComponent<Projectile>();
+        pp.SetUp(Attack, self);
+        NetworkObject netP = p.GetComponent<NetworkObject>();
+        netP.Spawn(true);
+        netP.TrySetParent(self.transform);
+    }
+
     public bool Equals (Attack other)
     {
         return
