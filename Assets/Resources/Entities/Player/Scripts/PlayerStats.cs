@@ -50,6 +50,7 @@ public class PlayerStats : EntityStats
     
     protected SkillTree skillTree;  // iba na servery
    
+    public Projectile Projectile { get; set; }
     public override Attack Attack 
     { 
         get { 
@@ -232,7 +233,21 @@ public class PlayerStats : EntityStats
     {
         base.KilledEnemy(died);
         xp.Value += (uint)(died.level.Value * 100);
-    }    
+    }
+    public virtual bool TryInteruptAttack()
+    {
+        bool canStop = Attack.IsRanged;
+
+        if (canStop)
+        {
+            StopRanAttackRpc();
+            atTime = 0;
+        }
+
+        return canStop;
+    }
+
+    // RPCs
     [Rpc(SendTo.Server)] public override void PickedUpRpc(string refItem)
     {
         inventory.Add(refItem);
@@ -240,6 +255,14 @@ public class PlayerStats : EntityStats
     [Rpc(SendTo.Server)] public virtual void AddSkillRpc(SkillTree.Skill skill)
     {
         skillTree.Add(skill);
+    }
+    
+    /// <summary>
+    /// Zastavi utok
+    /// </summary>
+    [Rpc(SendTo.Server)] protected void StopRanAttackRpc()
+    {
+        Projectile.StopAttack();
     }
     [Rpc(SendTo.Server)] public void AddLvlRpc()
     {

@@ -18,10 +18,9 @@ public class NPController : EntityController
     protected List<Transform> patrol = new();
     protected bool selfTarget;
 
+    protected new NPStats Stats => (NPStats)base.Stats;
     public bool ForceDecision       { get; protected set; }
-    protected Vector3 TargetPosition => 
-        sensor.ClosestTarget.position /*+ new Vector3(Random.Range(-0.5f,0.5f), Random.Range(-0.5f,0.5f))*/;
-
+    protected Vector3 TargetPosition => sensor.ClosestTarget.position;
 
     public override void OnNetworkSpawn()
     {
@@ -38,11 +37,11 @@ public class NPController : EntityController
     {
         if (!IsServer || path == null || !stats.IsAlive.Value) return;
 
-        if (nextDecisionTimer < Time.time || ForceDecision)
+        /*if (nextDecisionTimer < Time.time || ForceDecision)
         {
 
             //DecideNextMove();
-        }
+        }*/
             
         if (selfTarget && moveDir != Vector2.zero)
         {
@@ -52,7 +51,8 @@ public class NPController : EntityController
         }
         else if (!selfTarget && attacking && path.reachedEndOfPath)
         {
-            TurnForTarget();
+            if (!Stats.AboutToFire)
+                TurnForTarget();
             Attack();
         }
         else if (!selfTarget)

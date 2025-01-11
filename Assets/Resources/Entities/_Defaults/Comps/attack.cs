@@ -79,13 +79,17 @@ using System;
     void RangedTrigger(ref EntityStats self)
     {
         Ranged r = (Ranged)self.EquipedWeapon;
-        //byte b = (byte)weapE.Value.aIndex;
         GameObject p = GameObject.Instantiate(r.GetProjectile, self.AttackPoint.position, self.Rotation);
-        Projectile pp = p.GetComponent<Projectile>();
-        pp.SetUp(self.Attack, self);
+        Projectile proj = p.GetComponent<Projectile>();
+        proj.SetUp(self.Attack, self);
         NetworkObject netP = p.GetComponent<NetworkObject>();
         netP.Spawn(true);
         netP.TrySetParent(self.transform);
+
+        if      (self is PlayerStats plS)
+            plS.Projectile = proj;
+        else if (self is NPStats npS)
+            npS.SetAboutToFireTime(proj);
     }
 
     public bool Equals (Attack other)

@@ -42,6 +42,7 @@ public class NPStats : EntityStats
     [SerializeField] protected NPSensor sensor;
     [SerializeField] protected Equipment[] setUpEquipment;
     [SerializeField] protected bool drawGizmo = false;
+    protected const float RANGED_ATTACK_INACURRACY = 0.4f; // symbolizuje percento casu utoku kedy nedostava polohu ciela [+inacuracy => -presnost]
     protected const float ATTACK_DISTANCE_PERCENTAGE = 0.3f;
     public override Quaternion Rotation     { get => body.transform.rotation; }
     public float AttackDistance             
@@ -69,7 +70,10 @@ public class NPStats : EntityStats
     public Defence.Class DC     { get; protected set; }
     public Weapon.Class WC      { get; protected set; }
     public Behavior Behave      { get { return behavior; } protected set => behavior = value; }
+    public bool AboutToFire    => aToFire <= Time.time;
+    public float NextAttackTime=> atTime;
     public Action OnHit;
+    protected float aToFire;
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -132,7 +136,12 @@ public class NPStats : EntityStats
     {
         DC = defence.CallculateDC();
     }
-    
+    public void SetAboutToFireTime(Projectile proj)
+    {
+        aToFire = proj.FireTime;
+        aToFire *= 1 - RANGED_ATTACK_INACURRACY;
+        aToFire += Time.time;
+    }
     
     public override bool TakeDamage(Damage damage)
     {

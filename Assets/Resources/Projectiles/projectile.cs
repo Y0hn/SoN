@@ -9,6 +9,7 @@ public class Projectile : NetworkBehaviour
     [SerializeField] Rigidbody2D rb;
     [SerializeField] Collider2D coll;
     [SerializeField] Transform line;
+    [SerializeField] SpriteRenderer lineSpr;
 
     EntityStats shooter;
     Damage damage;
@@ -18,8 +19,9 @@ public class Projectile : NetworkBehaviour
 
     private Vector2 startPos = Vector2.positiveInfinity;
     private Vector3 force;
-    private float[] timer = { -1, -1};
+    private float[] timers;
     private float RangeLimit => range*2;
+    public float FireTime => delay;
     const float FORCE = 1000;
 
     public override void OnNetworkSpawn()
@@ -27,15 +29,28 @@ public class Projectile : NetworkBehaviour
         //Debug.Log("Projectile Lauched with attack: " + damage.amount);
         coll.enabled = false;
         sprite.enabled = false;
+        //lineSpr.enabled = false;
         
-        timer[0] = Time.time + delay;
-        timer[1] = Time.time + graficDelay;
-        line.gameObject.SetActive(false);
+        timers = new float[3];
+        timers[0] = Time.time + delay;
+        timers[1] = Time.time + graficDelay;
+        timers[2] = Time.time + graficDelay*0.5f;
     }
 #pragma warning disable IDE0051 // Remove unused private members
     void Update()
     {
-        if (timer[0] > 0 && Time.time >= timer[0])  // vystrelenie projektilu
+        if      (TimerReached(timers[2]))   // vykreslenie drahy projektilu
+        {
+            line.localScale = new (line.localScale.x,RangeLimit);
+            lineSpr.enabled = true;
+            timers[2] = 0;
+        }
+        else if (TimerReached(timers[1]))  // vykreslenie textury
+        {
+            sprite.enabled = true;
+            timers[1] = 0;
+        }
+        else if (TimerReached(timers[0]))  // vystrelenie projektilu
         {
             transform.SetParent(null);
             coll.enabled = true;
@@ -43,29 +58,27 @@ public class Projectile : NetworkBehaviour
             force *= FORCE;
             startPos = transform.position;
             rb.AddForce(force);
-            timer[0] = 0;
+            timers[0] = 0;
         }
-        else if (timer[1] > 0 && Time.time >= timer[1])  // vykreslenie textury
-        {
-            line.localScale = new (line.localScale.x,RangeLimit);
-            sprite.enabled = true;
-            timer[1] = 0;
-        }
-        else if (coll.enabled)  // range limit
+        else if (coll.enabled)              // limitovanie letu projektilu
         {
             float distance = Vector2.Distance(startPos, transform.position);
             if (distance >= RangeLimit)
-                Stop();
+                networkObject.Despawn();
             line.localScale = new (line.localScale.x,distance);
         }
     }
     void FixedUpdate()
     {
         // Toci sa okolo strelca podla toho kam mieri
-        if (timer[0] > 0 && shooter.ViewAngle != transform.rotation.z)
+        if (0 < timers[0] && shooter.ViewAngle != transform.rotation.z)
         {
             RotateAroundPoint();
         }
+    }
+    bool TimerReached(float timer)
+    {
+        return 0 < timer && timer <= Time.time;
     }
     void RotateAroundPoint()
     {
@@ -91,10 +104,11 @@ public class Projectile : NetworkBehaviour
         range = attack.range;
         shooter = entityStats;
 
-        Debug.Log($"Shoted projectile \nwith attack: {attack}");
+        Debug.Log($"Shoted projectile \nwith attack: {attack}\nwith shoot out delay: {delay}\ngrafical delay: {graficDelay}");
     }
-    public void Stop()
+    public void StopAttack()
     {
-        networkObject.Despawn();
+        if (networkObject.IsSpawned && timers[0] != 0)
+            networkObject.Despawn();
     }
 }

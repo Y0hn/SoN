@@ -35,6 +35,9 @@ public abstract class EntityStats : NetworkBehaviour
                         protected   NetworkVariable<Attack> weaponAttack = new();
                         protected   NetworkVariable<WeaponIndex> weapE = new(new(-1), NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
 #pragma warning disable IDE0004
+    /// <summary>
+    /// Vrati pomer hp/maxHp
+    /// </summary>
     public float HP                     { get => (float)hp.Value/(float)maxHp.Value; }
 #pragma warning restore IDE0004
     public virtual Quaternion Rotation  { get => transform.rotation; }
@@ -75,6 +78,9 @@ public abstract class EntityStats : NetworkBehaviour
     protected float atTime = 0;
     //private bool clampedDMG = true;
     public const float RANGED_ANIMATION_DUR = 1.5f, MELEE_ANIMATION_DUR = 1;
+    /// <summary>
+    /// Zavolane pri spawne u vsetkych
+    /// </summary>
     public override void OnNetworkSpawn()
     {
         EntitySetUp();
@@ -182,6 +188,7 @@ public abstract class EntityStats : NetworkBehaviour
             float speed = now.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
             speed /= now.AttackTime;
             Animator.SetFloat("atSpeed", speed);
+            Debug.Log("Attack animation set to time " + speed);
         };
         IsAlive.OnValueChanged += (bool old, bool now) =>
         {            
@@ -277,10 +284,10 @@ public abstract class EntityStats : NetworkBehaviour
     /// <returns>vrati ci sa je mozne utocit</returns>
     public virtual bool AttackTrigger()
     {
-        if (Time.time >= atTime)
+        if (atTime < Time.time)
         {
             AttackRpc();
-            atTime = Time.time + 1/weaponAttack.Value.rate;
+            atTime = Time.time + weaponAttack.Value.AttackTime;
             return true;
         }
         return false;
@@ -323,11 +330,6 @@ public abstract class EntityStats : NetworkBehaviour
     /// <param name="slot"></param>
     [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot = Equipment.Slot.NoPreference)
     {
-        /*if (slot == Equipment.Slot.NoPreference && reference != "")
-        {
-            Equipment i = Equipment.GetItem(reference)
-            slot = i.slot;
-        }*/
         equipment[(int)slot] = reference;
         Debug.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
     }

@@ -11,6 +11,8 @@ public class PlayerController : EntityController
     [SerializeField] GameObject cam;
     [SerializedDictionary("Key", "Input"),SerializeField] SerializedDictionary<string, InputActionReference> input_actions;
     private GameManager game;
+    protected bool wasAttacking;
+    protected new PlayerStats Stats => (PlayerStats)base.Stats;
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
@@ -28,10 +30,14 @@ public class PlayerController : EntityController
     protected override void Update()
     {
         if (!IsOwner) return;
-
-        if (stats.IsAlive.Value && game.PlayerAble)
+    
+        if (Stats.IsAlive.Value && game.PlayerAble)
         {
             base.Update();
+
+            if (!attacking && wasAttacking)
+                AttackInterupt();
+
             moveDir = input_actions["move"].action.ReadValue<Vector2>();
             viewDir = game.MousePos.normalized;
         }
@@ -41,7 +47,7 @@ public class PlayerController : EntityController
         if (Input.GetKeyDown(KeyCode.P))
             DropRpc();
         else if (Input.GetKeyDown(KeyCode.L))
-            ((PlayerStats)stats).AddLvlRpc();
+            Stats.AddLvlRpc();
     }
     void Q1(InputAction.CallbackContext context) { Q(1); }
     void Q2(InputAction.CallbackContext context) { Q(2); }
@@ -71,16 +77,16 @@ public class PlayerController : EntityController
     {
         if (attacking)
         {
-            stats.Animator.SetFloat("horizontal", viewDir.x);
-            stats.Animator.SetFloat("vertical", viewDir.y);
-            stats.RigidBody2D.linearVelocity = Vector2.zero;
-            stats.Animator.SetBool("move", false);
+            Stats.Animator.SetFloat("horizontal", viewDir.x);
+            Stats.Animator.SetFloat("vertical", viewDir.y);
+            Stats.RigidBody2D.linearVelocity = Vector2.zero;
+            Stats.Animator.SetBool("move", false);
         }
         base.AnimateMovement();
     }
     public void Fire(InputAction.CallbackContext context)
     {
-        if (!stats.IsAlive.Value)
+        if (!Stats.IsAlive.Value)
         {
             SetLiveRpc(/*OwnerClientId*/);
             return;
@@ -89,11 +95,25 @@ public class PlayerController : EntityController
     }
     protected override void Attack()
     {
+        stats.Animator.ResetTrigger("interuptAttack");
         base.Attack();
+        wasAttacking = true;
+    }    
+    protected virtual void AttackInterupt()
+    {
+        wasAttacking = false;
+        if (Stats.TryInteruptAttack())
+        {
+            stats.Animator.SetTrigger("attack");
+            stats.Animator.SetTrigger("interuptAttack");
+            Debug.Log("Attack interupted");
+        }
     }
+
+    // RPCs
     [Rpc(SendTo.Server)] protected void SetLiveRpc(/*ulong playerId*/)
     {
         //NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerStats>().IsAlive.Value = true;
-        stats.IsAlive.Value = true;
+        Stats.IsAlive.Value = true;
     }
 }

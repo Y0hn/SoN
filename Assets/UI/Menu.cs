@@ -10,6 +10,7 @@ public class MenuScript : MonoBehaviour
     [SerializeField] Animator animator;
     [SerializeField] Toggle onlineToggle;
     [SerializeField] Toggle fullScToggle;
+    [SerializeField] AudioSource meneTheme;
     [SerializeField] QualityScript quality;
     [SerializeField] AudioMixer[] audioMixers;
     public bool Online { get => onlineToggle.isOn;  set => onlineToggle.isOn = value;   }
@@ -116,6 +117,7 @@ public class MenuScript : MonoBehaviour
         SubscribeToButtons();
         SetTextFields();
         SetUpUI();
+        meneTheme.Play();
     }
     public void SetUpUI(bool active = true)
     {
@@ -200,9 +202,9 @@ public class MenuScript : MonoBehaviour
 
         switch (choice)
         {
-            case 1: conn.CreateSolo(); break;  // Pokracovat v hre
+            case 1: meneTheme.Stop(); conn.CreateSolo(); break;  // Pokracovat v hre
             case 2: break;  // Nacitat zo subora hru
-            case 3: conn.CreateSolo(); break;  // Vytvorit novu hru
+            case 3: meneTheme.Stop(); conn.CreateSolo(); break;  // Vytvorit novu hru
 
             default: Debug.LogWarning("Bad input [" + choice + "] on SoloNavigation!"); break;
         }
@@ -257,6 +259,7 @@ public class MenuScript : MonoBehaviour
     }
     void StartConnection(bool online, bool load = false)
     {
+        meneTheme.Stop();
         FileManager.RegeneradeSettings();
         if (!load)
         {
@@ -269,7 +272,8 @@ public class MenuScript : MonoBehaviour
     }
     bool ConnectionCheck()
     {
-        //FileManager.RegeneradeSettings();
+        meneTheme.Stop();
+        FileManager.RegeneradeSettings();
         string ipCode = inputFields["ipCode"].text.Trim();
         bool check = conn.JoinConnection(ipCode, out string e);
 
