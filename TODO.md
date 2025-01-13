@@ -17,12 +17,7 @@ SHOOTING INACURACY
 Patrol
 BOSS
 ```
-### DONE 2/5 TYPES OF ENEMIES 
-Skeleton
-Zombie
-Bakuk
-Baba Jaga
-Kikimora
+Individulal animation
 ### LOOT SYSTEM
 ### PLAYER AFTER DEATH REAINMATION
 ### PLAYER TIMED REGENERATION
