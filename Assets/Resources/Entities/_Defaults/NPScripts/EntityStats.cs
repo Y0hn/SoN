@@ -25,7 +25,7 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected Collider2D coll;
     [SerializeField] protected AITarget aiTeam = AITarget.Team_2;
     [SerializeField] protected EntityController controller;
-    [SerializeField]    protected   NetworkVariable<int> maxHp = new();
+                        protected   NetworkVariable<int> maxHp = new();
                         protected   NetworkList<FixedString64Bytes> equipment = new(/*null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner*/);    
                         // je to list ale sprava sa ako Dictionary
                         protected   NetworkVariable<int> hp = new();
@@ -190,6 +190,10 @@ public abstract class EntityStats : NetworkBehaviour
             Animator.SetFloat("atSpeed", speed);
             Debug.Log("Attack animation set to time " + speed);
         };
+        speed.OnValueChanged += (float old, float now) =>
+        {
+            Animator.SetFloat("wSpeed", now/100f);
+        };
         IsAlive.OnValueChanged += (bool old, bool now) =>
         {            
             Animator.SetBool("isAlive", now);
@@ -203,19 +207,26 @@ public abstract class EntityStats : NetworkBehaviour
         name = name.Split('(')[0].Trim();
         if (IsServer)
         {
+            // Nastavenie zakladneho utoku
             weaponAttack.Value = new (rase.attack);
 
+            // Nastavenie zivotov
             maxHp.Value = rase.maxHp;
             hp.Value = maxHp.Value;
 
-            level.Value = 1;
+            // Nastavenie zaciatocneho levelu
+            level.Value = rase.level;
 
+            // Nastavenie rychlosti chodze
             speed.Value = rase.speed;
+            Animator.SetFloat("wSpeed", rase.speed/(100f*transform.localScale.x));
             
+            // Nastavenie 
             int length = Enum.GetNames(typeof(Equipment.Slot)).Length;
             for (; equipment.Count < length;)
                 equipment.Add("");
 
+            // Nastavenie obrany
             defence = new(rase.resists);
             IsAlive.Value = true;
         }
