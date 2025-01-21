@@ -50,16 +50,42 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4181826370098675599, guid: 3174f1097d9f9554e898520c12230b0b, type: 3}
       propertyPath: m_Name
-      value: bodyV
+      value: Body
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3174f1097d9f9554e898520c12230b0b, type: 3}
+--- !u!212 &605704353275307209 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 547709969450286156, guid: 3174f1097d9f9554e898520c12230b0b, type: 3}
+  m_PrefabInstance: {fileID: 1152428609175541893}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2730722494070801184 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3034095830939573157, guid: 3174f1097d9f9554e898520c12230b0b, type: 3}
+  m_PrefabInstance: {fileID: 1152428609175541893}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3888554107324098314 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4181826370098675599, guid: 3174f1097d9f9554e898520c12230b0b, type: 3}
+  m_PrefabInstance: {fileID: 1152428609175541893}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5278091689412940307 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5098554008914725526, guid: 3174f1097d9f9554e898520c12230b0b, type: 3}
+  m_PrefabInstance: {fileID: 1152428609175541893}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3888554107324098314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37694f8da5730ab41af5e035d5e204b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &9198186238095873642 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8095424910587891439, guid: 3174f1097d9f9554e898520c12230b0b, type: 3}
   m_PrefabInstance: {fileID: 1152428609175541893}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8295177754402454207
@@ -197,7 +223,7 @@ PrefabInstance:
     - target: {fileID: 3689161656949318301, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: body
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 3888554107324098314}
     - target: {fileID: 3689161656949318301, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: rase
       value: 
@@ -205,19 +231,19 @@ PrefabInstance:
     - target: {fileID: 3689161656949318301, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: color
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 5278091689412940307}
     - target: {fileID: 3689161656949318301, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: weaponL
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 605704353275307209}
     - target: {fileID: 3689161656949318301, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: weaponR
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 605704353275307209}
     - target: {fileID: 3689161656949318301, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: attackPoint
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 9198186238095873642}
     - target: {fileID: 4102691267888484686, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: m_Sprite
       value: 
