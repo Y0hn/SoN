@@ -14,7 +14,7 @@ public class Connector : MonoBehaviour
     [SerializeField] Vector2 spawnRange = new(5,5);
     public TMP_Text codeText;
     [SerializeField] int maxConnections = 10;
-    private NetworkManager netMan;
+    public NetworkManager netMan;
     private string serverIP { get { return IPManager.GetIP(IPManager.AddressForm.IPv4); } }
     void Awake()
     {

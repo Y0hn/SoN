@@ -80,12 +80,11 @@ public class GameManager : MonoBehaviour
     public SkillPanel SkillTree     { get => skillTree; }
     public bool PlayerAble          { get => !(paused || chatting || inventory.open); }
     public string PlayerName        { get { return inputFields["name"].text.Trim(); } set { inputFields["name"].text = value; } }
+    public bool IsServer            { get { bool? b = conn.netMan?.IsServer; return b != null && b.Value; } }
     public static MenuScript UI     { get => instance.menu; }
-    public static bool IsServer     { get; private set; }
 //#pragma warning disable IDE0051 // Remove unused private members
     void Start()
     {
-        IsServer = NetworkManager.Singleton.IsServer;
         uiPanels["mainCam"].SetActive(true);
         SetUpTextFields();
         SubscribeInput();
@@ -93,6 +92,15 @@ public class GameManager : MonoBehaviour
         SetGameUI();
         
         FileManager.LoadSettings();
+    }
+    float timer = 0;
+    void Update()
+    {
+        if (IsServer && Time.time > timer)
+        {
+            MapScript.map.SpawnEnemy();
+            timer = Time.time + 1;
+        }
     }
 //#pragma warning restore IDE0051 // Remove unused private members
     void SetUpTextFields()

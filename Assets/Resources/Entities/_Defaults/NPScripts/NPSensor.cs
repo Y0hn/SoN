@@ -6,8 +6,8 @@ using Unity.Netcode;
 
 public class NPSensor : NetworkBehaviour
 {
-    [SerializeField] CircleCollider2D coll;
-    List<Transform> inRange = new();
+    [SerializeField] Collider2D coll;
+    protected List<Transform> inRange = new();
     public Transform ClosestTarget  {get; private set;}
     public bool TargetInRange       {get; private set;}
     public EntityStats.AITarget me              { get; set; }
@@ -42,9 +42,14 @@ public class NPSensor : NetworkBehaviour
     {
         if (IsServer)
         {
+            Collider2D[] colls = new Collider2D[0];
             ClosestTarget = null;
             string tt = "";
-            Collider2D[] colls = Physics2D.OverlapCircleAll(transform.position, coll.radius);
+
+            if (coll is CircleCollider2D circle)
+                colls = Physics2D.OverlapCircleAll(transform.position, circle.radius);
+            else if (coll is BoxCollider2D box)
+                colls = Physics2D.OverlapBoxAll(transform.position, box.size, 0);
 
             foreach (Collider2D c in colls)
             {
@@ -108,7 +113,10 @@ public class NPSensor : NetworkBehaviour
     }
     public void SetRange(float r)
     {
-        coll.radius = r;
+        if (coll is CircleCollider2D circle)
+            circle.radius = r;
+        else if (coll is BoxCollider2D box)
+            box.size = new (r*2, r*2);
     }
 }
 #if UNITY_EDITOR

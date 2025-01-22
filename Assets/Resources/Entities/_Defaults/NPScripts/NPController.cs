@@ -69,8 +69,6 @@ public class NPController : EntityController
     {
         viewDir = TargetPosition - transform.position;
         viewDir = viewDir.normalized;
-        // float angle = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
-        // transform.rotation = Quaternion.Euler(0, 0, angle);
     }
     protected virtual void FollowTarget()
     {

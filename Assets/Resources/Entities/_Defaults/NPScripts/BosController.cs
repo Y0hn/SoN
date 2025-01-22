@@ -18,6 +18,7 @@ public class BosController : NPController
      *  public bool ForceDecision       { get; protected set; }
      *  protected Vector3 TargetPosition => sensor.ClosestTarget.position;    
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
+    [SerializeField] protected GameObject hpBar;
     protected new BosStats Stats => (BosStats)base.Stats;
 
     protected override void Update()
@@ -26,7 +27,11 @@ public class BosController : NPController
 
         DecideNextMove();
     }
-
+    public override void SetTarget(Transform t)
+    {
+        base.SetTarget(t);
+        hpBar.SetActive(!selfTarget);
+    }
     protected virtual void DecideNextMove()
     {
         float nextChange = 1f;

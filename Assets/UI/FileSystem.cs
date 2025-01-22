@@ -268,7 +268,7 @@ public static class FileManager
     {
         if (get)
         {
-            if (GameManager.IsServer)
+            if (GameManager.instance.IsServer)
             {
                 foreach (GameObject e in GameObject.FindGameObjectsWithTag("Entity"))
                 {
