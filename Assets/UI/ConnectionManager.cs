@@ -10,7 +10,9 @@ using Unity.Networking.Transport.Relay;
 public class Connector : MonoBehaviour
 {
     public static Connector instance;
-    [SerializeField] public TMP_Text codeText;
+    public Transform spawnPoint;
+    [SerializeField] Vector2 spawnRange = new(5,5);
+    public TMP_Text codeText;
     [SerializeField] int maxConnections = 10;
     private NetworkManager netMan;
     private string serverIP { get { return IPManager.GetIP(IPManager.AddressForm.IPv4); } }
@@ -28,6 +30,8 @@ public class Connector : MonoBehaviour
         await UnityServices.InitializeAsync();
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
         netMan = NetworkManager.Singleton;
+
+        netMan.OnClientConnectedCallback += SpawnPlayer;
     }
     /*
             ____         __             
@@ -151,5 +155,16 @@ public class Connector : MonoBehaviour
         else
             netMan.Shutdown();
         //Environment.Exit(0);
+    }
+
+    private void SpawnPlayer(ulong id)
+    {
+        if (!netMan.IsServer) return;
+        Transform t = NetworkManager.Singleton.ConnectedClients[id].PlayerObject.transform;
+        Vector2 pos = spawnPoint.position;
+        pos = new(
+            pos.x + Random.Range(-spawnRange.x, spawnRange.x), 
+            pos.y + Random.Range(-spawnRange.y, spawnRange.y));
+        t.position = pos;
     }
 }

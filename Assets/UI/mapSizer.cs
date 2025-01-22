@@ -2,10 +2,11 @@ using UnityEngine;
 
 public class MapSizer : GizmosBoxDraw
 {
-    [SerializeField] protected GameObject mapPrefab;
+    [SerializeField] private GameObject mapPrefab;
     protected override void Start()
     {
-        Instantiate(mapPrefab, transform.position, Quaternion.identity, transform);
+        if (transform.childCount < 1)
+            Instantiate(mapPrefab, transform.position, Quaternion.identity, transform);
     }
     protected override void DrawWireCube()
     {        
