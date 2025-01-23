@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Collections;
+using Pathfinding;
 public class NPStats : EntityStats
 {
     /*  ZDEDENE ATRIBUTY
@@ -39,8 +40,9 @@ public class NPStats : EntityStats
      *  protected Defence defence;
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
     [SerializeField] protected Behavior behavior = Behavior.Neutral;
-    [SerializeField] protected NPSensor sensor;
     [SerializeField] protected Equipment[] setUpEquipment;
+    [SerializeField] protected NPSensor sensor;
+    [SerializeField] protected AIPath aIPath;
     [SerializeField] protected bool drawGizmo = false;
     protected float aToFire;
     public Action OnHit;
@@ -96,12 +98,17 @@ public class NPStats : EntityStats
         {
             sensor.me = aiTeam;
             sensor.SetRange(rase.view);
+            aIPath.maxSpeed = speed.Value/100f;
         }
     }
     protected override void OwnerSubsOnNetValChanged()
     {
         if (!IsServer) return;
         base.OwnerSubsOnNetValChanged();
+        speed.OnValueChanged += (float old, float now) =>
+        {
+            aIPath.maxSpeed = now/100f;
+        };
     }
     protected virtual void EquipmentSetUp()
     {

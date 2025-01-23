@@ -1,5 +1,23 @@
 # TO DO LIST
+
+## BUGS
+```
+Babajagas broom worng anr choise
+```
+
+## PLAN
+```
+LOOT SYSTEM
+PLAYER AFTER DEATH REAINMATION
+PLAYER TIMED REGENERATION
+```
+### ENEMY AI
+```
+Kaiting
+BOSS
+```
 ### SKILL TREE
+workings
 ```
 health
 own heath show
@@ -9,15 +27,3 @@ rasial rezists
 rasial movement speed
 rasial attack speed
 ```
-### ENEMY AI
-```
-Kaiting
-ENEMY AFTER PLAYER KILL
-SHOOTING INACURACY
-Patrol
-BOSS
-```
-Individulal animation
-### LOOT SYSTEM
-### PLAYER AFTER DEATH REAINMATION
-### PLAYER TIMED REGENERATION
