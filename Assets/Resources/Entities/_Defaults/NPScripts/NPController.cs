@@ -65,6 +65,9 @@ public class NPController : EntityController
         if (moveDir != Vector2.zero) moveDir = Vector2.zero;
         base.Attack();
     }
+    /// <summary>
+    /// Otaca telo NPC graficky
+    /// </summary>
     protected virtual void TurnForTarget()
     {
         viewDir = TargetPosition - transform.position;
@@ -101,7 +104,6 @@ public class NPController : EntityController
             stats.Animator.SetFloat("horizontal", viewDir.x);
             stats.Animator.SetFloat("vertical", viewDir.y);
         }
-    }/*
-    */
+    }
     protected enum NextAction { GoToTarget, RunToTarget, AttackTarget, RunFromTarget, StayOnPlace, None }
 }

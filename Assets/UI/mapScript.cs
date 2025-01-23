@@ -25,11 +25,13 @@ public class MapScript : MapSizer
     }
     public void SpawnEnemy(bool firstTier = true)
     {
-        // Must be server
+        // Musi byt server
         GameObject enemy = firstTier ? 
             regularEnemiesTier1[Random.Range(0,regularEnemiesTier1.Length)] 
                 : 
             regularEnemiesTier2[Random.Range(0,regularEnemiesTier2.Length)];
+
+        // Mal by si vybrat najblizsiu neprekrocenu liniu k hracom
         Vector2 spawnL = spawLines.GetChild(Random.Range(0,spawLines.childCount)).position;
         Vector3 pos = new (spawnL.x, Random.Range(-size.y/2, size.y/2), 0);
         enemy = Instantiate(enemy, pos, Quaternion.identity);
