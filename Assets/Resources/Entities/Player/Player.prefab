@@ -240,7 +240,7 @@ Transform:
   m_GameObject: {fileID: 8620589130980003894}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -431,7 +431,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5630875124356528717, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 2457329736
+      value: 2665253785
       objectReference: {fileID: 0}
     - target: {fileID: 5630875124356528717, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
@@ -545,6 +545,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!82 &456178372513912656 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 1963314083143016496, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
+  m_PrefabInstance: {fileID: 2119994833956943712}
+  m_PrefabAsset: {fileID: 0}
 --- !u!95 &670912806466320335 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 1451341833124036783, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
@@ -564,6 +569,11 @@ MonoBehaviour:
 --- !u!224 &2787502625492760395 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4306724166626459691, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
+  m_PrefabInstance: {fileID: 2119994833956943712}
+  m_PrefabAsset: {fileID: 0}
+--- !u!82 &3853302261130462517 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 2887390016899560021, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
   m_PrefabInstance: {fileID: 2119994833956943712}
   m_PrefabAsset: {fileID: 0}
 --- !u!58 &4438436423646962285 stripped
@@ -677,6 +687,7 @@ MonoBehaviour:
   animator: {fileID: 2596049322121240611}
   rb: {fileID: 5307415030544884398}
   coll: {fileID: 4438436423646962285}
+  aAS: {fileID: 3853302261130462517}
   aiTeam: 1
   controller: {fileID: 4269252700270445601}
   speed:
@@ -838,6 +849,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats: {fileID: -3433707315503268182}
+  step: {fileID: 456178372513912656}
   cam: {fileID: 8620589130980003894}
   input_actions:
     _serializedList:

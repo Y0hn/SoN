@@ -70,7 +70,7 @@ public class XpSliderScript : MonoBehaviour
         level++;
         levelUPs.Enqueue(level);
 
-        Debug.Log("Level UP queued to " + level);
+        //Debug.Log("Level UP queued to " + level);
     }
 #pragma warning restore IDE0051 // Remove unused private members
 }

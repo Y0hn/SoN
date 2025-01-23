@@ -54,7 +54,7 @@ public class SkillPanel : MonoBehaviour
         freePointCouter = (byte)(level - usedPointsCounter);
         skillCounterText.text = freePointCouter.ToString();
         OnChangeAvailablePoints?.Invoke(AvailablePoints);
-        Debug.Log("After level up to " + level + " AvailablePoints= " + AvailablePoints);
+        //Debug.Log("After level up to " + level + " AvailablePoints= " + AvailablePoints);
     }
     public void SkillPointAplied()
     {

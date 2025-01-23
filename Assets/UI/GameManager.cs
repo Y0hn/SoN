@@ -65,6 +65,7 @@ public class GameManager : MonoBehaviour
     public event Action<UtilitySkill> UtilityUpdate;
     public Inventory inventory;
     private const byte MAX_NPC_COUNT = 25;
+    public Transform spawnpoint     { get; set; }
     public Vector2 MousePos
     { 
         get 
@@ -185,6 +186,12 @@ public class GameManager : MonoBehaviour
         player = plStats;
         SetPlayerUI();
         AnimateFace(player.HP);
+        if (IsServer)
+        {
+            GameObject v = Resources.Load<GameObject>("Entities/Veles/Veles");
+            Instantiate(v, spawnpoint).GetComponent<NetworkObject>().Spawn();
+
+        }
     }
     void SetGameUI(bool active = false)
     {
@@ -203,7 +210,7 @@ public class GameManager : MonoBehaviour
     public void LevelUP(byte level)
     {
         skillTree.LevelUP(level);
-        Debug.Log("Player leveled UP to " + level);
+        //Debug.Log("Player leveled UP to " + level);
     }
     public void EnableUtility(UtilitySkill utility)
     {

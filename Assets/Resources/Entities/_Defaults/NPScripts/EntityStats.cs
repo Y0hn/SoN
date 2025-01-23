@@ -23,6 +23,7 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected NetworkAnimator animator;
     [SerializeField] protected Rigidbody2D rb;
     [SerializeField] protected Collider2D coll;
+    [SerializeField] protected AudioSource aAS;
     [SerializeField] protected AITarget aiTeam = AITarget.Team_2;
     [SerializeField] protected EntityController controller;
                         protected   NetworkVariable<int> maxHp = new();
@@ -361,6 +362,10 @@ public abstract class EntityStats : NetworkBehaviour
     {
         Equipment e = Equipment.GetItem(reference);
         equipment[(int)e.slot] = e.GetReferency;
+    }
+    [Rpc(SendTo.Server)] public virtual void TerrainChangeRpc(float speedMod)
+    {
+        speed.Value *= speedMod;
     }
     public enum AITarget { None, Player, Team_1, Team_2, Team_3, Boss }
 }

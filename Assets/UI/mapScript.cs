@@ -7,9 +7,11 @@ public class MapScript : MapSizer
 {
     [SerializeField] Transform spawLines;
     [SerializeField] Transform extractions;
-    [SerializeField] Transform spawnpoint;
+    [SerializeField] Transform PlayerSpawnPoint;
+    [SerializeField] Transform BossSpawnPoint;
     [SerializeField] GameObject[] regularEnemiesTier1;
     [SerializeField] GameObject[] regularEnemiesTier2;
+    //[SerializeField] GameObject boss;
     public static MapScript map;
     protected void Awake()
     {
@@ -18,7 +20,8 @@ public class MapScript : MapSizer
     }
     protected override void Start()
     {
-        Connector.instance.spawnPoint = spawnpoint;
+        Connector.instance.spawnPoint = PlayerSpawnPoint;
+        GameManager.instance.spawnpoint = BossSpawnPoint;
     }
     protected override void DrawWireCube()
     {        

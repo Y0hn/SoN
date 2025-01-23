@@ -7,7 +7,9 @@ using UnityEngine;
 public abstract class EntityController : NetworkBehaviour
 {
     [SerializeField] protected EntityStats stats;
+    [SerializeField] protected AudioSource step;
     protected Vector2 moveDir;
+    protected float stepTimer;
     protected bool attacking;
     protected Vector2 viewDir = Vector2.zero;
     protected const float MIN_MOVE_TOL = 0.1f;
@@ -17,6 +19,8 @@ public abstract class EntityController : NetworkBehaviour
     {
         moveDir = Vector2.zero;
         attacking = false;
+
+        step.maxDistance = 10f;
     }
     protected virtual void Update()
     {
@@ -41,11 +45,22 @@ public abstract class EntityController : NetworkBehaviour
 
             float mod = stats.speed.Value * Time.deltaTime;
             stats.RigidBody2D.linearVelocity = moveDir * mod;
+            
+            if (stepTimer == 0)
+            {
+                stepTimer = Time.time + 1/(stats.speed.Value/100f)/8f;
+            }
+            if (stepTimer < Time.time)
+            {
+                step.Play();
+                stepTimer = Time.time + 1/(stats.speed.Value/100f)/2f;
+            }
         }
         else
         {
             stats.RigidBody2D.linearVelocity = Vector2.zero;
             stats.Animator.SetBool("move", false);
+            stepTimer = 0;
         }
     }
     protected virtual void Attack()

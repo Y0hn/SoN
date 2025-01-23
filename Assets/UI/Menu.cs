@@ -11,6 +11,8 @@ public class MenuScript : MonoBehaviour
     [SerializeField] Toggle onlineToggle;
     [SerializeField] Toggle fullScToggle;
     [SerializeField] AudioSource meneTheme;
+    [SerializeField] AudioSource buttonClick;
+    [SerializeField] AudioSource pageChange;
     [SerializeField] QualityScript quality;
     [SerializeField] AudioMixer[] audioMixers;
     public bool Online { get => onlineToggle.isOn;  set => onlineToggle.isOn = value;   }
@@ -160,21 +162,25 @@ public class MenuScript : MonoBehaviour
     }
     void SubscribeToButtons()
     {
-        buttons["exit"].    onClick.AddListener(Exit);
-        buttons["solo"].    onClick.AddListener(delegate { MainMenuNav(1); });
-        buttons["multi"].   onClick.AddListener(delegate { MainMenuNav(2); });
-        buttons["sett"].    onClick.AddListener(delegate { MainMenuNav(3); });
+        /*foreach (var b in buttons)
+        {
+            b.Value.on;
+        }*/
+        buttons["exit"].    onClick.AddListener(delegate { pageChange.Play(); Exit();});
+        buttons["solo"].    onClick.AddListener(delegate { pageChange.Play(); MainMenuNav(1); });
+        buttons["multi"].   onClick.AddListener(delegate { pageChange.Play(); MainMenuNav(2); });
+        buttons["sett"].    onClick.AddListener(delegate { pageChange.Play(); MainMenuNav(3); });
 
-        buttons["soloCont"].    onClick.AddListener(delegate { SoloMenuNav(1); });
-        buttons["soloLoad"].    onClick.AddListener(delegate { SoloMenuNav(2); });
-        buttons["soloCreate"].  onClick.AddListener(delegate { SoloMenuNav(3); });
+        buttons["soloCont"].    onClick.AddListener(delegate { /*pageChange.Play();*/ SoloMenuNav(1); });
+        buttons["soloLoad"].    onClick.AddListener(delegate { pageChange.Play(); SoloMenuNav(2); });
+        buttons["soloCreate"].  onClick.AddListener(delegate { /*pageChange.Play();*/ SoloMenuNav(3); });
 
-        buttons["multiStart"].  onClick.AddListener(delegate { MultiMenuNav(1); });
-        buttons["multiJoin"].   onClick.AddListener(delegate { MultiMenuNav(2); });
-        buttons["multiLoad"].   onClick.AddListener(delegate { MultiMenuNav(3); });
-        buttons["multiCreate"]. onClick.AddListener(delegate { MultiMenuNav(4); });
+        buttons["multiStart"].  onClick.AddListener(delegate { pageChange.Play(); MultiMenuNav(1); });
+        buttons["multiJoin"].   onClick.AddListener(delegate { pageChange.Play(); MultiMenuNav(2); });
+        buttons["multiLoad"].   onClick.AddListener(delegate { pageChange.Play(); MultiMenuNav(3); });
+        buttons["multiCreate"]. onClick.AddListener(delegate { /*pageChange.Play();*/ MultiMenuNav(4); });
 
-        buttons["joinMultiJoin"].onClick.AddListener(delegate { MultiMenuNav(5); });
+        buttons["joinMultiJoin"].onClick.AddListener(delegate { /*pageChange.Play();*/ MultiMenuNav(5); });
     }
     void Exit()
     {
@@ -231,6 +237,7 @@ public class MenuScript : MonoBehaviour
             navLayer *= 10;
             navLayer += choice;
             animator.SetInteger("layer", navLayer);
+            pageChange.Play();
         }
     }
     bool NameTagCheck()
