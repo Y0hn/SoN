@@ -188,7 +188,7 @@ public abstract class EntityStats : NetworkBehaviour
             float speed = now.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
             speed /= now.AttackTime;
             Animator.SetFloat("atSpeed", speed);
-            Debug.Log("Attack animation set to time " + speed);
+            //Debug.Log("Attack animation set to time " + speed);
         };
         speed.OnValueChanged += (float old, float now) =>
         {

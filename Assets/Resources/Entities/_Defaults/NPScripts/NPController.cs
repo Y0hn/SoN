@@ -16,11 +16,11 @@ public class NPController : EntityController
     protected NextAction nextAction;
     protected float nextDecisionTimer = 0f;
     protected List<Transform> patrol = new();
+    protected Transform defaultTarget;
     protected bool selfTarget;
 
     protected new NPStats Stats => (NPStats)base.Stats;
     public bool ForceDecision       { get; protected set; }
-    protected Vector3 TargetPosition => sensor.ClosestTarget.position;
 
     public override void OnNetworkSpawn()
     {
@@ -59,6 +59,8 @@ public class NPController : EntityController
         {
             FollowTarget();
         }
+        else
+            SetTarget(defaultTarget);
     }
     protected override void Attack()
     {
@@ -66,13 +68,17 @@ public class NPController : EntityController
         base.Attack();
     }
     /// <summary>
-    /// Otaca telo NPC graficky
+    /// Otaca telo NPC graficky pri utoku
     /// </summary>
     protected virtual void TurnForTarget()
     {
-        viewDir = TargetPosition - transform.position;
+        if (sensor.ClosestTarget == null) return;
+        viewDir = sensor.ClosestTarget.position - transform.position;
         viewDir = viewDir.normalized;
     }
+    /// <summary>
+    /// Nastavuje parametre pre animovanie chodze charakteru pri utoku
+    /// </summary>
     protected virtual void FollowTarget()
     {
         if (viewDir != Vector2.zero) viewDir = Vector2.zero;
@@ -80,11 +86,15 @@ public class NPController : EntityController
         moveDir = move.normalized;
         if (!attacking) attacking = true; 
     }
+    /// <summary>
+    /// Manualne nastavuje ciel AI navigacie
+    /// </summary>
+    /// <param name="t"></param>
     public virtual void SetTarget(Transform t)
     {
         if (t != null)
         {
-            destinationSetter.target = sensor.ClosestTarget;
+            destinationSetter.target = t;
             selfTarget = false;
         }
         else
@@ -95,6 +105,19 @@ public class NPController : EntityController
         }
         attacking = false;
     }
+    /// <summary>
+    /// Nastavuje ciel pri objaveni charakteru
+    /// </summary>
+    /// <param name="t"></param>
+    public virtual void SetDefaultTarget(Transform t)
+    {
+        //Debug.Log("Default target setted to " + t.name);
+        defaultTarget = t;
+        SetTarget(t);
+    }
+    /// <summary>
+    /// Animuje chodzu
+    /// </summary>
     protected override void AnimateMovement()
     {
         base.AnimateMovement();

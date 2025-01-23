@@ -103,6 +103,7 @@ public class Projectile : NetworkBehaviour
         damage = attack.damage;
         range = attack.range;
         shooter = entityStats;
+        shooter.OnDeath += delegate { networkObject.Despawn(); };
         //Debug.Log($"Shoted projectile \nwith attack: {attack}\nwith shoot out delay: {delay}\ngrafical delay: {graficDelay}");
     }
     public void StopAttack()

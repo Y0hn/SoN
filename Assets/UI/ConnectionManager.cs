@@ -26,7 +26,7 @@ public class Connector : MonoBehaviour
     async void Start()
     {
         // RELAY
-        // Internet connection required
+        // Potrebne pripojenie na Internet
         await UnityServices.InitializeAsync();
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
         netMan = NetworkManager.Singleton;
@@ -146,7 +146,7 @@ public class Connector : MonoBehaviour
             FileManager.WorldAct(FileManager.WorldAction.Load/*get path to world save file*/);
         else if (host && !load)
              FileManager.WorldAct(FileManager.WorldAction.Create);
-        // load world
+        // nacitat svet
     }
     public void Quit(ulong id)
     {

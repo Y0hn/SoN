@@ -14,6 +14,11 @@ public class NPSensor : NetworkBehaviour
     public Action<Transform> targetChange;
 
 #pragma warning disable IDE0051 // Remove unused private members
+    /// <summary>
+    /// Do senzoru nieco voslo, ak je to v inom AI time ako ja 
+    /// => prida sa to na zoznam cielov a prepocita sa najblizsi ciel
+    /// </summary>
+    /// <param name="other"></param>
     void OnTriggerEnter2D(Collider2D other)
     {
         if (IsServer && other.TryGetComponent(out EntityStats et) && et.TargetTeam != me)
@@ -24,26 +29,32 @@ public class NPSensor : NetworkBehaviour
             targetChange.Invoke(ClosestTarget);
         }
     }
+    /// <summary>
+    /// Zo senzoru nieco vyslo, 
+    /// ak to bolo v zozname cielov -> odstrani sa to, 
+    /// ak to bol aktualny ciel => prepocita sa najblizsi ciel
+    /// </summary>
+    /// <param name="other"></param>
     void OnTriggerExit2D(Collider2D other)
     {
-        if (IsServer)
+        if (IsServer && inRange.Contains(other.transform))
         {
             inRange.Remove(other.transform);
             if (ClosestTarget != null && ClosestTarget.Equals(other.transform))
-            {
                 FindClosestTarget();
-
-                targetChange.Invoke(ClosestTarget);
-            }
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members
+    /// <summary>
+    /// Vyamaze list znamych cielov a ziska od znova vsetko v dosahu
+    /// </summary>
     public void ResetTargeting()
     {
         if (IsServer)
         {
             Collider2D[] colls = new Collider2D[0];
             ClosestTarget = null;
+            inRange.Clear();
             string tt = "";
 
             if (coll is CircleCollider2D circle)
@@ -61,6 +72,9 @@ public class NPSensor : NetworkBehaviour
             Debug.Log("Targeting Reset\nTargets: " + tt);
         }
     }
+    /// <summary>
+    /// Vypne senzor a resetuje premenne
+    /// </summary>
     public void DisableSensor()
     {
         coll.enabled = false;
@@ -68,6 +82,9 @@ public class NPSensor : NetworkBehaviour
         inRange.Clear();
         targetChange.Invoke(ClosestTarget);
     }
+    /// <summary>
+    /// Najde najblizsi ciel k sebe z listu moznych cielov
+    /// </summary>
     void FindClosestTarget()
     {
         float d = float.PositiveInfinity;
@@ -77,7 +94,7 @@ public class NPSensor : NetworkBehaviour
         {
             SetTarget(null, false);
         }
-        else if (inRange.Count >= 1) // preskakuje akje len 1 zapis
+        else
         {
             inRange.ForEach(iR => 
             {
@@ -91,13 +108,14 @@ public class NPSensor : NetworkBehaviour
                 i++;
             });
 
-            //try {
-                SetTarget(inRange[index]);/*
-            } catch {
-                Debug.LogWarning($"Exeption e i={i} inRange.Count={inRange.Count}");
-            }*/
+            SetTarget(inRange[index]);
         }
     }
+    /// <summary>
+    /// Nastavuje aktualny ciel senzoru (ten nablizsi)
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="inRange"></param>
     public void SetTarget(Transform target, bool inRange = true)
     {
         if (ClosestTarget != null)
@@ -111,6 +129,10 @@ public class NPSensor : NetworkBehaviour
         TargetInRange = inRange;
         targetChange.Invoke(ClosestTarget);
     }
+    /// <summary>
+    /// Nastavuje vzdialenost snimania od stredu
+    /// </summary>
+    /// <param name="r">polomer</param>
     public void SetRange(float r)
     {
         if (coll is CircleCollider2D circle)

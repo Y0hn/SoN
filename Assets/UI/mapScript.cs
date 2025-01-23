@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using Pathfinding;
+using System.Linq;
 
 public class MapScript : MapSizer
 {
@@ -23,23 +24,52 @@ public class MapScript : MapSizer
     {        
         Gizmos.DrawWireCube(transform.position + offset, size);
     }
-    public void SpawnEnemy(bool firstTier = true)
+    /// <summary>
+    /// Musi byt server aby spustil tuto funkciu
+    /// </summary>
+    public void SpawnEnemy()
     {
-        // Musi byt server
+        // ziska hraca, ktory zasiel najdalej
+        Vector2 furtherestPlayer = Vector2.zero;
+        GameObject.FindGameObjectsWithTag("Player").ToList().ForEach(g => 
+            {
+                float x = g.transform.position.x; 
+                if (furtherestPlayer.x < x) 
+                    furtherestPlayer = new (x, furtherestPlayer.y);
+            });
+
+        // ziska liniu pre vytvorenie nepriatela
+        bool firstTier = true;
+        Vector3 pos = Vector2.zero;
+        for (int i = 0; i < spawLines.childCount; i++)
+        {
+            // Mal by si vybrat najblizsiu neprekrocenu liniu k hracom
+            Vector2 spawnL = spawLines.GetChild(i).position;
+            if (furtherestPlayer.x < spawnL.x)
+            {
+                // po celej vyske linie vyberie nahodnu hodnotu
+                pos = new (spawnL.x, Random.Range(-size.y/2, size.y/2), 0);
+
+                // ak je za strednou liniou ma sancu 3/10
+                if (spawLines.childCount/2 < i)
+                    firstTier = Random.Range(0,10) < 3; // ak padne [0,1,2] zostava zakladny typ nepriatela
+                break;
+            }
+        }
+        
+        // Nahodne vyberie typ nepriatela (zakladny / silnejsi) variant
         GameObject enemy = firstTier ? 
             regularEnemiesTier1[Random.Range(0,regularEnemiesTier1.Length)] 
                 : 
             regularEnemiesTier2[Random.Range(0,regularEnemiesTier2.Length)];
 
-        // Mal by si vybrat najblizsiu neprekrocenu liniu k hracom
-        Vector2 spawnL = spawLines.GetChild(Random.Range(0,spawLines.childCount)).position;
-        Vector3 pos = new (spawnL.x, Random.Range(-size.y/2, size.y/2), 0);
+        // Vytvori objekt nepriatela na pozicii
         enemy = Instantiate(enemy, pos, Quaternion.identity);
         enemy.GetComponent<NetworkObject>().Spawn();
 
         // Zvoli nahodny ale mal by si vybrat najblizsi
-        enemy.GetComponent<AIDestinationSetter>().target = extractions.GetChild(Random.Range(0,extractions.childCount));
-        Debug.Log("enemy spawned");
+        Transform target = extractions.GetChild(Random.Range(0,extractions.childCount));
+        enemy.GetComponent<NPController>().SetDefaultTarget(target);
     }
 }
  

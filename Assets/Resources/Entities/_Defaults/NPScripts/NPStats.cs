@@ -42,9 +42,25 @@ public class NPStats : EntityStats
     [SerializeField] protected NPSensor sensor;
     [SerializeField] protected Equipment[] setUpEquipment;
     [SerializeField] protected bool drawGizmo = false;
+    protected float aToFire;
+    public Action OnHit;
+
     protected const float RANGED_ATTACK_INACURRACY = 0.4f; // symbolizuje percento casu utoku kedy nedostava polohu ciela [+inacuracy => -presnost]
     protected const float ATTACK_DISTANCE_PERCENTAGE = 0.3f;
-    public override Quaternion Rotation     { get => body.transform.rotation; }
+
+    public static byte NPCount = 0;
+
+    public override Quaternion Rotation => body.transform.rotation;
+    public override Attack Attack     
+    { 
+        get 
+        { 
+            if (weaponAttack.Value.IsSet) 
+                return weaponAttack.Value; 
+            else
+                return rase.attack;
+        } 
+    }
     public float AttackDistance             
     { 
         get 
@@ -57,27 +73,21 @@ public class NPStats : EntityStats
                 return 0f;
         }
     }
-    public override Attack Attack     
-    { 
-        get 
-        { 
-            if (weaponAttack.Value.IsSet) 
-                return weaponAttack.Value; 
-            else
-                return rase.attack;
-        } 
-    }
     public Defence.Class DC     { get; protected set; }
     public Weapon.Class WC      { get; protected set; }
     public Behavior Behave      { get { return behavior; } protected set => behavior = value; }
     public bool AboutToFire    => aToFire <= Time.time;
     public float NextAttackTime=> atTime;
-    public Action OnHit;
-    protected float aToFire;
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
         EquipmentSetUp();
+        AddToCount(1);
+    }
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+        AddToCount(-1);
     }
     protected override void EntitySetUp()
     {
@@ -108,8 +118,6 @@ public class NPStats : EntityStats
 
         if (e is Weapon && !weapE.Value.Holding)
             weapE.Value = new(slot);
-
-        //Debug.Log($"Equipment {e.name} equiped");
     }
     protected override void OnEquipmentUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
     {
@@ -122,6 +130,12 @@ public class NPStats : EntityStats
         base.OnHpUpdate(prev, now);
         OnHit.Invoke();
     }
+    protected virtual void AddToCount(sbyte b)
+    {
+        if (!IsServer) return;    
+        NPCount = (byte)(NPCount + b);
+    }
+
     public void CallculateWC()
     {
         if (weapE.Value.eIndex > 0)
@@ -192,6 +206,11 @@ public class NPStats : EntityStats
             Vector3 v = new(transform.position.x, transform.position.y + range[0], 0);
             Gizmos.DrawWireSphere(v, rase.attack.range);        
         }
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.layer.Equals(LayerMask.NameToLayer("Water")))
+            netObject.Despawn();
     }
 #pragma warning restore IDE0051 // Remove unused private members
     public enum Behavior 
