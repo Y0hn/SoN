@@ -77,7 +77,6 @@ public class NPStats : EntityStats
     }
     public Defence.Class DC     { get; protected set; }
     public Weapon.Class WC      { get; protected set; }
-    public Behavior Behave      { get { return behavior; } protected set => behavior = value; }
     public bool AboutToFire    => aToFire <= Time.time;
     public float NextAttackTime=> atTime;
     public override void OnNetworkSpawn()
@@ -114,8 +113,6 @@ public class NPStats : EntityStats
     {
         if (!IsServer) return;
         foreach(Equipment e in setUpEquipment) Equip(e.GetReferency);
-        CallculateWC();
-        CallculateDC();
     }
     protected void Equip(string equip)
     {
@@ -130,7 +127,6 @@ public class NPStats : EntityStats
     {
         base.OnEquipmentUpdate(changeEvent);
         Equipment.Slot slot = (Equipment.Slot)changeEvent.Index;
-        CallculateWC();
     }
     protected override void OnHpUpdate(int prev, int now)
     {
@@ -143,21 +139,6 @@ public class NPStats : EntityStats
         if (!IsServer) return;    
         NPCount = (byte)(NPCount + b);
     }
-    /*
-    public void CallculateWC()
-    {
-        if (weapE.Value.eIndex > 0)
-        {
-            Weapon w = (Weapon)Item.GetItem(equipment[weapE.Value.eIndex].ToString());
-            WC = w.CallculateWC();
-        }
-        else
-            WC = Weapon.Class.Medium;
-    }
-    public void CallculateDC()
-    {
-        DC = defence.CallculateDC();
-    }*/
     public void SetAboutToFireTime(Projectile proj)
     {
         aToFire = proj.FireTime;

@@ -24,44 +24,11 @@ public class BosController : NPController
     protected override void Update()
     {
         base.Update();
-
-        DecideNextMove();
     }
     public override void SetTarget(Transform t)
     {
         base.SetTarget(t);
         canvas.SetActive(!selfTarget);
         // nefunguje
-    }
-    void DecideByTreshhold(float tHP, bool inRange, bool gotRange, out float tDecay)
-    {
-        /*
-        float hp = stats.HP;
-        if      (hp < tHP && inRange)
-        {
-            nextAction = NextAction.RunFromTarget;
-            tDecay = 3;
-        }
-        else if (gotRange && (!inRange || inRange && tHP < hp))
-        {
-            nextAction = NextAction.AttackTarget;
-            tDecay = 0.5f;
-        }
-        else if (!gotRange && tHP < hp)
-        {
-            nextAction = NextAction.RunToTarget;
-            tDecay = 0.2f;
-        }
-        else if (patrol.Count > 0)
-        {
-            nextAction = NextAction.GoToTarget;
-            tDecay = 1;
-        }
-        else
-        {
-            nextAction = NextAction.StayOnPlace;
-            tDecay = 3;
-        }
-        */
     }
 }
