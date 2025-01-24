@@ -13,9 +13,6 @@ public class NPController : EntityController
     [SerializeField] AIDestinationSetter destinationSetter;
     [SerializeField] AIPath path;
     [SerializeField] NPSensor sensor;
-    protected NextAction nextAction;
-    protected float nextDecisionTimer = 0f;
-    protected List<Transform> patrol = new();
     protected Transform defaultTarget;
     protected bool selfTarget;
 
@@ -128,5 +125,4 @@ public class NPController : EntityController
             stats.Animator.SetFloat("vertical", viewDir.y);
         }
     }
-    protected enum NextAction { GoToTarget, RunToTarget, AttackTarget, RunFromTarget, StayOnPlace, None }
 }

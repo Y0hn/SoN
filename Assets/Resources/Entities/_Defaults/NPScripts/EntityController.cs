@@ -15,6 +15,8 @@ public abstract class EntityController : NetworkBehaviour
     protected const float MIN_MOVE_TOL = 0.1f;
     protected EntityStats Stats => stats; 
     public virtual Vector2 View => viewDir;
+
+
     public override void OnNetworkSpawn()
     {
         moveDir = Vector2.zero;
@@ -22,16 +24,28 @@ public abstract class EntityController : NetworkBehaviour
 
         step.maxDistance = 10f;
     }
+    /// <summary>
+    /// Stara sa aby sa co narychlejsie vykonala zmena spravania
+    /// 
+    /// V zaklade len strazi ci charakter chce utocit => pokusa sa o utok
+    /// alebo nie
+    /// </summary>
     protected virtual void Update()
     {
         if (attacking)
             Attack();
     }
+    /// <summary>
+    /// Stara sa o animacie
+    /// </summary>
     protected virtual void FixedUpdate()
     {
         if (IsServer)
             AnimateMovement();
     }
+    /// <summary>
+    /// Stara sa o Animovanie a Ozvucenie Pohybu charakteru (chodze)
+    /// </summary>
     protected virtual void AnimateMovement()
     {
         if (stats.Animator == null) return;
@@ -63,15 +77,22 @@ public abstract class EntityController : NetworkBehaviour
             stepTimer = 0;
         }
     }
+    /// <summary>
+    /// Skusa vykonat utok
+    /// </summary>
     protected virtual void Attack()
     {
         if (stats.AttackTrigger())
         {
-            if (stats.AttackBoth)
+            // sem sa dostane ak moze utocit (uz utoci) 
+            // ak je casovac utoku < cas
+            if (stats.AttackBoth)   
             {
+                // ak utok pouziva obe ruky tak sa meni utociaca ruka
                 float atBlend = stats.Animator.GetFloat("atBlend") * -1;
                 stats.Animator.SetFloat("atBlend", atBlend);
             }
+            // zanimuje utok
             stats.Animator.SetTrigger("attack");
         }
     }

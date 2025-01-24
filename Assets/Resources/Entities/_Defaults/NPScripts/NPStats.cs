@@ -39,7 +39,6 @@ public class NPStats : EntityStats
      *  private bool clampedDMG = true;
      *  protected Defence defence;
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
-    [SerializeField] protected Behavior behavior = Behavior.Neutral;
     [SerializeField] protected Equipment[] setUpEquipment;
     [SerializeField] protected NPSensor sensor;
     [SerializeField] protected AIPath aIPath;
@@ -47,7 +46,8 @@ public class NPStats : EntityStats
     protected float aToFire;
     public Action OnHit;
 
-    protected const float RANGED_ATTACK_INACURRACY = 0.4f; // symbolizuje percento casu utoku kedy nedostava polohu ciela [+inacuracy => -presnost]
+    // symbolizuje percento casu utoku kedy nedostava polohu ciela [+inacuracy => -presnost]
+    protected const float RANGED_ATTACK_INACURRACY = 0.4f; 
     protected const float ATTACK_DISTANCE_PERCENTAGE = 0.3f;
 
     public static byte NPCount = 0;
@@ -139,10 +139,11 @@ public class NPStats : EntityStats
     }
     protected virtual void AddToCount(sbyte b)
     {
+        // iba na servery
         if (!IsServer) return;    
         NPCount = (byte)(NPCount + b);
     }
-
+    /*
     public void CallculateWC()
     {
         if (weapE.Value.eIndex > 0)
@@ -156,7 +157,7 @@ public class NPStats : EntityStats
     public void CallculateDC()
     {
         DC = defence.CallculateDC();
-    }
+    }*/
     public void SetAboutToFireTime(Projectile proj)
     {
         aToFire = proj.FireTime;
@@ -220,12 +221,4 @@ public class NPStats : EntityStats
             netObject.Despawn();
     }
 #pragma warning restore IDE0051 // Remove unused private members
-    public enum Behavior 
-    {
-        Scared,     // unika pred target
-        Defesive,   // brani poziciu
-        Neutral,    // nerobi nic (idle)
-        Agressive,  // aktivne utoci na target
-        Berserk,    // --||-- neberie ohlad na nic ine
-    }
 }

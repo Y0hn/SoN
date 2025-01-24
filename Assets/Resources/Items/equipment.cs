@@ -12,6 +12,11 @@ public class Equipment : Item
         //Body,
         WeaponL, WeaponR, WeaponBoth, NoPreference
     }
+    /// <summary>
+    /// Meni navratovu hodnotu povodnej metody
+    /// </summary>
+    /// <param name="referency"></param>
+    /// <returns></returns>
     public new static Equipment GetItem (string referency)
     {
         return Resources.Load<Equipment>(referency);
@@ -53,6 +58,9 @@ public class Equipment : Item
             $"Sprite Referency: \"{SpriteRef}\"";
     }
 }
+/// <summary>
+/// Pouziva sa na redukovanie prichadzajuceho poskodenia
+/// </summary>
 [Serializable] public class Resistance
 {
     public float amount;

@@ -35,6 +35,9 @@ public class ItemDrop : NetworkBehaviour
         Item = item;        
         Register();
     }
+    /// <summary>
+    /// Registruje predmet na zemi
+    /// </summary>
     private void Register()
     {
         if (!IsServer || itFoor != null)  return;

@@ -31,36 +31,11 @@ public class BosController : NPController
     {
         base.SetTarget(t);
         canvas.SetActive(!selfTarget);
-    }
-    protected virtual void DecideNextMove()
-    {
-        float nextChange = 1f;
-        bool inRange = false, gotInRange = false ;
-
-        switch (Stats.WC)
-        {
-            default:
-                break;
-        }
-        switch (Stats.DC)
-        {
-            default:
-                break;
-        }
-        switch (Stats.Behave)
-        {
-            case NPStats.Behavior.Scared:       DecideByTreshhold(1, inRange, gotInRange, out nextChange);      break;
-            case NPStats.Behavior.Berserk:      DecideByTreshhold(0, inRange, gotInRange, out nextChange);      break;
-            case NPStats.Behavior.Neutral:      DecideByTreshhold(0.5f, inRange, gotInRange, out nextChange);   break;
-            case NPStats.Behavior.Agressive:    DecideByTreshhold(0.2f, inRange, gotInRange, out nextChange);   break;
-            case NPStats.Behavior.Defesive:     DecideByTreshhold(0.7f, inRange, gotInRange, out nextChange);   break;
-        }
-        if (ForceDecision)
-            ForceDecision = false;
-        nextDecisionTimer = Time.time + nextChange;
+        // nefunguje
     }
     void DecideByTreshhold(float tHP, bool inRange, bool gotRange, out float tDecay)
     {
+        /*
         float hp = stats.HP;
         if      (hp < tHP && inRange)
         {
@@ -87,5 +62,6 @@ public class BosController : NPController
             nextAction = NextAction.StayOnPlace;
             tDecay = 3;
         }
+        */
     }
 }

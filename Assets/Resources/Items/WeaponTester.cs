@@ -1,5 +1,7 @@
 using UnityEngine;
-
+/// <summary>
+/// sluzi na tesotvanie dosahov zbrani
+/// </summary>
 public class WeaponTester : MonoBehaviour
 {
     [SerializeField] Weapon weapon;

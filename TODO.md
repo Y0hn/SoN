@@ -2,7 +2,7 @@
 
 ## BUGS
 ```
-Babajagas broom worng anr choise
+Babajagas broom worng arm choise
 ```
 
 ## PLAN
