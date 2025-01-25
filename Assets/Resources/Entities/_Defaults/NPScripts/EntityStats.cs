@@ -125,7 +125,7 @@ public abstract class EntityStats : NetworkBehaviour
                     }
                 }
                 else
-                    weaponAttack.Value = rase.attack;
+                    weaponAttack.Value = rase.weapons[0].attack[0];
             };
             maxHp.OnValueChanged += (int prevValue, int newValue) => 
             {
@@ -209,7 +209,7 @@ public abstract class EntityStats : NetworkBehaviour
         if (IsServer)
         {
             // Nastavenie zakladneho utoku
-            weaponAttack.Value = new (rase.attack);
+            weaponAttack.Value = new (rase.weapons[0].attack[0]);
 
             // Nastavenie zivotov
             maxHp.Value = rase.maxHp;

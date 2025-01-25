@@ -60,7 +60,7 @@ public class NPStats : EntityStats
             if (weaponAttack.Value.IsSet) 
                 return weaponAttack.Value; 
             else
-                return rase.attack;
+                return rase.weapons[0].attack[0];
         } 
     }
     public float AttackDistance             
@@ -192,8 +192,16 @@ public class NPStats : EntityStats
         Gizmos.color = Color.red;
         if (range.Count > 0)
         {
-            Vector3 v = new(transform.position.x, transform.position.y + range[0], 0);
-            Gizmos.DrawWireSphere(v, rase.attack.range);        
+            List<Vector3> vecs = new();
+            foreach (Weapon w in rase.weapons)
+                foreach (Attack a in w.attack)
+                    vecs.Add( new(transform.position.x, transform.position.y + a.range, a.range));
+
+            foreach (Vector3 v in vecs)
+            {
+                Gizmos.DrawWireSphere(v, v.y);
+                Gizmos.color *= 1.1f;
+            }            
         }
     }
     private void OnCollisionEnter2D(Collision2D collision)

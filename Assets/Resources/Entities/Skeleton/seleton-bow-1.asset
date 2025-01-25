@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd18eea97bb415c4880c28c6e70526ef, type: 3}
+  m_Name: seleton-bow-1
+  m_EditorClassIdentifier: 
+  title: Bow
+  description: wood bow
+  iconRef: Items/textures/bow-1
+  color: {r: 0.4056604, g: 0.3347655, b: 0.18178178, a: 1}
+  rarity: {r: 0.8352941, g: 0.5176471, b: 0.1254902, a: 1}
+  slot: 0
+  sprite: bow-2
+  attack:
+  - damage:
+      type: 2
+      amount: 20
+    range: 4
+    rate: 0.5
+    type: 3
+    bothHanded: 0
+  projectile: arrow
+  projSpawnPosition: {x: 0, y: 0.5}

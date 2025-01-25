@@ -8,6 +8,6 @@ using System.Collections.Generic;
     public float speed = 100;
     public int maxHp = 100;
     public float view = 5;
-    public Attack attack = new(new Damage(Damage.Type.bludgeoning, 1), 1, 1, Attack.Type.MeleeSlash);
+    public Weapon[] weapons;
     public List<Resistance> resists = new();
 }

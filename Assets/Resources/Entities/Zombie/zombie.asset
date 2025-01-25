@@ -12,15 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4019a0a40daa294a886e5177b3efcdf, type: 3}
   m_Name: zombie
   m_EditorClassIdentifier: 
+  level: 1
   speed: 100
   maxHp: 100
   view: 5
-  attack:
-    damage:
-      type: 0
-      amount: 5
-    range: 0.7
-    rate: 0.5
-    type: 0
-    bothHanded: 0
-  naturalArmor: {fileID: 11400000, guid: dc19b5750bc482149b1598e7076e7dd9, type: 2}
+  weapons:
+  - {fileID: 11400000, guid: 027d271392eabf147860e5048ecfb240, type: 2}
+  resists: []
