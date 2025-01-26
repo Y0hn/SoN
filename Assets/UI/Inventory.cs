@@ -373,9 +373,7 @@ public class Inventory : MonoBehaviour
 
         // ak je miesto nastavi unarmened utok
         if (acSlots.FindAll(acS => acS.show).Count < acSlots.Count)
-        {
             acSlots[ii].Set(Attack.Type.RaseUnnarmed, -1);
-        }
 
         // ak je stale povodny utok zapnuty tak zostane zapnuty
         acSlots.Find(acS => acS.Identity == prev)?.Select();

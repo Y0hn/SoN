@@ -39,7 +39,6 @@ public class NPStats : EntityStats
      *  private bool clampedDMG = true;
      *  protected Defence defence;
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
-    [SerializeField] protected Equipment[] setUpEquipment;
     [SerializeField] protected NPSensor sensor;
     [SerializeField] protected AIPath aIPath;
     [SerializeField] protected bool drawGizmo = false;
@@ -53,16 +52,6 @@ public class NPStats : EntityStats
     public static byte NPCount = 0;
 
     public override Quaternion Rotation => body.transform.rotation;
-    public override Attack Attack     
-    { 
-        get 
-        { 
-            if (weaponAttack.Value.IsSet) 
-                return weaponAttack.Value; 
-            else
-                return rase.weapons[0].attack[0];
-        } 
-    }
     public float AttackDistance             
     { 
         get 
@@ -82,7 +71,6 @@ public class NPStats : EntityStats
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        EquipmentSetUp();
         AddToCount(1);
     }
     public override void OnNetworkDespawn()
@@ -109,25 +97,6 @@ public class NPStats : EntityStats
             aIPath.maxSpeed = now/100f;
         };
     }
-    protected virtual void EquipmentSetUp()
-    {
-        if (!IsServer) return;
-        foreach(Equipment e in setUpEquipment) Equip(e.GetReferency);
-    }
-    protected void Equip(string equip)
-    {
-        Equipment e = Equipment.GetItem(equip);
-        sbyte slot = (sbyte)e.slot;
-        equipment[slot] = e.GetReferency;
-
-        if (e is Weapon && !weapE.Value.Holding)
-            weapE.Value = new(slot);
-    }
-    protected override void OnEquipmentUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
-    {
-        base.OnEquipmentUpdate(changeEvent);
-        Equipment.Slot slot = (Equipment.Slot)changeEvent.Index;
-    }
     protected override void OnHpUpdate(int prev, int now)
     {
         base.OnHpUpdate(prev, now);
@@ -150,10 +119,6 @@ public class NPStats : EntityStats
     {
         return base.TakeDamage(damage);
     }
-    public override void PickedUpRpc(string reference)
-    {
-        
-    }
     public override void KilledEnemy(EntityStats died)
     {
         
@@ -175,14 +140,7 @@ public class NPStats : EntityStats
             view = rase.view;
             range.Add(Attack.range);
         }
-        
-        foreach (Equipment equipment in setUpEquipment)
-            if (equipment is Weapon w)
-                foreach (Attack a in w.attack)
-                {
-                    float r = a.IsRanged ? a.range : a.range*2;
-                    range.Add(r);
-                }
+
         Gizmos.color = Color.magenta;
         if (view > 0)
             Gizmos.DrawWireSphere(transform.position, view);

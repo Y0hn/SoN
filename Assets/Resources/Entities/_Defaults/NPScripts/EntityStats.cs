@@ -26,15 +26,15 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected AudioSource aAS;
     [SerializeField] protected AITarget aiTeam = AITarget.Team_2;
     [SerializeField] protected EntityController controller;
-                        protected   NetworkVariable<int> maxHp = new();
-                        protected   NetworkList<FixedString64Bytes> equipment = new(/*null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner*/);    
-                        // je to list ale sprava sa ako Dictionary
-                        protected   NetworkVariable<int> hp = new();
-                        public      NetworkVariable<float> speed = new();
-                        public      NetworkVariable<byte> level = new(1);
-                        public      NetworkVariable<bool> IsAlive = new(true);
-                        protected   NetworkVariable<Attack> weaponAttack = new();
-                        protected   NetworkVariable<WeaponIndex> weapE = new(new(-1), NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
+
+    protected   NetworkVariable<int> maxHp = new();
+    
+    protected   NetworkVariable<int> hp = new();
+    public      NetworkVariable<float> speed = new();
+    public      NetworkVariable<byte> level = new(1);
+    public      NetworkVariable<bool> IsAlive = new(true);
+    protected   NetworkVariable<WeaponIndex> weapE = new(new(0), NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
+
 #pragma warning disable IDE0004
     /// <summary>
     /// Vrati pomer hp/maxHp
@@ -42,17 +42,18 @@ public abstract class EntityStats : NetworkBehaviour
     public float HP                     { get => (float)hp.Value/(float)maxHp.Value; }
 #pragma warning restore IDE0004
     public virtual Quaternion Rotation  { get => transform.rotation; }
+    protected virtual Weapon[] Weapons  { get => rase.weapons; }
+    public Weapon EquipedWeapon         { get => Weapons[weapE.Value.eIndex];}
     public NetworkObject NetObject      { get => netObject; }
     public Rigidbody2D RigidBody2D      { get => rb; }
     public Transform AttackPoint        { get => attackPoint; }
-    public Weapon EquipedWeapon         { get => Resources.Load<Weapon>(equipment[weapE.Value.eIndex].ToString()); }
+    public virtual Attack Attack        { get => Weapons[weapE.Value.eIndex].attack[weapE.Value.aIndex];  } 
     public AITarget TargetTeam          { get => aiTeam; }
     public Animator Animator            { get => animator.Animator; }
     public Vector2 View                 { get => controller.View; }
     public Color Color                  { get => color.Color; }
     public float ViewAngle              { get => Mathf.Atan2(View.x, View.y); }
-    public bool AttackBoth              { get => weaponAttack.Value.bothHanded; }
-    public bool Armed                   { get => equipment[(int)Equipment.Slot.WeaponL] != "" || "" !=  equipment[(int)Equipment.Slot.WeaponR]; }
+    public bool AttackBoth              { get => Attack.bothHanded; }
     public virtual Defence Defence      
     { 
         get 
@@ -60,25 +61,25 @@ public abstract class EntityStats : NetworkBehaviour
             if (IsServer) 
                 return defence; 
             else
+            {
+                Debug.LogWarning("Defence requested from non Server");
                 return new();
+            }
         } 
+        set => defence = value;
     }
-    public virtual Attack Attack        
-    { 
-        get 
-        {
-            if (IsServer)
-                return weaponAttack.Value;
-            else
-                return new();
-        }
-    }
+
     public Action OnDeath;
     protected Defence defence;  // iba na servery/hoste
     protected float timeToDespawn = 0f;
     protected float atTime = 0;
-    //private bool clampedDMG = true;
-    public const float RANGED_ANIMATION_DUR = 1.5f, MELEE_ANIMATION_DUR = 1;
+    
+
+    public const float 
+        RANGED_ANIMATION_DUR = 1.5f, 
+        MELEE_ANIMATION_DUR = 1;
+
+
     /// <summary>
     /// Zavolane pri spawne u vsetkych
     /// </summary>
@@ -97,51 +98,35 @@ public abstract class EntityStats : NetworkBehaviour
     {
         if (IsServer)
         {
-            weaponAttack.OnValueChanged += (Attack prevValue, Attack newValue) => 
+            weapE.OnValueChanged += (WeaponIndex old, WeaponIndex now) =>
             {
-                if      (Attack.MeleeAttack(newValue.type))
+                if (now.Holding)
                 {
-                    attackPoint.localPosition = new(attackPoint.localPosition.x, newValue.range);
-                }
-                else if (Attack.RangedAttack(newValue.type))
-                {
-                    Ranged r = (Ranged)EquipedWeapon;
-                    attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
-                }
-            };
-            weapE.OnValueChanged += (WeaponIndex prevValue, WeaponIndex newValue) =>
-            {
-                if (newValue.Holding)
-                {
-                    try {
-                        weaponAttack.Value = Weapon.GetItem(equipment[newValue.eIndex].ToString()).attack[newValue.aIndex];
-                    } catch (Exception ex) {
-                        string eqs = "";
-                        for (int i = 0; i < equipment.Count; i++)
-                        {
-                            eqs += $"\n[{i}.]" + equipment[i].ToString();
-                        }
-                        Debug.LogWarning($"Equipment not set on\nWeaponIndex[{newValue}]\nEquipment: {eqs}\n" + ex.Message);
+                    if      (Attack.MeleeAttack(Attack.type))
+                    {
+                        attackPoint.localPosition = new(attackPoint.localPosition.x, Attack.range);
                     }
+                    else if (Attack.RangedAttack(Attack.type))
+                    {
+                        Ranged r = (Ranged)Weapons[now.eIndex];
+                        attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
+                    }                  
                 }
-                else
-                    weaponAttack.Value = rase.weapons[0].attack[0];
             };
             maxHp.OnValueChanged += (int prevValue, int newValue) => 
             {
                 hp.Value = maxHp.Value;
             };
         }
-        equipment.OnListChanged += OnEquipmentUpdate;
-        weaponAttack.OnValueChanged   += (Attack prevValue, Attack newValue) => 
+        weapE.OnValueChanged   += (WeaponIndex old, WeaponIndex now) => 
         {
             bool 
                 R = false, 
                 L = false, 
                 B = false;
-            if (newValue.type != Attack.Type.RaseUnnarmed)
+            if (Attack.type != Attack.Type.RaseUnnarmed)
             {
-                Weapon w = EquipedWeapon;
+                Weapon w = Weapons[now.eIndex];
                 Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
                 //Debug.Log($"Setted weapon sprite to \"{w.SpriteRef}\"");
                 weaponL.sprite = sprite;
@@ -182,12 +167,12 @@ public abstract class EntityStats : NetworkBehaviour
     protected virtual void OwnerSubsOnNetValChanged()
     {
         // Server / Owner
-        weaponAttack.OnValueChanged += (Attack old, Attack now) =>
+        weapE.OnValueChanged += (WeaponIndex old, WeaponIndex now) =>
         {
-            Animator.SetFloat("weapon", (float)now.type);
+            Animator.SetFloat("weapon", (float)Attack.type);
 
-            float speed = now.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
-            speed /= now.AttackTime;
+            float speed = Attack.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
+            speed /= Attack.AttackTime;
             Animator.SetFloat("atSpeed", speed);
             //Debug.Log("Attack animation set to time " + speed);
         };
@@ -209,7 +194,8 @@ public abstract class EntityStats : NetworkBehaviour
         if (IsServer)
         {
             // Nastavenie zakladneho utoku
-            weaponAttack.Value = new (rase.weapons[0].attack[0]);
+            weapE.Value = new(0);
+            attackPoint.localPosition = new(attackPoint.localPosition.x, rase.weapons[0].attack[0].range);
 
             // Nastavenie zivotov
             maxHp.Value = rase.maxHp;
@@ -222,16 +208,10 @@ public abstract class EntityStats : NetworkBehaviour
             speed.Value = rase.speed;
             Animator.SetFloat("wSpeed", rase.speed/(100f*transform.localScale.x));
             
-            // Nastavenie 
-            int length = Enum.GetNames(typeof(Equipment.Slot)).Length;
-            for (; equipment.Count < length;)
-                equipment.Add("");
-
             // Nastavenie obrany
-            defence = new(rase.resists);
+            Defence = new(rase.resists);
             IsAlive.Value = true;
         }
-        attackPoint.localPosition = new(attackPoint.localPosition.x, weaponAttack.Value.range);
     }
     /// <summary>
     /// Spúšta sa kazdy frame a stará sa o despawn po smrti
@@ -250,25 +230,7 @@ public abstract class EntityStats : NetworkBehaviour
     {
         float value = HP;
         hpBar.value = value;
-    } 
-    /// <summary>
-    /// Spúšťa sa po každej zmene zbrane
-    /// </summary>
-    /// <param name="changeEvent"></param>
-    protected virtual void OnEquipmentUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
-    {
-        if (changeEvent.Type != NetworkListEvent<FixedString64Bytes>.EventType.Value)
-        {
-            Debug.LogWarning("Equipment corrupted");
-            equipment.SetDirty(true);
-        }
-        /*
-        string eq = "Equipment Update\n";
-        for (int i = 0; i < equipment.Count; i++)
-            eq += $"[{i}.] Equiped= {equipment[i]!=""} | Path= {equipment[i]}\n";
-        Debug.Log(eq + $"\n Event.Value= {curr}");
-        */
-    }    
+    }
     /// <summary>
     /// Uberie hodnotu ublíženia zo źivotov podla obrany proti konkretnemu typu
     /// </summary>
@@ -279,7 +241,7 @@ public abstract class EntityStats : NetworkBehaviour
         if (!IsServer) 
             return false;
 
-        int newDamage = defence.CalculateDMG(damage);
+        int newDamage = Defence.CalculateDMG(damage);
         hp.Value -= newDamage;
         
         // if (FileManager.debug)
@@ -299,7 +261,7 @@ public abstract class EntityStats : NetworkBehaviour
         if (atTime < Time.time)
         {
             AttackRpc();
-            atTime = Time.time + weaponAttack.Value.AttackTime;
+            atTime = Time.time + Attack.AttackTime;
             return true;
         }
         return false;
@@ -323,8 +285,10 @@ public abstract class EntityStats : NetworkBehaviour
             weapE.Value = new (weapE.Value.eIndex, attack);
         else if (0 <= weapon && 0 <= attack)
             weapE.Value = new (weapon, attack);
-        else if (attack < 0)
-            weapE.Value = new (-1, -1);
+        else //if (attack < 0)
+            weapE.Value = new (0, 0);
+
+        Debug.Log($"Setted Weapon Index= {weapE.Value}");
     }
     /// <summary>
     /// Vyziada si uložené dáta 
@@ -334,17 +298,9 @@ public abstract class EntityStats : NetworkBehaviour
 
     }
 
-    // RPSs
-    /// <summary>
-    /// Pridáva/Odoberā zbrame
-    /// </summary>
-    /// <param name="reference"></param>
-    /// <param name="slot"></param>
-    [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot = Equipment.Slot.NoPreference)
-    {
-        equipment[(int)slot] = reference;
-        Debug.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
-    }
+
+    // RPCs
+
     /// <summary>
     /// Utocí za entitu podla typu útoku
     /// </summary>
@@ -353,15 +309,6 @@ public abstract class EntityStats : NetworkBehaviour
         foreach(EntityStats et in Attack.Trigger(this))                 // ak ranged tak count = 0
             if (et.IsAlive.Value && et.TakeDamage(Attack.damage))    // pravdive ak target zomrie
                 KilledEnemy(et);
-    }
-    /// <summary>
-    /// Zbiera a equipuje zbrane
-    /// </summary>
-    /// <param name="reference"></param>tile.Stop();
-    [Rpc(SendTo.Server)] public virtual void PickedUpRpc(string reference)
-    {
-        Equipment e = Equipment.GetItem(reference);
-        equipment[(int)e.slot] = e.GetReferency;
     }
     [Rpc(SendTo.Server)] public virtual void TerrainChangeRpc(float speedMod)
     {

@@ -17,6 +17,6 @@ using Unity.Netcode;
     }
     public override string ToString()
     {
-        return $"Weapon Index: equipIndex= {eIndex} attackIndex= {aIndex}";
+        return $"equipIndex= {eIndex} attackIndex= {aIndex}";
     }
 }

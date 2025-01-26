@@ -1,7 +1,11 @@
-using Unity.Collections;
-using Unity.Netcode;
 using UnityEngine;
+using Unity.Netcode;
+using Unity.Collections;
+using Unity.VisualScripting;
+using System;
+using System.Collections.Generic;
 using TMPro;
+using System.Linq;
 public class PlayerStats : EntityStats
 {
     /*  ZDEDENE ATRIBUTY
@@ -42,23 +46,59 @@ public class PlayerStats : EntityStats
     protected XpSliderScript xpBar;       // UI nastavene len pre Ownera
     protected GameManager game;
     protected Inventory inventUI;
-            protected NetworkVariable<uint> xp = new(0);
-            protected NetworkVariable<uint> xpMax = new(10, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
-            protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
-            protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-            public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+    protected NetworkVariable<uint> xp = new(0);
+    protected NetworkVariable<uint> xpMax = new(10, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
+    protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
+    protected NetworkList<FixedString64Bytes> equipment = new(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // je to list ale sprava sa ako Dictionary
+    protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     
     protected SkillTree skillTree;  // iba na servery
    
     public Projectile Projectile { get; set; }
+    protected Equipment[] Equipments     
+    { 
+        get 
+        {
+            List<Equipment> eq = new();
+            foreach (var e in equipment)
+                if (e != "")
+                    eq.Add(Equipment.GetItem(e.ToString()));
+            Debug.Log($"Additional weapons {eq.Count}");
+            return eq.ToArray();
+        }
+    }
+    protected override Weapon[] Weapons 
+    { 
+        get 
+        { 
+            var w = base.Weapons.ToList();
+            w.AddRange(Equipments); 
+            Debug.Log($"Returning weapons [{w.Count}]");
+            return w.ToArray();
+        } 
+    }
     public override Attack Attack 
     { 
         get { 
             Attack a = new(base.Attack);
             if (a.IsSet)
-                a.AddDamage(skillTree.GetDamage(base.Attack.damage.type)); 
+                a.AddDamage(SkillsTree.GetDamage(base.Attack.damage.type)); 
             return a;
         } 
+    }
+    protected SkillTree SkillsTree  
+    {
+        get 
+        {
+            if (IsServer)
+                return skillTree;
+            else
+                Debug.LogWarning("");
+            return null;
+        }
+
     }
     public override Defence Defence
     {
@@ -66,6 +106,8 @@ public class PlayerStats : EntityStats
             return base.Defence;
         }
     }
+    
+    
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -106,6 +148,11 @@ public class PlayerStats : EntityStats
             xpMax.Value = 50;
             xpBar.SliderValue = xp.Value;
             xpBar.LevelUP(1, xpMax.Value);
+
+            // Nastavenie 
+            int length = Enum.GetNames(typeof(Equipment.Slot)).Length;
+            for (; equipment.Count < length;)
+                equipment.Add("");
 
             playerName.Value = game.PlayerName;
         }
@@ -153,10 +200,6 @@ public class PlayerStats : EntityStats
             xpBar.SliderValue = newValue; 
             
         };
-        /*xpMax.OnValueChanged += (int prevValue, int newValue) =>
-        {
-            xpBar.AddMax(xpMax.Value);
-        };*/
         hp.OnValueChanged += (int prev, int now) => 
         {
             if (now < prev)
@@ -205,8 +248,8 @@ public class PlayerStats : EntityStats
         att = (sbyte)(id % 10 - 1);
         if (0 <= att)
             wea = id/10 == 1 ? (sbyte)Equipment.Slot.WeaponR : (sbyte)Equipment.Slot.WeaponL;
-        
-        //Debug.Log($"Setting weapon index to new(att= {att} | wea= {wea})");
+        wea++;        
+        Debug.Log($"Setting ID={id} to weapon index to new(att= {att} | wea= {wea})");
         SetWeaponIndex(att, wea);
     }
     public override bool TakeDamage(Damage damage)
@@ -214,7 +257,7 @@ public class PlayerStats : EntityStats
         if (!IsServer) 
             return false;
 
-        int newDamage = defence.CalculateDMG(damage, skillTree.GetResist(damage.type));
+        int newDamage = Defence.CalculateDMG(damage, skillTree.GetResist(damage.type));
         hp.Value -= newDamage;
         
         // if (FileManager.debug)
@@ -248,10 +291,6 @@ public class PlayerStats : EntityStats
     }
 
     // RPCs
-    [Rpc(SendTo.Server)] public override void PickedUpRpc(string refItem)
-    {
-        inventory.Add(refItem);
-    }
     [Rpc(SendTo.Server)] public virtual void AddSkillRpc(SkillTree.Skill skill)
     {
         skillTree.Add(skill);
@@ -263,6 +302,24 @@ public class PlayerStats : EntityStats
     [Rpc(SendTo.Server)] protected void StopRanAttackRpc()
     {
         Projectile.StopAttack();
+    }
+    /// <summary>
+    /// Pridáva/Odoberā zbrame
+    /// </summary>
+    /// <param name="reference"></param>
+    /// <param name="slot"></param>
+    /*[Rpc(SendTo.Server)] */public void SetEquipmentRpc(string reference, Equipment.Slot slot = Equipment.Slot.NoPreference)
+    {
+        equipment[(int)slot] = reference;
+        Debug.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
+    }
+    /// <summary>
+    /// Zbiera a equipuje zbrane
+    /// </summary>
+    /// <param name="reference"></param>tile.Stop();
+    [Rpc(SendTo.Server)] public virtual void PickedUpRpc(string reference)
+    {
+        inventory.Add(reference);
     }
     [Rpc(SendTo.Server)] public void AddLvlRpc()
     {
