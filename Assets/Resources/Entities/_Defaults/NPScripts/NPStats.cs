@@ -46,8 +46,9 @@ public class NPStats : EntityStats
     public Action OnHit;
 
     // symbolizuje percento casu utoku kedy nedostava polohu ciela [+inacuracy => -presnost]
-    protected const float RANGED_ATTACK_INACURRACY = 0.4f; 
-    protected const float ATTACK_DISTANCE_PERCENTAGE = 0.3f;
+    protected const float 
+        RANGED_ATTACK_INACURRACY = 0.4f,
+        ATTACK_DISTANCE_PERCENTAGE = 0.3f;
 
     public static byte NPCount = 0;
 
@@ -72,6 +73,8 @@ public class NPStats : EntityStats
     {
         base.OnNetworkSpawn();
         AddToCount(1);
+        
+        SetWeaponIndex(0,0);
     }
     public override void OnNetworkDespawn()
     {
@@ -88,6 +91,12 @@ public class NPStats : EntityStats
             aIPath.maxSpeed = speed.Value/100f;
         }
     }
+    protected override void Update()
+    {
+        base.Update();
+    }
+
+
     protected override void OwnerSubsOnNetValChanged()
     {
         if (!IsServer) return;
@@ -127,9 +136,7 @@ public class NPStats : EntityStats
     void OnDrawGizmos()
     {
         if (drawGizmo)
-        {
             OnDrawGizmosSelected();
-        }
     }
     void OnDrawGizmosSelected()
     {
@@ -157,15 +164,20 @@ public class NPStats : EntityStats
 
             foreach (Vector3 v in vecs)
             {
-                Gizmos.DrawWireSphere(v, v.y);
+                Gizmos.DrawWireSphere(v, v.z);
                 Gizmos.color *= 1.1f;
             }            
         }
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.layer.Equals(LayerMask.NameToLayer("Water")))
+        if (IsServer && collision.gameObject.layer.Equals(LayerMask.NameToLayer("Water")))
+        {
+            /*int php = hp.Value;
+            hp.Value = 0;
+            hp.OnValueChanged.Invoke(php, hp.Value);*/
             netObject.Despawn();
+        }
     }
 #pragma warning restore IDE0051 // Remove unused private members
 }

@@ -77,7 +77,7 @@ public abstract class EntityStats : NetworkBehaviour
 
     public const float 
         RANGED_ANIMATION_DUR = 1.5f, 
-        MELEE_ANIMATION_DUR = 1;
+        MELEE_ANIMATION_DUR  = 1;
 
 
     /// <summary>
@@ -100,17 +100,15 @@ public abstract class EntityStats : NetworkBehaviour
         {
             weapE.OnValueChanged += (WeaponIndex old, WeaponIndex now) =>
             {
-                if (now.Holding)
+                if      (Attack.MeleeAttack(Attack.type))
                 {
-                    if      (Attack.MeleeAttack(Attack.type))
-                    {
-                        attackPoint.localPosition = new(attackPoint.localPosition.x, Attack.range);
-                    }
-                    else if (Attack.RangedAttack(Attack.type))
-                    {
-                        Ranged r = (Ranged)Weapons[now.eIndex];
-                        attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
-                    }                  
+                    attackPoint.localPosition = new(attackPoint.localPosition.x, Attack.range);
+                }
+                else if (Attack.RangedAttack(Attack.type))
+                {
+                    Ranged r = (Ranged)Weapons[now.eIndex];
+                    attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
+                    //Debug.Log($"{name}'s attack point position set to [{attackPoint.localPosition.x},{attackPoint.localPosition.y}]");
                 }
             };
             maxHp.OnValueChanged += (int prevValue, int newValue) => 
@@ -118,12 +116,15 @@ public abstract class EntityStats : NetworkBehaviour
                 hp.Value = maxHp.Value;
             };
         }
+
+
         weapE.OnValueChanged   += (WeaponIndex old, WeaponIndex now) => 
         {
             bool 
                 R = false, 
                 L = false, 
                 B = false;
+
             if (Attack.type != Attack.Type.RaseUnnarmed)
             {
                 Weapon w = Weapons[now.eIndex];
@@ -174,7 +175,7 @@ public abstract class EntityStats : NetworkBehaviour
             float speed = Attack.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
             speed /= Attack.AttackTime;
             Animator.SetFloat("atSpeed", speed);
-            //Debug.Log("Attack animation set to time " + speed);
+            //Debug.Log($"Attack animation set on weapon {Animator.GetFloat("weapon")} to speed {speed}");
         };
         speed.OnValueChanged += (float old, float now) =>
         {
@@ -193,10 +194,6 @@ public abstract class EntityStats : NetworkBehaviour
         name = name.Split('(')[0].Trim();
         if (IsServer)
         {
-            // Nastavenie zakladneho utoku
-            weapE.Value = new(0);
-            attackPoint.localPosition = new(attackPoint.localPosition.x, rase.weapons[0].attack[0].range);
-
             // Nastavenie zivotov
             maxHp.Value = rase.maxHp;
             hp.Value = maxHp.Value;
@@ -211,6 +208,10 @@ public abstract class EntityStats : NetworkBehaviour
             // Nastavenie obrany
             Defence = new(rase.resists);
             IsAlive.Value = true;
+
+            // Nastavenie zakladneho utoku
+            weapE.Value = new (0);
+            Animator.SetFloat("weapon", (float)Weapons[0].attack[0].type);
         }
     }
     /// <summary>
@@ -235,7 +236,7 @@ public abstract class EntityStats : NetworkBehaviour
     /// Uberie hodnotu ublíženia zo źivotov podla obrany proti konkretnemu typu
     /// </summary>
     /// <param name="damage"></param>
-    /// <returns></returns>
+    /// <returns>PRAVDA ak nepriatel zomrel</returns>
     public virtual bool TakeDamage(Damage damage)
     {
         if (!IsServer) 
@@ -255,7 +256,7 @@ public abstract class EntityStats : NetworkBehaviour
     /// <summary>
     /// Posle serveru prikaz na utok
     /// </summary>
-    /// <returns>vrati ci sa je mozne utocit</returns>
+    /// <returns>PRAVDA ak moze utocit</returns>
     public virtual bool AttackTrigger()
     {
         if (atTime < Time.time)
@@ -281,6 +282,7 @@ public abstract class EntityStats : NetworkBehaviour
     /// <param name="weapon"></param>
     public virtual void SetWeaponIndex (sbyte attack, sbyte weapon= -1)
     {
+        WeaponIndex wi = weapE.Value;
         if      (weapon < 0 && 0 <= attack)
             weapE.Value = new (weapE.Value.eIndex, attack);
         else if (0 <= weapon && 0 <= attack)
@@ -288,7 +290,8 @@ public abstract class EntityStats : NetworkBehaviour
         else //if (attack < 0)
             weapE.Value = new (0, 0);
 
-        Debug.Log($"Setted Weapon Index= {weapE.Value}");
+        weapE.OnValueChanged.Invoke(wi, weapE.Value);
+        //Debug.Log($"Setted Weapon Index= {weapE.Value}");
     }
     /// <summary>
     /// Vyziada si uložené dáta 

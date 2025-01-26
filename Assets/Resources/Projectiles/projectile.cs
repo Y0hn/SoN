@@ -1,6 +1,5 @@
 using UnityEngine;
 using Unity.Netcode;
-using Unity.VisualScripting;
 
 public class Projectile : NetworkBehaviour
 {
@@ -64,7 +63,7 @@ public class Projectile : NetworkBehaviour
         {
             float distance = Vector2.Distance(startPos, transform.position);
             if (distance >= RangeLimit)
-                networkObject.Despawn();
+                TryToDestoy();
             line.localScale = new (line.localScale.x,distance);
         }
     }
@@ -82,8 +81,7 @@ public class Projectile : NetworkBehaviour
     }
     void RotateAroundPoint()
     {
-        transform.position = shooter.AttackPoint.position;
-        transform.rotation = shooter.AttackPoint.rotation;
+        transform.SetPositionAndRotation(shooter.AttackPoint.position, shooter.AttackPoint.rotation);
         transform.Rotate(new Vector3(0,0,1), shooter.ViewAngle, Space.Self);
     }
     void OnTriggerEnter2D(Collider2D other)
@@ -92,7 +90,7 @@ public class Projectile : NetworkBehaviour
         {
             if (et.TakeDamage(damage))
                 shooter.KilledEnemy(et);
-            networkObject.Despawn();
+            TryToDestoy();
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members
@@ -103,12 +101,22 @@ public class Projectile : NetworkBehaviour
         damage = attack.damage;
         range = attack.range;
         shooter = entityStats;
-        shooter.OnDeath += delegate { networkObject.Despawn(); };
+        shooter.OnDeath += delegate 
+        { 
+            TryToDestoy(); 
+        };
         //Debug.Log($"Shoted projectile \nwith attack: {attack}\nwith shoot out delay: {delay}\ngrafical delay: {graficDelay}");
     }
     public void StopAttack()
     {
-        if (networkObject.IsSpawned && timers[0] != 0)
+        if (timers[0] != 0)
+            TryToDestoy();
+    }
+    void TryToDestoy()
+    {
+        if      (/*!IsServer && */networkObject.IsSpawned)
             networkObject.Despawn();
+        else //if (!networkObject.IsSpawned)
+            Destroy(gameObject);
     }
 }

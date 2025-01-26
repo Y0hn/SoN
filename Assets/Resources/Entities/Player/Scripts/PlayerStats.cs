@@ -65,7 +65,7 @@ public class PlayerStats : EntityStats
             foreach (var e in equipment)
                 if (e != "")
                     eq.Add(Equipment.GetItem(e.ToString()));
-            Debug.Log($"Additional weapons {eq.Count}");
+            //Debug.Log($"Additional weapons {eq.Count}");
             return eq.ToArray();
         }
     }
@@ -75,7 +75,7 @@ public class PlayerStats : EntityStats
         { 
             var w = base.Weapons.ToList();
             w.AddRange(Equipments); 
-            Debug.Log($"Returning weapons [{w.Count}]");
+            //Debug.Log($"Returning weapons [{w.Count}]");
             return w.ToArray();
         } 
     }
@@ -241,7 +241,7 @@ public class PlayerStats : EntityStats
                 break;
         }
     }
-    public virtual void SetWeaponIndex (sbyte id)
+    public void SetWeaponIndex (sbyte id)
     {
         sbyte att, wea= -1;
 
