@@ -1,11 +1,12 @@
 using Unity.Netcode.Components;
 using Unity.Netcode;
-using Unity.Collections;
 using UnityEngine.UI;
 using UnityEngine;
-using System.Collections.Generic;
 using System;
 using TMPro;
+using Random = UnityEngine.Random;
+using System.Collections.Generic;
+using System.Linq;
 /// <summary>
 /// Drzi hodnoty pre entitu
 /// </summary>
@@ -27,8 +28,7 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected AITarget aiTeam = AITarget.Team_2;
     [SerializeField] protected EntityController controller;
 
-    protected   NetworkVariable<int> maxHp = new();
-    
+    protected   NetworkVariable<int> maxHp = new();    
     protected   NetworkVariable<int> hp = new();
     public      NetworkVariable<float> speed = new();
     public      NetworkVariable<byte> level = new(1);
@@ -73,11 +73,13 @@ public abstract class EntityStats : NetworkBehaviour
     protected Defence defence;  // iba na servery/hoste
     protected float timeToDespawn = 0f;
     protected float atTime = 0;
+    protected bool onDeathWait;
     
 
     public const float 
         RANGED_ANIMATION_DUR = 1.5f, 
-        MELEE_ANIMATION_DUR  = 1;
+        MELEE_ANIMATION_DUR  = 1,
+        TIME_TO_DESPAWN      = 5;
 
 
     /// <summary>
@@ -85,39 +87,50 @@ public abstract class EntityStats : NetworkBehaviour
     /// </summary>
     public override void OnNetworkSpawn()
     {
+        // Najprv nastavi zakladne hodnoty
         EntitySetUp();
-        SubsOnNetValChanged();
-        OwnerSubsOnNetValChanged(); 
 
-        hpBar.value = hp.Value;
+        // Dalej nastavi odber pre zmenu na Zdielanych premennych
+        ServerSubsOnNetValChanged();
+        OwnerSubsOnNetValChanged(); 
+        SubsOnNetValChanged();
+    }
+    /// <summary>
+    /// Zabezpecuje spravne nastavenie a chod 
+    /// </summary>
+    protected virtual void ServerSubsOnNetValChanged()
+    {
+        if (!IsServer) return;
+        weapE.OnValueChanged += (WeaponIndex old, WeaponIndex now) =>
+        {
+            if      (Attack.MeleeAttack(Attack.type))
+            {
+                attackPoint.localPosition = new(attackPoint.localPosition.x, Attack.range);
+            }
+            else if (Attack.RangedAttack(Attack.type))
+            {
+                Ranged r = (Ranged)Weapons[now.eIndex];
+                attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
+                //Debug.Log($"{name}'s attack point position set to [{attackPoint.localPosition.x},{attackPoint.localPosition.y}]");
+            }
+        };
+        maxHp.OnValueChanged += (int prevValue, int newValue) => 
+        {
+            hp.Value = maxHp.Value;
+        };
+        IsAlive.OnValueChanged += (bool old, bool now) =>
+        {            
+            if (now)
+                hp.Value = maxHp.Value;
+            else
+                Die();
+        };
     }
     /// <summary>
     /// Zavolane v netSpawne, zabezpecuje synchronizaciu hodnot/vlastnosti componentov, ktore vidia vsetci
     /// </summary>
     protected virtual void SubsOnNetValChanged()
     {
-        if (IsServer)
-        {
-            weapE.OnValueChanged += (WeaponIndex old, WeaponIndex now) =>
-            {
-                if      (Attack.MeleeAttack(Attack.type))
-                {
-                    attackPoint.localPosition = new(attackPoint.localPosition.x, Attack.range);
-                }
-                else if (Attack.RangedAttack(Attack.type))
-                {
-                    Ranged r = (Ranged)Weapons[now.eIndex];
-                    attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
-                    //Debug.Log($"{name}'s attack point position set to [{attackPoint.localPosition.x},{attackPoint.localPosition.y}]");
-                }
-            };
-            maxHp.OnValueChanged += (int prevValue, int newValue) => 
-            {
-                hp.Value = maxHp.Value;
-            };
-        }
-
-
         weapE.OnValueChanged   += (WeaponIndex old, WeaponIndex now) => 
         {
             bool 
@@ -149,18 +162,11 @@ public abstract class EntityStats : NetworkBehaviour
         };
         IsAlive.OnValueChanged  += (bool prev, bool alive) => 
         {
-            if (IsServer && alive)
-                hp.Value = maxHp.Value;
             hpBar.gameObject.SetActive(alive);
             coll.enabled = alive;
-            if (!alive)
-            {
-                timeToDespawn = Time.time + 5f;
-
-                OnDeath?.Invoke();
-            }
         };
         hp.OnValueChanged += OnHpUpdate;
+        hpBar.value = hp.Value;
     }
     /// <summary>
     /// Zabezpecuje synchronizaciu zmeny hodnoty/vlastnosti componentov, ktore su dôleźité iba pre majitela/server alebo spúšťa animacie
@@ -212,6 +218,9 @@ public abstract class EntityStats : NetworkBehaviour
             // Nastavenie zakladneho utoku
             weapE.Value = new (0);
             Animator.SetFloat("weapon", (float)Weapons[0].attack[0].type);
+
+            // Oneskorenie zmiznutia po smrti
+            onDeathWait = true;
         }
     }
     /// <summary>
@@ -231,6 +240,24 @@ public abstract class EntityStats : NetworkBehaviour
     {
         float value = HP;
         hpBar.value = value;
+        if (now <= 0)
+            Die();
+    }
+    /// <summary>
+    /// Zavolana ak zivoty chraktera dosiahnu 0
+    /// </summary>
+    protected virtual void Die()
+    {
+        if (onDeathWait)
+            timeToDespawn = Time.time + TIME_TO_DESPAWN;
+        foreach (Delegate d in OnDeath?.GetInvocationList())
+        {
+            if (d.Target == null)  // Ak je objekt odstránený, odpojíme metódu
+            {
+                OnDeath -= (Action)d;
+            }
+        }        
+        OnDeath?.Invoke();
     }
     /// <summary>
     /// Uberie hodnotu ublíženia zo źivotov podla obrany proti konkretnemu typu
@@ -300,10 +327,31 @@ public abstract class EntityStats : NetworkBehaviour
     {
 
     }
+    /*   _____  _____   _____     
+     *  |  __ \|  __ \ / ____|    
+     *  | |__) | |__) | |     ___ 
+     *  |  _  /|  ___/| |    / __|
+     *  | | \ \| |    | |____\__ \
+     *  |_|  \_\_|     \_____|___/
+     */
+    /// <summary>
+    /// Vyhodi item, tak ze vytvori objekt na nahodnych suradniciach v dosahu
+    /// a prida mu ho aku atribut
+    /// </summary>
+    /// <param name="itemPath"></param>
+    /// <param name="dropRange"></param>
+    [Rpc(SendTo.Server)] public void DropRpc(string itemPath, Vector2 dropRange)
+    {
+        Vector2 pos = new (
+            transform.position.x + 
+                Random.Range(-dropRange.x, dropRange.x), 
+            transform.position.y + 
+                Random.Range(-dropRange.y, dropRange.y));
 
-
-    // RPCs
-
+        GameObject i = Instantiate(Resources.Load<GameObject>("Items/ItemDrop"), pos, Quaternion.identity);
+        i.GetComponent<ItemDrop>().Item = Item.GetItem(itemPath);
+        i.GetComponent<NetworkObject>().Spawn();
+    }
     /// <summary>
     /// Utocí za entitu podla typu útoku
     /// </summary>
@@ -313,9 +361,17 @@ public abstract class EntityStats : NetworkBehaviour
             if (et.IsAlive.Value && et.TakeDamage(Attack.damage))    // pravdive ak target zomrie
                 KilledEnemy(et);
     }
+    /// <summary>
+    /// Meni rychlost charakteru, pri zmene terenu
+    /// </summary>
+    /// <param name="speedMod"></param>
     [Rpc(SendTo.Server)] public virtual void TerrainChangeRpc(float speedMod)
     {
         speed.Value *= speedMod;
     }
+    /// <summary>
+    /// Urcuje skupinu pre cielenie a ublizovanie si navzajom ;)
+    /// (skupiny sa navzajom nemaju radi a None je  neutralna)
+    /// </summary>
     public enum AITarget { None, Player, Team_1, Team_2, Team_3, Boss }
 }

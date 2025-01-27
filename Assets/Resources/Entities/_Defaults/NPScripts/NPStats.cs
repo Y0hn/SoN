@@ -111,6 +111,10 @@ public class NPStats : EntityStats
         base.OnHpUpdate(prev, now);
         OnHit.Invoke();
     }
+    protected override void Die()
+    {
+        base.Die();
+    }
     protected virtual void AddToCount(sbyte b)
     {
         // iba na servery

@@ -162,6 +162,7 @@ public class PlayerStats : EntityStats
         chatField.SetActive(false);
         name = playerName.Value.ToString();
         nameTag.text = name;
+        onDeathWait = false;
         GetComponent<NetworkObject>().name = nameTag.text;
     }
     protected override void SubsOnNetValChanged()
@@ -220,6 +221,11 @@ public class PlayerStats : EntityStats
         {
             xpBar.LevelUP((byte)(now+1), xpMax.Value);
         };
+    }
+    protected override void Die()
+    {
+        OnDeath?.Invoke();
+        OnDeath = null;
     }
     protected void OnInventoryUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)  // iba lokalne
     {        

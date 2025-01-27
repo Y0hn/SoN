@@ -10,9 +10,14 @@ public class PlayerController : EntityController
      */
     [SerializeField] GameObject cam;
     [SerializedDictionary("Key", "Input"),SerializeField] SerializedDictionary<string, InputActionReference> input_actions;
+#if UNITY_EDITOR
+    [SerializeField] Equipment[] equipmentPool;
+#endif
     private GameManager game;
     protected bool wasAttacking;
     protected new PlayerStats Stats => (PlayerStats)base.Stats;
+
+
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
@@ -44,10 +49,17 @@ public class PlayerController : EntityController
         else if (moveDir != Vector2.zero)
             moveDir = Vector2.zero;
 
+#if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.P))
-            DropRpc();
+        {
+            int e = Random.Range(0, equipmentPool.Length);
+            Stats.DropRpc(equipmentPool[e].GetReferency, new(2,2));
+        }
         else if (Input.GetKeyDown(KeyCode.L))
+        {
             Stats.AddLvlRpc();
+        }
+#endif
     }
     void Q1(InputAction.CallbackContext context) { Q(1); }
     void Q2(InputAction.CallbackContext context) { Q(2); }
@@ -56,17 +68,6 @@ public class PlayerController : EntityController
     {
         id--;
         game.inventory.Quick(id);
-    }
-    [Rpc(SendTo.Server)] void DropRpc()
-    {
-        Vector2 pos = new (transform.position.x + Random.Range(-5, 6), transform.position.y + Random.Range(-5, 6));
-        GameObject i = Instantiate(Resources.Load<GameObject>("Items/ItemDrop"), pos, Quaternion.identity);
-        switch (Random.Range(1, 3))
-        {
-            case 1: i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/sword-1");    break;
-            case 2: i.GetComponent<ItemDrop>().Item = Item.GetItem("Items/weapons/bow-1");      break;
-        } 
-        i.GetComponent<NetworkObject>().Spawn();
     }
     protected override void FixedUpdate()
     {

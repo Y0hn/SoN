@@ -69,7 +69,7 @@ public class NPSensor : NetworkBehaviour
             }
             targetChange.Invoke(ClosestTarget);
             
-            Debug.Log("Targeting Reset\nTargets: " + tt);
+            //Debug.Log("Targeting Reset\nTargets: " + tt);
         }
     }
     /// <summary>
