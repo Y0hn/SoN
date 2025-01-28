@@ -16,6 +16,8 @@ public class Connector : MonoBehaviour
     [SerializeField] int maxConnections = 10;
     public NetworkManager netMan;
     private string serverIP { get { return IPManager.GetIP(IPManager.AddressForm.IPv4); } }
+
+    
     void Awake()
     {
         if (instance == null)
@@ -41,6 +43,11 @@ public class Connector : MonoBehaviour
         /_/ |_| \___//_/ \__,_/ \__, /  
                                /____/   
      */
+     /// <summary>
+     /// Vytvori server pre vzdialene pripojenie  
+     /// </summary>
+     /// <param name="host"></param>
+     /// <returns></returns>
     async void CreateRelay(bool host = true)
     {
         Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
@@ -57,6 +64,11 @@ public class Connector : MonoBehaviour
 
         codeText.text = joinCode;        
     }
+    /// <summary>
+    /// Pripoji sa n a vzdialeny server
+    /// </summary>
+    /// <param name="joinCode"></param>
+    /// <returns></returns>
     async void JoinRelay(string joinCode)
     {
         var JoinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
@@ -73,6 +85,10 @@ public class Connector : MonoBehaviour
          / /___ / ___ | / /|  /  
         /_____//_/  |_|/_/ |_/   
     */
+    /// <summary>
+    /// Zapne lokalny server
+    /// </summary>
+    /// <param name="host"></param>
     void CreateLAN(bool host = true)
     {
         netMan.GetComponent<UnityTransport>().SetConnectionData(serverIP, 7777);
@@ -84,12 +100,21 @@ public class Connector : MonoBehaviour
 
         codeText.text = serverIP;
     }
+    /// <summary>
+    /// Pripoji sa na server v lokalnej sieti
+    /// </summary>
+    /// <param name="serverIP"></param>
     void JoinLAN(string serverIP)
     {
         netMan.GetComponent<UnityTransport>().SetConnectionData(serverIP, 7777);
         if (netMan.StartClient())
             codeText.text = serverIP;
     }
+    /// <summary>
+    /// Zapne server na lokalnej sieti alebo na online prepojeni
+    /// </summary>
+    /// <param name="online"></param>
+    /// <returns></returns>
     public bool StartConnection(bool online)
     {
         bool start = true;
@@ -103,6 +128,12 @@ public class Connector : MonoBehaviour
             FileManager.RegeneradeSettings();
         return start;
     }
+    /// <summary>
+    /// Pokusi sa pripojit na adresu alebo relay kod 
+    /// </summary>
+    /// <param name="connection">adresa alebo kod pripojejia</param>
+    /// <param name="errorCode">chybovy kod</param>
+    /// <returns></returns>
     public bool JoinConnection(string connection, out string errorCode)
     {
         bool join = true;
@@ -135,11 +166,20 @@ public class Connector : MonoBehaviour
 
         return join;
     }
+    /// <summary>
+    /// Vytvori hru pre jendneho hraca 
+    /// Tym ze sa vytvori server na loopback adrese
+    /// </summary>
     public void CreateSolo()
     {
         netMan.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 7777);
         netMan.StartHost(); 
     }
+    /// <summary>
+    /// Nacita udaje z pamate pri nacitani sveta zo suboru
+    /// </summary>
+    /// <param name="load"></param>
+    /// <param name="host"></param>
     private void LoadWorld(bool load = false, bool host = true)
     {
         if (host && load)
@@ -148,6 +188,10 @@ public class Connector : MonoBehaviour
              FileManager.WorldAct(FileManager.WorldAction.Create);
         // nacitat svet
     }
+    /// <summary>
+    /// Na klientovy vypne pripojenie a na servere odpoji konkretneho klienta
+    /// </summary>
+    /// <param name="id">ID hraca</param>
     public void Quit(ulong id)
     {
         if (!netMan.IsServer)
@@ -157,6 +201,11 @@ public class Connector : MonoBehaviour
         //Environment.Exit(0);
     }
 
+    /// <summary>
+    /// Je volana na servery hned po pripojeni hraca do hry.
+    /// Nastavuje jeho poziciu v ramci hranic stanovenych Vektorom "spawnRange"
+    /// </summary>
+    /// <param name="id">ID hraca</param>
     private void SpawnPlayer(ulong id)
     {
         if (!netMan.IsServer) return;
