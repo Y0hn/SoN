@@ -251,12 +251,11 @@ public abstract class EntityStats : NetworkBehaviour
         if (onDeathWait)
             timeToDespawn = Time.time + TIME_TO_DESPAWN;
         foreach (Delegate d in OnDeath?.GetInvocationList())
-        {
             if (d.Target == null)  // Ak je objekt odstránený, odpojíme metódu
-            {
                 OnDeath -= (Action)d;
-            }
-        }        
+        foreach (var s in GetComponentsInChildren<SpriteRenderer>())
+            s.sortingLayerName = "DeadEntity";
+        
         OnDeath?.Invoke();
     }
     /// <summary>
@@ -379,7 +378,7 @@ public abstract class EntityStats : NetworkBehaviour
         try {
             speed.Value *= speedMod;
         } catch {
-            
+
         }
     }
     /// <summary>
