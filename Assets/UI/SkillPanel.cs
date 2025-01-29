@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 using System;
 using System.Collections.Generic;
-public class SkillPanel : MonoBehaviour
+public class SkillPanel : AwakeBehavior
 {
     public event Action<bool> OnChangeAvailablePoints;
     public bool AvailablePoints => 0 < freePointCouter;
@@ -17,7 +17,7 @@ public class SkillPanel : MonoBehaviour
     Vector2[] limits = new Vector2[2];
     Vector2 startMouse;
     byte usedPointsCounter = 0, freePointCouter = 0;
-    void Start()
+    public override void Awake()
     {
         freePointCouter = 0; 
         usedPointsCounter = 0;

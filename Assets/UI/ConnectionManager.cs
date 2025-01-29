@@ -208,7 +208,6 @@ public class Connector : MonoBehaviour
     /// <param name="id">ID hraca</param>
     private void SpawnPlayer(ulong id)
     {
-        if (!netMan.IsServer) return;
         Transform t = NetworkManager.Singleton.ConnectedClients[id].PlayerObject.transform;
         Vector2 pos = spawnPoint.position;
         pos = new(

@@ -12,13 +12,15 @@ using System;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    /*public static async Awaitable<GameManager> GetGameManager()
-    {
-        //await new WaitUntil(() => weaponSelected == true);
-        while (instance != null);
-        return instance;
-    }*/
-    void Awake()    { instance = this; }
+    void Awake()    
+    { 
+        instance = this;
+        /*foreach (var a in awakes)
+        {
+            a.Awake();
+        }*/
+    }
+    //[SerializeField] List<AwakeBehavior> awakes;
     [SerializeField] SkillPanel skillTree;
     [SerializeField] MenuScript menu;
     [SerializeField] Connector conn;
@@ -27,7 +29,6 @@ public class GameManager : MonoBehaviour
     private bool paused;
     private bool chatting;
     private PlayerStats player;
-    
     [SerializedDictionary("Name", "buttn"), SerializeField]         SerializedDictionary<string, Button> buttons = new();           /*  OBSAH
         {"copy"},
         {"quit"},

@@ -31,7 +31,7 @@ public abstract class EntityStats : NetworkBehaviour
     public      NetworkVariable<float> speed = new();
     public      NetworkVariable<byte> level = new(1);
     public      NetworkVariable<bool> IsAlive = new(true);
-    protected   NetworkVariable<WeaponIndex> weapE = new(new(0), NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
+    protected   NetworkVariable<WeaponIndex> weapE = new(new(0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
 #pragma warning disable IDE0004
     /// <summary>
@@ -303,7 +303,7 @@ public abstract class EntityStats : NetworkBehaviour
 
     }
     /// <summary>
-    /// Nastaví aktualnu zbran a jej utok alebo iba zmení jej útok
+    /// Nastaví aktualnu zbran a jej utok
     /// </summary>
     /// <param name="attack"></param>
     /// <param name="weapon"></param>
@@ -376,8 +376,11 @@ public abstract class EntityStats : NetworkBehaviour
     /// <param name="speedMod"></param>
     [Rpc(SendTo.Server)] public virtual void TerrainChangeRpc(float speedMod)
     {
-        if (speed != null)
+        try {
             speed.Value *= speedMod;
+        } catch {
+            
+        }
     }
     /// <summary>
     /// Urcuje skupinu pre cielenie a ublizovanie si navzajom ;)

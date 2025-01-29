@@ -2,9 +2,6 @@ using UnityEngine.UI;
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using System.Linq;
-using UnityEditor.Playables;
-using Unity.Android.Gradle;
 
 public class SkillSlot : MonoBehaviour
 {

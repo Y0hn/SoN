@@ -81,10 +81,10 @@ public class PlayerStats : EntityStats
     }
     public override Attack Attack 
     { 
-        get { 
+        get {
             Attack a = new(base.Attack);
-            if (a.IsSet)
-                a.AddDamage(SkillsTree.GetDamage(base.Attack.damage.type)); 
+            if (IsServer && a.IsSet)
+                a.AddDamage(SkillsTree.GetDamage(a.damage.type)); 
             return a;
         } 
     }
@@ -137,7 +137,10 @@ public class PlayerStats : EntityStats
     {
         base.EntitySetUp();
         if (IsServer)
-            level.Value= 0;
+        {
+            xpMax.Value = 50;
+            level.Value = 0;
+        }
         if (IsOwner)
         {
             game = GameManager.instance;
@@ -145,7 +148,6 @@ public class PlayerStats : EntityStats
             hpBar.gameObject.SetActive(false);
             hpBar = game.GetHpBar();
             xpBar = game.GetXpBar();
-            xpMax.Value = 50;
             xpBar.SliderValue = xp.Value;
             xpBar.LevelUP(1, xpMax.Value);
 
