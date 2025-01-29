@@ -12,7 +12,12 @@ public class Weapon : Equipment
     }
     public override string GetReferency
     {
-        get { return FileManager.WEAPONS_DEFAULT_PATH + "/" + name; }
+        get 
+        { 
+            if (path != "")
+                return path;
+            return FileManager.WEAPONS_DEFAULT_PATH + "/" + name; 
+        }
     }
     public override string SpriteRef => FileManager.WEAPONS_REF_DEFAULT_PATH + "/" + sprite;
     public override void Use(ItemSlot iS)

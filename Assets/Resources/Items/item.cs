@@ -8,6 +8,7 @@ public abstract class Item : ScriptableObject, IEquatable<Item>
     public string iconRef = "Items/textures";
     public Color color = Color.white;
     public Color rarity = Color.white;
+    [SerializeField] protected string path = "";
     /// <summary>
     /// Ziska predmet na zaklade referencnej cesty
     /// Tato metoda ma byt "prepisana" (overwrite)
@@ -18,7 +19,16 @@ public abstract class Item : ScriptableObject, IEquatable<Item>
     {
         return Resources.Load<Item>(referency);
     }
-    public virtual string GetReferency { get { return FileManager.ITEM_DEFAULT_PATH + "/" + name; } }
+    public virtual string GetReferency 
+    { 
+        get 
+        { 
+            if (path != "")
+                return path;
+            else
+                return FileManager.ITEM_DEFAULT_PATH + "/" + name; 
+        } 
+    }
     /// <summary>
     /// Bude obsahovat to co sa stane po/pri pouziti predmetu 
     /// </summary>

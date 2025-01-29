@@ -280,7 +280,7 @@ public class Inventory : MonoBehaviour
                 // nastavi prny volny            
                 for (int slot = 0; slot < free; slot++)
                     atSlots[hand].Click(slot);
-                if (0 < free)
+                if (0 <= free)
                     ReloadAttacks();
             }
         }
@@ -357,6 +357,9 @@ public class Inventory : MonoBehaviour
     {
         // ziska prechadzjuci aktivny utok
         string prev = acSlots.Find(acS => acS.active)?.Identity;
+
+        // ak predchadzjuci utok bol vypnuty nastavi prvy utok
+        prev ??= acSlots[0].Identity;
 
         // vypne vsetky (aj aktivne) utoky v aktivnych slotoch
         for (int i = 0; i < acSlots.Count; i++)

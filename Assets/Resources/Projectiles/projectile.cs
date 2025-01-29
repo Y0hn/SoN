@@ -101,10 +101,7 @@ public class Projectile : NetworkBehaviour
         damage = attack.damage;
         range = attack.range;
         shooter = entityStats;
-        shooter.OnDeath += delegate 
-        { 
-            TryToDestoy(); 
-        };
+        shooter.OnDeath += TryToDestoy;
         //Debug.Log($"Shoted projectile \nwith attack: {attack}\nwith shoot out delay: {delay}\ngrafical delay: {graficDelay}");
     }
     public void StopAttack()
@@ -114,6 +111,7 @@ public class Projectile : NetworkBehaviour
     }
     void TryToDestoy()
     {
+        shooter.OnDeath -= TryToDestoy;
         if      (/*!IsServer && */networkObject.IsSpawned)
             networkObject.Despawn();
         else //if (!networkObject.IsSpawned)

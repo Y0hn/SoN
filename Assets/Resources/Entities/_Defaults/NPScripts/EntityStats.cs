@@ -5,8 +5,6 @@ using UnityEngine;
 using System;
 using TMPro;
 using Random = UnityEngine.Random;
-using System.Collections.Generic;
-using System.Linq;
 /// <summary>
 /// Drzi hodnoty pre entitu
 /// </summary>
@@ -47,7 +45,7 @@ public abstract class EntityStats : NetworkBehaviour
     public NetworkObject NetObject      { get => netObject; }
     public Rigidbody2D RigidBody2D      { get => rb; }
     public Transform AttackPoint        { get => attackPoint; }
-    public virtual Attack Attack        { get => Weapons[weapE.Value.eIndex].attack[weapE.Value.aIndex];  } 
+    public virtual Attack Attack        { get => GetAttackByWeaponIndex(weapE.Value);  } 
     public AITarget TargetTeam          { get => aiTeam; }
     public Animator Animator            { get => animator.Animator; }
     public Vector2 View                 { get => controller.View; }
@@ -103,11 +101,12 @@ public abstract class EntityStats : NetworkBehaviour
         if (!IsServer) return;
         weapE.OnValueChanged += (WeaponIndex old, WeaponIndex now) =>
         {
-            if      (Attack.MeleeAttack(Attack.type))
+            Attack a = GetAttackByWeaponIndex(now);
+            if      (Attack.MeleeAttack(a.type))
             {
                 attackPoint.localPosition = new(attackPoint.localPosition.x, Attack.range);
             }
-            else if (Attack.RangedAttack(Attack.type))
+            else if (Attack.RangedAttack(a.type))
             {
                 Ranged r = (Ranged)Weapons[now.eIndex];
                 attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
@@ -137,8 +136,9 @@ public abstract class EntityStats : NetworkBehaviour
                 R = false, 
                 L = false, 
                 B = false;
+            Attack a = GetAttackByWeaponIndex(now);
 
-            if (Attack.type != Attack.Type.RaseUnnarmed)
+            if (a.type != Attack.Type.RaseUnnarmed)
             {
                 Weapon w = Weapons[now.eIndex];
                 Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
@@ -178,9 +178,9 @@ public abstract class EntityStats : NetworkBehaviour
         {
             Animator.SetFloat("weapon", (float)Attack.type);
 
-            float speed = Attack.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
-            speed /= Attack.AttackTime;
-            Animator.SetFloat("atSpeed", speed);
+            float aSpeed = Attack.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
+            aSpeed /= Attack.AttackTime;
+            Animator.SetFloat("atSpeed", aSpeed);
             //Debug.Log($"Attack animation set on weapon {Animator.GetFloat("weapon")} to speed {speed}");
         };
         speed.OnValueChanged += (float old, float now) =>
@@ -307,15 +307,11 @@ public abstract class EntityStats : NetworkBehaviour
     /// </summary>
     /// <param name="attack"></param>
     /// <param name="weapon"></param>
-    public virtual void SetWeaponIndex (sbyte attack, sbyte weapon= -1)
+    public virtual void SetWeaponIndex (sbyte attack, sbyte weapon)
     {
         WeaponIndex wi = weapE.Value;
-        if      (weapon < 0 && 0 <= attack)
-            weapE.Value = new (weapE.Value.eIndex, attack);
-        else if (0 <= weapon && 0 <= attack)
-            weapE.Value = new (weapon, attack);
-        else //if (attack < 0)
-            weapE.Value = new (0, 0);
+
+        weapE.Value = new (weapon, attack);
 
         weapE.OnValueChanged.Invoke(wi, weapE.Value);
         //Debug.Log($"Setted Weapon Index= {weapE.Value}");
@@ -327,6 +323,19 @@ public abstract class EntityStats : NetworkBehaviour
     {
 
     }
+    protected virtual Attack GetAttackByWeaponIndex(WeaponIndex wIndex)
+    {
+        string debug = $"GetAttackByWeaponIndex({wIndex})\nReturning:";
+        try {
+            debug += $"\nFrom Weapons: {Weapons.Length}";
+            debug += $"\nFrom Attacks: {Weapons[wIndex.eIndex].attack.Count}";
+        } finally {
+            if (this is PlayerStats)
+                Debug.Log(debug);
+        }
+        return Weapons[wIndex.eIndex].attack[wIndex.aIndex];
+    }
+    
     /*   _____  _____   _____     
      *  |  __ \|  __ \ / ____|    
      *  | |__) | |__) | |     ___ 
@@ -367,7 +376,8 @@ public abstract class EntityStats : NetworkBehaviour
     /// <param name="speedMod"></param>
     [Rpc(SendTo.Server)] public virtual void TerrainChangeRpc(float speedMod)
     {
-        speed.Value *= speedMod;
+        if (speed != null)
+            speed.Value *= speedMod;
     }
     /// <summary>
     /// Urcuje skupinu pre cielenie a ublizovanie si navzajom ;)

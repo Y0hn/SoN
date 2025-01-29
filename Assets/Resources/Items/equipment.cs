@@ -10,7 +10,7 @@ public class Equipment : Item
     {
         //Head, Torso, Legs,
         //Body,
-        WeaponL, WeaponR, WeaponBoth, NoPreference
+        WeaponR, WeaponL, WeaponBoth/*, NoPreference*/
     }
     /// <summary>
     /// Meni navratovu hodnotu povodnej metody
@@ -26,7 +26,13 @@ public class Equipment : Item
         get { return FileManager.ITEM_DEFAULT_PATH; }
     }
     //public static bool IsArmor(Slot slot)   { return slot == Slot.Head || slot == Slot.Torso || slot == Slot.Legs || slot == Slot.Body; }
-    public static bool IsWeapon(Slot slot)  { return slot == Slot.WeaponL || slot == Slot.WeaponR || slot == Slot.WeaponBoth || slot == Slot.NoPreference; }
+    public static bool IsWeapon(Slot slot)  
+    { 
+        return 
+            slot == Slot.WeaponL 
+                || slot == 
+            Slot.WeaponR;
+    }
     public override void Use(ItemSlot iS)
     {
         if (iS is EquipmentSlot)

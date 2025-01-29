@@ -63,8 +63,7 @@ public class PlayerStats : EntityStats
         {
             List<Equipment> eq = new();
             foreach (var e in equipment)
-                if (e != "")
-                    eq.Add(Equipment.GetItem(e.ToString()));
+                eq.Add(Equipment.GetItem(e.ToString()));
             //Debug.Log($"Additional weapons {eq.Count}");
             return eq.ToArray();
         }
@@ -73,6 +72,7 @@ public class PlayerStats : EntityStats
     { 
         get 
         { 
+            
             var w = base.Weapons.ToList();
             w.AddRange(Equipments); 
             //Debug.Log($"Returning weapons [{w.Count}]");
@@ -150,7 +150,7 @@ public class PlayerStats : EntityStats
             xpBar.LevelUP(1, xpMax.Value);
 
             // Nastavenie 
-            int length = Enum.GetNames(typeof(Equipment.Slot)).Length;
+            int length = Enum.GetNames(typeof(Equipment.Slot)).Length-1;
             for (; equipment.Count < length;)
                 equipment.Add("");
 
@@ -251,11 +251,19 @@ public class PlayerStats : EntityStats
     {
         sbyte att, wea= -1;
 
-        att = (sbyte)(id % 10 - 1);
-        if (0 <= att)
-            wea = id/10 == 1 ? (sbyte)Equipment.Slot.WeaponR : (sbyte)Equipment.Slot.WeaponL;
-        wea++;        
-        Debug.Log($"Setting ID={id} to weapon index to new(att= {att} | wea= {wea})");
+        if (id < 0)
+        {
+            att = 0;
+            wea = 0;
+        }
+        else 
+        {
+            att = (sbyte)(id % 10 - 1);
+            if (0 <= att)
+                wea = id/10 == 1 ? (sbyte)Equipment.Slot.WeaponR : (sbyte)Equipment.Slot.WeaponL;
+            wea++;
+        }
+        Debug.Log($"Setting ID={id} to weapon index to new(att= {att} | wea= {wea})\nWeapons count: {Weapons.Length}");
         SetWeaponIndex(att, wea);
     }
     public override bool TakeDamage(Damage damage)
@@ -314,10 +322,10 @@ public class PlayerStats : EntityStats
     /// </summary>
     /// <param name="reference"></param>
     /// <param name="slot"></param>
-    /*[Rpc(SendTo.Server)] */public void SetEquipmentRpc(string reference, Equipment.Slot slot = Equipment.Slot.NoPreference)
+    [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot/* = Equipment.Slot.NoPreference*/)
     {
         equipment[(int)slot] = reference;
-        Debug.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
+        //Debug.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
     }
     /// <summary>
     /// Zbiera a equipuje zbrane
