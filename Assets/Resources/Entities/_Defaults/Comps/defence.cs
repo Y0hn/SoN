@@ -37,11 +37,9 @@ using System.Collections.Generic;
         return false;
     }
     
-    public int CalculateDMG(Damage damage, Resistance additionalRezists = null, bool clamp = true)
+    public int CalculateDMG(Damage damage, bool clamp = true)
     {
         List<Resistance> list = resistances.FindAll(r => r.defenceType == damage.type);
-        if (additionalRezists != null)
-            list.Add(additionalRezists);
 
         float sum = 0f, per = 0f;
         list.ForEach(r=>

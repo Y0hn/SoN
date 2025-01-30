@@ -1,174 +1,125 @@
 using System.Collections.Generic;
-using System;
 using UnityEngine;
-using Unity.Netcode;
-[Serializable] public class SkillTree
+//using Unity.Netcode;
+public class SkillTree
 {
+#pragma warning disable IDE0044 // Add readonly modifier
     List<Skill> skills;
-
-    Dictionary<Damage.Type, float> offence;
-    Dictionary<Damage.Type, float> defence;
+    PlayerStats player;
+    Dictionary<Damage.Type, Modifier> offence;
+    Dictionary<Damage.Type, float> offRate;
+#pragma warning restore IDE0044 // Add readonly modifier
 
     public SkillTree ()
     {
         skills = new ();
-        defence = new ();
         offence = new ();
+        offRate = new ();
     }
+    public SkillTree (PlayerStats _player)
+    {
+        skills = new ();
+        offence = new ();
+        offRate = new ();
+        player = _player;
+    }
+
     public void Add(Skill skill)
     {
         skills.Add(skill);
+        string debug = $"For player {player.name} skill [{skill.name}] has been added as ";
 
-        if (skill is Health h)
+        if (skill is ModDamage mD)
         {
-            // change max health
-        }
-        else if (skill is Combat c)
+            Damage.Type type = mD.condition;
+            if (mD.damage)
+            {
+                debug += "Attack";
+                if (mD.isSpeed)
+                {
+                    if (offRate.ContainsKey(type))
+                        offRate[type] *= mD.amount;
+                    else
+                        offRate.Add(type, mD.amount);
+                    debug += "Rate";
+                }
+                else
+                {
+                    if (offence.ContainsKey(type))
+                        offence[type].Add(new (mD.amount, mD.isPercentyl));
+                    else if (mD.isPercentyl)
+                        offence.Add(type, new (mD.amount, mD.isPercentyl));
+                    debug += "Damage";
+                }
+            }
+            else
+            {
+                player.Defence.Add(new (type, mD.amount));
+                debug += "Defence";
+            }
+            debug += " Modifier";
+        }        
+        else if (skill is ModSkill mS)
         {
-            // urci ci je offensivny
-            if      (0 < c.amount)
-            {
-                if (offence.ContainsKey(c.condition))
-                    offence[c.condition] += c.amount;
-                else
-                    offence.Add(c.condition, c.amount);
-            }
-            // ak je defenzivny urci ci je percentilny
-            else if (-1 <= c.amount)
-            {
-                if (defence.ContainsKey(c.condition) && defence[c.condition] < c.amount)
-                    defence[c.condition] += c.amount;
-                else
-                    defence.Add(c.condition, c.amount);
-            }
-            else // if (c.amount < -1)  // je pocetny defenzivny
-            {
-                if (defence.ContainsKey(c.condition))
-                    defence[c.condition] += c.amount;
-                else
-                    defence.Add(c.condition, c.amount);                
-            }
-        }
-    }
-    // NoNeedForRemovalYet
+            if (mS.isSpeed)
+                player.TerrainChangeRpc(mS.amount);
+            else
+                player.AddMaxHealthRpc(mS.amount);
 
-    public Damage GetDamage(Damage.Type type)           
-    {
-        if (defence.ContainsKey(type))
-        {
-            return new Damage (type, (int)offence[type]); 
+            debug += mS.isSpeed ? "Speed" : "Health";
+            debug += " Modifier";
         }
-        return new ();
+        else if (skill is Utility ut)
+        {
+            player.UnlockUtilityRpc(ut);
+            debug += "Utility";
+        }
+        else
+            debug += "UNRECOGNIZED";
+
+        Debug.Log(debug + $"\n{skill}");
     }
-    public Resistance GetResist(Damage.Type type) 
-    { 
-        if (defence.ContainsKey(type))
-        {
-            return new Resistance(type, Mathf.Abs(defence[type]));
-        }
-        return null;
-    }
-    [Serializable] public class Skill : INetworkSerializable
+
+    public Attack ModAttack (Attack baseAttack)
     {
-        public string name;
-        public Skill ()
-        {
-            name = "";
-        }
-        public Skill (string n)
-        {
-            name = n;
-        }
-        public virtual void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref name);
-        }
+        // Zmeni utoku poskodenie
+        Damage.Type dt = baseAttack.damage.type;
+        float damageA = baseAttack.damage.amount;
+        if (offence.ContainsKey(dt))
+            damageA = offence[dt].ModifyValue(damageA);
+        baseAttack.damage.amount = Mathf.RoundToInt(damageA);
+
+        // Zmeni utkoku rychlost
+        if (offRate.ContainsKey(dt))
+            baseAttack.rate *= offRate[dt];
+
+        return baseAttack;
     }
-    [Serializable] public class Health : Skill
+    private class Modifier
     {
-        public int amount;
-        public Health ()
-        {
-            amount = 0;
-        }
-        public Health (string n, int a) : base (n)
+        public float amount;
+        public float percentyl;
+
+        public Modifier(float a = 0, float p = 1)
         {
             amount = a;
+            percentyl = p;
         }
-
-        public override void NetworkSerialize<T>(BufferSerializer<T> serializer)
+        public Modifier(float ap, bool percent)
         {
-            base.NetworkSerialize(serializer);
-            serializer.SerializeValue(ref amount);
+            amount = percent ? 0 : ap;
+            percentyl = percent ? ap : 1;
         }
-    }
-    [Serializable] public class Combat : Skill
-    {
-        /// <summary>
-        /// + ak offence
-        /// - ak defence 
-        /// </summary>
-        public float amount;   
-        // |amount| > 1 => pocetny 
-        // |amount| < 1 => percentny    (offence nieje nikdy v percentach)
-        public Damage.Type condition;
-        public Combat ()
+        public void Add(Modifier mod)
         {
-            amount = 0;
-            condition = Damage.Type.bludgeoning;
+            this.amount += mod.amount;
+            this.percentyl *= mod.percentyl;
         }
-        public Combat (string n, float a, Damage.Type c) : base (n)
+        public float ModifyValue(float value)
         {
-            amount = a;
-            condition = c;
-        }
-        public override void NetworkSerialize<T>(BufferSerializer<T> serializer)
-        {
-            base.NetworkSerialize(serializer);
-            serializer.SerializeValue(ref amount);
-        }
-    }/*
-    [Serializable] public class ModArmor : Combat
-    {
-        
-    }*/
-    [Serializable] public class ModAttack : Combat
-    {
-        public bool rate;
-        public ModAttack ()
-        {
-            rate = false;
-        }
-        public ModAttack (string n, float a, Damage.Type c, bool r) : base (n, a, c)
-        {
-            rate = r;
-        }
-        public override void NetworkSerialize<T>(BufferSerializer<T> serializer)
-        {
-            base.NetworkSerialize(serializer);
-            serializer.SerializeValue(ref rate);
-        }
-    }
-    [Serializable] public class Utility : Skill
-    {
-        public Function function;
-
-        public Utility ()
-        {
-
-        }
-        public Utility (string n, Function f) : base (n)
-        {
-            function = f;
-        }
-        public enum Function
-        {
-            None, 
-            ViewOwnHP, ViewOwnMeleeAttack, ViewOwnRangedAttack,
-            ViewOthersHP, ViewOthersMeleeAttack, ViewOthersRangedAttack,
-            NightVision, 
-            VisionSizeIncrease, 
-            ViewCorruptionAndBecomeImune
+            value *= percentyl;
+            value -= amount;
+            return value;
         }
     }
 }

@@ -144,35 +144,35 @@ public static class FileManager
         //Debug.Log("Returning at ref on: " + refer);
         return refer;
     }
-    public static string[] GetSkillRefferency(SkillSlot.SkillCreator.SkillType type)
+    public static string[] GetSkillRefferency(Skill skill)
     {
         List<string> list = new();
 
-        switch (type)
+        if (skill is Utility)
+            list.Add(SKILLS_ICONS_PATH + "utility"); 
+        else if (skill is ModDamage mD)
         {
-            case SkillSlot.SkillCreator.SkillType.Utility:
-                list.Add(SKILLS_ICONS_PATH + "utility");             
-                break;
-            case SkillSlot.SkillCreator.SkillType.Health: 
-                list.Add(SKILLS_ICONS_PATH + "healthUP");
-                list.Add(SKILLS_ICONS_PATH + "valueUP");                    
-                break;
-            case SkillSlot.SkillCreator.SkillType.Protection: 
+            if (mD.damage)
+            {
+                list.Add(SKILLS_ICONS_PATH + "attacks");
+                if (mD.isSpeed)
+                    list.Add(SKILLS_ICONS_PATH + "rateUPC");
+                else
+                    list.Add(SKILLS_ICONS_PATH + "valueUP");
+            }
+            else
+            {
                 list.Add(SKILLS_ICONS_PATH + "shieldUP");
-                list.Add(SKILLS_ICONS_PATH + "valueUP");                    
-                break;
-            case SkillSlot.SkillCreator.SkillType.AttackDamage: 
-                list.Add(SKILLS_ICONS_PATH + "attacks");
                 list.Add(SKILLS_ICONS_PATH + "valueUP");                
-                break;
-            case SkillSlot.SkillCreator.SkillType.AttackRate: 
-                list.Add(SKILLS_ICONS_PATH + "attacks");
-                list.Add(SKILLS_ICONS_PATH + "rateUPC");
-                break;            
-            case SkillSlot.SkillCreator.SkillType.MovementSpeed:
+            }
+        }        
+        else if (skill is ModSkill mS)
+        {
+            if (mS.isSpeed)
                 list.Add(SKILLS_ICONS_PATH + "speedUP");
-                list.Add(SKILLS_ICONS_PATH + "valueUP");
-                break;
+            else
+                list.Add(SKILLS_ICONS_PATH + "healthUP");
+            list.Add(SKILLS_ICONS_PATH + "valueUP");
         }
 
         return list.ToArray();

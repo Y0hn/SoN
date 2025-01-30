@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class UtilitySkillScript : MonoBehaviour
 {
-    [SerializeField] SkillTree.Utility.Function condition;
+    [SerializeField] Utility.Function condition;
     //[SerializeField] bool loadCurrentOnStart = true;
     [SerializeField] bool refreshOnChange = true;
     [SerializeField] bool defaultState = false;
@@ -22,7 +22,7 @@ public class UtilitySkillScript : MonoBehaviour
         else
             SetGameObjects(defaultState);                
     }
-    void UtilityUpdate(UtilitySkill skill)
+    void UtilityUpdate(Utility skill)
     {
         if (condition.Equals(skill.function))
         {
@@ -31,16 +31,6 @@ public class UtilitySkillScript : MonoBehaviour
     }
     void SetGameObjects(bool setTo = true)
     {
-        gameObjects.ForEach(g => g.SetActive(setTo) );
-    }
-}
-[Serializable] public class UtilitySkill
-{
-    public SkillTree.Utility.Function function;
-    public bool aquired = false;
-    public UtilitySkill(SkillTree.Utility.Function f, bool a = false)
-    {
-        function = f;
-        aquired = a;
+        gameObjects.ForEach(g => {if (gameObject != null) g.SetActive(setTo); });
     }
 }

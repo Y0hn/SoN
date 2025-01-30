@@ -2,6 +2,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using TMPro;
 
 public class SkillSlot : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class SkillSlot : MonoBehaviour
     [SerializeField] Image value;
     [SerializeField] Image moddifier;
     [SerializeField] Image background;
+    [SerializeField] TMP_Text amountT;
     [SerializeField] List<SkillSlot> dependentcySkills = new();
     [SerializeField] bool needsAllDependecies = false;
     
@@ -29,9 +31,11 @@ public class SkillSlot : MonoBehaviour
         { "aquired",        new ( 89f/255f,  89f/255f,  89f/255f, 1f   ) },  // disabled //rgba(89, 89, 89, 1)
     };    
     private Color[] defaultColors;
-    public SkillTree.Skill Skill => skillCreator.Skill;
+    public Skill Skill => skillCreator.Skill;
     private GameManager game;
-
+    /// <summary>
+    /// Kontroluje ci boli ziskane potrebne predchadzajuce schopnosti
+    /// </summary>
     private bool DependenciesFullfiled 
     {
         get
@@ -49,6 +53,7 @@ public class SkillSlot : MonoBehaviour
     }
     void Start()
     {
+        skillCreator.name = name;
         defaultColors = new Color[4];
         button.onClick.AddListener(ActivateSkill);
         ResetGrafic();
@@ -68,28 +73,24 @@ public class SkillSlot : MonoBehaviour
         defaultColors[3] = value.color;
     }
     /// <summary>
+    /// Prida schopnost do Stromu schopnosti hraca a povoluje zavisle schopnosti
     /// Adds skill to Player Skill Tree and Enables Dependent skills
     /// </summary>
     public void ActivateSkill()
     {
+        amountT.text = "";
         isPurchased = true;
         moddifier.enabled = false;
         value.enabled = false;
         SetInteractable(false);
 
-        game.LocalPlayer.AddSkillRpc(Skill);
+        game.LocalPlayer.AddSkill(Skill);
         game.SkillTree.SkillPointAplied();
         SetGraficColor(pallete["aquired"]);
-        TryActivateUtility();
-    }
-    void TryActivateUtility(bool active = true)
-    {
-        if (Skill is SkillTree.Utility u)
-            game.EnableUtility(new (u.function, active));
     }
 
     /// <summary>
-    /// Sets Skill (un)available to get by spending point
+    /// Nastavi schopnost (ne)kupitenu za bod
     /// </summary>
     /// <param name="enable"></param>
     void PurchableSkill(bool enable)
@@ -106,6 +107,7 @@ public class SkillSlot : MonoBehaviour
     }
     void SetInteractable(bool interactable)
     {
+        amountT.text = interactable ? skillCreator.Amount : "";
         button.interactable = interactable;
         background.raycastTarget = interactable;
         background.raycastTarget = interactable;
@@ -120,43 +122,64 @@ public class SkillSlot : MonoBehaviour
         moddifier.color = colorMod * defaultColors[2];
         icon.color = colorIcon * defaultColors[1];
     }
+    void OnDrawGizmos()
+    {
+        //skillCreator = new(name);
+    }
+
+    /// <summary>
+    /// Pouzivane na vytvaranie schopnosti a nastavovanie konkretnych prarametrov podla hodnot v editore
+    /// </summary>
     [Serializable] public class SkillCreator
     {
-        public SkillType skillType;
-        public string name;
-        [SerializeField] float amount;
+        [HideInInspector] public string name;
+        [SerializeField] Utility.Function function;
         [SerializeField] Damage.Type condition;
-        [SerializeField] SkillTree.Utility.Function utilFunction;
-        public SkillTree.Skill Skill 
+        [SerializeField] bool isAttack;
+        [SerializeField] bool speed;
+        [SerializeField] float amount;
+
+        public SkillCreator(string n)
+        {
+            name = n;
+
+            function = Utility.Function.None;
+            condition = Damage.Type.None;
+            isAttack = false;
+            speed = false;
+            amount = 0;
+        }
+        public Skill Skill
         {
             get
             {
-                SkillTree.Skill skill;
-                switch (skillType)
-                {
-                    case SkillType.Health:
-                        int a = Mathf.RoundToInt(amount);
-                        skill = new SkillTree.Health(name, a);
-                        break;
-                    case SkillType.AttackDamage:
-                    case SkillType.AttackRate:
-                        skill = new SkillTree.ModAttack(name, amount, condition, skillType == SkillType.AttackRate);
-                        break;
-                    case SkillType.Protection:
-                        float am = -amount;
-                        skill = new SkillTree.Combat(name, am, condition);
-                        break;
-                    case SkillType.Utility:
-                    default: 
-                        skill = new SkillTree.Utility(name, utilFunction);
-                        break;
-                }
-                return skill;
+                if (function != Utility.Function.None)
+                    return new Utility(name, function);
+                else if (condition == Damage.Type.None)
+                    return new ModSkill(name, amount);
+                else
+                    return new ModDamage(name, amount, condition, speed, isAttack);
             }
         }
-        public enum SkillType
+        public string Amount
         {
-            Utility, Health, Protection, AttackDamage, AttackRate, MovementSpeed
+            get 
+            {
+                string a = "";
+                
+                if (function == Utility.Function.None)
+                {
+                    ModSkill ms = (ModSkill)Skill;
+                    a += ms.amount;
+                    
+                    if (ms.isPercentyl)
+                        a += " %";
+                    else
+                        a = "+ " + a;
+                }
+
+                return a;
+            }
         }
     }
 }

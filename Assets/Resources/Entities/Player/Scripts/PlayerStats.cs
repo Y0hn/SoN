@@ -79,34 +79,7 @@ public class PlayerStats : EntityStats
             return w.ToArray();
         } 
     }
-    public override Attack Attack 
-    { 
-        get {
-            Attack a = new(base.Attack);
-            if (IsServer && a.IsSet)
-                a.AddDamage(SkillsTree.GetDamage(a.damage.type)); 
-            return a;
-        } 
-    }
-    protected SkillTree SkillsTree  
-    {
-        get 
-        {
-            if (IsServer)
-                return skillTree;
-            else
-                Debug.LogWarning("");
-            return null;
-        }
-
-    }
-    public override Defence Defence
-    {
-        get {
-            return base.Defence;
-        }
-    }
-    
+    public override Attack Attack => IsServer && skillTree != null ? skillTree.ModAttack(base.Attack) : base.Attack;    
     
     public override void OnNetworkSpawn()
     {
@@ -138,6 +111,7 @@ public class PlayerStats : EntityStats
         base.EntitySetUp();
         if (IsServer)
         {
+            skillTree = new(this);
             xpMax.Value = 50;
             level.Value = 0;
         }
@@ -160,7 +134,6 @@ public class PlayerStats : EntityStats
         }
         chatTimer = 0;
         chatBox.text = "";
-        skillTree = new();
         chatField.SetActive(false);
         name = playerName.Value.ToString();
         nameTag.text = name;
@@ -273,7 +246,7 @@ public class PlayerStats : EntityStats
         if (!IsServer) 
             return false;
 
-        int newDamage = Defence.CalculateDMG(damage, skillTree.GetResist(damage.type));
+        int newDamage = Defence.CalculateDMG(damage);
         hp.Value -= newDamage;
         
         // if (FileManager.debug)
@@ -306,12 +279,42 @@ public class PlayerStats : EntityStats
         return canStop;
     }
 
+
+
     // RPCs
-    [Rpc(SendTo.Server)] public virtual void AddSkillRpc(SkillTree.Skill skill)
+
+    /// <summary>
+    /// Prida schopnost do stromu schopnosti
+    /// </summary>
+    /// <param name="skill"></param>
+    public virtual void AddSkill(Skill skill)
     {
-        skillTree.Add(skill);
+        if      (skill is ModDamage mD)
+            AddSkillRpc(mD);
+        else if (skill is ModSkill mS)
+            AddSkillRpc(mS);
+        else if (skill is Utility ut)
+            AddSkillRpc(ut);
     }
+    [Rpc(SendTo.Server)] protected void AddSkillRpc (Utility skill)      { skillTree.Add(skill); }
+    [Rpc(SendTo.Server)] protected void AddSkillRpc (ModSkill skill)     { skillTree.Add(skill); }
+    [Rpc(SendTo.Server)] protected void AddSkillRpc (ModDamage skill)    { skillTree.Add(skill); }
     
+    [Rpc(SendTo.Owner)] public void UnlockUtilityRpc (Utility skill)
+    {
+        game.AddUtility(skill);
+    }
+    /// <summary>
+    /// Prida maximalne zivoty
+    /// </summary>
+    /// <param name="addHealth"></param>
+    [Rpc(SendTo.Server)] public virtual void AddMaxHealthRpc (float addHealth)
+    {
+        if (addHealth % 100 == 0)
+            maxHp.Value += (int)addHealth;
+        else
+            maxHp.Value = Mathf.RoundToInt((float)maxHp.Value * (float)(1+addHealth));
+    }
     /// <summary>
     /// Zastavi utok
     /// </summary>

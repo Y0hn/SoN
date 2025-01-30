@@ -21,7 +21,8 @@ using System;
         // ELEMENTAL
         cold, fire, holy, lightning, dark, acid,
         //  OVER TIME
-        poison    
+        poison,
+        None
     }
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {

@@ -61,10 +61,10 @@ public class GameManager : MonoBehaviour
         {"point"},
     */
     [HideInInspector] public bool playerLives;
-    Dictionary<SkillTree.Utility.Function, bool> Utils = new();
     /*[SerializedDictionary("Utility", "Aquired")]public SerializedDictionary*/ 
-    public event Action<UtilitySkill> UtilityUpdate;
+    public event Action<Utility> UtilityUpdate;
     public Inventory inventory;
+    private List<Utility.Function> utilities = new();
     private const byte MAX_NPC_COUNT = 25;
     public Transform spawnpoint     { get; set; }
     public Vector2 MousePos
@@ -90,7 +90,6 @@ public class GameManager : MonoBehaviour
         uiPanels["mainCam"].SetActive(true);
         SetUpTextFields();
         SubscribeInput();
-        SetUpUtility();
         SetGameUI();
         
         FileManager.LoadSettings();
@@ -100,12 +99,19 @@ public class GameManager : MonoBehaviour
         if (IsServer && NPStats.NPCount < MAX_NPC_COUNT)
             MapScript.map.SpawnEnemy();
     }
+    /// <summary>
+    /// Nastavi hodnoty pre textove polia <br />
+    /// (moznost prekladu UI)
+    /// </summary>
     void SetUpTextFields()
     {
         textFields["pName"].text = Application.productName;
         textFields["versi"].text = "Version: " + Application.version;
         textFields["compa"].text = Application.companyName;
     }
+    /// <summary>
+    /// Nastavi metody na pocuvanie vstupov
+    /// </summary>
     void SubscribeInput()
     {
         // Stanovuje vstupy pre input system
@@ -116,13 +122,10 @@ public class GameManager : MonoBehaviour
         buttons["copy"].onClick.AddListener(Copy);
         buttons["quit"].onClick.AddListener(Quit);
     }
-    void SetUpUtility()
-    {
-        foreach (SkillTree.Utility.Function uti in Enum.GetValues(typeof(SkillTree.Utility.Function)))
-        {
-            EnableUtility(new (uti));
-        }
-    }
+    /// <summary>
+    /// Otvori/Zavrie pauzove menu
+    /// </summary>
+    /// <param name="context"></param>
     void OC_Pause(InputAction.CallbackContext context)
     {
         if (PlayerAble)
@@ -213,21 +216,19 @@ public class GameManager : MonoBehaviour
         skillTree.LevelUP(level);
         //Debug.Log("Player leveled UP to " + level);
     }
-    public void EnableUtility(UtilitySkill utility)
+    public void AddUtility(Utility utility)
     {
-        if (Utils.ContainsKey(utility.function))
-            Utils[utility.function] = utility.aquired;
-        else
-            Utils.Add(utility.function, utility.aquired);
-
+        utilities.Add(utility.function);
         UtilityUpdate?.Invoke(utility);
     }
-    public bool IsUtilityEnabled (SkillTree.Utility.Function f)
+    public void RemUtility(Utility utility)
     {
-        bool b = false;
-        if (!Utils.ContainsKey(f))
-            Utils.Add(f, b);
-        return Utils[f];
+        utilities.Remove(utility.function);
+        UtilityUpdate?.Invoke(new Utility (utility.name, utility.function));
+    }
+    public bool IsUtilityEnabled (Utility.Function f)
+    {
+        return utilities.Contains(f);
     }
     public void SetPlayerUI(bool lives = true)
     {

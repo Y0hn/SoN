@@ -45,7 +45,6 @@ using System;
         return Type.BowSingle == t || t == Type.BowMulti;
     }
 
-
     public void AddDamage(Damage damage)
     {
         damage.Add(damage);

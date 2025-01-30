@@ -81,10 +81,10 @@ public class SkillPanel : AwakeBehavior
                         $"Limits: \n0 => ({limits[0].x},{limits[0].y}) \n1 => ({limits[1].x},{limits[1].y})");*/
         }
     }
-    public void LoadSkills(SkillTree.Skill[] loadSkills)
+    public void LoadSkills(Skill[] loadSkills)
     {
         List<string> skills= new();
-        foreach (SkillTree.Skill skill in loadSkills)
+        foreach (Skill skill in loadSkills)
             skills.Add(skill.name);
 
         SkillSlot[] sSlots = GetComponentsInChildren<SkillSlot>();
