@@ -154,7 +154,7 @@ public class SkillSlot : MonoBehaviour
             get
             {
                 if (function != Utility.Function.None)
-                    return new Utility(name, function);
+                    return new Utility(name, function, true);
                 else if (condition == Damage.Type.None)
                     return new ModSkill(name, amount);
                 else
