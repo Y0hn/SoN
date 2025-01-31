@@ -75,15 +75,27 @@ public class Projectile : NetworkBehaviour
             RotateAroundPoint();
         }
     }
+    /// <summary>
+    /// Kontroluje ci bol casovac dosiahnuty a ci je platny
+    /// </summary>
+    /// <param name="timer">casovaca</param>
+    /// <returns>PRAVDA ak Casovac je povoleny a uz uplynul</returns>
     bool TimerReached(float timer)
     {
         return 0 < timer && timer <= Time.time;
     }
+    /// <summary>
+    /// Otaca sa okolo strelca
+    /// </summary>
     void RotateAroundPoint()
     {
         transform.SetPositionAndRotation(shooter.AttackPoint.position, shooter.AttackPoint.rotation);
         transform.Rotate(new Vector3(0,0,1), shooter.ViewAngle, Space.Self);
     }
+    /// <summary>
+    /// Projektil narazil na nieco
+    /// </summary>
+    /// <param name="other"></param>
     void OnTriggerEnter2D(Collider2D other)
     {
         if (IsServer && other.TryGetComponent(out EntityStats et) && et != shooter)
@@ -94,6 +106,11 @@ public class Projectile : NetworkBehaviour
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members
+    /// <summary>
+    /// Uvodne nastavenie atributov projektilu
+    /// </summary>
+    /// <param name="attack">utok strelca</param>
+    /// <param name="entityStats">strelec</param>
     public void SetUp(Attack attack, EntityStats entityStats)
     {
         delay = attack.AttackTime   * 2/3;
@@ -104,11 +121,18 @@ public class Projectile : NetworkBehaviour
         shooter.OnDeath += TryToDestoy;
         //Debug.Log($"Shoted projectile \nwith attack: {attack}\nwith shoot out delay: {delay}\ngrafical delay: {graficDelay}");
     }
+    /// <summary>
+    /// Zastavi strelu ak este neboa vystrelena
+    /// </summary>
     public void StopAttack()
     {
         if (timers[0] != 0)
             TryToDestoy();
     }
+    /// <summary>
+    /// Znici projektil, bud iba lokalne alebo po celej sieti <br />
+    /// Taktiez ho odboberie z akcie po smrti strelca
+    /// </summary>
     void TryToDestoy()
     {
         shooter.OnDeath -= TryToDestoy;

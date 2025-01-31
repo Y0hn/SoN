@@ -1,13 +1,19 @@
 using UnityEngine.UI;
 using UnityEngine;
 using System;
+/// <summary>
+/// Sluzi ako zakladna pre Drzitelov utokov 
+/// </summary>
 [Serializable] public abstract class AttackSlot
 {
+    /// <summary>
+    /// identifikacia
+    /// </summary>
     public sbyte id;
     [field:SerializeField] protected Image background;
     [field:SerializeField] protected Image foreground;
     [HideInInspector] public Attack.Type attackType;
-    /*[HideInInspector]*/ public bool active = false, show = false;
+    public bool active = false, show = false;
     public virtual void SetShow(bool show = false)
     {
         this.show = show;
@@ -19,13 +25,27 @@ using System;
         this.active = active;
     }
 }
+/// <summary>
+/// Drzi utok zbrane v inventari <br />
+/// Po aktivacii prida hodnoty z utoku medzi aktivne utoky <br />
+/// </summary>
 [Serializable] public class AttackSlotPassive : AttackSlot
 {
     [field:SerializeField] protected Image placeHolder;
     [field:SerializeField] protected Button button;
+    /// <summary>
+    /// Zadava zmenu farby podla toho ci je utok aktivny alebo pasivny
+    /// </summary>
+    /// <param name="72f/255f"></param>
+    /// <returns></returns>
     private static Color 
         activeC = new (190f/255f,  72f/255f, 31f/255f),      // #BE481F
         passiveC = new(149f/255f, 100f/255f, 65f/255f);      // #956441
+    /// <summary>
+    /// Sluzi na nastavenie utoku a jeho grafiku podla typu utoku
+    /// </summary>
+    /// <param name="aType"></param>
+    /// <param name="active"></param>
     public void Set(Attack.Type aType, bool active = false)
     {
         string aref = FileManager.GetAttackRefferency(aType);
@@ -48,6 +68,10 @@ using System;
         placeHolder.enabled = show;
         button.interactable = show;
     }
+    /// <summary>
+    /// Nastavi ci je drzitel aktivny
+    /// </summary>
+    /// <param name="active"></param>
     public override void SetActive(bool active = true)
     {
         if (!show && active) return;
@@ -58,7 +82,7 @@ using System;
             background.color = passiveC;
     }
     /// <summary>
-    /// Nastavi aktivny utok pre danu zbran ako tento utok
+    /// Prida tento utok medzi aktivne utoky (max. 3)
     /// </summary>
     /// <param name="type">Typ utoku zbrane</param>
     public void OnButtonClick()
@@ -67,15 +91,27 @@ using System;
         GameManager.instance.inventory.SetActiveAttackType(id, active);
     }
 }
+/// <summary>
+/// Drzi typ utoku v Hracovom Panely UI <br />
+/// Po aktivacii sa nastavi ako aktuany utok hraca   
+/// </summary>
 [Serializable] public class AttackSlotActive : AttackSlot
 {
     [HideInInspector] public Equipment.Slot slot;
     [field:SerializeField] protected Image edge;
     private static Action<bool> ChangeActive;
+    /// <summary>
+    /// Nastavenie farby pre rozne stavy
+    /// </summary>
+    /// <returns></returns>
     private static Color 
         activeC = new (50f/255f, 103f/255f, 30f/255f),      // #32671e
         passiveC = new(64f/255f,  64f/255f, 64f/255f),      // #404040
         defaultC = new(1f,1f,1f);                           // #ffffff
+    /// <summary>
+    /// Vyrobi ukazovatel drzanej zbrane podla parametrov 
+    /// </summary>
+    /// <value>UKAZOVATEL_ZBRANE</value>
     public WeaponIndex Weapon 
     { 
         get 
@@ -90,6 +126,11 @@ using System;
     }
     private string aRef;
     public string Identity { get => aRef; }
+    /// <summary>
+    /// Nastavi 
+    /// </summary>
+    /// <param name="aType"></param>
+    /// <param name="id"></param>
     public void Set(Attack.Type aType, sbyte id)
     {
         aRef = FileManager.GetAttackRefferency(aType);
@@ -134,6 +175,6 @@ using System;
             edge.color = passiveC;
             ChangeActive -= SetActive;
         }
-        //sDebug.Log($"SetActive active= {active} => this.active= {this.active}");
+        //Debug.Log($"SetActive active= {active} => this.active= {this.active}");
     }
 }

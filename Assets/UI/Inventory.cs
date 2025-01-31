@@ -21,6 +21,15 @@ public class Inventory : MonoBehaviour
     }
     public bool open { get; private set; }
     public bool FreeSpace { get { return itemSlots.Find(iS => iS.empty == true) != null; } }
+    
+    /// <summary>
+    /// Ziska data inventara alebo vybavy
+    /// </summary>
+    /// <param name="inv">
+    /// PRAVDA ak chceme inventar <br />
+    /// NEPRAVDA ak chceme vybavu
+    /// </param>
+    /// <returns>CESTY_KU_PREDMETOM</returns>
     public string[] GetReference(bool inv = true) 
     { 
         string[] references;
@@ -53,13 +62,22 @@ public class Inventory : MonoBehaviour
     [SerializeField] List<AttackSlotActive> acSlots;
     [SerializeField] PassiveAttackSlotScript[] atSlots;
     
-    // INVENTORY
+    /// <summary>
+    /// lokalny inventar
+    /// </summary>
+    /// <returns></returns>
     List<ItemSlot> itemSlots = new();
     
+    /// <summary>
+    /// Vybava
+    /// </summary>
+    /// <returns></returns>
     [SerializedDictionary("Slot", "SlotObject"), SerializeField]    
     SerializedDictionary<Equipment.Slot, EquipmentSlot> equipSlots = new();
+    
     private event Action onSizeChange;
     private GameManager game;
+    
     void Start()
     {
         button.onClick.AddListener(OC_Inventory);
@@ -81,6 +99,9 @@ public class Inventory : MonoBehaviour
             instance = this;
         Sizing();
     }
+    /// <summary>
+    /// Nastavi predvolene hodnoty pre rychle moznosti utoku 
+    /// </summary>
     void SetQuicks()
     {
         foreach (AttackSlotActive acSlot in acSlots)
@@ -88,18 +109,13 @@ public class Inventory : MonoBehaviour
         foreach (var atS in atSlots)
             atS.UnsetAttacks();
     }
+    /// <summary>
+    /// Prisposobenie velkosti drzitelov predmoetov podla ich mnozstva
+    /// </summary>
     void Sizing()
     {
         if (size <= 0) return;
 
-        /*
-        RectTransform rs = parent.GetComponent<RectTransform>();
-        Vector2 pixelSize = new (
-            (rs.anchorMax.x - rs.anchorMin.x)*Screen.width  - (grid.padding.right + grid.padding.left),
-            (rs.anchorMax.y - rs.anchorMin.y)*Screen.height - (grid.padding.top + grid.padding.bottom)
-             600, 1200
-        );
-        */
         Vector2 spacing = inventoryGrid.spacing;
         if (size <= 0) 
         {
@@ -134,6 +150,9 @@ public class Inventory : MonoBehaviour
 
         //Debug.Log($"Pixel size {cell} => [r:{rows},c:{cols}]");
     }
+    /// <summary>
+    /// V pripade nezhody velkosti inventara a poctu drzitelov ipredmetov <br />
+    /// </summary>
     void FixDiscrepancy()
     {
         int kids = parent.childCount,
@@ -182,10 +201,24 @@ public class Inventory : MonoBehaviour
                 }
         }
     }
+    /// <summary>
+    /// Zistuje ci je spravna velkost drzitela predmetu voci velkosti inventara 
+    /// </summary>
+    /// <param name="size">velkost drzitela predmetu</param>
+    /// <param name="grid">velkost inventara</param>
+    /// <param name="cell">pocet buniek na </param>
+    /// <returns>PRAVDA ak spravna velkost</returns>
     bool Fits(Vector2 size, Vector2 grid, float cell)
     {
         return !(size.x < grid.x * cell || grid.y * cell > size.y);
     }
+    /// <summary>
+    /// Zmensuje Velkost az kym sa nezmesti
+    /// </summary>
+    /// <param name="size"></param>
+    /// <param name="grid"></param>
+    /// <param name="cell"></param>
+    /// <param name="spase"></param>
     void MakeItFit(Vector2 size, Vector2 grid, ref float cell, float spase)
     {
         for (int i=1; i < size.x && !Fits(size, grid, cell + spase); i++)
@@ -193,11 +226,24 @@ public class Inventory : MonoBehaviour
             cell -= i;
         }
     }
+    /// <summary>
+    /// Znici drzitela itemu
+    /// </summary>
+    /// <param name="index"></param>
     void DestroySlot(int index)
     {
         DestroyImmediate(parent.GetChild(index).gameObject);
     }
+
+    /// <summary>
+    /// Zavola otvorenie / zatvorenie inventara
+    /// </summary>
+    /// <param name="OC_Inventory("></param>
     void OC_Inventory(InputAction.CallbackContext context) { OC_Inventory(); }
+    
+    /// <summary>
+    /// Otvori alebo Zavire inventar
+    /// </summary>  
     public void OC_Inventory() 
     {
         if (GameManager.instance.PlayerAble || open)
@@ -209,11 +255,21 @@ public class Inventory : MonoBehaviour
             else btn.text = ">";
         }
     }
+    /// <summary>
+    /// Nastavi monztvo predmetov, ktore inventar udrzi
+    /// </summary>
+    /// <param name="newSize"></param>
     public void SetSize(ushort newSize)
     {
         size = newSize;
         Sizing();
     }
+    /// <summary>
+    /// Prida predmet do inventara <br />
+    /// 
+    /// </summary>
+    /// <param name="refItem">cesta k predmetu</param>
+    /// <returns>PRAVDA ak bol uspesne pridany</returns>
     public bool Add(string refItem)
     {
         Item item = Item.GetItem(refItem);
@@ -231,6 +287,10 @@ public class Inventory : MonoBehaviour
         //Debug.Log(a);
         return add;
     }
+    /// <summary>
+    /// Odstrani predmet z inventara a vytvori ho na zemi v hracovom okoli
+    /// </summary>
+    /// <param name="refItem">cesta ku predmetu</param>
     public void Remove(string refItem)
     {
         
@@ -249,7 +309,12 @@ public class Inventory : MonoBehaviour
             }
         }
     }
-
+    /// <summary>
+    /// Predmet sa nastavi ako vybava, presunia sa do vybavy <br />
+    /// Nastavia sa k nemu pridruzene utoky podla ich poctu <br />
+    /// Ak je miesto nastavia sa aj ako aktivne utoky
+    /// </summary>
+    /// <param name="eq"></param>
     public void Equip (Equipment eq)
     {
         if (equipSlots.Keys.Contains(eq.slot))
@@ -285,6 +350,11 @@ public class Inventory : MonoBehaviour
             }
         }
     }
+    /// <summary>
+    /// Odoberie predmet z vybavy a prida ho spat do inventara <br />
+    /// Taktiez vymaze k nemu naviazane pasivne a aktivne utoky 
+    /// </summary>
+    /// <param name="equip"></param>
     public void UnEquip (EquipmentSlot equip)
     {
         Equipment eq = (Equipment)equip.Item;
@@ -315,13 +385,20 @@ public class Inventory : MonoBehaviour
             }
         }
     }
-    
+    /// <summary>
+    /// Zvoli aktivny utok z nastavenych moznosti 
+    /// </summary>
+    /// <param name="b"></param>
     public void Quick(byte b)
     {
         if (!acSlots[b].active)
             acSlots[b].Select();
     }
-
+    /// <summary>
+    /// Nastavi typ aktivneho utoku a jeho zobrazenie
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="active"></param>
     public void SetActiveAttackType(sbyte id, bool active)
     {
         bool already = acSlots.Find(acS => acS.id == id) != null;
@@ -353,6 +430,10 @@ public class Inventory : MonoBehaviour
         
         ReloadAttacks();
     }
+
+    /// <summary>
+    /// Znova nacita utoky podla povolenych pasivnych utokov a nasledne z nich vyberie po poradi 
+    /// </summary>
     public void ReloadAttacks()
     {
         // ziska prechadzjuci aktivny utok

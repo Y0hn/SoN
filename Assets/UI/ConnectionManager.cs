@@ -7,6 +7,10 @@ using Unity.Services.Authentication;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
+
+/// <summary>
+/// Sluzi na zhrnutie parametrov potrebnych pre pripojenie
+/// </summary>
 public class Connector : MonoBehaviour
 {
     public static Connector instance;
@@ -15,6 +19,10 @@ public class Connector : MonoBehaviour
     public TMP_Text codeText;
     [SerializeField] int maxConnections = 10;
     public NetworkManager netMan;
+    /// <summary>
+    /// Ziska si lokanu ip adresu pocitaca
+    /// </summary>
+    /// <returns>IP_ADRESA</returns>
     private string serverIP { get { return IPManager.GetIP(IPManager.AddressForm.IPv4); } }
 
     

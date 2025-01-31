@@ -3,9 +3,15 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using TMPro;
-
+/// <summary>
+/// Drzi, povoluje a aktivuje schopnost
+/// </summary>
 public class SkillSlot : MonoBehaviour
 {
+    /// <summary>
+    /// Zistuje ci je zakupena schopnost
+    /// </summary>
+    /// <value>PRAVDA ak je uz ziskana</value>
     public bool isPurchased { get; private set; }
 
     [SerializeField] SkillCreator skillCreator;
@@ -18,6 +24,10 @@ public class SkillSlot : MonoBehaviour
     [SerializeField] List<SkillSlot> dependentcySkills = new();
     [SerializeField] bool needsAllDependecies = false;
     
+    /// <summary>
+    /// Urcuje zmenu farby podla zmneny stavu pre konkretne casti grafiky schopnosti
+    /// </summary>
+    /// <returns></returns>
     private static Dictionary<string, Color> pallete = new()
     {
         { "unavailableIc",  new (128f/255f, 128f/255f, 128f/255f, 0.5f ) },  // disabled //rgba(76, 76, 76, 0.5)
@@ -62,6 +72,9 @@ public class SkillSlot : MonoBehaviour
         game = GameManager.instance;
         game.SkillTree.OnChangeAvailablePoints += PurchableSkill;
     }
+    /// <summary>
+    /// Nastavi grafiku do vychodiskovej podoby
+    /// </summary>
     void ResetGrafic()
     {
         icon.enabled = true;
@@ -88,9 +101,9 @@ public class SkillSlot : MonoBehaviour
         game.SkillTree.SkillPointAplied();
         SetGraficColor(pallete["aquired"]);
     }
-
     /// <summary>
-    /// Nastavi schopnost (ne)kupitenu za bod
+    /// Nastavi schopnost (ne)kupitenu za bod <br />
+    /// Zalezi na tom ci bola spnena podmienka zavislosti predchadzajucich schopnosti
     /// </summary>
     /// <param name="enable"></param>
     void PurchableSkill(bool enable)
@@ -105,6 +118,10 @@ public class SkillSlot : MonoBehaviour
                 SetGraficColor(pallete["unafordableIc"], pallete["unafordableBG"], pallete["unafordableIc"]);
         }
     }
+    /// <summary>
+    /// Nastavi ci sa da schopnost ziskat (ci sa da na nu kilkinut)
+    /// </summary>
+    /// <param name="interactable"></param>
     void SetInteractable(bool interactable)
     {
         amountT.text = interactable ? skillCreator.Amount : "";
@@ -112,10 +129,21 @@ public class SkillSlot : MonoBehaviour
         background.raycastTarget = interactable;
         background.raycastTarget = interactable;
     }
+    /// <summary>
+    /// Sluzi ako skrateny zapis <br />
+    /// Nastavi zhodnu farbu vsetkym 
+    /// </summary>
+    /// <param name="color"></param>
     void SetGraficColor(Color color)
     {
         SetGraficColor(color, color, color);
     }
+    /// <summary>
+    /// Nastavi farby pre rozne casti grafiky
+    /// </summary>
+    /// <param name="colorIcon"></param>
+    /// <param name="colorBG"></param>
+    /// <param name="colorMod"></param>
     void SetGraficColor(Color colorIcon, Color colorBG, Color colorMod)
     {
         background.color = colorBG * defaultColors[0];
@@ -133,12 +161,17 @@ public class SkillSlot : MonoBehaviour
     [Serializable] public class SkillCreator
     {
         [HideInInspector] public string name;
+
         [SerializeField] Utility.Function function;
         [SerializeField] Damage.Type condition;
         [SerializeField] bool isAttack;
         [SerializeField] bool speed;
         [SerializeField] float amount;
 
+        /// <summary>
+        /// Vytvori nanovo celeho tvrocu schopnosti
+        /// </summary>
+        /// <param name="n">meno objektu, potrebne pre identifikaciu</param>
         public SkillCreator(string n)
         {
             name = n;
@@ -149,6 +182,10 @@ public class SkillSlot : MonoBehaviour
             speed = false;
             amount = 0;
         }
+        /// <summary>
+        /// Vrati schopnost typu podla vyplnenych parametrov
+        /// </summary>
+        /// <value>SCHOPNOST</value>
         public Skill Skill
         {
             get
@@ -161,6 +198,10 @@ public class SkillSlot : MonoBehaviour
                     return new ModDamage(name, amount, condition, speed, isAttack);
             }
         }
+        /// <summary>
+        /// Vrati mnozstvo spolu s pridavnymi znakmi podla parametrov 
+        /// </summary>
+        /// <value>TEXT mnozstva so znakami</value>
         public string Amount
         {
             get 

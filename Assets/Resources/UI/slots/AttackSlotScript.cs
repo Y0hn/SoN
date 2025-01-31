@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// V inventari drzi a spravuje vestky passivne utoky pre jednu zbran
+/// </summary>
 public class PassiveAttackSlotScript : MonoBehaviour
 {
     [SerializeField] List<AttackSlotPassive> attackSlots;
@@ -42,6 +44,12 @@ public class PassiveAttackSlotScript : MonoBehaviour
     {
         return attackSlots.Find(atS => atS.id == id);
     }
+    /// <summary>
+    /// Zapne alebo Vypne konkretny pasivny utok
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="active"></param>
+    /// <returns></returns>
     public bool SetActive(int id = -1, bool active = false)
     {
         if      (id == -1) 
@@ -58,11 +66,16 @@ public class PassiveAttackSlotScript : MonoBehaviour
         }
         return false;
     }
+    /// <summary>
+    /// Ak je viac zapnutych pasivnych utokov ako aktivnych utokov (3)
+    /// </summary>
+    /// <returns>ID vypnuteho</returns>
     public int ShutLastActive()
     {
         List<AttackSlotPassive> atsP = GetActive();
-        if (atsP.Count > 0)
+        if (0 < atsP.Count)
         {
+            // prvy od konca
             int id = atsP[^1].id;
             if (SetActive(id))
                 return id;

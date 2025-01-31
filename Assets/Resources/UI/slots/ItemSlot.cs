@@ -1,6 +1,9 @@
 using UnityEngine.UI;
 using UnityEngine;
 
+/// <summary>
+/// Drzi predmet v inventary
+/// </summary>
 public class ItemSlot : MonoBehaviour
 {
     public bool empty = true;
@@ -9,6 +12,10 @@ public class ItemSlot : MonoBehaviour
     [SerializeField] protected Image background;
     [SerializeField] protected Color defaultColor;
     private Item item;
+    /// <summary>
+    /// Drzany predmet
+    /// </summary>
+    /// <value></value>
     public Item Item
     {
         get { return item; }
@@ -19,6 +26,9 @@ public class ItemSlot : MonoBehaviour
             ItemUpdate();
         }
     }
+    /// <summary>
+    /// Zmena drzaneho predmetu
+    /// </summary>
     protected virtual void ItemUpdate()
     {
         if (empty)
@@ -34,6 +44,7 @@ public class ItemSlot : MonoBehaviour
             background.color = Item.rarity;
             icon.color = Item.color;
         }
+
         button.interactable = !empty;
         icon.enabled = !empty;
     }
