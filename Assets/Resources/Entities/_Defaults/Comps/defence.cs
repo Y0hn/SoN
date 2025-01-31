@@ -1,6 +1,10 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+
+/// <summary>
+/// Drzi vsetky obranny a vypocitava ich ucinok
+/// </summary>
 [Serializable] public class Defence
 {
     List<Resistance> resistances;
@@ -18,6 +22,11 @@ using System.Collections.Generic;
         resistances = new();
         resists.ForEach(res => Add(res));
     }
+    /// <summary>
+    /// Prida obranu
+    /// </summary>
+    /// <param name="r"></param>
+    /// <returns></returns>
     public bool Add     (Resistance r)
     {
         if (!resistances.Contains(r))
@@ -36,7 +45,12 @@ using System.Collections.Generic;
         }
         return false;
     }
-    
+    /// <summary>
+    /// Vypocita poskodenie na zaklade predchadzajucej hodnoty a hodnty obrany proti danemu elementu
+    /// </summary>
+    /// <param name="damage"></param>
+    /// <param name="clamp"></param>
+    /// <returns>vysledne p</returns>
     public int CalculateDMG(Damage damage, bool clamp = true)
     {
         List<Resistance> list = resistances.FindAll(r => r.defenceType == damage.type);
@@ -56,31 +70,4 @@ using System.Collections.Generic;
             recieved = Math.Clamp(recieved, 0, int.MaxValue);
         return recieved;
     }
-    public Class CallculateDC()
-    {
-        if (resistances.Count > 0)
-        {
-            float total = 0;
-            int count = 0;
-
-            foreach (Resistance r in resistances)
-            {
-                total += (r.amount > 1) ? r.amount : r.amount * 100;
-                count++;
-            }
-            total /= count; 
-            
-            if      (total < 40)
-                return Class.Small;
-            else if (total < 70)
-                return Class.Medium;
-            else if (count < 5)
-                return Class.Dedicated;
-            else
-                return Class.Heavy;
-        }
-        else
-            return Class.None;
-    }
-    public enum Class  { None, Small, Medium, Heavy, Dedicated }
 }

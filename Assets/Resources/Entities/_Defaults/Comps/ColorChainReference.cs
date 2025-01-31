@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEditor;
 using System;
+/// <summary>
+/// Sluzi ako pociatocna farba pre retazec
+/// </summary>
 public class ColorChainReference : MonoBehaviour
 {
     [SerializeField] Color color = new(255,255,255,1);

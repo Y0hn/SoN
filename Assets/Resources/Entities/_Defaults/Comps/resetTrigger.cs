@@ -1,5 +1,7 @@
 using UnityEngine;
-
+/// <summary>
+/// Resetuje Triger vv animatore aby sa zabranilo nechcenemu spravaniu
+/// </summary>
 public class ResetTrigger : StateMachineBehaviour
 {
     [SerializeField] string resetTrigger = "";

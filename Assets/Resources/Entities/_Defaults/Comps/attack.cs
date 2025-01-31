@@ -44,11 +44,19 @@ using System;
     {
         return Type.BowSingle == t || t == Type.BowMulti;
     }
-
+    /// <summary>
+    /// Utoku prida poskodenie
+    /// </summary>
+    /// <param name="damage">pridane poskodenie</param>
     public void AddDamage(Damage damage)
     {
         damage.Add(damage);
     }
+    /// <summary>
+    /// Utok zautoci NaBlizku / NaDialku
+    /// </summary>
+    /// <param name="self">utocnik</param>
+    /// <returns></returns>
     public List<EntityStats> Trigger(EntityStats self)
     {
         List<EntityStats> etS = new();
@@ -61,7 +69,7 @@ using System;
         return etS;
     }
 	/// <summary>
-    /// Získa vśetky entity okrem seba, ktoré sú v dosahu (beźí na servery)
+    /// Získa vśetky entity okrem seba, ktoré sú v dosahu (beźí na servery) a zautoci na ne
     /// </summary>
     /// <returns>vráti pole získaných entít</returns>
     void MeleeTrigger(ref EntityStats self, ref List<EntityStats> list)
@@ -73,7 +81,7 @@ using System;
                     list.Add(stats);
     }
 	/// <summary>
-	/// Z strelnej zbrane získa projektil, ktorý spawne a nastaví mu hodnoty
+	/// Z strelnej zbrane získa projektil, ktorý vytvori a nastaví mu hodnoty
 	/// </summary>
     void RangedTrigger(ref EntityStats self)
     {
@@ -90,7 +98,11 @@ using System;
         else if (self is NPStats npS)
             npS.SetAboutToFireTime(proj);
     }
-
+    /// <summary>
+    /// Porovnavac
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals (Attack other)
     {
         return
@@ -99,6 +111,11 @@ using System;
         other.range.Equals(range) && 
         other.damage.Equals(damage);
     }
+    /// <summary>
+    /// Posielanie po sieti
+    /// </summary>
+    /// <param name="serializer"></param>
+    /// <typeparam name="T"></typeparam>
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref bothHanded);
@@ -107,6 +124,10 @@ using System;
         serializer.SerializeValue(ref rate);
         serializer.SerializeValue(ref type);
     }
+    /// <summary>
+    /// Vypis
+    /// </summary>
+    /// <returns></returns>
     public override string ToString()
     {
         string s = "";

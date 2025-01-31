@@ -1,6 +1,9 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+/// <summary>
+/// Drzi informacie, na zaklade ktorych sa vypnaju informacie o charakteroch
+/// </summary>
 [CreateAssetMenu(fileName = "NewRase", menuName = "Entity/Rase"), Serializable] public class Rase : ScriptableObject
 {
     // public GameObject body;

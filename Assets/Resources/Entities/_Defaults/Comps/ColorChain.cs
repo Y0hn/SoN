@@ -1,6 +1,9 @@
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
+/// <summary>
+/// Urcene pre jednoduchu zmenu farby pre celok podla jednej referencnej farby
+/// </summary>
 public class ColorChain : MonoBehaviour
 {
     [SerializeField] ColorChainReference reference;

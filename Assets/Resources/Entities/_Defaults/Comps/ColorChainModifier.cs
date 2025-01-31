@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// Upravuje referencnu farbu vlastnou
+/// </summary>
 public class ColorChainModifier : ColorChainReference
 {
     [SerializeField] ColorChainReference colorRef;

@@ -106,6 +106,9 @@ public class PlayerStats : EntityStats
         // Ulozi hodnoty na servery
         FileManager.SaveClientData(this);
     }
+    /// <summary>
+    /// Nastavi zacinajuce hodnoty pre charakter
+    /// </summary>
     protected override void EntitySetUp()
     {
         base.EntitySetUp();
@@ -167,6 +170,9 @@ public class PlayerStats : EntityStats
             chatTimer = Time.time + chatTime;
         };
     }
+    /// <summary>
+    /// Nastavi odber zmenenych sietovych premennych
+    /// </summary>
     protected override void OwnerSubsOnNetValChanged()
     {
         if (!IsOwner) return;
@@ -202,7 +208,11 @@ public class PlayerStats : EntityStats
         OnDeath?.Invoke();
         OnDeath = null;
     }
-    protected void OnInventoryUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)  // iba lokalne
+    /// <summary>
+    /// Volane lokalne pre klienta ak sa zmeni inventar
+    /// </summary>
+    /// <param name="changeEvent"></param>
+    protected void OnInventoryUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
     {        
         switch (changeEvent.Type)
         {
@@ -222,6 +232,10 @@ public class PlayerStats : EntityStats
                 break;
         }
     }
+    /// <summary>
+    /// zmena utkou podla ID rychlej volby utku
+    /// </summary>
+    /// <param name="id"></param>
     public void SetWeaponIndex (sbyte id)
     {
         sbyte att, wea= -1;
@@ -266,6 +280,10 @@ public class PlayerStats : EntityStats
         base.KilledEnemy(died);
         xp.Value += (uint)(died.level.Value * 100);
     }
+    /// <summary>
+    /// Pokusi sa prerusit utok
+    /// </summary>
+    /// <returns>PRAVDA ak bol utok preruseny</returns>
     public virtual bool TryInteruptAttack()
     {
         bool canStop = Attack.IsRanged;
@@ -300,6 +318,10 @@ public class PlayerStats : EntityStats
     [Rpc(SendTo.Server)] protected void AddSkillRpc (ModSkill skill)     { skillTree.Add(skill); }
     [Rpc(SendTo.Server)] protected void AddSkillRpc (ModDamage skill)    { skillTree.Add(skill); }
     
+    /// <summary>
+    /// Odomkne funkciu "Utiliti" schopnosti lokalne na klientovy 
+    /// </summary>
+    /// <param name="skill"></param>
     [Rpc(SendTo.Owner)] public void UnlockUtilityRpc (Utility skill)
     {
         game.AddUtility(skill);
@@ -316,7 +338,7 @@ public class PlayerStats : EntityStats
             maxHp.Value = Mathf.RoundToInt((float)maxHp.Value * (float)(1+addHealth));
     }
     /// <summary>
-    /// Zastavi utok
+    /// Zastavi aktualne prebiehajuci strelny utok znicenim projektilu
     /// </summary>
     [Rpc(SendTo.Server)] protected void StopRanAttackRpc()
     {
@@ -340,6 +362,9 @@ public class PlayerStats : EntityStats
     {
         inventory.Add(reference);
     }
+    /// <summary>
+    /// prida level hracovi
+    /// </summary>
     [Rpc(SendTo.Server)] public void AddLvlRpc()
     {
         //Debug.Log("XP added to player");

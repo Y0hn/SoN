@@ -1,5 +1,9 @@
 using Unity.Netcode;
 using System;
+
+/// <summary>
+/// Drzi hodnoty poskodenia utoku
+/// </summary>
 [Serializable] public struct Damage : INetworkSerializable, IEquatable<Damage>
 {
     public Type type;
@@ -9,6 +13,10 @@ using System;
         this.type = type;
         this.amount = amount;
     }
+    /// <summary>
+    /// Prida velkost poskodenia
+    /// </summary>
+    /// <param name="damage"></param>
     public void Add(Damage damage)
     {
         if (type == damage.type)

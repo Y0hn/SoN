@@ -106,11 +106,16 @@ public class NPStats : EntityStats
             aIPath.maxSpeed = now/100f;
         };
     }
+    /// <summary>
+    /// Spusti sa pri zmene zivotov, zmeni utok alebo zbran ak je dosiahnuty prah zmeny
+    /// </summary>
+    /// <param name="prev"></param>
+    /// <param name="now"></param>
     protected override void OnHpUpdate(int prev, int now)
     {
         base.OnHpUpdate(prev, now);
         for (int i = rase.swapons.Lenght-1; 0 <= i; i--)
-            if (i < rase.swapons.Lenght && rase.swapons[i].ReachedHP(hp))
+            if (i < rase.swapons.Lenght && rase.swapons[i].ReachedHP(HP))
                 SetWeaponIndex(rase.swapons[i].WeaponIndex);
         OnHit.Invoke();
     }
@@ -118,12 +123,20 @@ public class NPStats : EntityStats
     {
         base.Die();
     }
+    /// <summary>
+    /// Prida nepriatela do pocitadla
+    /// </summary>
+    /// <param name="b"></param>
     protected virtual void AddToCount(sbyte b)
     {
         // iba na servery
         if (!IsServer) return;    
         NPCount = (byte)(NPCount + b);
     }
+    /// <summary>
+    /// Zastavuje ziskavanie pozicie ciela na urcity cas pred vystrelenim
+    /// </summary>
+    /// <param name="proj"></param>
     public void SetAboutToFireTime(Projectile proj)
     {
         aToFire = proj.FireTime;
@@ -187,6 +200,9 @@ public class NPStats : EntityStats
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members
+    /// <summary>
+    /// Meni zbran a jej utok (Weaponindex) po dodiahnuti prahu zivotov
+    /// </summary>
     [Serializable] public class WeaponChange
     {
         [SerializeField] float ownerHP;

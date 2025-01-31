@@ -3,7 +3,9 @@ using System;
 using UnityEngine;
 using UnityEditor;
 using Unity.Netcode;
-
+/// <summary>
+/// Sluzi na zachtenie hracov/nepriatelov v dosahu
+/// </summary>
 public class NPSensor : NetworkBehaviour
 {
     [SerializeField] Collider2D coll;

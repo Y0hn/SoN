@@ -1,5 +1,8 @@
 using System;
 using Unity.Netcode;
+/// <summary>
+/// Urcuje aktuanu zbran a jej utok
+/// </summary>
 [Serializable] public struct WeaponIndex : INetworkSerializable
 {
     public sbyte eIndex;

@@ -2,12 +2,22 @@ using UnityEngine.InputSystem;
 using Unity.Netcode;
 using UnityEngine;
 using AYellowpaper.SerializedCollections;
+/// <summary>
+/// Umoznuje klientovi ovladat svoj charakter
+/// </summary>
 public class PlayerController : EntityController
 {
-    /* Inhereted variables
-     *
-     *
-     */
+    /* ZDEDENE ATRIBUTY
+     * [SF] protected EntityStats stats;
+     * [SF] protected AudioSource step;
+     * protected Vector2 moveDir;
+     * protected float stepTimer;
+     * protected bool attacking;
+     * protected Vector2 viewDir = Vector2.zero;
+     * protected const float MIN_MOVE_TOL = 0.1f;
+     * protected EntityStats Stats => stats; 
+     * public virtual Vector2 View => viewDir;
+     *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
     [SerializeField] GameObject cam;
     [SerializedDictionary("Key", "Input"),SerializeField] SerializedDictionary<string, InputActionReference> input_actions;
 #if UNITY_EDITOR
@@ -64,6 +74,10 @@ public class PlayerController : EntityController
     void Q1(InputAction.CallbackContext context) { Q(1); }
     void Q2(InputAction.CallbackContext context) { Q(2); }
     void Q3(InputAction.CallbackContext context) { Q(3); }
+    /// <summary>
+    /// Pokusa sa aktivovat quick slot ako aktuany utko
+    /// </summary>
+    /// <param name="id"></param>
     void Q (byte id)
     {
         id--;
@@ -74,6 +88,9 @@ public class PlayerController : EntityController
         if (!IsOwner) return;        
         AnimateMovement();
     }
+    /// <summary>
+    /// Animuje pohyb alebo utko a rotaciu pocas neho
+    /// </summary>
     protected override void AnimateMovement()
     {
         if (attacking)
@@ -85,6 +102,11 @@ public class PlayerController : EntityController
         }
         base.AnimateMovement();
     }
+    /// <summary>
+    /// Po kiknuti mysi sa utok povoli/zakaze <br />
+    /// alebo hrac znovuzrodi
+    /// </summary>
+    /// <param name="context"></param>
     public void Fire(InputAction.CallbackContext context)
     {
         if (!Stats.IsAlive.Value)
@@ -94,12 +116,16 @@ public class PlayerController : EntityController
         }
         attacking = !context.canceled;
     }
+
     protected override void Attack()
     {
-        stats.Animator.ResetTrigger("interuptAttack");
+        Stats.Animator.ResetTrigger("interuptAttack");
         base.Attack();
         wasAttacking = true;
-    }    
+    }
+    /// <summary>
+    ///  Prerusi utok ak hrac prestane drzat mys 
+    /// </summary>
     protected virtual void AttackInterupt()
     {
         wasAttacking = false;
@@ -112,6 +138,9 @@ public class PlayerController : EntityController
     }
 
     // RPCs
+    /// <summary>
+    /// Znovu zrodi hraca
+    /// </summary>
     [Rpc(SendTo.Server)] protected void SetLiveRpc(/*ulong playerId*/)
     {
         //NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerStats>().IsAlive.Value = true;
