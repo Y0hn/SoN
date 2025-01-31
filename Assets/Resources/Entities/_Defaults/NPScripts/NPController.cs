@@ -33,12 +33,6 @@ public class NPController : EntityController
     protected override void Update()
     {
         if (!IsServer || path == null || !stats.IsAlive.Value) return;
-
-        /*if (nextDecisionTimer < Time.time || ForceDecision)
-        {
-
-            //DecideNextMove();
-        }*/
             
         if (selfTarget && moveDir != Vector2.zero)
         {

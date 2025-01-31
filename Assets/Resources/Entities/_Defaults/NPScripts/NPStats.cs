@@ -109,6 +109,9 @@ public class NPStats : EntityStats
     protected override void OnHpUpdate(int prev, int now)
     {
         base.OnHpUpdate(prev, now);
+        for (int i = rase.swapons.Lenght-1; 0 <= i; i--)
+            if (i < rase.swapons.Lenght && rase.swapons[i].ReachedHP(hp))
+                SetWeaponIndex(rase.swapons[i].WeaponIndex);
         OnHit.Invoke();
     }
     protected override void Die()
@@ -184,4 +187,15 @@ public class NPStats : EntityStats
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members
+    [Serializable] public class WeaponChange
+    {
+        [SerializeField] float ownerHP;
+        [SerializeField] WeaponIndex wpI;
+
+        public bool ReachedHP(float hp)
+        {
+            return hp < ownerHP;
+        }
+        public WeaponIndex weaponIndex => wpI;
+    } 
 }

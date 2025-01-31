@@ -315,6 +315,11 @@ public abstract class EntityStats : NetworkBehaviour
         weapE.OnValueChanged.Invoke(wi, weapE.Value);
         //Debug.Log($"Setted Weapon Index= {weapE.Value}");
     }
+    public virtual void SerWeaponIndex (WeaponIndex WeI)
+    {
+        SetWeaponIndex(WeI.aIndex, WeI.eIndex);
+    }
+
     /// <summary>
     /// Vyziada si uložené dáta 
     /// </summary>
