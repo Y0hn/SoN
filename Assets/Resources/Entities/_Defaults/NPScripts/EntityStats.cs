@@ -37,21 +37,21 @@ public abstract class EntityStats : NetworkBehaviour
     /// <summary>
     /// Vrati pomer hp/maxHp
     /// </summary>
-    public float HP                     { get => (float)hp.Value/(float)maxHp.Value; }
+    public float HP                     => (float)hp.Value/(float)maxHp.Value;
 #pragma warning restore IDE0004
-    public virtual Quaternion Rotation  { get => transform.rotation; }
-    protected virtual Weapon[] Weapons  { get => rase.weapons; }
-    public Weapon EquipedWeapon         { get => Weapons[weapE.Value.eIndex];}
-    public NetworkObject NetObject      { get => netObject; }
-    public Rigidbody2D RigidBody2D      { get => rb; }
-    public Transform AttackPoint        { get => attackPoint; }
-    public virtual Attack Attack        { get => GetAttackByWeaponIndex(weapE.Value);  } 
-    public AITarget TargetTeam          { get => aiTeam; }
-    public Animator Animator            { get => animator.Animator; }
-    public Vector2 View                 { get => controller.View; }
-    public Color Color                  { get => color.Color; }
-    public float ViewAngle              { get => Mathf.Atan2(View.x, View.y); }
-    public bool AttackBoth              { get => Attack.bothHanded; }
+    public virtual Quaternion Rotation  => transform.rotation;
+    protected virtual Weapon[] Weapons  => rase.weapons;
+    public Weapon EquipedWeapon         => Weapons[weapE.Value.eIndex];
+    public NetworkObject NetObject      => netObject;
+    public Rigidbody2D RigidBody2D      => rb;
+    public Transform AttackPoint        => attackPoint;
+    public virtual Attack Attack        => GetAttackByWeaponIndex(weapE.Value);  
+    public AITarget TargetTeam          => aiTeam;
+    public Animator Animator            => animator.Animator;
+    public Vector2 View                 => controller.View;
+    public Color Color                  => color.Color;
+    public float ViewAngle              => Mathf.Atan2(View.x, View.y);
+    public bool AttackBoth              => Attack.bothHanded;
     public virtual Defence Defence      
     { 
         get 
@@ -315,7 +315,7 @@ public abstract class EntityStats : NetworkBehaviour
         weapE.OnValueChanged.Invoke(wi, weapE.Value);
         //Debug.Log($"Setted Weapon Index= {weapE.Value}");
     }
-    public virtual void SerWeaponIndex (WeaponIndex WeI)
+    public virtual void SetWeaponIndex (WeaponIndex WeI)
     {
         SetWeaponIndex(WeI.aIndex, WeI.eIndex);
     }
@@ -334,7 +334,7 @@ public abstract class EntityStats : NetworkBehaviour
             debug += $"\nFrom Weapons: {Weapons.Length}";
             debug += $"\nFrom Attacks: {Weapons[wIndex.eIndex].attack.Count}";
         } finally {
-            if (this is PlayerStats)
+            if (false && this is PlayerStats)
                 Debug.Log(debug);
         }
         return Weapons[wIndex.eIndex].attack[wIndex.aIndex];

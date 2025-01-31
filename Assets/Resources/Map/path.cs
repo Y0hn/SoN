@@ -3,6 +3,9 @@ using UnityEngine;
 public class StonePath : MonoBehaviour
 {
     [SerializeField] float speedModifier = 1.2f;
+    /// <summary>
+    /// Aktivne len na servery
+    /// </summary>
     public bool Active => GameManager.instance.IsServer;
 
     /// <summary>
@@ -22,9 +25,7 @@ public class StonePath : MonoBehaviour
     /// <param name="collider"></param>
     void OnTriggerExit2D(Collider2D collider)
     {
-        if (Active && collider.TryGetComponent(out EntityStats es))
-        {
+        if (Active && collider.TryGetComponent(out EntityStats es) && es.IsSpawned)
             es.TerrainChangeRpc(1f/speedModifier);
-        }
     }
 }

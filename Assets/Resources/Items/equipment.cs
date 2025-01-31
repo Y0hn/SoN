@@ -25,7 +25,6 @@ public class Equipment : Item
     {
         get { return FileManager.ITEM_DEFAULT_PATH; }
     }
-    //public static bool IsArmor(Slot slot)   { return slot == Slot.Head || slot == Slot.Torso || slot == Slot.Legs || slot == Slot.Body; }
     public static bool IsWeapon(Slot slot)  
     { 
         return 

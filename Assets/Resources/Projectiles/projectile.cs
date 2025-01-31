@@ -111,12 +111,13 @@ public class Projectile : NetworkBehaviour
     /// </summary>
     /// <param name="attack">utok strelca</param>
     /// <param name="entityStats">strelec</param>
-    public void SetUp(Attack attack, EntityStats entityStats)
+    public void SetUp(EntityStats entityStats)
     {
-        delay = attack.AttackTime   * 2/3;
-        graficDelay = delay         * 1/3;
-        damage = attack.damage;
-        range = attack.range;
+        Attack a = entityStats.Attack;
+        delay = a.AttackTime * 2/3;
+        graficDelay = delay  * 1/3;
+        damage = a.damage;
+        range = a.range;
         shooter = entityStats;
         shooter.OnDeath += TryToDestoy;
         //Debug.Log($"Shoted projectile \nwith attack: {attack}\nwith shoot out delay: {delay}\ngrafical delay: {graficDelay}");
@@ -136,9 +137,9 @@ public class Projectile : NetworkBehaviour
     void TryToDestoy()
     {
         shooter.OnDeath -= TryToDestoy;
-        if      (/*!IsServer && */networkObject.IsSpawned)
+        if      (networkObject.IsSpawned)
             networkObject.Despawn();
-        else //if (!networkObject.IsSpawned)
+        else
             Destroy(gameObject);
     }
 }

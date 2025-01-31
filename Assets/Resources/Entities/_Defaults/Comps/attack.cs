@@ -57,7 +57,7 @@ using System;
     /// </summary>
     /// <param name="self">utocnik</param>
     /// <returns></returns>
-    public List<EntityStats> Trigger(EntityStats self)
+    public /*readonly*/ List<EntityStats> Trigger(EntityStats self)
     {
         List<EntityStats> etS = new();
 
@@ -72,7 +72,7 @@ using System;
     /// Získa vśetky entity okrem seba, ktoré sú v dosahu (beźí na servery) a zautoci na ne
     /// </summary>
     /// <returns>vráti pole získaných entít</returns>
-    void MeleeTrigger(ref EntityStats self, ref List<EntityStats> list)
+    private static void MeleeTrigger(ref EntityStats self, ref List<EntityStats> list)
     {
         Collider2D[] targets = Physics2D.OverlapCircleAll(self.AttackPoint.position, self.Attack.range /*, layer mask */);
         foreach (Collider2D target in targets)
@@ -83,12 +83,12 @@ using System;
 	/// <summary>
 	/// Z strelnej zbrane získa projektil, ktorý vytvori a nastaví mu hodnoty
 	/// </summary>
-    void RangedTrigger(ref EntityStats self)
+    private static void RangedTrigger(ref EntityStats self)
     {
         Ranged r = (Ranged)self.EquipedWeapon;
         GameObject p = GameObject.Instantiate(r.GetProjectile, self.AttackPoint.position, self.Rotation);
         Projectile proj = p.GetComponent<Projectile>();
-        proj.SetUp(self.Attack, self);
+        proj.SetUp(self);
         NetworkObject netP = p.GetComponent<NetworkObject>();
         netP.Spawn(true);
         netP.TrySetParent(self.transform);

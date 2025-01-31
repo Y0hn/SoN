@@ -1,8 +1,6 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using Unity.Netcode;
-using Unity.Collections;
 using Pathfinding;
 public class NPStats : EntityStats
 {
@@ -65,8 +63,6 @@ public class NPStats : EntityStats
                 return 0f;
         }
     }
-    public Defence.Class DC     { get; protected set; }
-    public Weapon.Class WC      { get; protected set; }
     public bool AboutToFire    => aToFire <= Time.time;
     public float NextAttackTime=> atTime;
     public override void OnNetworkSpawn()
@@ -114,9 +110,9 @@ public class NPStats : EntityStats
     protected override void OnHpUpdate(int prev, int now)
     {
         base.OnHpUpdate(prev, now);
-        for (int i = rase.swapons.Lenght-1; 0 <= i; i--)
-            if (i < rase.swapons.Lenght && rase.swapons[i].ReachedHP(HP))
-                SetWeaponIndex(rase.swapons[i].WeaponIndex);
+        for (int i = rase.swapons.Length-1; 0 <= i; i--)
+            if (i < rase.swapons.Length && rase.swapons[i].ReachedHP(HP))
+                SetWeaponIndex(rase.swapons[i].weaponIndex);
         OnHit.Invoke();
     }
     protected override void Die()

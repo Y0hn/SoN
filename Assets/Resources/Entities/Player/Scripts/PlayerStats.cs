@@ -252,7 +252,7 @@ public class PlayerStats : EntityStats
                 wea = id/10 == 1 ? (sbyte)Equipment.Slot.WeaponR : (sbyte)Equipment.Slot.WeaponL;
             wea++;
         }
-        Debug.Log($"Setting ID={id} to weapon index to new(att= {att} | wea= {wea})\nWeapons count: {Weapons.Length}");
+        //Debug.Log($"Setting ID={id} to weapon index to new(att= {att} | wea= {wea})\nWeapons count: {Weapons.Length}");
         SetWeaponIndex(att, wea);
     }
     public override bool TakeDamage(Damage damage)
