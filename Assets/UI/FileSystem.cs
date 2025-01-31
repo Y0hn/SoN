@@ -5,6 +5,10 @@ using System.IO;
 using System;
 using UnityEngine;
 using System.Linq;
+
+/// <summary>
+/// Sluzi pre ziskavanie, nastavenie a ukladanie dat
+/// </summary>
 public static class FileManager
 {
     // FROM RECOURCES
@@ -117,6 +121,11 @@ public static class FileManager
             }
         }
     }
+    /// <summary>
+    /// Vrati cestu k ikone utoku podla typu utoku 
+    /// </summary>
+    /// <param name="type">typ utoku</param>
+    /// <returns>CESTA_K_IKONE</returns>
     public static string GetAttackRefferency(Attack.Type type)
     {
         string refer = ATTACKS_ICONS_PATH + "/";
@@ -144,6 +153,11 @@ public static class FileManager
         //Debug.Log("Returning at ref on: " + refer);
         return refer;
     }
+    /// <summary>
+    /// Ziska ikonu schopnosti podla Schopnosti
+    /// </summary>
+    /// <param name="skill"></param>
+    /// <returns></returns>
     public static string[] GetSkillRefferency(Skill skill)
     {
         List<string> list = new();
@@ -177,6 +191,7 @@ public static class FileManager
 
         return list.ToArray();
     }
+
     public enum MessageType { LOG, RECORD, ERROR, WARNING }
     public static void Log(string message, MessageType type = MessageType.LOG)
     {
@@ -198,6 +213,9 @@ public static class FileManager
 
     }
 }
+/// <summary>
+/// Drzi informacie o poslednej konfiguracii nastaveni
+/// </summary>
 [Serializable] public class Settings
 {
     public bool online;
@@ -207,6 +225,10 @@ public static class FileManager
     public string lastConnection;
     public float[] audioS;
     // ...
+
+    /// <summary>
+    /// Ziska si hodnoty zo statickych clenov menu
+    /// </summary>
     public Settings()
     {
         try {
@@ -221,6 +243,10 @@ public static class FileManager
             // Revert to defaults Settings
         }
     }
+    /// <summary>
+    /// Nastavi hodnoty do statickych clenov menu
+    /// </summary>
+    /// <param name="settings"></param>
     public void SetSettings(Settings settings)
     {
         online = settings.online;
@@ -237,6 +263,10 @@ public static class FileManager
         GameManager.UI.Online = online;
         GameManager.UI.FullSc = fullSc;
     }
+    /// <summary>
+    /// Sluzi ako moznost kontroly spravnosti
+    /// </summary>
+    /// <returns></returns>
     public override string ToString()
     {
         string auL = "[ ";
@@ -258,6 +288,9 @@ public static class FileManager
             $"Auidos list: {auL}";
     }
 }
+/// <summary>
+/// Drzi hodnoty pre cely svet
+/// </summary>
 [Serializable] public class World
 {
     readonly List<ItemOnFoor> items;

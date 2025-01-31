@@ -44,18 +44,18 @@ public class Connector : MonoBehaviour
         netMan.OnClientConnectedCallback += SpawnPlayer;
     }
     /*
-            ____         __             
-           / __ \ ___   / /____ _ __  __
-          / /_/ // _ \ / // __ `// / / /
-         / _, _//  __// // /_/ // /_/ / 
-        /_/ |_| \___//_/ \__,_/ \__, /  
-                               /____/   
-     */
-     /// <summary>
-     /// Vytvori server pre vzdialene pripojenie  
-     /// </summary>
-     /// <param name="host"></param>
-     /// <returns></returns>
+           ____         __             
+          / __ \ ___   / /____ _ __  __
+         / /_/ // _ \ / // __ `// / / /
+        / _, _//  __// // /_/ // /_/ / 
+       /_/ |_| \___//_/ \__,_/ \__, /  
+                              /____/   
+    */
+    /// <summary>
+    /// Vytvori server pre vzdialene pripojenie  
+    /// </summary>
+    /// <param name="host"></param>
+    /// <returns></returns>
     async void CreateRelay(bool host = true)
     {
         Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
