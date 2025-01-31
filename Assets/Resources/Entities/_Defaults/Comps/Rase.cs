@@ -11,7 +11,7 @@ using System.Collections.Generic;
     public float speed = 100;
     public int maxHp = 100;
     public float view = 5;
-    public Weapon[] weapons;
-    public NPStats.WeaponChange[] swapons;
+    public Weapon[] weapons = new Weapon[1];
+    public WeaponChange[] swapons = new WeaponChange[0];
     public List<Resistance> resists = new();
 }

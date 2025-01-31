@@ -10,12 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4019a0a40daa294a886e5177b3efcdf, type: 3}
-  m_Name: human
+  m_Name: merV2
   m_EditorClassIdentifier: 
-  level: 1
-  speed: 100
-  maxHp: 100
-  view: 5
+  level: 20
+  speed: 150
+  maxHp: 175
+  view: 7
   weapons:
-  - {fileID: 11400000, guid: 16f0f96176298a5498b8652ae825b0ac, type: 2}
-  resists: []
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  swapons:
+  - ownerHP: 0.5
+    wpI:
+      eIndex: 0
+      aIndex: 0
+  resists:
+  - amount: 0.3
+    defenceType: 0
+  - amount: 0.3
+    defenceType: 1

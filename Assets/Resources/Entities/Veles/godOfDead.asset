@@ -12,10 +12,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4019a0a40daa294a886e5177b3efcdf, type: 3}
   m_Name: godOfDead
   m_EditorClassIdentifier: 
-  level: 1
+  level: 50
   speed: 150
   maxHp: 1000
   view: 5
   weapons:
   - {fileID: 11400000, guid: 23861d980380b264baf3bc2ceba90dbf, type: 2}
-  resists: []
+  swapons:
+  - ownerHP: 0
+    wpI:
+      eIndex: 0
+      aIndex: 0
+  - ownerHP: 0
+    wpI:
+      eIndex: 0
+      aIndex: 0
+  - ownerHP: 0
+    wpI:
+      eIndex: 0
+      aIndex: 0
+  - ownerHP: 0
+    wpI:
+      eIndex: 0
+      aIndex: 0
+  - ownerHP: 0
+    wpI:
+      eIndex: 0
+      aIndex: 0
+  resists:
+  - amount: 0.3
+    defenceType: 0
+  - amount: 10
+    defenceType: 0
+  - amount: 0.3
+    defenceType: 1
+  - amount: 10
+    defenceType: 1
+  - amount: 0.3
+    defenceType: 2
+  - amount: 10
+    defenceType: 2

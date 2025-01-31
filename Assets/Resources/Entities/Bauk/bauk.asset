@@ -12,10 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4019a0a40daa294a886e5177b3efcdf, type: 3}
   m_Name: bauk
   m_EditorClassIdentifier: 
-  level: 1
-  speed: 100
-  maxHp: 100
+  level: 4
+  speed: 80
+  maxHp: 180
   view: 5
   weapons:
   - {fileID: 11400000, guid: c57af145f368dfd4d91926eebb946646, type: 2}
-  resists: []
+  swapons: []
+  resists:
+  - amount: 0.3
+    defenceType: 1
+  - amount: 0.1
+    defenceType: 2

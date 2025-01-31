@@ -12,16 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4019a0a40daa294a886e5177b3efcdf, type: 3}
   m_Name: babajaga
   m_EditorClassIdentifier: 
-  level: 1
-  speed: 100
-  maxHp: 500
+  level: 5
+  speed: 90
+  maxHp: 200
   view: 5
   weapons:
   - {fileID: 11400000, guid: 9da7f2fcdaf4a484eb4894e12bec5337, type: 2}
+  swapons:
+  - ownerHP: 0.5
+    wpI:
+      eIndex: 0
+      aIndex: 0
   resists:
-  - amount: 0
+  - amount: 5
     defenceType: 0
-  - amount: 0
-    defenceType: 0
-  - amount: 0
-    defenceType: 0
+  - amount: 5
+    defenceType: 2

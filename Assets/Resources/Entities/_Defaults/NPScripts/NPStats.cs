@@ -196,18 +196,4 @@ public class NPStats : EntityStats
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members
-    /// <summary>
-    /// Meni zbran a jej utok (Weaponindex) po dodiahnuti prahu zivotov
-    /// </summary>
-    [Serializable] public class WeaponChange
-    {
-        [SerializeField] float ownerHP;
-        [SerializeField] WeaponIndex wpI;
-
-        public bool ReachedHP(float hp)
-        {
-            return hp < ownerHP;
-        }
-        public WeaponIndex weaponIndex => wpI;
-    } 
 }
