@@ -5,6 +5,8 @@ using System.IO;
 using System;
 using UnityEngine;
 using System.Linq;
+using Unity.VisualScripting;
+using NUnit.Framework.Constraints;
 
 /// <summary>
 /// Sluzi pre ziskavanie, nastavenie a ukladanie dat
@@ -293,34 +295,54 @@ public static class FileManager
 /// </summary>
 [Serializable] public class World
 {
-    readonly List<ItemOnFoor> items;
-    readonly List<EntitySave> players;
-    readonly List<EntitySave> entities;
+    public readonly List<ItemOnFoor> items;
+    public readonly List<PlayerSave> players;
+    public readonly List<EntitySave> entities;
+    public readonly BossSave boss;
 
-    public World(bool get = false)
+    /// <summary>
+    /// Ziska udaje o svete a zapise ich od premennych
+    /// </summary>
+    /// <exception cref="Ak nie je server tak zlyha"></exception>
+    public World()
     {
-        if (get)
+        if (GameManager.instance.IsServer)
         {
-            if (GameManager.instance.IsServer)
+            items = new ();
+            players = new ();
+            entities = new ();
+            foreach (GameObject e in GameObject.FindGameObjectsWithTag("Entity"))
             {
-                foreach (GameObject e in GameObject.FindGameObjectsWithTag("Entity"))
+                if (e.TryGetComponent(out EntityStats eS))
                 {
-                    EntitySave es = new (e.GetComponent<EntityStats>());
-
-                    if (es.isPlayer)
-                        players.Add(es);
+                    if (eS is BosStats bS)
+                        boss = new (bS);
                     else
-                        entities.Add(es);
+                        entities.Add(new (eS));
                 }
-                foreach (GameObject d in GameObject.FindGameObjectsWithTag("Drop"))
-                    items.Add(new (d.GetComponent<ItemDrop>()));
+                else
+                    Debug.LogWarning($"NotEntity with tag Entity: {e.name} was incorectly handled in savefile");
             }
-            // Client nemoze Ukladat stav sveta
+            foreach (GameObject p in GameObject.FindGameObjectsWithTag("Player"))
+            {
+                if (p.TryGetComponent(out PlayerStats pS))
+                    players.Add(new (pS));
+                else
+                    Debug.LogWarning($"NotPlayer with tag Player: {p.name} was incorectly handled in savefile");
+
+            }
+            foreach (GameObject d in GameObject.FindGameObjectsWithTag("Drop"))
+            {
+                if (d.TryGetComponent(out ItemDrop iD))
+                    items.Add(new (iD));
+                else
+                    Debug.LogWarning($"NotDropItem with tag Drop: {d.name} was incorectly handled in savefile");
+            }
         }
         else
         {
-            items = new();
-            entities = new();
+            Debug.LogWarning("World tried to save on klient");
+            throw new Exception("World tried to save on klient");
         }
     }
     /// <summary>
@@ -329,72 +351,153 @@ public static class FileManager
     /// <param name="old_world"></param>
     public World(World old_world)
     {
-        World new_world= new(true);
+        World new_world= new();
         items = new_world.items;
         players = new_world.players;
         entities = new_world.entities;
 
-        List<EntitySave> pl = old_world.entities.FindAll(e => e.isPlayer);
-        pl = players.FindAll(e => entities.Find(en => en.etName == e.etName) == null); // najde vsetkych hracov co nesu pripojeny
-        players.AddRange(pl);
+        old_world.players.ForEach(p => {if (!players.Contains(p)) players.Add(p); } ); // najde vsetkych hracov co nesu pripojeny
     }
+
+    /// <summary>
+    /// Drzi udaje o itemoch na zemi
+    /// </summary>
     [Serializable] public class ItemOnFoor
     {
-        public Vector2 pos;
+        public Cordinates pos;
         public string itemRef;
         public ItemOnFoor(Vector2 _pos, string _itemRef)
         {
-            pos = _pos;
+            pos = new (_pos);
             itemRef = _itemRef;
         }
         public ItemOnFoor(ItemDrop iDrop)
         {
-            pos = iDrop.transform.position;
+            pos = new (iDrop.transform.position);
             itemRef = iDrop.Item.GetReferency;
         }
     }
+    /// <summary>
+    /// Drzi informacie o charakteroch vo svete
+    /// </summary>
     [Serializable] public class EntitySave
     {
-        protected Defence defence;
-        protected Vector2 position;
+        public Cordinates position;
         public string etName;
-        public bool isPlayer;
-        protected float hp;
+        public float hp;
 
         public EntitySave(EntityStats entity)
         {
             position = new(entity.transform.position.x,entity.transform.position.y);
-            isPlayer = entity is PlayerStats;
             etName = entity.transform.name;
             hp = entity.HP;
         }
+
+        /// <summary>
+        /// Vypis informacii charaktera
+        /// </summary>
+        /// <returns>Meno, poziciu, pocetZivotov</returns>
+        public override string ToString()
+        {
+            return $"{etName} on {position} with hp=  {hp}";
+        }
     }
+    /// <summary>
+    /// Drzi informacie o hracovi, ktori sa pripojil na server
+    /// </summary>
     [Serializable] public class PlayerSave : EntitySave
     {
-        InventorySave inventory;
-        public PlayerSave(EntityStats player) : base(player)
+        public InventorySave inventory;
+        public SkillTreeSave skillTree;
+        public int maxHp;
+        public PlayerSave(PlayerStats player) : base(player)
         {
 
         }
 
+        /// <summary>
+        /// Zrdi informacie o inventari hraca
+        /// </summary>
         [Serializable] public class InventorySave
         {
-            public readonly string playerName;
             private string[] items;
-            private string[] equiped;/*
-            public InventorySave(Inventory inventory)
-            {
-                playerName = GameManager.instance.PlayerName;
-                foreach (ItemSlot it in inventory.inventoryGrid)
-                {
+            private string[] equiped;
 
-                }
-            }*/
+            /// <summary>
+            /// Vypis vlasnosti ulozeneho inventara hraca
+            /// </summary>
+            /// <returns>pocetPredmetov pocetPoredmetovNaSebe</returns>
+            public override string ToString()
+            {
+                return $"items.Lenght= {items.Length} equiped.Lenght= {equiped.Length}";
+            }
+        }
+        /// <summary>
+        /// Drzi informacie o ziskanych a pouzivanych schopnostiach hraca
+        /// </summary>
+        [Serializable] public class SkillTreeSave
+        {
+            public Skill[] skills;
+            public string[] usingUtils;
+
+            /// <summary>
+            /// Vypis vlastosti ulozeneho stromu schopnosti 
+            /// </summary>
+            /// <returns>pocetSchonosti pocetPozivanychSchopnosti</returns>
+            public override string ToString()
+            {
+                string s = "";
+                foreach (string uS in usingUtils)
+                    s += $"{uS} ";
+                return $"skills.Lenght= {skills.Length} usingUtils = [{s}]";
+            }
+        }
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/>, maximalneZdravie, inventar, stromSchonpnosti</returns>
+        public override string ToString()
+        {
+            string s = base.ToString();
+            s += $", MaxHP= {maxHp}";
+            s += $", Inventar= {inventory}";
+            s += $", SkillTree= {skillTree}";
+            return s;
+        }
+        /// <summary>
+        /// Porovnava save dvoch hracov
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns>Ak sa jedna o jedneho hraca</returns>
+        public bool Equals(PlayerSave other)
+        {
+            return etName == other.etName;
         }
     }
-    
     /// <summary>
-    /// Nahrada za Vector2 v World pre FileSystem
+    /// Drzi informacie o hlavnom nepriatelovi
+    /// </summary>
+    [Serializable] public class BossSave : EntitySave
+    {
+        public BossSave(BosStats entity) : base(entity)
+        {
+
+        }
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
+        public override string ToString()
+        {
+            string s = base.ToString();
+
+            return s;
+        }
+    }
+
+    /// <summary>
+    /// Drzi informacie o polohe v dvoj rozmernom svete <br />
+    /// "Vector2" nie je systemovo Srializovatelny
     /// </summary>
     [Serializable] public class Cordinates
     {
@@ -415,6 +518,14 @@ public static class FileManager
             y = vector.y;
         }
         public Vector2 Vector { get { return new Vector2(x,y); } }
+        /// <summary>
+        /// Vypis pozicie
+        /// </summary>
+        /// <returns>(x,y)</returns>
+        public override string ToString()
+        {
+            return $"({x},{y})";
+        }
     }
 }
 /********************************************************************************** OLD CODE *****************************************************************************\
