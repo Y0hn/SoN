@@ -19,6 +19,16 @@ using UnityEngine;
     {
         serializer.SerializeValue(ref name);
     }
+    public bool Equals(Skill other)
+    {
+        return this.name == other.name;
+    }
+    public override string ToString()
+    {
+        string s = base.ToString();
+        s += $" >>> ID: {name}";
+        return s;
+    }
 }
 /// <summary>
 /// Schopnost meni hodnotu nejakeho parametra <br />
@@ -49,6 +59,12 @@ using UnityEngine;
         base.NetworkSerialize(serializer);
         serializer.SerializeValue(ref amount);
     }
+    public override string ToString()
+    {
+        string s = base.ToString();
+        s += $" => Amount: {amount} {(isPercentyl ? "%" : "+")} {(isSpeed ? "time" : "")}";
+        return s;
+    }
 }
 /// <summary>
 /// Schopnost meni hodnotu len ak je spnena podmienka - rovnaky typ damage <br />
@@ -78,6 +94,12 @@ using UnityEngine;
         serializer.SerializeValue(ref damage);
         serializer.SerializeValue(ref condition);
     }
+    public override string ToString()
+    {
+        string s = base.ToString();
+        s += $", Damage: {damage}, Element: {Enum.GetName(typeof(Damage.Type), condition)}";
+        return s;
+    }
 }
 /// <summary>
 /// Schopnost odomkyna skytu funkciu <br />
@@ -102,6 +124,12 @@ using UnityEngine;
         base.NetworkSerialize(serializer);
         serializer.SerializeValue(ref aquired);
         serializer.SerializeValue(ref function);
+    }
+    public override string ToString()
+    {
+        string s = base.ToString();
+        s += $" => Function: {Enum.GetName(typeof(Function), function)}, Aquired= {aquired}";
+        return s;
     }
     public enum Function
     {
