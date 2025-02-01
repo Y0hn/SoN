@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Mono.Cecil;
 using UnityEngine;
 //using Unity.Netcode;
 /// <summary>
@@ -69,11 +70,16 @@ public class SkillTree
         else if (skill is ModSkill mS)
         {
             if (mS.isSpeed)
+            {
                 player.TerrainChangeRpc(mS.amount);
+                debug += "Speed";
+            }
             else
+            {
                 player.AddMaxHealthRpc(mS.amount);
-
-            debug += mS.isSpeed ? "Speed" : "Health";
+                debug += "Health";
+            }
+            
             debug += " Modifier";
         }
         else if (skill is Utility ut)
@@ -127,7 +133,7 @@ public class SkillTree
         public void Add(Modifier mod)
         {
             this.amount += mod.amount;
-            this.percentyl *= mod.percentyl;
+            this.percentyl = Mathf.Max(percentyl, mod.percentyl);
         }
         public float ModifyValue(float value)
         {

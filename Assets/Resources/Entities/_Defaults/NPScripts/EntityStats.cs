@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using System;
 using TMPro;
+using AYellowpaper.SerializedCollections;
 using Random = UnityEngine.Random;
 /// <summary>
 /// Drzi hodnoty pre entitu
@@ -22,15 +23,16 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected NetworkAnimator animator;
     [SerializeField] protected Rigidbody2D rb;
     [SerializeField] protected Collider2D coll;
-    [SerializeField] protected AudioSource aAS;
     [SerializeField] protected AITarget aiTeam = AITarget.Team_2;
     [SerializeField] protected EntityController controller;
+    [SerializeField, SerializedDictionary("Nazov","Audios")] protected SerializedDictionary<string, AudioSource> audioSources;
 
-    protected   NetworkVariable<int> maxHp = new();    
-    protected   NetworkVariable<int> hp = new();
-    public      NetworkVariable<float> speed = new();
-    public      NetworkVariable<byte> level = new(1);
-    public      NetworkVariable<bool> IsAlive = new(true);
+    protected   NetworkVariable<int> maxHp = new(100);    
+    protected   NetworkVariable<int> hp = new(100);
+    [HideInInspector] public NetworkVariable<float> speed = new(100);
+    [HideInInspector] public NetworkVariable<byte> level = new(1);
+    [HideInInspector] public NetworkVariable<bool> IsAlive = new(true);
+    protected   NetworkVariable<byte> stepIndex = new(0);
     protected   NetworkVariable<WeaponIndex> weapE = new(new(0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
 #pragma warning disable IDE0004
@@ -250,6 +252,7 @@ public abstract class EntityStats : NetworkBehaviour
     /// </summary>
     protected virtual void Die()
     {
+        PlaySoundRpc("die");
         if (onDeathWait)
             timeToDespawn = Time.time + TIME_TO_DESPAWN;
         foreach (Delegate d in OnDeath?.GetInvocationList())
@@ -388,11 +391,23 @@ public abstract class EntityStats : NetworkBehaviour
     [Rpc(SendTo.Server)] public virtual void TerrainChangeRpc(float speedMod)
     {
         try {
+            stepIndex.Value = (byte)(speedMod < 1 ? 0 : 1);
             speed.Value *= speedMod;
         } catch {
 
         }
     }
+    /// <summary>
+    /// Vyda zvuk pre vsetkych, budu ho vsak pocut len ti v blizkosti
+    /// </summary>
+    /// <param name="name">KLUCova hodnota zdroja zvuku</param>
+    [Rpc(SendTo.Everyone)] public virtual void PlaySoundRpc (string name)
+    {
+        if (name.Equals("step"))
+            name += "-" + stepIndex.Value;
+        audioSources[name].Play();
+    }
+
     /// <summary>
     /// Urcuje skupinu pre cielenie a ublizovanie si navzajom ;)
     /// (skupiny sa navzajom nemaju radi a None je  neutralna)

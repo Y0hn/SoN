@@ -7,7 +7,6 @@ using UnityEngine;
 public abstract class EntityController : NetworkBehaviour
 {
     [SerializeField] protected EntityStats stats;
-    [SerializeField] protected AudioSource step;
     protected Vector2 moveDir;
     protected float stepTimer;
     protected bool attacking;
@@ -23,8 +22,6 @@ public abstract class EntityController : NetworkBehaviour
     {
         moveDir = Vector2.zero;
         attacking = false;
-
-        step.maxDistance = 10f;
     }
     /// <summary>
     /// Stara sa aby sa co narychlejsie vykonala zmena spravania
@@ -68,7 +65,7 @@ public abstract class EntityController : NetworkBehaviour
             }
             if (stepTimer < Time.time)
             {
-                step.Play();
+                Stats.PlaySoundRpc("step");
                 stepTimer = Time.time + 1/(stats.speed.Value/100f)/2f;
             }
         }
