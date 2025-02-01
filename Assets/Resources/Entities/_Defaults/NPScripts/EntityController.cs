@@ -16,7 +16,9 @@ public abstract class EntityController : NetworkBehaviour
     protected EntityStats Stats => stats; 
     public virtual Vector2 View => viewDir;
 
-
+    /// <summary>
+    /// Vykovana sa pri Vzniku objektu v ramci siete
+    /// </summary>
     public override void OnNetworkSpawn()
     {
         moveDir = Vector2.zero;

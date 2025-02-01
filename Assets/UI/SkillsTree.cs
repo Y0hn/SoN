@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 //using Unity.Netcode;
+/// <summary>
+/// Sluzi na drzanie ziskanych schopnosti pre hraca na servery <br />
+/// Ovplyvnuje vypocty hodnot pri boji a pod.
+/// </summary>
 public class SkillTree
 {
 #pragma warning disable IDE0044 // Add readonly modifier
@@ -23,7 +27,10 @@ public class SkillTree
         offRate = new ();
         player = _player;
     }
-
+    /// <summary>
+    /// Pridanie schopnosti
+    /// </summary>
+    /// <param name="skill"></param>
     public void Add(Skill skill)
     {
         skills.Add(skill);
@@ -79,7 +86,11 @@ public class SkillTree
 
         Debug.Log(debug + $"\n{skill}");
     }
-
+    /// <summary>
+    /// Zikanie zmeneneho utoku podla ziskanych schopnosti
+    /// </summary>
+    /// <param name="baseAttack"></param>
+    /// <returns></returns>
     public Attack ModAttack (Attack baseAttack)
     {
         // Zmeni utoku poskodenie
@@ -95,6 +106,9 @@ public class SkillTree
 
         return baseAttack;
     }
+    /// <summary>
+    /// Zostrucnenie zmeny
+    /// </summary>
     private class Modifier
     {
         public float amount;

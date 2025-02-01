@@ -53,6 +53,9 @@ public class BosStats : NPStats
      *  public Action OnHit;
      *  protected float aToFire;
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void OwnerSubsOnNetValChanged()
     {
         if (!IsServer) return;

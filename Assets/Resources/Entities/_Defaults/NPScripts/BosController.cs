@@ -20,11 +20,17 @@ public class BosController : NPController
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
     [SerializeField] protected GameObject canvas;
     protected new BosStats Stats => (BosStats)base.Stats;
-
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void Update()
     {
         base.Update();
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="t"></param>
     public override void SetTarget(Transform t)
     {
         base.SetTarget(t);

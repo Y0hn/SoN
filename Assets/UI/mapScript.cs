@@ -2,7 +2,9 @@ using Unity.Netcode;
 using UnityEngine;
 using Pathfinding;
 using System.Linq;
-
+/// <summary>
+/// Sluzi pre spravne nacitanie udajov mapy a zaroven aj zo serveru vytvara nepriatelov na liniiach mapy
+/// </summary>
 public class MapScript : MapSizer
 {
     [SerializeField] Transform spawLines;
@@ -13,16 +15,25 @@ public class MapScript : MapSizer
     [SerializeField] GameObject[] regularEnemiesTier2;
     //[SerializeField] GameObject boss;
     public static MapScript map;
+    /// <summary>
+    /// Zavola sa pred prvym snimkom obrazovky hry
+    /// </summary>
     protected void Awake()
     {
         if (map == null)
             map = this;
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void Start()
     {
         Connector.instance.spawnPoint = PlayerSpawnPoint;
         GameManager.instance.spawnpoint = BossSpawnPoint;
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void DrawWireCube()
     {        
         Gizmos.DrawWireCube(transform.position + offset, size);

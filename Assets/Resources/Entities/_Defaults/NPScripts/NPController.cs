@@ -19,6 +19,9 @@ public class NPController : EntityController
     protected new NPStats Stats => (NPStats)base.Stats;
     public bool ForceDecision       { get; protected set; }
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -30,6 +33,9 @@ public class NPController : EntityController
             path.endReachedDistance = ((NPStats)stats).AttackDistance;
         }
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void Update()
     {
         if (!IsServer || path == null || !stats.IsAlive.Value) return;
@@ -53,6 +59,9 @@ public class NPController : EntityController
         else
             SetTarget(defaultTarget);
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void Attack()
     {
         if (moveDir != Vector2.zero) moveDir = Vector2.zero;
@@ -107,7 +116,7 @@ public class NPController : EntityController
         SetTarget(t);
     }
     /// <summary>
-    /// Animuje chodzu
+    /// <inheritdoc/>
     /// </summary>
     protected override void AnimateMovement()
     {

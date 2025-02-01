@@ -1,8 +1,17 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
-public class IPManager
+/// <summary>
+/// Sluzi pre ziskavanie sietovych parametrov lokalneho pocitaca <br />
+/// Vyzaduje si povolenie o pristupe k sieti pri spusteni aplikacie
+/// </summary>
+public static class IPManager
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="Addfam"></param>
+    /// <returns></returns>
     public static string GetIP(AddressForm Addfam)
     {
         //Return null if ADDRESSFAM is Ipv6 but Os does not support it

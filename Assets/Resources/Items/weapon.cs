@@ -6,10 +6,19 @@ using System.Linq;
 public class Weapon : Equipment
 {
     public List<Attack> attack;
+    /// <summary>
+    /// Ziska predmet na zaklade referencnej cesty
+    /// Tato metoda ma byt "prepisana" (overwrite)
+    /// </summary>
+    /// <param name="referency">cesta</param>
+    /// <returns>ZBRAN</returns>
     public new static Weapon GetItem (string referency)
     {
         return Resources.Load<Weapon>(referency);
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override string GetReferency
     {
         get 
@@ -19,11 +28,19 @@ public class Weapon : Equipment
             return FileManager.WEAPONS_DEFAULT_PATH + "/" + name; 
         }
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override string SpriteRef => FileManager.WEAPONS_REF_DEFAULT_PATH + "/" + sprite;
     public override void Use(ItemSlot iS)
     {
         base.Use(iS);
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
     public override bool Equals(Item other)
     {
         bool eq = false;
@@ -35,32 +52,10 @@ public class Weapon : Equipment
         }
         return eq;
     }
-    public Class CallculateWC()
-    {
-        List<float> vals = new();
-
-        for (int i = 0; i < vals.Count; i++)
-            vals.Add(attack[i].rate * attack[i].damage.amount);
-        
-        if (vals.Count == 0) return Class.Light;
-        int index = vals.IndexOf(vals.Max());   // zsika najefektiktivnejsi utok zbrane
-        vals.Clear();
-        float r = attack[index].rate;
-
-        switch (attack[index].type)
-        {
-            case Attack.Type.BowSingle:
-            case Attack.Type.BowMulti:
-                return Class.Ranged;
-            default:
-                if      (r > 2f)
-                    return Class.Light;
-                else if (r > 1f)
-                    return Class.Medium;
-                else
-                    return Class.Heavy;
-        }
-    }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
         string atts = "";
@@ -69,5 +64,4 @@ public class Weapon : Equipment
             base.ToString() + "\n" +
             $"Attacks: \n( {atts} \n)";
     }
-    public enum Class { Light, Medium, Heavy, Ranged, AoE }
 }

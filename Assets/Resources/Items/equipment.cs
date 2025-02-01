@@ -5,7 +5,10 @@ public class Equipment : Item
 {
     public Slot slot;
     [SerializeField] protected string sprite;
-    public virtual string SpriteRef { get; }
+    /// <summary>
+    /// Cesta k texture v hre
+    /// </summary>
+    public virtual string SpriteRef => sprite;
     public enum Slot
     {
         //Head, Torso, Legs,
@@ -13,18 +16,24 @@ public class Equipment : Item
         WeaponR, WeaponL, WeaponBoth/*, NoPreference*/
     }
     /// <summary>
-    /// Meni navratovu hodnotu povodnej metody
+    /// Ziska predmet na zaklade referencnej cesty
+    /// Tato metoda ma byt "prepisana" (overwrite)
     /// </summary>
-    /// <param name="referency"></param>
-    /// <returns></returns>
+    /// <param name="referency">cesta</param>
+    /// <returns>NOSITELNY PREDMET</returns>
     public new static Equipment GetItem (string referency)
     {
         return Resources.Load<Equipment>(referency);
     }
-    public override string GetReferency
-    {
-        get { return FileManager.ITEM_DEFAULT_PATH; }
-    }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public override string GetReferency => FileManager.ITEM_DEFAULT_PATH;
+    /// <summary>
+    /// Zisti ci je pouzitelny predmet zbran
+    /// </summary>
+    /// <param name="slot"></param>
+    /// <returns></returns>
     public static bool IsWeapon(Slot slot)  
     { 
         return 
@@ -32,6 +41,10 @@ public class Equipment : Item
                 || slot == 
             Slot.WeaponR;
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="iS"></param>
     public override void Use(ItemSlot iS)
     {
         if (iS is EquipmentSlot)
@@ -44,6 +57,11 @@ public class Equipment : Item
             Inventory.instance.Equip(this);
         }
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns><inheritdoc/></returns>
     public override bool Equals(Item other)
     {
         bool eq = false;
@@ -55,6 +73,10 @@ public class Equipment : Item
         }
         return eq;
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
         return 
@@ -68,7 +90,13 @@ public class Equipment : Item
 /// </summary>
 [Serializable] public class Resistance
 {
+    /// <summary>
+    /// Mnozstvo odporu pri utoku
+    /// </summary>
     public float amount;
+    /// <summary>
+    /// Element, proti ktoremu je odolnost urcena
+    /// </summary>
     [SerializeField] public Damage.Type defenceType;
     public Resistance (Damage.Type type, float amount)
     {

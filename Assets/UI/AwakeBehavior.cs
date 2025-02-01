@@ -5,5 +5,8 @@ using UnityEngine;
 /// </summary>
 public abstract class AwakeBehavior : MonoBehaviour
 {
+    /// <summary>
+    /// Spusti sa pred prvim snimkom obrazovky
+    /// </summary>
     public abstract void Awake();
 }

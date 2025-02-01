@@ -11,14 +11,17 @@ public abstract class Item : ScriptableObject, IEquatable<Item>
     [SerializeField] protected string path = "";
     /// <summary>
     /// Ziska predmet na zaklade referencnej cesty
-    /// Tato metoda ma byt "prepisana" (overwrite)
+    /// Tato metoda ma byt "prepisana" (overwrite/new)
     /// </summary>
-    /// <param name="referency">referencna cesta</param>
-    /// <returns></returns>
+    /// <param name="referency">cesta</param>
+    /// <returns>PREDMET</returns>
     public static Item GetItem (string referency)
     {
         return Resources.Load<Item>(referency);
     }
+    /// <summary>
+    /// Ziskava cestu k aktualnemu predmetu
+    /// </summary>
     public virtual string GetReferency 
     { 
         get 
@@ -48,8 +51,8 @@ public abstract class Item : ScriptableObject, IEquatable<Item>
     /// Sluzi na porovnavanie predmetov
     /// Dolezite pri tvorbe listov
     /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
+    /// <param name="other">Druhy predmet</param>
+    /// <returns>PRAVDA ak su rovnake</returns>
     public virtual bool Equals(Item other)
     {
         return 
@@ -61,7 +64,7 @@ public abstract class Item : ScriptableObject, IEquatable<Item>
     /// <summary>
     /// Sluzi na rychle ziskanie vypisu vlastnosti predmetu
     /// </summary>
-    /// <returns></returns>
+    /// <returns>vypis PARAMETROV</returns>
     public override string ToString()
     {
         return 

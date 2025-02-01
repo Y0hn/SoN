@@ -66,7 +66,9 @@ public abstract class EntityStats : NetworkBehaviour
         } 
         set => defence = value;
     }
-
+    /// <summary>
+    /// Akcia sa zavola pri smrti
+    /// </summary>
     public Action OnDeath;
     protected Defence defence;  // iba na servery/hoste
     protected float timeToDespawn = 0f;
@@ -81,7 +83,7 @@ public abstract class EntityStats : NetworkBehaviour
 
 
     /// <summary>
-    /// Zavolane pri spawne u vsetkych
+    /// Zavolane pri vzniku objektu v sieti
     /// </summary>
     public override void OnNetworkSpawn()
     {
@@ -327,6 +329,11 @@ public abstract class EntityStats : NetworkBehaviour
     {
 
     }
+    /// <summary>
+    /// Zisti utok z dostupnych zbrani podla 
+    /// </summary>
+    /// <param name="wIndex">Index zbrane</param>
+    /// <returns>UTOK zo zbrane</returns>
     protected virtual Attack GetAttackByWeaponIndex(WeaponIndex wIndex)
     {
         string debug = $"GetAttackByWeaponIndex({wIndex})\nReturning:";

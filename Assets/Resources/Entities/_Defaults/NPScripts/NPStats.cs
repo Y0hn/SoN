@@ -65,6 +65,10 @@ public class NPStats : EntityStats
     }
     public bool AboutToFire    => aToFire <= Time.time;
     public float NextAttackTime=> atTime;
+    
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -72,11 +76,18 @@ public class NPStats : EntityStats
         
         SetWeaponIndex(0,0);
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// Spusta sa po vymazani objektu v ramci siete
+    /// </summary>
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
         AddToCount(-1);
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void EntitySetUp()
     {
         base.EntitySetUp();
@@ -87,12 +98,16 @@ public class NPStats : EntityStats
             aIPath.maxSpeed = speed.Value/100f;
         }
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void Update()
     {
         base.Update();
     }
-
-
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void OwnerSubsOnNetValChanged()
     {
         if (!IsServer) return;
@@ -115,6 +130,9 @@ public class NPStats : EntityStats
                 SetWeaponIndex(rase.swapons[i].weaponIndex);
         OnHit.Invoke();
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void Die()
     {
         base.Die();
@@ -131,29 +149,43 @@ public class NPStats : EntityStats
     }
     /// <summary>
     /// Zastavuje ziskavanie pozicie ciela na urcity cas pred vystrelenim
-    /// </summary>
     /// <param name="proj"></param>
+    /// </summary>
     public void SetAboutToFireTime(Projectile proj)
     {
         aToFire = proj.FireTime;
         aToFire *= 1 - RANGED_ATTACK_INACURRACY;
         aToFire += Time.time;
     }
-    
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="damage"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
     public override bool TakeDamage(Damage damage)
     {
         return base.TakeDamage(damage);
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="died"><inheritdoc/></param>
     public override void KilledEnemy(EntityStats died)
     {
         
     }
 #pragma warning disable IDE0051 // Remove unused private members
+    /// <summary>
+    /// Kresli grafiku v editore ak je zapnuty parameter "drawGizmo"
+    /// </summary>
     void OnDrawGizmos()
     {
         if (drawGizmo)
             OnDrawGizmosSelected();
     }
+    /// <summary>
+    /// Kresli grafiku v edtiore ak je objekt oznaceny
+    /// </summary>
     void OnDrawGizmosSelected()
     {
         float view = 0f;
@@ -185,6 +217,10 @@ public class NPStats : EntityStats
             }            
         }
     }
+    /// <summary>
+    /// Ak sa dotke vody tak sa znici
+    /// </summary>
+    /// <param name="collision"></param>
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (IsServer && collision.gameObject.layer.Equals(LayerMask.NameToLayer("Water")))

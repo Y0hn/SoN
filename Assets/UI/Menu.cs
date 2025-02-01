@@ -2,7 +2,9 @@ using AYellowpaper.SerializedCollections;
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
-using Unity.VisualScripting;
+/// <summary>
+/// Spravuje hlavne menu
+/// </summary>
 public class MenuScript : MonoBehaviour
 {
     int navLayer;
@@ -113,6 +115,10 @@ public class MenuScript : MonoBehaviour
         {"SubSett"}
         {"SubLoad"}
     */
+    
+    /// <summary>
+    /// Zavola sa na zaciatku
+    /// </summary>
     void Start()
     {
         conn = Connector.instance;
@@ -121,6 +127,10 @@ public class MenuScript : MonoBehaviour
         SetUpUI();
         meneTheme.Play();
     }
+    /// <summary>
+    /// Nastavi aktivne UI elementy
+    /// </summary>
+    /// <param name="active"></param>
     public void SetUpUI(bool active = true)
     {
         uis["BG"].SetActive(active);
@@ -151,6 +161,9 @@ public class MenuScript : MonoBehaviour
 
         
     }
+    /// <summary>
+    /// Nastavi textove polia
+    /// </summary>
     void SetTextFields()
     {
         textFields["TITLE"].text = Application.productName;
@@ -160,6 +173,9 @@ public class MenuScript : MonoBehaviour
         textFields["IPCodeError"].text = "";
         textFields["UserNameError"].text = "";
     }
+    /// <summary>
+    /// Prida posluchcov na stlacenie tlacidiel podla slovnika "buttons"
+    /// </summary>
     void SubscribeToButtons()
     {
         /*foreach (var b in buttons)
@@ -182,6 +198,9 @@ public class MenuScript : MonoBehaviour
 
         buttons["joinMultiJoin"].onClick.AddListener(delegate { /*pageChange.Play();*/ MultiMenuNav(5); });
     }
+    /// <summary>
+    /// Odide z vnorenej navigacie alebo zavire hru
+    /// </summary>
     void Exit()
     {
         if (navLayer > 0)
@@ -195,11 +214,19 @@ public class MenuScript : MonoBehaviour
         else
             Application.Quit();
     }
+    /// <summary>
+    /// Spravuje navigaciu v hlavnom menu
+    /// </summary>
+    /// <param name="to">VOLBA podla tlacitka</param>
     void MainMenuNav(int to)
     {
         navLayer = to;
         animator.SetInteger("layer", to);
     }
+    /// <summary>
+    /// Spravuje navigaciu v prvom podmenu - v hre pre jedneho hraca
+    /// </summary>
+    /// <param name="choice">VOLBA podla tlacitka</param>
     void SoloMenuNav(int choice)
     {
         navLayer *= 10;
@@ -215,6 +242,11 @@ public class MenuScript : MonoBehaviour
             default: Debug.LogWarning("Bad input [" + choice + "] on SoloNavigation!"); break;
         }
     }
+    /// <summary>
+    /// Spravuje navigaciu v druhom pod menu - v hre pre viac hracov <br />
+    /// Taktiez overuje vstupy zadane pouzivatelom
+    /// </summary>
+    /// <param name="choice">VOLBA podla tlacitka</param>
     void MultiMenuNav(int choice)
     {
         bool proceed = false;
@@ -240,6 +272,10 @@ public class MenuScript : MonoBehaviour
             pageChange.Play();
         }
     }
+    /// <summary>
+    /// Overi spravnost mena hraca
+    /// </summary>
+    /// <returns>PRAVDA ak je spravne</returns>
     bool NameTagCheck()
     {
         bool check = false;
@@ -264,6 +300,11 @@ public class MenuScript : MonoBehaviour
             FileManager.RegeneradeSettings();
         return check;
     }
+    /// <summary>
+    /// Spusti hru ako hostitel
+    /// </summary>
+    /// <param name="online">PRAVDA spusti online inak lokane</param>
+    /// <param name="load">PRAVDA nacita hru zo suboru</param>
     void StartConnection(bool online, bool load = false)
     {
         meneTheme.Stop();
@@ -277,6 +318,10 @@ public class MenuScript : MonoBehaviour
             Debug.LogError("NONIMPLEMENTED EXEPTION");
         }
     }
+    /// <summary>
+    /// Pokusi sa pripojit do hry pre viac hracov
+    /// </summary>
+    /// <returns>PRAVDA ak je pokus uspasny</returns>
     bool ConnectionCheck()
     {
         meneTheme.Stop();

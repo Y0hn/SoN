@@ -2,6 +2,9 @@ using UnityEngine;
 using TMPro;
 using System;
 using System.Collections.Generic;
+/// <summary>
+/// Spravuje schopnosti lokalneho hraca
+/// </summary>
 public class SkillPanel : AwakeBehavior
 {
     public event Action<bool> OnChangeAvailablePoints;
@@ -17,6 +20,9 @@ public class SkillPanel : AwakeBehavior
     Vector2[] limits = new Vector2[2];
     Vector2 startMouse;
     byte usedPointsCounter = 0, freePointCouter = 0;
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void Awake()
     {
         freePointCouter = 0; 
@@ -40,6 +46,9 @@ public class SkillPanel : AwakeBehavior
         if (ReloadLimimts)
             CalculateLimits();
     }
+    /// <summary>
+    /// Vypocita hranice pohybu pre grafiku stromu schopnosti
+    /// </summary>
     private void CalculateLimits()
     {
         limits[0] = new (
@@ -56,6 +65,9 @@ public class SkillPanel : AwakeBehavior
         OnChangeAvailablePoints?.Invoke(AvailablePoints);
         //Debug.Log("After level up to " + level + " AvailablePoints= " + AvailablePoints);
     }
+    /// <summary>
+    /// Nastava ked je schopnost kupena, 
+    /// </summary>
     public void SkillPointAplied()
     {
         if (AvailablePoints)
@@ -66,6 +78,10 @@ public class SkillPanel : AwakeBehavior
             OnChangeAvailablePoints?.Invoke(AvailablePoints);
         }
     }
+    /// <summary>
+    /// Hybe stromom schopnosti v ramci vopred vypocitanych hranic
+    /// </summary>
+    /// <param name="moveBy"></param>
     public void MoveSkills (Vector2 moveBy)
     {
         Vector2 newPosition = new (skills.position.x + moveBy.x, skills.position.y + moveBy.y);
@@ -81,6 +97,10 @@ public class SkillPanel : AwakeBehavior
                         $"Limits: \n0 => ({limits[0].x},{limits[0].y}) \n1 => ({limits[1].x},{limits[1].y})");*/
         }
     }
+    /// <summary>
+    /// Nacitava schopnosti zo suboru
+    /// </summary>
+    /// <param name="loadSkills"></param>
     public void LoadSkills(Skill[] loadSkills)
     {
         List<string> skills= new();

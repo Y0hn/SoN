@@ -143,6 +143,9 @@ public class PlayerStats : EntityStats
         onDeathWait = false;
         GetComponent<NetworkObject>().name = nameTag.text;
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void SubsOnNetValChanged()
     {
         base.SubsOnNetValChanged();
@@ -203,6 +206,9 @@ public class PlayerStats : EntityStats
             xpBar.LevelUP((byte)(now+1), xpMax.Value);
         };
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void Die()
     {
         OnDeath?.Invoke();
@@ -255,6 +261,11 @@ public class PlayerStats : EntityStats
         //Debug.Log($"Setting ID={id} to weapon index to new(att= {att} | wea= {wea})\nWeapons count: {Weapons.Length}");
         SetWeaponIndex(att, wea);
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="damage"></param>
+    /// <returns></returns>
     public override bool TakeDamage(Damage damage)
     {
         if (!IsServer) 
@@ -271,10 +282,18 @@ public class PlayerStats : EntityStats
 
         return !IsAlive.Value;
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override bool AttackTrigger()
     {
         return base.AttackTrigger();
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="died"><inheritdoc/></param>
     public override void KilledEnemy(EntityStats died)
     {
         base.KilledEnemy(died);

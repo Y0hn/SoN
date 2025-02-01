@@ -7,6 +7,9 @@ public class WeaponTester : MonoBehaviour
     [SerializeField] Weapon weapon;
     [SerializeField] Transform atPiont;
     [SerializeField] int AttackIndex = 0;
+    /// <summary>
+    /// Nastava ak je v editore zapnute Gizmos a je urcena zbran
+    /// </summary>
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
