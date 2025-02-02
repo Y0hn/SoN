@@ -356,7 +356,7 @@ public abstract class EntityStats : NetworkBehaviour
      *  |  _  /|  ___/| |    / __|
      *  | | \ \| |    | |____\__ \
      *  |_|  \_\_|     \_____|___/
-     */
+     *  *  *  *  *  *  *  *  *  *  */
     /// <summary>
     /// Vyhodi item, tak ze vytvori objekt na nahodnych suradniciach v dosahu
     /// a prida mu ho aku atribut

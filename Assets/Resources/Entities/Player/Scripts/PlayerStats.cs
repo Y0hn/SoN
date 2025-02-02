@@ -80,12 +80,17 @@ public class PlayerStats : EntityStats
         } 
     }
     public override Attack Attack => IsServer && skillTree != null ? skillTree.ModAttack(base.Attack) : base.Attack;    
-    
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
         TryLoadServerData();
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void Update()
     {
         if (chatTimer != 0 && chatTimer <= Time.time)
@@ -95,14 +100,19 @@ public class PlayerStats : EntityStats
             chatTimer = 0;
         }
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     protected override void TryLoadServerData()
     {
         
     }
+    /// <summary>
+    /// Pri odpojeni hraca
+    /// </summary>
     public override void OnNetworkDespawn()
     {
         if (!IsServer) return;
-
         // Ulozi hodnoty na servery
         FileManager.SaveClientData(this);
     }
@@ -316,10 +326,13 @@ public class PlayerStats : EntityStats
         return canStop;
     }
 
-
-
-    // RPCs
-
+    /*   _____  _____   _____     
+     *  |  __ \|  __ \ / ____|    
+     *  | |__) | |__) | |     ___ 
+     *  |  _  /|  ___/| |    / __|
+     *  | | \ \| |    | |____\__ \
+     *  |_|  \_\_|     \_____|___/
+     *  *  *  *  *  *  *  *  *  *  */
     /// <summary>
     /// Prida schopnost do stromu schopnosti
     /// </summary>

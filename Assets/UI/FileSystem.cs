@@ -70,6 +70,14 @@ public static class FileManager
         return acted;
     }
     /// <summary>
+    /// Ulozi data jedneho hraca pri jeho odpojeni
+    /// </summary>
+    /// <param name="player">ODPAJANY hrac</param>
+    public static void SaveClientData(PlayerStats player)
+    {
+        world.SaveRewritePlayer(player);
+    }
+    /// <summary>
     /// Ulozenie aktualneho sveta do binarneho suboru
     /// </summary>
     /// <param name="path">cesta a nazov suboru</param>
@@ -399,6 +407,14 @@ public static class FileManager
     {
         oldPlayerList.ForEach(p => {if (!players.Contains(p)) players.Add(p); } );
     }
+    /// <summary>
+    /// Prepise data len konkretnemu hracovi
+    /// </summary>
+    /// <param name="player"></param>
+    public void SaveRewritePlayer(PlayerStats player)
+    {
+        players[players.FindIndex(p => p.etName == player.name)] = new(player);
+    }    
     /// <summary>
     /// Suhrny vypis o ulozenych dat v subore 
     /// </summary>
