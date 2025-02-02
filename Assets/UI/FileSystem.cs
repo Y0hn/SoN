@@ -40,6 +40,9 @@ public static class FileManager
     /// Ulozene na kazdom klientovy lokalne
     /// </summary>
     private static Settings settings = new();
+    /// <summary>
+    /// Typ akcie na vykonanie so svetom
+    /// </summary>
     public enum WorldAction { Create, Load, Save, Check }
 
     /// <summary>
@@ -72,10 +75,13 @@ public static class FileManager
     /// <summary>
     /// Ulozi data jedneho hraca pri jeho odpojeni
     /// </summary>
-    /// <param name="player">ODPAJANY hrac</param>
-    public static void SaveClientData(PlayerStats player)
+    /// <param name="player">odpajany HRAC</param>
+    public static void SaveClientData(World.PlayerSave player)
     {
-        world.SaveRewritePlayer(player);
+        if (world != null)
+            world.SaveRewritePlayer(player);
+        else
+            world = new();
     }
     /// <summary>
     /// Ulozenie aktualneho sveta do binarneho suboru
@@ -85,15 +91,23 @@ public static class FileManager
     private static bool SaveWorldData(string path)
     {
         bool saved = false;
-        BinaryFormatter formatter = new();
-        FileStream stream = new(path, FileMode.Create);
+        FileStream stream = null;
 
         try {
-            world = new();
-            formatter.Serialize(stream, world);
-            saved = File.Exists(path);        
+            stream = new(path, FileMode.Create);
+            BinaryFormatter formatter = new();
+
+            World w = new();
+            if (world != null)
+                w.AddOfflinePlayers(world.players);
+
+            formatter.Serialize(stream, w);
+            saved = File.Exists(path);
+            if (saved)
+                world = w;
         } finally {
             stream.Close();
+            Log($"World ({(saved ? "was" : "wasn't")}) saved: {world}");
         }
 
         return saved;
@@ -107,7 +121,22 @@ public static class FileManager
     {
         bool loaded = false;
 
-
+        if (File.Exists(path))
+        {
+            FileStream stream = null;
+            try {
+                stream = new(path, FileMode.Open);
+                BinaryFormatter formatter = new();
+                World w = formatter.Deserialize(stream) as World;
+                world = w;
+                loaded = true;
+            } finally {
+                stream.Close();
+                Log($"World ({(loaded ? "was" : "wasn't")}) loaded: {world}");                
+            }
+        }
+        else
+            Log("Savefile not found: " + path, MessageType.ERROR);
 
         return loaded;
     }
@@ -240,7 +269,7 @@ public static class FileManager
         string log = $"[{DateTime.Now}] ";
         bool writeToFile = type != MessageType.LOG;
         if (writeToFile)
-            log += "[RECORDED] ";
+            log = "[RECORDED] " + log;
         log += message;
 
         // Zapise spravu do suboru
@@ -411,9 +440,9 @@ public static class FileManager
     /// Prepise data len konkretnemu hracovi
     /// </summary>
     /// <param name="player"></param>
-    public void SaveRewritePlayer(PlayerStats player)
+    public void SaveRewritePlayer(PlayerSave player)
     {
-        players[players.FindIndex(p => p.etName == player.name)] = new(player);
+        players[players.FindIndex(p => p.etName == player.etName)] = player;
     }    
     /// <summary>
     /// Suhrny vypis o ulozenych dat v subore 

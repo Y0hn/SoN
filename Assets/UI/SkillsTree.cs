@@ -71,7 +71,7 @@ public class SkillTree
         {
             if (mS.isSpeed)
             {
-                player.TerrainChangeRpc(mS.amount);
+                player.TerrainChangeRpc(Mathf.Abs(mS.amount));
                 debug += "Speed";
             }
             else
@@ -90,7 +90,7 @@ public class SkillTree
         else
             debug += "UNRECOGNIZED";
 
-        Debug.Log(debug + $"\n{skill}");
+        FileManager.Log(debug + $"\n{skill}", FileManager.MessageType.RECORD);
     }
     /// <summary>
     /// Zikanie zmeneneho utoku podla ziskanych schopnosti

@@ -108,13 +108,13 @@ public class PlayerStats : EntityStats
         
     }
     /// <summary>
-    /// Pri odpojeni hraca
+    /// Pri odpojeni hraca ulozi jeho data na server
     /// </summary>
     public override void OnNetworkDespawn()
     {
         if (!IsServer) return;
-        // Ulozi hodnoty na servery
-        FileManager.SaveClientData(this);
+        // Ulozi hodnoty iba na servery
+        FileManager.SaveClientData(new (this));
     }
     /// <summary>
     /// Nastavi zacinajuce hodnoty pre charakter

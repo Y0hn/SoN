@@ -51,7 +51,13 @@ using UnityEngine;
 [Serializable] public class ModSkill : Skill
 {
     public float amount;    // ak zaporne tak sa jedna o rychlost inak zivoty
+    /// <summary>
+    /// PRAVDA ak (amount * 100 % 100 != 0)
+    /// </summary>
     public bool isPercentyl => amount * 100 % 100 != 0;
+    /// <summary>
+    /// PRAVDA ak (amount < 0)
+    /// </summary>
     public bool isSpeed => amount < 0;
     public ModSkill ()
     {
