@@ -4,44 +4,50 @@ using System.Xml.Serialization;
 using System.IO;
 using System;
 using UnityEngine;
-using System.Linq;
-using Unity.VisualScripting;
-using NUnit.Framework.Constraints;
 
 /// <summary>
 /// Sluzi pre ziskavanie, nastavenie a ukladanie dat
 /// </summary>
 public static class FileManager
 {
-    // FROM RECOURCES
-    public const string TEXTURE_DEFAULT_PATH = @"Items/textures";
+    // relativna cesta v priecinku "RECOURCES"
     public const string ITEM_DEFAULT_PATH = @"Items";
-    public const string WEAPONS_DEFAULT_PATH = @"Items/weapons";
-    //public const string ARMORS_DEFAULT_PATH = @"Items/armors";
-    public const string WEAPONS_REF_DEFAULT_PATH = @"Items/textures/InGame";
-    public const string ATTACKS_ICONS_PATH = @"UI/at_types";
-    public const string PROJECTILES_OBJECTS_PATH = @"Projectiles/";
     public const string SKILLS_ICONS_PATH = @"UI/skills/";
+    public const string ATTACKS_ICONS_PATH = @"UI/at_types";
+    public const string WEAPONS_DEFAULT_PATH = @"Items/weapons";
+    public const string TEXTURE_DEFAULT_PATH = @"Items/textures";
+    public const string PROJECTILES_OBJECTS_PATH = @"Projectiles/";
+    public const string WEAPONS_REF_DEFAULT_PATH = @"Items/textures/InGame";
 
-    
-    // FROM APP DATA PATH
-    private const string LOG_DEFAULT_PATH = @"";
+    // Pridavky k ceste "Application.persistentDataPath"
+    private const string LOG_DEFAULT_PATH = @"/debug.log";
     private const string SETTINGS_DEFAULT_PATH = @"/settings.xml";
     private const string WORLD_DEFAULT_PATH = @"/saves/"; // + nazov
 
+    // Ukazovatele na cesty ukladaina
+    public static string AppData        => Application.persistentDataPath;
+    public static string SettingsPath   => AppData + SETTINGS_DEFAULT_PATH;
+    public static string LogPath        => AppData + LOG_DEFAULT_PATH;
+    public static string WorldPath      => AppData + WORLD_DEFAULT_PATH;
 
-    public static string AppData { get =>  Application.persistentDataPath; }
-    public static string SettingsPath   { get => AppData + SETTINGS_DEFAULT_PATH; }
-    public static string LogPath        { get => AppData + LOG_DEFAULT_PATH;    }
-    public static string WorldPath     { get => AppData + WORLD_DEFAULT_PATH;  }
+    /// <summary>
+    /// Drzi udaje o aktualnom ulozeni sveta <br />
+    /// Ulozene iba na Servery
+    /// </summary>
+    private static World world;
+    /// <summary>
+    /// Drzi udaje o aktualnom nastaveni hry <br />
+    /// Ulozene na kazdom klientovy lokalne
+    /// </summary>
+    private static Settings settings = new();
+    public enum WorldAction { Create, Load, Save, Check }
 
-
-    private static World world;     // Ulozene iba na servery
-    public enum WorldAction
-    {
-        Create, Load, Save, Check
-    }
-    public static bool WorldAct(WorldAction action)
+    /// <summary>
+    /// Akcia spustenia hry
+    /// </summary>
+    /// <param name="action"></param>
+    /// <returns>PRAVDA ak prebehlo uspesne</returns>
+    public static bool WorldAct(string name, WorldAction action)
     {
         bool acted= false;
 
@@ -52,31 +58,43 @@ public static class FileManager
                 acted = true;
                 break;
             case WorldAction.Load:
-                acted = LoadWorldData(WorldPath+"save1");
+                acted = LoadWorldData(WorldPath+name);
                 break;
             case WorldAction.Save:
-                acted = SaveWorldData(WorldPath+"save1");
+                acted = SaveWorldData(WorldPath+name);
                 break;
             case WorldAction.Check:
-                //acted = false;
                 break;
         }
 
         return acted;
     }
+    /// <summary>
+    /// Ulozenie aktualneho sveta do binarneho suboru
+    /// </summary>
+    /// <param name="path">cesta a nazov suboru</param>
+    /// <returns>PRAVDA ak prebehlo uspesne</returns>
     private static bool SaveWorldData(string path)
     {
         bool saved = false;
         BinaryFormatter formatter = new();
         FileStream stream = new(path, FileMode.Create);
 
-        world = new(world);
-        formatter.Serialize(stream, world);
-        saved = File.Exists(path);        
-        stream.Close();
+        try {
+            world = new();
+            formatter.Serialize(stream, world);
+            saved = File.Exists(path);        
+        } finally {
+            stream.Close();
+        }
 
         return saved;
     }
+    /// <summary>
+    /// Nacitanie sveta zo suboru
+    /// </summary>
+    /// <param name="path">cesta a nazov suboru</param>
+    /// <returns>PRAVDA ak prebehlo uspesne</returns>
     private static bool LoadWorldData(string path)
     {
         bool loaded = false;
@@ -85,11 +103,15 @@ public static class FileManager
 
         return loaded;
     }
-
-    private static Settings settings = new();
+    /// <summary>
+    /// Vytvori novy subor nastaveni podla aktualnych hodnot <br /> 
+    /// ulozi ho vo formate .xml a prepise ten stary
+    /// </summary>
     public static void RegeneradeSettings() // Called on ConnectToSever/SettingsClose
     {
+        // Ziska hodnoty aktualneho nastavenia 
         settings = new Settings();
+
         TextWriter writer = null;
         try
         {
@@ -100,26 +122,31 @@ public static class FileManager
         finally
         {
             writer?.Close();
-            Debug.Log("Settings regenerated:\n"+settings);
+            Log("Settings regenerated:\n"+settings, MessageType.RECORD);
         }
     }
+    /// <summary>
+    /// Nacita udaje nastaveni zo .xml suboru
+    /// </summary>
     public static void LoadSettings()
-    {/*
-        if (settings == null)
-            settings = new(false);*/
+    {
+        // Skontroluje ci subor nastaveni existuje
         if (File.Exists(SettingsPath))
         {
+            // ak ANO pokusi sa ho nacitat
             TextReader reader = null;
             try
             {
                 var serializer = new XmlSerializer(typeof(Settings));
                 reader = new StreamReader(SettingsPath);
-                settings.SetSettings((Settings)serializer.Deserialize(reader));
+
+                // Nacitane hodnoty zo suboru nastavi ako aktuale
+                settings.LoadSettings((Settings)serializer.Deserialize(reader));
             }
             finally
             {
                 reader?.Close();
-                Debug.Log("Settings loaded:\n"+settings);
+                Log("Settings loaded:\n"+settings, MessageType.RECORD);
             }
         }
     }
@@ -194,27 +221,43 @@ public static class FileManager
         return list.ToArray();
     }
 
-    public enum MessageType { LOG, RECORD, ERROR, WARNING }
+    /// <summary>
+    /// Ziskavanie a zapisovanie blizsich informacii o stave hry
+    /// </summary>
+    /// <param name="message">sprava s udajmi</param>
+    /// <param name="type">typ spravy</param>
     public static void Log(string message, MessageType type = MessageType.LOG)
     {
+        // Zapise aktualny cas
+        string log = $"[{DateTime.Now}] ";
+        bool writeToFile = type != MessageType.LOG;
+        if (writeToFile)
+            log += "[RECORDED] ";
+        log += message;
+
+        // Zapise spravu do suboru
+        if (writeToFile)
+        {
+            using StreamWriter sw = new (LogPath, true);
+            sw.WriteLine(log);
+            sw.Flush();
+            sw.Close();
+        }
+
+        // Vypise spravu do konzoly v editore
         switch (type)
         {
-            case MessageType.RECORD:
-                Debug.Log("[RECORDED] " + message);
-                break;
-            case MessageType.ERROR:
-                Debug.LogWarning("[RECORDED] " + message);
-                break;
-            case MessageType.WARNING:
-                Debug.LogError("[RECORDED] " + message);
-                break;
+            default:                    Debug.Log(log);         break;
+            case MessageType.ERROR:     Debug.LogError(log);    break;
+            case MessageType.WARNING:   Debug.LogWarning(log);  break;
         }
     }
-    public static void SaveClientData(EntityStats stats)
-    {
-
-    }
+    /// <summary>
+    /// Typ zapisu v denniku ("LOG" sa do suboru nepise)
+    /// </summary>
+    public enum MessageType { LOG, RECORD, ERROR, WARNING }
 }
+
 /// <summary>
 /// Drzi informacie o poslednej konfiguracii nastaveni
 /// </summary>
@@ -241,16 +284,16 @@ public static class FileManager
             online = GameManager.UI.Online;
             fullSc = GameManager.UI.FullSc;
         } catch (Exception ex) {
-            Debug.LogWarning($"Setting Creation Error \nExeption: {ex.Message}\nSource: {ex.Source}");
-            // Revert to defaults Settings
+            FileManager.Log($"Setting Creation Error \nExeption: {ex.Message}\nSource: {ex.Source}", FileManager.MessageType.WARNING);
         }
     }
     /// <summary>
     /// Nastavi hodnoty do statickych clenov menu
     /// </summary>
     /// <param name="settings"></param>
-    public void SetSettings(Settings settings)
+    public void LoadSettings(Settings settings)
     {
+        // Nastavi hodnoty z 
         online = settings.online;
         fullSc = settings.fullSc;
         audioS = settings.audioS;
@@ -258,6 +301,7 @@ public static class FileManager
         playerName = settings.playerName;
         lastConnection = settings.lastConnection;
         
+        // Nastavi vlastnosti hry podla novych hodnot
         Connector.instance.codeText.text = lastConnection;
         GameManager.instance.PlayerName = playerName;
         GameManager.UI.Audios = audioS;
@@ -266,7 +310,7 @@ public static class FileManager
         GameManager.UI.FullSc = fullSc;
     }
     /// <summary>
-    /// Sluzi ako moznost kontroly spravnosti
+    /// Sluzi ako moznost kontroly spravnosti ulozenia nastaveni
     /// </summary>
     /// <returns></returns>
     public override string ToString()
@@ -290,15 +334,16 @@ public static class FileManager
             $"Auidos list: {auL}";
     }
 }
+
 /// <summary>
-/// Drzi hodnoty pre cely svet
+/// Drzi hodnoty potrebne pre bezproblemove nacitanie zo suboru
 /// </summary>
 [Serializable] public class World
 {
-    public readonly List<ItemOnFoor> items;
-    public readonly List<PlayerSave> players;
-    public readonly List<EntitySave> entities;
-    public readonly BossSave boss;
+    public List<ItemOnFoor> items;
+    public List<PlayerSave> players;
+    public List<EntitySave> entities;
+    public BossSave boss;
 
     /// <summary>
     /// Ziska udaje o svete a zapise ich od premennych
@@ -346,19 +391,29 @@ public static class FileManager
         }
     }
     /// <summary>
-    /// Spaja data (o hracoch) z stareho aj aktualneho ulozenia
+    /// Spaja data o hracoch zo stareho aj aktualneho ulozenia <br />
+    /// Sluzi na uchovanie dat o hracoch, ktori niesu pripojeny
     /// </summary>
-    /// <param name="old_world"></param>
-    public World(World old_world)
+    /// <param name="oldPlayerList">Old Player list</param>
+    public void AddOfflinePlayers(List<PlayerSave> oldPlayerList)
     {
-        World new_world= new();
-        items = new_world.items;
-        players = new_world.players;
-        entities = new_world.entities;
-
-        old_world.players.ForEach(p => {if (!players.Contains(p)) players.Add(p); } ); // najde vsetkych hracov co nesu pripojeny
+        oldPlayerList.ForEach(p => {if (!players.Contains(p)) players.Add(p); } );
     }
-
+    /// <summary>
+    /// Suhrny vypis o ulozenych dat v subore 
+    /// </summary>
+    /// <returns>SUHRN informacii</returns>
+    public override string ToString()
+    {
+        string s = "";
+        s += $"items.Count= {items.Count}, ";
+        s += $"entities.Count= {entities.Count}, ";
+        s += $"Boss: {boss}";
+        s += $"players.Count= {players.Count}\n";
+        s += "Mena Hracov: ";
+        players.ForEach(p => s += p.etName + ", ");
+        return s;
+    }    
     /// <summary>
     /// Drzi udaje o itemoch na zemi
     /// </summary>
@@ -414,7 +469,6 @@ public static class FileManager
         {
 
         }
-
         /// <summary>
         /// Zrdi informacie o inventari hraca
         /// </summary>
@@ -494,7 +548,6 @@ public static class FileManager
             return s;
         }
     }
-
     /// <summary>
     /// Drzi informacie o polohe v dvoj rozmernom svete <br />
     /// "Vector2" nie je systemovo Srializovatelny
@@ -528,123 +581,3 @@ public static class FileManager
         }
     }
 }
-/********************************************************************************** OLD CODE *****************************************************************************\
-public static class SaveSystem
-{
-    public static bool CheckSaveNeed()
-    {
-        return CompareData(GetData(), Load());
-    }
-    public static bool SaveDataExist(string filename = "data")
-    {
-        Data d = Load();
-        return DataCheck(d);
-    }
-    private static bool DataCheck(Data data)
-    {
-        bool check = true;
-        try
-        {
-            // Level number
-            check &= data != null;
-            check &= data.curLevel >= 0;
-            check &= data.level.roomsPos.Length == data.level.rooms.Length;
-
-
-            // Entities => min. 1 {Player}
-            check &= data.entities.Length >= 1;
-            foreach (Data.CharakterData e in data.entities)
-                check &= e.curHealth >= 0 && e.charName != "" && e.position != null;
-
-            // Inventory + Equipment DUPLICATE CHECK
-            check &= data.inventory.items.Count >= 0;
-            check &= data.inventory.equipment.Length >= 0;
-            List<ItemData> list = new();
-            for (int i = 0, e = 0; (i < data.inventory.items.Count || data.inventory.equipment.Length > e) && check; i++, e++)
-            {
-                if (i < data.inventory.items.Count)
-                {
-                    check &= !list.Contains(data.inventory.items[i]);
-                    list.Add(data.inventory.items[i]);
-                }
-                if (e < data.inventory.equipment.Length)
-                {
-                    check &= !list.Contains(data.inventory.equipment[e]);
-                    list.Add(data.inventory.equipment[e]);
-                }
-            }
-            list.Clear();
-
-            // Interactables
-            check &= data.interactables.positions.Length == data.interactables.items.Length;
-        }
-        catch
-        {
-            check = false;
-        }
-        if (check)
-            Debug.Log("Passed data check!");
-        else
-            Debug.Log("Failed data check!");
-        return check;
-    }
-    private static void DebugLogForComperators(bool pass, string message)
-    {
-        if (debug)
-        {
-            if (pass)
-                Debug.Log(message + " passed!");
-            else
-                Debug.Log(message + " failed!");
-        }
-    }
-    private static void DebugLogDataOut(Data data, string action)
-    {
-        if (debug)
-            Debug.Log($"Data {action} " + data);
-    }
-    public static void Save()
-    {
-        BinaryFormatter formatter = new();
-        FileStream stream = new(Path("data"), FileMode.Create);
-
-        Data data = GetData();
-        formatter.Serialize(stream, data);
-        stream.Close();
-        DebugLogDataOut(data, "saved");
-    }
-    private static Data GetData()
-    {
-        // Entities DATA
-        List<Data.CharakterData> charakterData = new()
-        { GameManager.instance.playerStats.SaveData() };
-        foreach (GameObject e in GameObject.FindGameObjectsWithTag("Enemy"))
-            charakterData.Add(e.GetComponent<EnemyStats>().SaveData());
-        if (GameManager.instance.boss != null)
-            charakterData.Add(GameManager.instance.boss.SaveData());
-
-        return new(charakterData);
-    }
-    public static Data Load()
-    {
-        if (File.Exists(Path("data")))
-        {
-            BinaryFormatter formatter = new();
-            FileStream steam = new(Path("data"), FileMode.Open);
-
-            Data data = formatter.Deserialize(steam) as Data;
-            steam.Close();
-            DebugLogDataOut(data, "loaded");
-            return data;
-        }
-        else
-        {
-            Debug.LogError("Savefile not found: " + Path("data"));
-            return null;
-        }
-    }
-    private static string Path(string filename)
-    {
-        string path = Application.persistentDataPath + "/" + filename + ".file";
-        return path;
-    }*/

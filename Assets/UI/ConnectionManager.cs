@@ -191,9 +191,9 @@ public class Connector : MonoBehaviour
     private void LoadWorld(bool load = false, bool host = true)
     {
         if (host && load)
-            FileManager.WorldAct(FileManager.WorldAction.Load/*get path to world save file*/);
+            FileManager.WorldAct("", FileManager.WorldAction.Load/*get path to world save file*/);
         else if (host && !load)
-             FileManager.WorldAct(FileManager.WorldAction.Create);
+             FileManager.WorldAct("", FileManager.WorldAction.Create);
         // nacitat svet
     }
     /// <summary>
