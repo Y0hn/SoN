@@ -26,7 +26,10 @@ public class Connector : MonoBehaviour
     /// Ziska si lokanu ip adresu pocitaca
     /// </summary>
     /// <returns>IP_ADRESA</returns>
-    private string ServerIP { get { return IPManager.GetIP(); } }
+    private string ServerIP => IPManager.GetIP();
+    private Vector2 PlayerRandomSpawn => 
+        new(spawnPoint.position.x + Random.Range(-spawnRange.x, spawnRange.x), 
+            spawnPoint.position.y + Random.Range(-spawnRange.y, spawnRange.y));
 
     void Awake()
     {
@@ -158,18 +161,12 @@ public class Connector : MonoBehaviour
                 JoinLAN(connection);
             }
             // RELAY CONNECTION
-            else // if (connection.Lenght == 6)
+            else
             {
                 errorCode = "code";
                 JoinRelay(connection);
-            }/*
-            else 
-            {
-                errorCode += " in worng format";
-            }*/
-        }
-        catch
-        {
+            }
+        } catch {
             errorCode += " is invalid";
             join = false;
         }
@@ -192,10 +189,10 @@ public class Connector : MonoBehaviour
     /// <param name="host"></param>
     private void LoadWorld(bool load = false, bool host = true)
     {
-        if (host && load)
-            FileManager.WorldAct("", FileManager.WorldAction.Load/*get path to world save file*/);
+        if      (host && load)
+            FileManager.WorldAct("", FileManager.WorldAction.Load);
         else if (host && !load)
-             FileManager.WorldAct("", FileManager.WorldAction.Create);
+            FileManager.WorldAct("", FileManager.WorldAction.Create);
         // nacitat svet
     }
     /// <summary>
@@ -208,7 +205,6 @@ public class Connector : MonoBehaviour
             netMan.DisconnectClient(id);
         else
             netMan.Shutdown();
-        //Environment.Exit(0);
     }
 
     /// <summary>
@@ -219,10 +215,12 @@ public class Connector : MonoBehaviour
     private void SpawnPlayer(ulong id)
     {
         Transform t = netMan.ConnectedClients[id].PlayerObject.transform;
-        Vector2 pos = spawnPoint.position;
-        pos = new(
-            pos.x + Random.Range(-spawnRange.x, spawnRange.x), 
-            pos.y + Random.Range(-spawnRange.y, spawnRange.y));
-        t.position = pos;
+        
+        if (FileManager.World.TryGetPlayerSave(t.name, out var save))
+        {
+            t.position = save.Position;
+        }
+        else
+            t.position = PlayerRandomSpawn;
     }
 }

@@ -35,6 +35,8 @@ public static class FileManager
     /// Ulozene iba na Servery
     /// </summary>
     private static World world;
+    public static World World => world;
+
     /// <summary>
     /// Drzi udaje o aktualnom nastaveni hry <br />
     /// Ulozene na kazdom klientovy lokalne
@@ -445,6 +447,17 @@ public static class FileManager
         players[players.FindIndex(p => p.etName == player.etName)] = player;
     }    
     /// <summary>
+    /// Ziska udaje hraca na zaklade mena
+    /// </summary>
+    /// <param name="name">MENO hraca</param>
+    /// <param name="player">vychadzajuce UDAJE hraca</param>
+    /// <returns></returns>
+    public bool TryGetPlayerSave(string name, out PlayerSave player)
+    {
+        player = players.Find(p => p.etName == name);
+        return player != null;
+    }
+    /// <summary>
     /// Suhrny vypis o ulozenych dat v subore 
     /// </summary>
     /// <returns>SUHRN informacii</returns>
@@ -485,6 +498,8 @@ public static class FileManager
         public Cordinates position;
         public string etName;
         public float hp;
+
+        public Vector2 Position => position.Vector;
 
         public EntitySave(EntityStats entity)
         {
