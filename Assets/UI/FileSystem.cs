@@ -159,7 +159,7 @@ public static class FileManager
         finally
         {
             writer?.Close();
-            Log("Settings regenerated:\n"+settings, MessageType.RECORD);
+            Log("Settings regenerated:\n"+settings);
         }
     }
     /// <summary>
@@ -183,7 +183,7 @@ public static class FileManager
             finally
             {
                 reader?.Close();
-                Log("Settings loaded:\n"+settings, MessageType.RECORD);
+                Log("Settings loaded:\n"+settings);
             }
         }
     }
