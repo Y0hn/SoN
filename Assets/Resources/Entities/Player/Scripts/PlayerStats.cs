@@ -89,7 +89,21 @@ public class PlayerStats : EntityStats
             return w.ToArray();
         } 
     }
-    
+    public World.PlayerSave.SkillTreeSave SkillTreeSave => IsServer ? skillTree.SkillTreeSave : null;
+    public World.PlayerSave.InventorySave InventorySave 
+    {
+        get
+        {
+            string[] inv = new string[inventory.Count];
+            string[] eq = new string[equipment.Count];
+            for (int i = 0; i < inventory.Count; i++)
+                inv[i] = inventory[i].ToString();
+            for (int i = 0; i < equipment.Count; i++)
+                eq[i] = equipment[i].ToString();
+
+            return new (inv, eq);
+        }
+    }
     public override Attack Attack => IsServer && skillTree != null ? skillTree.ModAttack(base.Attack) : base.Attack;    
     /// <summary>
     /// <inheritdoc/>

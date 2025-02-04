@@ -527,7 +527,8 @@ public static class FileManager
         public int maxHp;
         public PlayerSave(PlayerStats player) : base(player)
         {
-            
+            inventory = player.InventorySave;
+            skillTree = player.SkillTreeSave;
         }
         /// <summary>
         /// Zrdi informacie o inventari hraca
@@ -536,6 +537,17 @@ public static class FileManager
         {
             private string[] items;
             private string[] equiped;
+
+            /// <summary>
+            /// Vytvori objekt drziaci udaje o inventary hraca
+            /// </summary>
+            /// <param name="items">PREMETY v inventary</param>
+            /// <param name="equiped">nosene PREDMETY</param>
+            public InventorySave(string[] items, string[] equiped)
+            {
+                this.items = items;
+                this.equiped = equiped;
+            }
 
             /// <summary>
             /// Vypis vlasnosti ulozeneho inventara hraca
@@ -553,6 +565,14 @@ public static class FileManager
         {
             public Skill[] skills;
             public string[] usingUtils;
+
+            public SkillTreeSave(Skill[] skills, string[] actives = null)
+            {
+                this.skills = skills;
+
+                // ak su aktivyty "null" nastavi pole s 2-ma hodnotami ("")
+                usingUtils = actives ?? new string[] { "", ""} ;
+            }
 
             /// <summary>
             /// Vypis vlastosti ulozeneho stromu schopnosti 

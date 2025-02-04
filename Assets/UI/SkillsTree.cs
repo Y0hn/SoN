@@ -14,6 +14,11 @@ public class SkillTree
     Dictionary<Damage.Type, float> offRate;
 #pragma warning restore IDE0044 // Add readonly modifier
 
+    public World.PlayerSave.SkillTreeSave SkillTreeSave
+    {
+        get => new (skills.ToArray(), new string[2]);
+    }
+
     public SkillTree ()
     {
         skills = new ();
