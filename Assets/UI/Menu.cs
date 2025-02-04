@@ -207,7 +207,7 @@ public class MenuScript : MonoBehaviour
         {
             if (navLayer == 3/* || 2 == navLayer*/)
                 FileManager.RegeneradeSettings();
-            // Chod o layer vyssie
+            // Chod o vrstvu vyssie
             navLayer /= 10;
             animator.SetInteger("layer", navLayer);
         }

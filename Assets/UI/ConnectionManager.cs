@@ -14,18 +14,20 @@ using Unity.Networking.Transport.Relay;
 public class Connector : MonoBehaviour
 {
     public static Connector instance;
-    public Transform spawnPoint;
+
     [SerializeField] Vector2 spawnRange = new(5,5);
-    public TMP_Text codeText;
     [SerializeField] int maxConnections = 10;
+    [SerializeField] UnityTransport tporter;
+    public Transform spawnPoint;
+    public TMP_Text codeText;
     public NetworkManager netMan;
+
     /// <summary>
     /// Ziska si lokanu ip adresu pocitaca
     /// </summary>
     /// <returns>IP_ADRESA</returns>
-    private string serverIP { get { return IPManager.GetIP(IPManager.AddressForm.IPv4); } }
+    private string ServerIP { get { return IPManager.GetIP(); } }
 
-    
     void Awake()
     {
         if (instance == null)
@@ -63,7 +65,7 @@ public class Connector : MonoBehaviour
 
         var relayServerData = new RelayServerData(allocation, "dtls");
 
-        netMan.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+        tporter.SetRelayServerData(relayServerData);
         
         if (host)
             netMan.StartHost();
@@ -99,14 +101,14 @@ public class Connector : MonoBehaviour
     /// <param name="host"></param>
     void CreateLAN(bool host = true)
     {
-        netMan.GetComponent<UnityTransport>().SetConnectionData(serverIP, 7777);
+        tporter.SetConnectionData(ServerIP, 7777);
 
         if (host)
             netMan.StartHost(); 
         else
             netMan.StartServer();
 
-        codeText.text = serverIP;
+        codeText.text = ServerIP;
     }
     /// <summary>
     /// Pripoji sa na server v lokalnej sieti
@@ -114,9 +116,9 @@ public class Connector : MonoBehaviour
     /// <param name="serverIP"></param>
     void JoinLAN(string serverIP)
     {
-        netMan.GetComponent<UnityTransport>().SetConnectionData(serverIP, 7777);
+        tporter.SetConnectionData(ServerIP, 7777);
         if (netMan.StartClient())
-            codeText.text = serverIP;
+            codeText.text = ServerIP;
     }
     /// <summary>
     /// Zapne server na lokalnej sieti alebo na online prepojeni
@@ -180,7 +182,7 @@ public class Connector : MonoBehaviour
     /// </summary>
     public void CreateSolo()
     {
-        netMan.GetComponent<UnityTransport>().SetConnectionData("127.0.0.1", 7777);
+        tporter.SetConnectionData("127.0.0.1", 7777);
         netMan.StartHost(); 
     }
     /// <summary>
@@ -216,7 +218,7 @@ public class Connector : MonoBehaviour
     /// <param name="id">ID hraca</param>
     private void SpawnPlayer(ulong id)
     {
-        Transform t = NetworkManager.Singleton.ConnectedClients[id].PlayerObject.transform;
+        Transform t = netMan.ConnectedClients[id].PlayerObject.transform;
         Vector2 pos = spawnPoint.position;
         pos = new(
             pos.x + Random.Range(-spawnRange.x, spawnRange.x), 

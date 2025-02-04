@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Spravuje schopnosti lokalneho hraca
 /// </summary>
-public class SkillPanel : AwakeBehavior
+public class SkillPanel : MonoBehaviour
 {
     public event Action<bool> OnChangeAvailablePoints;
     public bool AvailablePoints => 0 < freePointCouter;
@@ -21,16 +21,14 @@ public class SkillPanel : AwakeBehavior
     Vector2 startMouse;
     byte usedPointsCounter = 0, freePointCouter = 0;
     /// <summary>
-    /// <inheritdoc/>
+    /// Nastavi pociatocne hodnoty pre pocitadla <br />
+    /// Vypocita limity pohybu stromu
     /// </summary>
-    public override void Awake()
+    void Awake()
     {
         freePointCouter = 0; 
         usedPointsCounter = 0;
-        button.onEnterHold += delegate
-        {
-            startMouse = game.MousePos;
-        };
+        button.onEnterHold += delegate => startMouse = game.MousePos;
         CalculateLimits();
         skillCounterText.text = freePointCouter.ToString();
         //OnChangeAvailablePoints += (bool change) => { Debug.Log($"OnChangeAvailablePoints.Invoked({change})"); };
@@ -63,7 +61,6 @@ public class SkillPanel : AwakeBehavior
         freePointCouter = (byte)(level - usedPointsCounter);
         skillCounterText.text = freePointCouter.ToString();
         OnChangeAvailablePoints?.Invoke(AvailablePoints);
-        //Debug.Log("After level up to " + level + " AvailablePoints= " + AvailablePoints);
     }
     /// <summary>
     /// Nastava ked je schopnost kupena, 

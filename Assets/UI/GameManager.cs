@@ -2,10 +2,10 @@ using AYellowpaper.SerializedCollections;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine;
-using TMPro;
 using Unity.Netcode;
 using System.Collections.Generic;
 using System;
+using TMPro;
 /// <summary>
 /// Managing Game and PLayerUI - has 'instance'
 /// </summary>
@@ -20,7 +20,6 @@ public class GameManager : MonoBehaviour
             a.Awake();
         }*/
     }
-    //[SerializeField] List<AwakeBehavior> awakes;
     [SerializeField] SkillPanel skillTree;
     [SerializeField] MenuScript menu;
     [SerializeField] Connector conn;

@@ -191,7 +191,7 @@ public static class FileManager
     /// Vrati cestu k ikone utoku podla typu utoku 
     /// </summary>
     /// <param name="type">typ utoku</param>
-    /// <returns>CESTA_K_IKONE</returns>
+    /// <returns>CESTA k ikone</returns>
     public static string GetAttackRefferency(Attack.Type type)
     {
         string refer = ATTACKS_ICONS_PATH + "/";
@@ -223,7 +223,7 @@ public static class FileManager
     /// Ziska ikonu schopnosti podla Schopnosti
     /// </summary>
     /// <param name="skill"></param>
-    /// <returns></returns>
+    /// <returns>CESTA k texture skillu</returns>
     public static string[] GetSkillRefferency(Skill skill)
     {
         List<string> list = new();
