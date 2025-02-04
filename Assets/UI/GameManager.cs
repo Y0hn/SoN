@@ -11,15 +11,11 @@ using TMPro;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
+    void Awake() => instance = this;
     public static GameManager instance;
-    void Awake()    
-    { 
-        instance = this;
-        /*foreach (var a in awakes)
-        {
-            a.Awake();
-        }*/
-    }
+    public static MapScript Map         { get; set; }
+    public static MenuScript UI         { get => instance.menu; }
+    
     [SerializeField] SkillPanel skillTree;
     [SerializeField] MenuScript menu;
     [SerializeField] Connector conn;
@@ -65,7 +61,6 @@ public class GameManager : MonoBehaviour
     public Inventory inventory;
     private List<Utility.Function> utilities = new();
     private const byte MAX_NPC_COUNT = 25;
-    public Transform spawnpoint     { get; set; }
     public Vector2 MousePos
     { 
         get 
@@ -83,7 +78,6 @@ public class GameManager : MonoBehaviour
     public bool PlayerAble          { get => !(paused || chatting || inventory.open); }
     public string PlayerName        { get { return inputFields["name"].text.Trim(); } set { inputFields["name"].text = value; } }
     public bool IsServer            { get { bool? b = conn.netMan?.IsServer; return b != null && b.Value; } }
-    public static MenuScript UI     { get => instance.menu; }
     void Start()
     {
         uiPanels["mainCam"].SetActive(true);
@@ -96,7 +90,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         if (IsServer && NPStats.NPCount < MAX_NPC_COUNT)
-            MapScript.map.SpawnEnemy();
+            Map.SpawnEnemy();
     }
     /// <summary>
     /// Nastavi hodnoty pre textove polia <br />
@@ -192,7 +186,7 @@ public class GameManager : MonoBehaviour
         if (IsServer)
         {
             GameObject v = Resources.Load<GameObject>("Entities/Veles/Veles");
-            Instantiate(v, spawnpoint).GetComponent<NetworkObject>().Spawn();
+            Instantiate(v, Map.BossSpawn).GetComponent<NetworkObject>().Spawn();
 
         }
     }

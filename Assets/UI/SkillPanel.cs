@@ -28,7 +28,7 @@ public class SkillPanel : MonoBehaviour
     {
         freePointCouter = 0; 
         usedPointsCounter = 0;
-        button.onEnterHold += delegate => startMouse = game.MousePos;
+        button.onEnterHold += delegate { startMouse = game.MousePos; };
         CalculateLimits();
         skillCounterText.text = freePointCouter.ToString();
         //OnChangeAvailablePoints += (bool change) => { Debug.Log($"OnChangeAvailablePoints.Invoked({change})"); };

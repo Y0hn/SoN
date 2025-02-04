@@ -527,7 +527,7 @@ public static class FileManager
         public int maxHp;
         public PlayerSave(PlayerStats player) : base(player)
         {
-
+            
         }
         /// <summary>
         /// Zrdi informacie o inventari hraca

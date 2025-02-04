@@ -18,9 +18,10 @@ public class Connector : MonoBehaviour
     [SerializeField] Vector2 spawnRange = new(5,5);
     [SerializeField] int maxConnections = 10;
     [SerializeField] UnityTransport tporter;
-    public Transform spawnPoint;
-    public TMP_Text codeText;
     public NetworkManager netMan;
+    public TMP_Text codeText;
+
+    public Transform SpawnPoint { get; set;}
 
     /// <summary>
     /// Ziska si lokanu ip adresu pocitaca
@@ -28,8 +29,8 @@ public class Connector : MonoBehaviour
     /// <returns>IP_ADRESA</returns>
     private string ServerIP => IPManager.GetIP();
     private Vector2 PlayerRandomSpawn => 
-        new(spawnPoint.position.x + Random.Range(-spawnRange.x, spawnRange.x), 
-            spawnPoint.position.y + Random.Range(-spawnRange.y, spawnRange.y));
+        new(SpawnPoint.position.x + Random.Range(-spawnRange.x, spawnRange.x), 
+            SpawnPoint.position.y + Random.Range(-spawnRange.y, spawnRange.y));
 
     void Awake()
     {
@@ -208,8 +209,9 @@ public class Connector : MonoBehaviour
     }
 
     /// <summary>
-    /// Je volana na servery hned po pripojeni hraca do hry.
-    /// Nastavuje jeho poziciu v ramci hranic stanovenych Vektorom "spawnRange"
+    /// Je volana na servery hned po pripojeni hraca do hry. <br />
+    /// Nastavuje jeho poziciu v ramci hranic stanovenych Vektorom "spawnRange" <br />
+    /// Alebo nastavi jeho poziciu podla ulozenej v pamati
     /// </summary>
     /// <param name="id">ID hraca</param>
     private void SpawnPlayer(ulong id)
@@ -222,5 +224,16 @@ public class Connector : MonoBehaviour
         }
         else
             t.position = PlayerRandomSpawn;
+    }
+    /// <summary>
+    /// Je volana z hraca, ktory sa chce ozivit. <br />
+    /// Nastavi jeho poziciu na vychodiskovu poziciu a ulozi jeho data
+    /// </summary>
+    /// <param name="id"></param>
+    public void RespawnPlayer(ulong id)
+    {
+        Transform t = netMan.ConnectedClients[id].PlayerObject.transform;
+        t.position = PlayerRandomSpawn;
+        FileManager.World.SaveRewritePlayer(new (t.GetComponent<PlayerStats>()));
     }
 }

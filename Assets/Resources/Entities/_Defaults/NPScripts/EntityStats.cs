@@ -328,7 +328,7 @@ public abstract class EntityStats : NetworkBehaviour
     /// <summary>
     /// Vyziada si uložené dáta 
     /// </summary>
-    protected virtual void TryLoadServerData()
+    protected virtual void LoadSavedData()
     {
 
     }

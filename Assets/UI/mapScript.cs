@@ -1,6 +1,5 @@
 using Unity.Netcode;
 using UnityEngine;
-using Pathfinding;
 using System.Linq;
 /// <summary>
 /// Sluzi pre spravne nacitanie udajov mapy a zaroven aj zo serveru vytvara nepriatelov na liniiach mapy
@@ -13,23 +12,24 @@ public class MapScript : MapSizer
     [SerializeField] Transform BossSpawnPoint;
     [SerializeField] GameObject[] regularEnemiesTier1;
     [SerializeField] GameObject[] regularEnemiesTier2;
-    //[SerializeField] GameObject boss;
-    public static MapScript map;
+
+    public Transform PlaySpawn => PlayerSpawnPoint;
+    public Transform BossSpawn => BossSpawnPoint;
+
     /// <summary>
     /// Zavola sa pred prvym snimkom obrazovky hry
     /// </summary>
     protected void Awake()
     {
-        if (map == null)
-            map = this;
+        if (Connector.instance.netMan.IsServer)
+            GameManager.Map = this;
     }
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     protected override void Start()
     {
-        Connector.instance.spawnPoint = PlayerSpawnPoint;
-        GameManager.instance.spawnpoint = BossSpawnPoint;
+        
     }
     /// <summary>
     /// <inheritdoc/>

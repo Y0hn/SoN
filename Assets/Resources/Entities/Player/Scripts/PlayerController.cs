@@ -111,7 +111,7 @@ public class PlayerController : EntityController
     {
         if (!Stats.IsAlive.Value)
         {
-            SetLiveRpc(/*OwnerClientId*/);
+            SetLiveRpc(OwnerClientId);
             return;
         }
         attacking = !context.canceled;
@@ -133,7 +133,7 @@ public class PlayerController : EntityController
         {
             stats.Animator.SetTrigger("attack");
             stats.Animator.SetTrigger("interuptAttack");
-            Debug.Log("Attack interupted");
+            FileManager.Log("Attack interupted");
         }
     }
 
@@ -141,9 +141,9 @@ public class PlayerController : EntityController
     /// <summary>
     /// Znovu zrodi hraca
     /// </summary>
-    [Rpc(SendTo.Server)] protected void SetLiveRpc(/*ulong playerId*/)
+    [Rpc(SendTo.Server)] protected void SetLiveRpc(ulong playerId)
     {
-        //NetworkManager.Singleton.ConnectedClients[playerId].PlayerObject.GetComponent<PlayerStats>().IsAlive.Value = true;
         Stats.IsAlive.Value = true;
+        Connector.instance.RespawnPlayer(playerId);
     }
 }

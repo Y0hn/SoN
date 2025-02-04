@@ -89,6 +89,7 @@ public class PlayerStats : EntityStats
             return w.ToArray();
         } 
     }
+    
     public override Attack Attack => IsServer && skillTree != null ? skillTree.ModAttack(base.Attack) : base.Attack;    
     /// <summary>
     /// <inheritdoc/>
@@ -96,7 +97,6 @@ public class PlayerStats : EntityStats
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        TryLoadServerData();
     }
     /// <summary>
     /// <inheritdoc/>
@@ -113,10 +113,11 @@ public class PlayerStats : EntityStats
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    protected override void TryLoadServerData()
+    protected override void LoadSavedData()
     {
         
     }
+
     /// <summary>
     /// Pri odpojeni hraca ulozi jeho data na server
     /// </summary>

@@ -36,7 +36,7 @@ public static class IPManager
                 foreach (UnicastIPAddressInformation ip in item.GetIPProperties().UnicastAddresses)
                 {
                     //IPv4
-                    if (Addfam == AddressForm.IPv 
+                    if (Addfam == AddressForm.IPv4
                             && 
                         ip.Address.AddressFamily == AddressFamily.InterNetwork)
                             output = ip.Address.ToString();
