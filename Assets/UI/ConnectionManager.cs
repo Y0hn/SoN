@@ -217,13 +217,17 @@ public class Connector : MonoBehaviour
     private void SpawnPlayer(ulong id)
     {
         Transform t = netMan.ConnectedClients[id].PlayerObject.transform;
-        
-        if (FileManager.World.TryGetPlayerSave(t.name, out var save))
+        bool saved = FileManager.World.TryGetPlayerSave(t.name, out var save);
+
+        if (saved)
         {
             t.position = save.Position;
+
         }
         else
             t.position = PlayerRandomSpawn;
+
+        FileManager.Log($"Player {t.name} spawned, his save {(saved ? "was" : "wasn't")} loaded and position= ({t.position.x},{t.position.y})", FileManager.MessageType.RECORD);
     }
     /// <summary>
     /// Je volana z hraca, ktory sa chce ozivit. <br />

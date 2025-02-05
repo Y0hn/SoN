@@ -454,6 +454,7 @@ public static class FileManager
     /// <returns></returns>
     public bool TryGetPlayerSave(string name, out PlayerSave player)
     {
+        player = null;
         player = players.Find(p => p.etName == name);
         return player != null;
     }
