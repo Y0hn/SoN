@@ -13,9 +13,7 @@ public class GameManager : MonoBehaviour
 {
     void Awake() => instance = this;
     public static GameManager instance;
-    public static MapScript Map         { get; set; }
-    public static MenuScript UI         { get => instance.menu; }
-    
+    public static MenuScript UI         { get => instance.menu; }    
     [SerializeField] SkillPanel skillTree;
     [SerializeField] MenuScript menu;
     [SerializeField] Connector conn;
@@ -84,13 +82,11 @@ public class GameManager : MonoBehaviour
         SetUpTextFields();
         SubscribeInput();
         SetGameUI();
-        
-        FileManager.LoadSettings();
     }
     void Update()
     {
-        if (IsServer && NPStats.NPCount < MAX_NPC_COUNT)
-            Map.SpawnEnemy();
+        if (IsServer && MapScript.map != null && NPStats.NPCount < MAX_NPC_COUNT)
+            MapScript.map.SpawnEnemy();
     }
     /// <summary>
     /// Nastavi hodnoty pre textove polia <br />
@@ -186,7 +182,7 @@ public class GameManager : MonoBehaviour
         if (IsServer)
         {
             GameObject v = Resources.Load<GameObject>("Entities/Veles/Veles");
-            Instantiate(v, Map.BossSpawn).GetComponent<NetworkObject>().Spawn();
+            Instantiate(v, MapScript.map.BossSpawn).GetComponent<NetworkObject>().Spawn();
 
         }
     }

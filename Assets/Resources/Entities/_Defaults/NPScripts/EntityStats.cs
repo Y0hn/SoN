@@ -328,9 +328,10 @@ public abstract class EntityStats : NetworkBehaviour
     /// <summary>
     /// Vyziada si uložené dáta 
     /// </summary>
-    protected virtual void LoadSavedData()
+    protected virtual void LoadSavedData(World.EntitySave save)
     {
-
+        hp.Value = Mathf.RoundToInt(save.hp * (float)maxHp.Value);
+        transform.position = save.Position;
     }
     /// <summary>
     /// Zisti utok z dostupnych zbrani podla 

@@ -12,11 +12,12 @@ public class SkillTree
     PlayerStats player;
     Dictionary<Damage.Type, Modifier> offence;
     Dictionary<Damage.Type, float> offRate;
+    string[] uSkils;
 #pragma warning restore IDE0044 // Add readonly modifier
 
     public World.PlayerSave.SkillTreeSave SkillTreeSave
     {
-        get => new (skills.ToArray(), new string[2]);
+        get => new (skills.ToArray(), uSkils);
     }
 
     public SkillTree ()
@@ -24,12 +25,14 @@ public class SkillTree
         skills = new ();
         offence = new ();
         offRate = new ();
+        uSkils = new string[2];
     }
     public SkillTree (PlayerStats _player)
     {
         skills = new ();
         offence = new ();
         offRate = new ();
+        uSkils = new string[2];
         player = _player;
     }
     /// <summary>

@@ -29,8 +29,8 @@ public class Connector : MonoBehaviour
     /// <returns>IP_ADRESA</returns>
     private string ServerIP => IPManager.GetIP();
     private Vector2 PlayerRandomSpawn => 
-        new(SpawnPoint.position.x + Random.Range(-spawnRange.x, spawnRange.x), 
-            SpawnPoint.position.y + Random.Range(-spawnRange.y, spawnRange.y));
+        new(MapScript.map.PlaySpawn.position.x + Random.Range(-spawnRange.x, spawnRange.x), 
+            MapScript.map.PlaySpawn.position.y + Random.Range(-spawnRange.y, spawnRange.y));
 
     void Awake()
     {
@@ -38,6 +38,7 @@ public class Connector : MonoBehaviour
             instance = this;
         else
             Debug.LogError("More than one instance of Connection Manager");
+        FileManager.WorldAct("", FileManager.WorldAction.Create);
     }
     async void Start()
     {
@@ -182,6 +183,8 @@ public class Connector : MonoBehaviour
     {
         tporter.SetConnectionData("127.0.0.1", 7777);
         netMan.StartHost(); 
+        //if ()
+        LoadWorld(false);
     }
     /// <summary>
     /// Nacita udaje z pamate pri nacitani sveta zo suboru
@@ -216,14 +219,12 @@ public class Connector : MonoBehaviour
     /// <param name="id">ID hraca</param>
     private void SpawnPlayer(ulong id)
     {
+        if (!netMan.IsServer) return;
         Transform t = netMan.ConnectedClients[id].PlayerObject.transform;
         bool saved = FileManager.World.TryGetPlayerSave(t.name, out var save);
 
         if (saved)
-        {
             t.position = save.Position;
-
-        }
         else
             t.position = PlayerRandomSpawn;
 

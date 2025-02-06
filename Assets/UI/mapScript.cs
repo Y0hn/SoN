@@ -6,6 +6,7 @@ using System.Linq;
 /// </summary>
 public class MapScript : MapSizer
 {
+    public static MapScript map;
     [SerializeField] Transform spawLines;
     [SerializeField] Transform extractions;
     [SerializeField] Transform PlayerSpawnPoint;
@@ -19,17 +20,13 @@ public class MapScript : MapSizer
     /// <summary>
     /// Zavola sa pred prvym snimkom obrazovky hry
     /// </summary>
-    protected void Awake()
-    {
-        if (Connector.instance.netMan.IsServer)
-            GameManager.Map = this;
-    }
+    protected void Awake() => map = this;
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     protected override void Start()
     {
-        
+
     }
     /// <summary>
     /// <inheritdoc/>

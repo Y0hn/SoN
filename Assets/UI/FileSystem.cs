@@ -41,7 +41,7 @@ public static class FileManager
     /// Drzi udaje o aktualnom nastaveni hry <br />
     /// Ulozene na kazdom klientovy lokalne
     /// </summary>
-    private static Settings settings = new();
+    private static Settings settings;
     /// <summary>
     /// Typ akcie na vykonanie so svetom
     /// </summary>
@@ -180,7 +180,8 @@ public static class FileManager
                 reader = new StreamReader(SettingsPath);
 
                 // Nacitane hodnoty zo suboru nastavi ako aktuale
-                settings.LoadSettings((Settings)serializer.Deserialize(reader));
+                settings ??= new();
+                settings?.LoadSettings((Settings)serializer.Deserialize(reader));
             }
             finally
             {
@@ -317,13 +318,13 @@ public static class FileManager
     {
         try {
             lastConnection = Connector.instance.codeText.text;
-            playerName = GameManager.instance.PlayerName;
+            playerName = GameManager.UI.PlayerName;
             quality = GameManager.UI.Quality;
             audioS = GameManager.UI.Audios;
             online = GameManager.UI.Online;
             fullSc = GameManager.UI.FullSc;
         } catch (Exception ex) {
-            FileManager.Log($"Setting Creation Error \nExeption: {ex.Message}\nSource: {ex.Source}", FileManager.MessageType.WARNING);
+            FileManager.Log($"Setting Creation Error \nExeption: {ex.Message}\nData: {ex.Data}", FileManager.MessageType.WARNING);
         }
     }
     /// <summary>
@@ -379,18 +380,30 @@ public static class FileManager
 /// </summary>
 [Serializable] public class World
 {
+    public string worldName;
     public List<ItemOnFoor> items;
     public List<PlayerSave> players;
     public List<EntitySave> entities;
     public BossSave boss;
-
+    /// <summary>
+    /// Vytvori prazdny save pre svet
+    /// </summary>
+    public World()
+    {
+        worldName = "";
+        items = new ();
+        players = new ();
+        entities = new ();
+        boss = null;
+    }
     /// <summary>
     /// Ziska udaje o svete a zapise ich od premennych
     /// </summary>
     /// <exception cref="Ak nie je server tak zlyha"></exception>
-    public World()
+    public World(string name)
     {
-        if (GameManager.instance.IsServer)
+        worldName = name;
+        if (Connector.instance.netMan.IsServer)
         {
             items = new ();
             players = new ();
@@ -444,7 +457,13 @@ public static class FileManager
     /// <param name="player"></param>
     public void SaveRewritePlayer(PlayerSave player)
     {
-        players[players.FindIndex(p => p.etName == player.etName)] = player;
+        int index = players.FindIndex(p => p.etName == player.etName);
+        if (0 < index && index < players.Count)
+            players[index] = player;
+        else
+            players.Add(player);
+
+        FileManager.Log($"Player {player.etName} save {(0 < index ? "rewriten" : "added")} with values {player}", FileManager.MessageType.RECORD);
     }    
     /// <summary>
     /// Ziska udaje hraca na zaklade mena
@@ -456,6 +475,7 @@ public static class FileManager
     {
         player = null;
         player = players.Find(p => p.etName == name);
+        FileManager.Log($"Player {name} requested save file: {(player != null ? player : "NOT FOUND")}", FileManager.MessageType.RECORD);
         return player != null;
     }
     /// <summary>
@@ -536,8 +556,8 @@ public static class FileManager
         /// </summary>
         [Serializable] public class InventorySave
         {
-            private string[] items;
-            private string[] equiped;
+            public string[] items;
+            public string[] equiped;
 
             /// <summary>
             /// Vytvori objekt drziaci udaje o inventary hraca

@@ -127,9 +127,25 @@ public class PlayerStats : EntityStats
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    protected override void LoadSavedData()
+    protected override void LoadSavedData(World.EntitySave save)
     {
-        
+        if (!IsServer) return;
+        var pSave = (World.PlayerSave)save;
+
+        // Nacitaj data inventara
+        foreach (var item in pSave.inventory.items)
+            inventory.Add(item);
+        // Nacita data o pouzitych predmetoch
+        foreach (var eq in pSave.inventory.equiped)
+            equipment.Add(eq);
+
+
+        foreach (var skill in pSave.skillTree.skills)
+            skillTree.Add(skill);
+        /*foreach (var uSill in pSave.skillTree.usingUtils)
+            skillTree.*/
+
+        base.LoadSavedData(pSave);
     }
 
     /// <summary>
