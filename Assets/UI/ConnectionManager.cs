@@ -28,7 +28,7 @@ public class Connector : MonoBehaviour
     /// </summary>
     /// <returns>IP_ADRESA</returns>
     private string ServerIP => IPManager.GetIP();
-    private Vector2 PlayerRandomSpawn => 
+    public Vector2 PlayerRandomSpawn => 
         new(MapScript.map.PlaySpawn.position.x + Random.Range(-spawnRange.x, spawnRange.x), 
             MapScript.map.PlaySpawn.position.y + Random.Range(-spawnRange.y, spawnRange.y));
 
@@ -218,5 +218,6 @@ public class Connector : MonoBehaviour
         Transform t = netMan.ConnectedClients[id].PlayerObject.transform;
         t.position = PlayerRandomSpawn;
         FileManager.World.SaveRewritePlayer(new (t.GetComponent<PlayerStats>()));
+        FileManager.Log($"Player respawned {t.name} ", FileManager.MessageType.RECORD);
     }
 }

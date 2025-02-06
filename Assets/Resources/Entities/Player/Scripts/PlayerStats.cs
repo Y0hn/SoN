@@ -406,7 +406,7 @@ public class PlayerStats : EntityStats
         else if (skill is Utility ut)
             AddSkillRpc(ut);
     }
-    [Rpc(SendTo.Owner)]  protected void BoughtSkillRpc (string name)     { game.SkillPanel.BuySkill(name); }
+    [Rpc(SendTo.Owner)]  protected void BoughtSkillRpc (string name)     { game.SkillTree.BuySkill(name); }
     [Rpc(SendTo.Server)] protected void AddSkillRpc (Utility skill)      { skillTree.Add(skill); }
     [Rpc(SendTo.Server)] protected void AddSkillRpc (ModSkill skill)     { skillTree.Add(skill); }
     [Rpc(SendTo.Server)] protected void AddSkillRpc (ModDamage skill)    { skillTree.Add(skill); }

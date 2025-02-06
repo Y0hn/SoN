@@ -26,3 +26,6 @@ rasial rezists
 rasial movement speed
 rasial attack speed
 ```
+local player wont despanw
+
+need to unsub 

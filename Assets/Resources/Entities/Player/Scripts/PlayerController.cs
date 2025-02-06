@@ -114,6 +114,7 @@ public class PlayerController : EntityController
             SetLiveRpc(OwnerClientId);
             return;
         }
+        FileManager.Log($"Player {name} is attacking, Alive= {Stats.IsAlive.Value}");
         attacking = !context.canceled;
     }
 
