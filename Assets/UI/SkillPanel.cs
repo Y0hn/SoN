@@ -19,6 +19,7 @@ public class SkillPanel : MonoBehaviour
 
     Vector2[] limits = new Vector2[2];
     Vector2 startMouse;
+    Dictionary<string, SkillSlot> skillSlots = new();
     byte usedPointsCounter = 0, freePointCouter = 0;
     /// <summary>
     /// Nastavi pociatocne hodnoty pre pocitadla <br />
@@ -30,6 +31,8 @@ public class SkillPanel : MonoBehaviour
         usedPointsCounter = 0;
         button.onEnterHold += delegate { startMouse = game.MousePos; };
         CalculateLimits();
+        foreach (var skS in transform.GetComponentsInChildren<SkillSlot>())
+            skillSlots.Add(skS.name, skS);
         skillCounterText.text = freePointCouter.ToString();
         //OnChangeAvailablePoints += (bool change) => { Debug.Log($"OnChangeAvailablePoints.Invoked({change})"); };
     }
@@ -108,5 +111,13 @@ public class SkillPanel : MonoBehaviour
         foreach (SkillSlot s in sSlots)
             if (skills.Contains(s.name))
                 s.ActivateSkill();
+    }
+    /// <summary>
+    /// Sluzi pre kupu schopnosti v okruznou cestou
+    /// </summary>
+    /// <param name="skillName"></param>
+    public void BuySkill(string skillName)
+    {
+         skillSlots[skillName].BuySkill();
     }
 }

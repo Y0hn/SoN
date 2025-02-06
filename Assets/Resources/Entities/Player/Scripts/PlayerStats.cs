@@ -111,6 +111,8 @@ public class PlayerStats : EntityStats
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+
+        ServerRequestData();
     }
     /// <summary>
     /// <inheritdoc/>
@@ -123,6 +125,21 @@ public class PlayerStats : EntityStats
             chatBox.text = "";
             chatTimer = 0;
         }
+    }
+    /// <summary>
+    /// Server sa pokusi nacitat data o hracovi z ulozenia sveta <br />
+    /// Ak sa podari, zavola metodu pre nacitanie ziskanych udajov. <br />
+    /// Ak nie nastavi poziciu v okruhu miesta zrodenia.
+    /// </summary>
+    protected void ServerRequestData()
+    {
+        if (!IsServer) return;
+        
+        if (FileManager.World != null && FileManager.World.TryGetPlayerSave(name, out var saved))
+            LoadSavedData(saved);
+        else 
+            // ak data o hracovi nenajde nastavi jeho poziciu v ramci zaciatocneho bodu
+            transform.position = Connector.instance.PlayerRandomSpawn;
     }
     /// <summary>
     /// <inheritdoc/>
@@ -141,7 +158,7 @@ public class PlayerStats : EntityStats
 
 
         foreach (var skill in pSave.skillTree.skills)
-            skillTree.Add(skill);
+            AddSkill(skill);
         /*foreach (var uSill in pSave.skillTree.usingUtils)
             skillTree.*/
 
@@ -378,8 +395,10 @@ public class PlayerStats : EntityStats
     /// Prida schopnost do stromu schopnosti
     /// </summary>
     /// <param name="skill"></param>
-    public virtual void AddSkill(Skill skill)
+    public void AddSkill(Skill skill)
     {
+        BoughtSkillRpc(skill.name);
+
         if      (skill is ModDamage mD)
             AddSkillRpc(mD);
         else if (skill is ModSkill mS)
@@ -387,6 +406,7 @@ public class PlayerStats : EntityStats
         else if (skill is Utility ut)
             AddSkillRpc(ut);
     }
+    [Rpc(SendTo.Owner)]  protected void BoughtSkillRpc (string name)     { game.SkillPanel.BuySkill(name); }
     [Rpc(SendTo.Server)] protected void AddSkillRpc (Utility skill)      { skillTree.Add(skill); }
     [Rpc(SendTo.Server)] protected void AddSkillRpc (ModSkill skill)     { skillTree.Add(skill); }
     [Rpc(SendTo.Server)] protected void AddSkillRpc (ModDamage skill)    { skillTree.Add(skill); }

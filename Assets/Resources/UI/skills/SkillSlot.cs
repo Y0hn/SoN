@@ -41,6 +41,9 @@ public class SkillSlot : MonoBehaviour
         { "aquired",        new ( 89f/255f,  89f/255f,  89f/255f, 1f   ) },  // disabled //rgba(89, 89, 89, 1)
     };    
     private Color[] defaultColors;
+    /// <summary>
+    /// Ziska schopnosti jej vytvorenim pomocou vytvaraca schopnosti  
+    /// </summary>
     public Skill Skill => skillCreator.Skill;
     private GameManager game;
     /// <summary>
@@ -86,18 +89,22 @@ public class SkillSlot : MonoBehaviour
         defaultColors[3] = value.color;
     }
     /// <summary>
-    /// Prida schopnost do Stromu schopnosti hraca a povoluje zavisle schopnosti
-    /// Adds skill to Player Skill Tree and Enables Dependent skills
+    /// Prida schopnost do stromu schopnosti hraca
     /// </summary>
     public void ActivateSkill()
+    {
+        game.LocalPlayer.AddSkill(Skill);
+    }
+    /// <summary>
+    /// Povoluje zavisle schopnosti
+    /// </summary>
+    public void BuySkill()
     {
         amountT.text = "";
         isPurchased = true;
         moddifier.enabled = false;
         value.enabled = false;
         SetInteractable(false);
-
-        game.LocalPlayer.AddSkill(Skill);
         game.SkillTree.SkillPointAplied();
         SetGraficColor(pallete["aquired"]);
     }

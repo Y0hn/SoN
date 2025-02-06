@@ -44,11 +44,9 @@ public class Connector : MonoBehaviour
     {
         // RELAY
         // Potrebne pripojenie na Internet
+        netMan = NetworkManager.Singleton;
         await UnityServices.InitializeAsync();
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
-        netMan = NetworkManager.Singleton;
-
-        netMan.OnClientConnectedCallback += SpawnPlayer;
     }
     /*
            ____         __             
@@ -209,26 +207,6 @@ public class Connector : MonoBehaviour
             netMan.DisconnectClient(id);
         else
             netMan.Shutdown();
-    }
-
-    /// <summary>
-    /// Je volana na servery hned po pripojeni hraca do hry. <br />
-    /// Nastavuje jeho poziciu v ramci hranic stanovenych Vektorom "spawnRange" <br />
-    /// Alebo nastavi jeho poziciu podla ulozenej v pamati
-    /// </summary>
-    /// <param name="id">ID hraca</param>
-    private void SpawnPlayer(ulong id)
-    {
-        if (!netMan.IsServer) return;
-        Transform t = netMan.ConnectedClients[id].PlayerObject.transform;
-        bool saved = FileManager.World.TryGetPlayerSave(t.name, out var save);
-
-        if (saved)
-            t.position = save.Position;
-        else
-            t.position = PlayerRandomSpawn;
-
-        FileManager.Log($"Player {t.name} spawned, his save {(saved ? "was" : "wasn't")} loaded and position= ({t.position.x},{t.position.y})", FileManager.MessageType.RECORD);
     }
     /// <summary>
     /// Je volana z hraca, ktory sa chce ozivit. <br />
