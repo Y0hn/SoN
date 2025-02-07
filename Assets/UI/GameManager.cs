@@ -193,8 +193,7 @@ public class GameManager : MonoBehaviour
         paused = false;
         uiPanels["chatUI"].SetActive(false);
         chatting = false;
-
-        menu.SetUpUI(!active);
+        
         uiPanels["mainCam"].SetActive(!active);
     }
     
@@ -238,9 +237,7 @@ public class GameManager : MonoBehaviour
         uiPanels["chatUI"].SetActive(false);
         chatting = false;
 
-        //uiPanels["menuUI"].SetActive(false);
         uPl.Reset();
-        menu.SetUpUI(false);
         inventory.ReloadAttacks();
 
         playerLives = lives;
