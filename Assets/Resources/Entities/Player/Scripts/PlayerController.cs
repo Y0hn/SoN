@@ -27,7 +27,9 @@ public class PlayerController : EntityController
     protected bool wasAttacking;
     protected new PlayerStats Stats => (PlayerStats)base.Stats;
 
-
+    /// <summary>
+    /// Pripoji sa na lokalny vstup vstup 
+    /// </summary>
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
@@ -40,6 +42,21 @@ public class PlayerController : EntityController
             input_actions["q2"].action.started += Q2;
             input_actions["q3"].action.started += Q3;
             cam.SetActive(true);
+        }
+    }
+    /// <summary>
+    /// Odstrani napojenie vstupu na objekt hraca 
+    /// </summary>
+    public override void OnNetworkDespawn()
+    {
+        if (IsOwner)
+        {
+            game.PlayerSpawned()
+            input_actions["attack"].action.started -= Fire;
+            input_actions["attack"].action.canceled -= Fire;
+            input_actions["q1"].action.started -= Q1;
+            input_actions["q2"].action.started -= Q2;
+            input_actions["q3"].action.started -= Q3;
         }
     }
     protected override void Update()

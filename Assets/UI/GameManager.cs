@@ -139,6 +139,10 @@ public class GameManager : MonoBehaviour
         else
             player.GetComponent<PlayerController>().Fire(new());
     }
+    /// <summary>
+    /// Otvori pole na 
+    /// </summary>
+    /// <param name="context"></param>
     void OpenChat(InputAction.CallbackContext context)
     {
         if (PlayerAble)
@@ -179,12 +183,6 @@ public class GameManager : MonoBehaviour
         player = plStats;
         SetPlayerUI();
         AnimateFace(player.HP);
-        if (IsServer)
-        {
-            GameObject v = Resources.Load<GameObject>("Entities/Veles/Veles");
-            Instantiate(v, MapScript.map.BossSpawn).GetComponent<NetworkObject>().Spawn();
-
-        }
     }
     void SetGameUI(bool active = false)
     {
