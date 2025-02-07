@@ -36,6 +36,7 @@ public static class FileManager
     /// </summary>
     private static World world;
     public static World World => world;
+    public static bool WorldLoaded => world != null;
 
     /// <summary>
     /// Drzi udaje o aktualnom nastaveni hry <br />

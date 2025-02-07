@@ -135,7 +135,7 @@ public class PlayerStats : EntityStats
     {
         if (!IsServer) return;
         
-        if (FileManager.World != null && FileManager.World.TryGetPlayerSave(name, out var saved))
+        if (FileManager.WorldLoaded && FileManager.World.TryGetPlayerSave(name, out var saved))
             LoadSavedData(saved);
         else 
             // ak data o hracovi nenajde nastavi jeho poziciu v ramci zaciatocneho bodu

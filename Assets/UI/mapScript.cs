@@ -85,7 +85,7 @@ public class MapScript : MapSizer
     void SpawnBoss()
     {
         GameObject v = Resources.Load<GameObject>("Entities/Veles/Veles");
-        Instantiate(v, MapScript.map.BossSpawn).GetComponent<NetworkObject>().Spawn();
+        Instantiate(v, BossSpawn).GetComponent<NetworkObject>().Spawn();
     }
 }
  

@@ -7,6 +7,7 @@ using Unity.Services.Authentication;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
+using System.IO;
 
 /// <summary>
 /// Sluzi na zhrnutie parametrov potrebnych pre pripojenie
@@ -45,6 +46,9 @@ public class Connector : MonoBehaviour
         // RELAY
         // Potrebne pripojenie na Internet
         netMan = NetworkManager.Singleton;
+
+        netMan.OnServerStopped += delegate { FileManager.WorldAct("", FileManager.WorldAction.Save); };
+
         await UnityServices.InitializeAsync();
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
     }
