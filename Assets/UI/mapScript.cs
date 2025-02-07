@@ -82,5 +82,10 @@ public class MapScript : MapSizer
         Transform target = extractions.GetChild(Random.Range(0,extractions.childCount));
         enemy.GetComponent<NPController>().SetDefaultTarget(target);
     }
+    void SpawnBoss()
+    {
+        GameObject v = Resources.Load<GameObject>("Entities/Veles/Veles");
+        Instantiate(v, MapScript.map.BossSpawn).GetComponent<NetworkObject>().Spawn();
+    }
 }
  

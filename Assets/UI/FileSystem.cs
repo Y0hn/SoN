@@ -492,7 +492,7 @@ public static class FileManager
         s += "Mena Hracov: ";
         players.ForEach(p => s += p.etName + ", ");
         return s;
-    }    
+    }
     /// <summary>
     /// Drzi udaje o itemoch na zemi
     /// </summary>
@@ -634,9 +634,10 @@ public static class FileManager
     /// </summary>
     [Serializable] public class BossSave : EntitySave
     {
+        public bool isAlive;
         public BossSave(BosStats entity) : base(entity)
         {
-
+            isAlive = entities.IsAlive.Value;
         }
         /// <summary>
         /// <inheritdoc/>
@@ -645,7 +646,7 @@ public static class FileManager
         public override string ToString()
         {
             string s = base.ToString();
-
+            s += $"IsAlive: {isAlive}";
             return s;
         }
     }

@@ -53,6 +53,14 @@ public class BosStats : NPStats
      *  public Action OnHit;
      *  protected float aToFire;
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        if (IsServer)
+            LoadSavedData(FileManager.World.boss);
+    }
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -60,5 +68,16 @@ public class BosStats : NPStats
     {
         if (!IsServer) return;
         base.OwnerSubsOnNetValChanged();
+    }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="save">ulozene DATA hlavneho nepriatela</param>
+    protected override LoadSavedData(World.EntitySave save)
+    {
+        if (!save.IsAlive)
+            netObject.Despawn();
+        else
+            base.LoadSavedData(save);
     }
 }
