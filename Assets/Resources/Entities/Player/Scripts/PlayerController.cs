@@ -51,7 +51,7 @@ public class PlayerController : EntityController
     {
         if (IsOwner)
         {
-            game.PlayerSpawned()
+            game.PlayerSpawned(null);
             input_actions["attack"].action.started -= Fire;
             input_actions["attack"].action.canceled -= Fire;
             input_actions["q1"].action.started -= Q1;

@@ -181,6 +181,7 @@ public class GameManager : MonoBehaviour
     public void PlayerSpawned(PlayerStats plStats)
     {
         player = plStats;
+        if (player == null) return;
         SetPlayerUI();
         AnimateFace(player.HP);
     }

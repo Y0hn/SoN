@@ -637,7 +637,7 @@ public static class FileManager
         public bool isAlive;
         public BossSave(BosStats entity) : base(entity)
         {
-            isAlive = entities.IsAlive.Value;
+            isAlive = entity.IsAlive.Value;
         }
         /// <summary>
         /// <inheritdoc/>

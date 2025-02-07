@@ -73,9 +73,10 @@ public class BosStats : NPStats
     /// <inheritdoc/>
     /// </summary>
     /// <param name="save">ulozene DATA hlavneho nepriatela</param>
-    protected override LoadSavedData(World.EntitySave save)
+    protected override void LoadSavedData(World.EntitySave save)
     {
-        if (!save.IsAlive)
+        var b = (World.BossSave)save;
+        if (!b.isAlive)
             netObject.Despawn();
         else
             base.LoadSavedData(save);
