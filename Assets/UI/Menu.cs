@@ -13,7 +13,7 @@ public class MenuScript : MonoBehaviour
     [SerializeField] Toggle onlineToggle;
     [SerializeField] Toggle fullScToggle;
     [SerializeField] AudioSource meneTheme;
-    //[SerializeField] AudioSource pageChange;
+    [SerializeField] AudioSource ui_sfx;
     [SerializeField] QualityScript quality;
     [SerializeField] AudioMixer[] audioMixers;
     public bool Online { get => onlineToggle.isOn;  set => onlineToggle.isOn = value;   }
@@ -40,7 +40,7 @@ public class MenuScript : MonoBehaviour
         }
     }
     [SerializedDictionary("Name", "Button"), SerializeField]
-    private SerializedDictionary<string, Button> buttons = new();
+    private SerializedDictionary<string, MainUIButton> buttons = new();
     /* OBSAH
         {"exit",            - },
         {"solo",            - },
@@ -150,10 +150,6 @@ public class MenuScript : MonoBehaviour
         uis["SubMultiStart"].SetActive(false);
         uis["SubSett"].SetActive(false);
         uis["SubLoad"].SetActive(false);
-        
-        MainMenuNav(0);
-        if (!active)
-            animator.SetTrigger("reset");
 
         fullScToggle.onValueChanged.AddListener(
             delegate (bool on) 
@@ -181,25 +177,24 @@ public class MenuScript : MonoBehaviour
     /// </summary>
     void SubscribeToButtons()
     {
-        /*foreach (var b in buttons)
-        {
-            b.Value.on;
-        }*/
-        buttons["exit"].    onClick.AddListener(delegate { Exit();});
-        buttons["solo"].    onClick.AddListener(delegate { MainMenuNav(1); });
-        buttons["multi"].   onClick.AddListener(delegate { MainMenuNav(2); });
-        buttons["sett"].    onClick.AddListener(delegate { MainMenuNav(3); });
+        foreach (var b in buttons)
+            b.Value.SetAudioSource(ui_sfx);
+            
+        buttons["exit"].AddListener(delegate { Exit();});
+        buttons["solo"].AddListener(delegate { MainMenuNav(1); });
+        buttons["multi"].AddListener(delegate { MainMenuNav(2); });
+        buttons["sett"].AddListener(delegate { MainMenuNav(3); });
 
-        buttons["soloCont"].    onClick.AddListener(delegate { SoloMenuNav(1); });
-        buttons["soloLoad"].    onClick.AddListener(delegate { SoloMenuNav(2); });
-        buttons["soloCreate"].  onClick.AddListener(delegate { SoloMenuNav(3); });
+        buttons["soloCont"].AddListener(delegate { SoloMenuNav(1); });
+        buttons["soloLoad"].AddListener(delegate { SoloMenuNav(2); });
+        buttons["soloCreate"].AddListener(delegate { SoloMenuNav(3); });
 
-        buttons["multiStart"].  onClick.AddListener(delegate { MultiMenuNav(1); });
-        buttons["multiJoin"].   onClick.AddListener(delegate { MultiMenuNav(2); });
-        buttons["multiLoad"].   onClick.AddListener(delegate { MultiMenuNav(3); });
-        buttons["multiCreate"]. onClick.AddListener(delegate { MultiMenuNav(4); });
+        buttons["multiStart"].AddListener(delegate { MultiMenuNav(1); });
+        buttons["multiJoin"].AddListener(delegate { MultiMenuNav(2); });
+        buttons["multiLoad"].AddListener(delegate { MultiMenuNav(3); });
+        buttons["multiCreate"].AddListener(delegate { MultiMenuNav(4); });
 
-        buttons["joinMultiJoin"].onClick.AddListener(delegate {MultiMenuNav(5); });
+        buttons["joinMultiJoin"].AddListener(delegate {MultiMenuNav(5); });
     }
     /// <summary>
     /// Odide z vnorenej navigacie alebo zavire hru
@@ -217,6 +212,8 @@ public class MenuScript : MonoBehaviour
         }
         else
             Application.Quit();
+
+        animator.SetTrigger("change");
     }
     /// <summary>
     /// Spravuje navigaciu v hlavnom menu
@@ -226,7 +223,8 @@ public class MenuScript : MonoBehaviour
     {
         navLayer = to;
         //pageChange.Play();
-        animator.SetInteger("layer", to);
+        //animator.SetInteger("layer", to);
+        animator.SetTrigger("change");
     }
     /// <summary>
     /// Spravuje navigaciu v prvom podmenu - v hre pre jedneho hraca
@@ -236,7 +234,9 @@ public class MenuScript : MonoBehaviour
     {
         navLayer *= 10;
         navLayer += choice;
-        animator.SetInteger("layer", navLayer);
+        //animator.SetInteger("layer", navLayer);
+        animator.SetTrigger("change");
+
 
         switch (choice)
         {
@@ -273,8 +273,10 @@ public class MenuScript : MonoBehaviour
         {            
             navLayer *= 10;
             navLayer += choice;
-            animator.SetInteger("layer", navLayer);
+            //animator.SetInteger("layer", navLayer);
             //pageChange.Play();
+            animator.SetTrigger("change");
+
         }
     }
     /// <summary>
