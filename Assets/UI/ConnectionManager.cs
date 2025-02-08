@@ -178,36 +178,13 @@ public class Connector : MonoBehaviour
         return join;
     }
     /// <summary>
-    /// Vytvori hru pre jendneho hraca 
-    /// Tym ze sa vytvori server na loopback adrese
+    /// Vytvori hru pre jendneho hraca.
+    /// Tym ze sa vytvori server na loopback adrese.
     /// </summary>
-    public void CreateSolo(bool loadLast = false)
+    public void CreateSolo()
     {
         tporter.SetConnectionData("127.0.0.1", 7777);
         netMan.StartHost();
-        StartWorld(loadLast);
-    }
-    /// <summary>
-    /// Nacita udaje z pamate pri nacitani sveta zo suboru
-    /// </summary>
-    /// <param name="load"></param>
-    /// <param name="host"></param>
-    private void StartWorld(bool load = false)
-    {
-        /*if      (host && load)
-            FileManager.WorldAct("", FileManager.WorldAction.Load);
-        else if (host && !load)
-            FileManager.WorldAct("", FileManager.WorldAction.Create);*/
-        // nacitat svet
-        if (load)
-        {
-
-        }
-        else
-        {
-            // vytvori novy svet
-            FileManager.StartWorld();
-        }
     }
     /// <summary>
     /// Na klientovy vypne pripojenie a na servere odpoji konkretneho klienta
@@ -229,7 +206,6 @@ public class Connector : MonoBehaviour
     {
         Transform t = netMan.ConnectedClients[id].PlayerObject.transform;
         t.position = PlayerRandomSpawn;
-        FileManager.World.SaveRewritePlayer(new (t.GetComponent<PlayerStats>()));
         FileManager.Log($"Player respawned {t.name} ", FileLogType.RECORD);
     }
 }

@@ -29,15 +29,19 @@ public static class FileManager
     public static string SettingsPath   => AppData + SETTINGS_DEFAULT_PATH;
     public static string LogPath        => AppData + LOG_DEFAULT_PATH;
     public static string WorldPath      => AppData + WORLD_DEFAULT_PATH;
+    
+    /// <summary>
+    /// K menu sveta prida cestu a priponu
+    /// </summary>
+    /// <param name="name">nazov SVETA (napr. world)</param>
+    /// <returns>CESTU k svetu (napr. "/saves/world.sav")</returns>
     public static string NameWorldPath(string name)      => WorldPath + name + ".sav";
 
     /// <summary>
     /// Drzi udaje o aktualnom ulozeni sveta <br />
     /// Ulozene iba na Servery
     /// </summary>
-    private static World world;
-    public static World World => world;
-    public static bool WorldLoaded => world != null;
+    private static World world; public static World World => world;
 
     /// <summary>
     /// Drzi udaje o aktualnom nastaveni hry <br />
@@ -109,23 +113,41 @@ public static class FileManager
             stream?.Close();
         }
     }
-
     /// <summary>
     /// Spustanie sveta
     /// </summary>
     /// <param name="name"></param>
-    public static void StartWorld(string name = "")
+    public static void StartWorld(string name) 
     {
-        if (name == "")
+        string path = NameWorldPath(name);
+
+        if (File.Exists(path))
         {
-            // enable tutor
+            world = ReadWorld(path);
         }
         else
         {
-            WorldData(NameWorldPath(name));
+            world = new();
+            world.worldName = name;
         }
-    }
 
+        Log("World has been opened");
+    }
+    public static void EndWorld()
+    {
+        string path = NameWorldPath(world.worldName);
+        
+        // Ziska aktualne udaje o svete
+        World w = new(world.worldName);
+
+        // Prida udaje nepripojenych hracov
+        w.AddOfflinePlayers(world.players);
+        
+        // Zapise do suboru
+        WriteWorld(path, ref w);
+
+        Log("World has been closed");
+    }
     /// <summary>
     /// Ulozi data jedneho hraca pri jeho odpojeni
     /// </summary>
@@ -136,58 +158,6 @@ public static class FileManager
             world.SaveRewritePlayer(player);
         else
             world = new();
-    }
-    /// <summary>
-    /// Ulozenie aktualneho sveta do binarneho suboru <br />
-    /// Alebo nacitanie sveta zo suboru
-    /// </summary>
-    /// <param name="path">cesta a nazov SUBORU</param>
-    /// <param name="load">PRAVDA ak ma nacitat</param>
-    /// <returns>PRAVDA ak prebehlo uspesne</returns>
-    private static bool WorldData(string path, bool load= true)
-    {
-        bool 
-            fileExists = File.Exists(path),
-            success = false;
-
-        // napr. 
-        //  path= "$PREFIX/saves/world.sav"
-        //  worldName= "world" 
-        string worldName = path.Split('/')[^1].Split('.')[0];
-        World w = new(worldName);
-
-        // Ak je uz svet spusteny
-        if (world != null)
-            w.AddOfflinePlayers(world.players);
-
-        try {
-            // ak ma zo suboru citat
-            if (load && fileExists)
-            {
-                w= ReadWorld(path);
-                success = true;
-            }
-            // ak ma do suboru pisat
-            else if (!load)
-            {
-                WriteWorld(path, ref w);
-                world = w;
-                success = true;
-                Log($"World was {(fileExists ? "overwriten" : "new")}", FileLogType.RECORD);
-            }
-            else
-                Log($"World was {(fileExists ? "overwriten" : "new")}", FileLogType.RECORD);
-
-        } catch {
-            Log($"World file doesn't exist on path={path}", FileLogType.WARNING);
-        } finally {
-            // Nakoniec zatvori tok ak je otvoreny
-            if (world != null)
-                w.AddOfflinePlayers(world.players);
-            world = w;
-        }
-
-        return success;
     }
     /// <summary>
     /// Vytvori novy subor nastaveni podla aktualnych hodnot <br /> 
@@ -237,6 +207,9 @@ public static class FileManager
             }
         }
     }
+    
+    
+    
     /// <summary>
     /// Vrati cestu k ikone utoku podla typu utoku 
     /// </summary>
@@ -308,6 +281,8 @@ public static class FileManager
         return list.ToArray();
     }
 
+    
+    
     /// <summary>
     /// Ziskavanie a zapisovanie blizsich informacii o stave hry
     /// </summary>
@@ -365,11 +340,11 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
     {
         try {
             lastConnection = Connector.instance.codeText.text;
-            playerName = GameManager.UI.PlayerName;
-            quality = GameManager.UI.Quality;
-            audioS = GameManager.UI.Audios;
-            online = !GameManager.UI.onlyLAN;
-            fullSc = GameManager.UI.FullSc;
+            playerName = Menu.menu.PlayerName;
+            quality = Menu.menu.Quality;
+            audioS = Menu.menu.Audios;
+            online = !Menu.menu.onlyLAN;
+            fullSc = Menu.menu.FullSc;
         } catch (Exception ex) {
             FileManager.Log($"Setting Creation Error \nExeption: {ex.Message}\nData: {ex.Data}", FileLogType.WARNING);
         }
@@ -391,10 +366,10 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
         // Nastavi vlastnosti hry podla novych hodnot
         Connector.instance.codeText.text = lastConnection;
         GameManager.instance.PlayerName = playerName;
-        GameManager.UI.Audios = audioS;
-        GameManager.UI.Quality = quality;
-        GameManager.UI.onlyLAN = !online;
-        GameManager.UI.FullSc = fullSc;
+        Menu.menu.Audios = audioS;
+        Menu.menu.Quality = quality;
+        Menu.menu.onlyLAN = !online;
+        Menu.menu.FullSc = fullSc;
     }
     /// <summary>
     /// Sluzi ako moznost kontroly spravnosti ulozenia nastaveni
@@ -428,6 +403,7 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
 [Serializable] public class World
 {
     public string worldName;
+    public string writeDate;
     public List<ItemOnFoor> items;
     public List<PlayerSave> players;
     public List<EntitySave> entities;
@@ -438,6 +414,7 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
     public World()
     {
         worldName = "";
+        writeDate = DateTime.Now.ToString();
         items = new ();
         players = new ();
         entities = new ();
@@ -450,6 +427,7 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
     public World(string name)
     {
         worldName = name;
+        writeDate = DateTime.Now.ToString();
         if (Connector.instance.netMan.IsServer)
         {
             items = new ();

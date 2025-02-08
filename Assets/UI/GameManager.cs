@@ -12,9 +12,9 @@ public class GameManager : MonoBehaviour
 {
     void Awake() => instance = this;
     public static GameManager instance;
-    public static MenuScript UI         { get => instance.menu; }    
+    public static Menu UI         { get => instance.menu; }    
     [SerializeField] SkillPanel skillTree;
-    [SerializeField] MenuScript menu;
+    [SerializeField] Menu menu;
     [SerializeField] Connector conn;
     [SerializeField] Animator anima;
     [SerializeField] UpperPanel uPl;
@@ -167,7 +167,7 @@ public class GameManager : MonoBehaviour
     void Quit()
     {
         SetGameUI(false);
-        UI.gameObject.SetActive(true);
+        Menu.menu.gameObject.SetActive(true);
         conn.Quit(player.OwnerClientId);
     }
     public Slider GetHpBar()

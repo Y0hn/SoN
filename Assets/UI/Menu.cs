@@ -5,10 +5,11 @@ using TMPro;
 using System.Linq;
 using System.Collections.Generic;
 /// <summary>
-/// Spravuje hlavne menu
+/// Spravuje hlavnu ponuku
 /// </summary>
-public class MenuScript : MonoBehaviour
+public class Menu : MonoBehaviour
 {
+    public static Menu menu;
     [SerializeField] Connector conn;
     [SerializeField] new Camera camera;
     [SerializeField] Animator animator;
@@ -128,6 +129,7 @@ public class MenuScript : MonoBehaviour
     {   
         SubscribeToButtons();
         ResetTextFields();
+        menu = this;
     }
     void Start() 
     {
@@ -153,6 +155,8 @@ public class MenuScript : MonoBehaviour
     /// </summary>
     public void ResetUI()
     {
+        camera.gameObject.SetActive(true);
+        
         uis["BG"].SetActive(true);
         uis["PT"].SetActive(true);
         uis["PV"].SetActive(true);
@@ -169,6 +173,12 @@ public class MenuScript : MonoBehaviour
         foreach(string key in uis.Keys.ToList().FindAll(k => k.Contains("Sub")))
             uis[key].SetActive(false);
         timer = -1;
+    }
+    void HideUI()
+    {
+        meneTheme.Stop();
+        gameObject.SetActive(false);
+        FileManager.Log($"Game Started => Menu Disabled => MenuTheme Stoped", FileLogType.RECORD);
     }
     /// <summary>
     /// Resetuje textove polia, <br />
@@ -208,6 +218,9 @@ public class MenuScript : MonoBehaviour
         buttons["multiCreate"].AddListener(delegate { MenuNavigation(2, 21); });
 
         buttons["joinMultiJoin"].AddListener(delegate {MenuNavigation(1, 22); });
+
+        buttons["createWorld"].AddListener(delegate {MenuNavigation(0);});
+
 
         
         fullScToggle.onValueChanged.AddListener(
@@ -252,17 +265,25 @@ public class MenuScript : MonoBehaviour
             case 3: currentLayer.Push("SubSett"); break;
 
             // PODPONUKA pre JEDNEHO hraca                          (localhost)
-            case 11: /* Pokracuje v poslednom svete */ conn.CreateSolo(); break;
+            case 11: /* Pokracuje v poslednom svete */ conn.CreateSolo(); layer= -1; break;
             case 12: /* Nacita zo subora hru    */ currentLayer.Push("SubLoad"); break; 
-            case 13: /* Vytvorit novu hru       */ conn.CreateSolo(); layer= -1; break;
+            case 13: /* Vytvorit novu hru       */ currentLayer.Push("SubCreate"); break;
 
             // PODPONUKA pre VIAC hracov
             case 21: currentLayer.Push("SubMultiStart"); break;  // vnori sa do ponuky pre server
             case 22: currentLayer.Push("SubMultiJoin");  break;  // vnori sa do ponuky pre klienta
 
             // PODPONUKA pre ZALOZENIE hry pre VIAC hracov          (pre server)
-            case 211: /* Nacita zo subora hru   */  currentLayer.Push("SubLoad"); break;
-            case 212: /* Vytvorit novu hru      */  StartConnection(onlyLAN); layer= -1; break;
+            case 211: /* Nacita zo subora hru   */  if(NameTagCheck()) currentLayer.Push("SubLoad"); break;
+            case 212: /* Vytvorit novu hru      */  if(NameTagCheck()) currentLayer.Push("SubCreate"); break;
+
+            /// PODPONUKA pre VYTVORENIE sveta
+            case 0:
+                string s = inputFields["worldName"].text.Trim();
+                if (s == "") 
+                    s = "my-world";
+                FileManager.StartWorld(s);
+                break;
 
             // PODPONUKA pre PRIPOJENIE sa ho hry pre VIAC hracov   (pre klienta)
             case 221: 
@@ -271,21 +292,30 @@ public class MenuScript : MonoBehaviour
                     layer= -1;
                 break;
 
+            case -1: 
+                break;
             default: 
                 FileManager.Log("Bad layer [" + layer + "] on MenuNavigation!", FileLogType.WARNING); 
                 break;
         }
 
+        // v niektorych pripadoch v prepinaci je "layer= -1;" to znamena ze hrac chce vstupit do hry,
+        // cize hlavne menu sa vypne
         if (layer < 0)
-        {
-            meneTheme.Stop();
-            gameObject.SetActive(false);
-            FileManager.Log($"Game Started => Menu Disabled => MenuTheme Stoped", FileLogType.RECORD);
-        }
+            HideUI();
 
         FileManager.Log($"Navigation set to {currentLayer}");
         animator.SetTrigger("change");
         timer = Time.time + ANIMATION_DURATION;
+    }
+    /// <summary>
+    /// Po stlaceni tlacidla pre nacitanie konkretneho suboru hry
+    /// </summary>
+    /// <param name="worldName"></param>
+    public void PressLoad(string worldName)
+    {
+        FileManager.StartWorld(worldName);
+        MenuNavigation(-1);
     }
 
     /// <summary>

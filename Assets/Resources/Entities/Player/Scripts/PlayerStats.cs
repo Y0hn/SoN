@@ -135,10 +135,10 @@ public class PlayerStats : EntityStats
     {
         if (!IsServer) return;
         
-        if (FileManager.WorldLoaded && FileManager.World.TryGetPlayerSave(name, out var saved))
+        if (FileManager.World.TryGetPlayerSave(name, out var saved))
             LoadSavedData(saved);
         else 
-            // ak data o hracovi nenajde nastavi jeho poziciu v ramci zaciatocneho bodu
+            // ak data o hracovi nenajde nastavi jeho poziciu v okruhu zaciatocneho bodu
             transform.position = Connector.instance.PlayerRandomSpawn;
     }
     /// <summary>

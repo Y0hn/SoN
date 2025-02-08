@@ -7,8 +7,8 @@ using UnityEngine;
 /// </summary>
 public class MainUIButton : MonoBehaviour
 {
-    [SerializeField] Button button;
-    [SerializeField] AudioClip clip;
+    [SerializeField] protected Button button;
+    [SerializeField] protected AudioClip clip;
     //[SerializeField] TMP_Text text;
     AudioSource source;
 
@@ -18,25 +18,25 @@ public class MainUIButton : MonoBehaviour
         set => text.text = value;
     }*/
 
-    void Awake()
+    protected virtual void Awake()
     {
         AddListener(OnClick);
         FileManager.Log($"{name} awoken");
     }
-    void Start()
+    protected virtual void Start()
     {
         
     }
-    void OnClick()
+    protected virtual void OnClick()
     {
-        FileManager.Log($"{name} clicked");
         source.PlayOneShot(clip);
+        FileManager.Log($"{name} clicked");
     }
-    public void AddListener(UnityAction call)
+    public virtual void AddListener(UnityAction call)
     {
         button.onClick.AddListener(call);
     }
-    public void SetAudioSource(AudioSource s)
+    public virtual void SetAudioSource(AudioSource s)
     {
         source = s;
     }
