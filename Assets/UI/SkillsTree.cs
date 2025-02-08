@@ -97,7 +97,7 @@ public class SkillTree
         else
             debug += "UNRECOGNIZED";
 
-        FileManager.Log(debug + $"\n{skill}", FileManager.MessageType.RECORD);
+        FileManager.Log(debug + $"\n{skill}", FileLogType.RECORD);
     }
     /// <summary>
     /// Zikanie zmeneneho utoku podla ziskanych schopnosti

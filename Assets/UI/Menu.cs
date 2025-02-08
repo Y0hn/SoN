@@ -12,7 +12,7 @@ public class MenuScript : MonoBehaviour
     [SerializeField] Connector conn;
     [SerializeField] new Camera camera;
     [SerializeField] Animator animator;
-    [SerializeField] Toggle onlineToggle;
+    [SerializeField] Toggle lanToggle;
     [SerializeField] Toggle fullScToggle;
     [SerializeField] AudioSource meneTheme;
     [SerializeField] AudioSource ui_sfx;
@@ -98,7 +98,7 @@ public class MenuScript : MonoBehaviour
     float timer;  
 
     public string PlayerName { get => inputFields["playerName"].text; set => inputFields["playerName"].text = value; }
-    public bool Online { get => onlineToggle.isOn;  set => onlineToggle.isOn = value;   }
+    public bool onlyLAN { get => lanToggle.isOn;  set => lanToggle.isOn = value;   }
     public bool FullSc { get => fullScToggle.isOn;  set => fullScToggle.isOn = value;   }
     public int Quality { get => quality.Q;          set => quality.Q = value;           }
     public float[] Audios 
@@ -128,14 +128,14 @@ public class MenuScript : MonoBehaviour
     {   
         SubscribeToButtons();
         ResetTextFields();
-        ResetUI();
-        
-        FileManager.LoadSettings();        
     }
     void Start() 
     {
-        conn ??= Connector.instance;
-        meneTheme.Play();        
+        if (conn == null)
+            conn = Connector.instance;
+        FileManager.Renew();
+        meneTheme.Play();
+        ResetUI();   
     }
     /// <summary>
     /// Sluzi pre animovanie "farebneho" prechodu
@@ -224,14 +224,17 @@ public class MenuScript : MonoBehaviour
     {
         if (1 < currentLayer.Count)
         {
-            // Chod o vrstvu vyssie
+            // Posun sa na predchadzajucu vrstvu -> vypni sucasnu
             uis[currentLayer.Pop()].SetActive(false);
             animator.SetTrigger("change");
             timer = Time.time + ANIMATION_DURATION;
         }
         else
+        {
             // Zavri hru
             Application.Quit();
+            FileManager.Log("GAME CLOSED", FileLogType.RECORD);
+        }
     }
     /// <summary>
     /// Spravuje navigaciu v hlavnom menu
@@ -249,42 +252,35 @@ public class MenuScript : MonoBehaviour
             case 3: currentLayer.Push("SubSett"); break;
 
             // PODPONUKA pre JEDNEHO hraca                          (localhost)
-            case 11: /* Zapne hru na localhoste */ conn.CreateSolo(); break;
-            case 12: /* Nacita zo subora hru    */  break; 
-            case 13: /* Vytvorit novu hru       */ conn.CreateSolo(); break;
+            case 11: /* Pokracuje v poslednom svete */ conn.CreateSolo(); break;
+            case 12: /* Nacita zo subora hru    */ currentLayer.Push("SubLoad"); break; 
+            case 13: /* Vytvorit novu hru       */ conn.CreateSolo(); layer= -1; break;
 
             // PODPONUKA pre VIAC hracov
-            case 21: 
-                if(NameTagCheck()) 
-                    currentLayer.Push("SubMultiStart");
-                break;  // vnori sa do ponuky pre server
-            case 22: 
-                if(NameTagCheck()) 
-                    currentLayer.Push("SubMultiJoin"); 
-                break;  // vnori sa do ponuky pre klienta
+            case 21: currentLayer.Push("SubMultiStart"); break;  // vnori sa do ponuky pre server
+            case 22: currentLayer.Push("SubMultiJoin");  break;  // vnori sa do ponuky pre klienta
 
             // PODPONUKA pre ZALOZENIE hry pre VIAC hracov          (pre server)
-            case 211: /* Nacita zo subora hru   */  break;
-            case 212: /* Vytvorit novu hru      */  StartConnection(Online); break;
+            case 211: /* Nacita zo subora hru   */  currentLayer.Push("SubLoad"); break;
+            case 212: /* Vytvorit novu hru      */  StartConnection(onlyLAN); layer= -1; break;
 
             // PODPONUKA pre PRIPOJENIE sa ho hry pre VIAC hracov   (pre klienta)
             case 221: 
                 /* Pripoji sa do uz existujucej hry */
-                ConnectionCheck();
+                if (ConnectionCheck())
+                    layer= -1;
                 break;
 
             default: 
-                FileManager.Log("Bad layer [" + layer + "] on MenuNavigation!", FileManager.MessageType.WARNING); 
+                FileManager.Log("Bad layer [" + layer + "] on MenuNavigation!", FileLogType.WARNING); 
                 break;
         }
 
         if (layer < 0)
         {
             meneTheme.Stop();
-
             gameObject.SetActive(false);
-            ResetUI();
-            FileManager.Log($"Game Started => MenuReset => MenuTheme Stoped", FileManager.MessageType.RECORD);
+            FileManager.Log($"Game Started => Menu Disabled => MenuTheme Stoped", FileLogType.RECORD);
         }
 
         FileManager.Log($"Navigation set to {currentLayer}");

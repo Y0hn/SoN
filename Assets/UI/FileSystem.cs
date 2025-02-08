@@ -29,6 +29,7 @@ public static class FileManager
     public static string SettingsPath   => AppData + SETTINGS_DEFAULT_PATH;
     public static string LogPath        => AppData + LOG_DEFAULT_PATH;
     public static string WorldPath      => AppData + WORLD_DEFAULT_PATH;
+    public static string NameWorldPath(string name)      => WorldPath + name + ".sav";
 
     /// <summary>
     /// Drzi udaje o aktualnom ulozeni sveta <br />
@@ -43,38 +44,88 @@ public static class FileManager
     /// Ulozene na kazdom klientovy lokalne
     /// </summary>
     private static Settings settings;
-    /// <summary>
-    /// Typ akcie na vykonanie so svetom
-    /// </summary>
-    public enum WorldAction { Create, Load, Save, Check }
 
     /// <summary>
-    /// Akcia spustenia hry
+    /// Nastavi "FileManager" pri vstupe do hlavneho menu <br />
+    /// Vymaze nacitany svet a Nacita ulozene nastavenia
     /// </summary>
-    /// <param name="action"></param>
-    /// <returns>PRAVDA ak prebehlo uspesne</returns>
-    public static bool WorldAct(string name, WorldAction action)
+    public static void Renew()
     {
-        bool acted= false;
-
-        switch (action)
-        {
-            case WorldAction.Create:
-                world = new();
-                acted = true;
-                break;
-            case WorldAction.Load:
-                acted = LoadWorldData(WorldPath+name);
-                break;
-            case WorldAction.Save:
-                acted = SaveWorldData(WorldPath+name);
-                break;
-            case WorldAction.Check:
-                break;
-        }
-
-        return acted;
+        world= null;
+        LoadSettings();
     }
+    /// <summary>
+    /// Ziska vsetky ulozene svety
+    /// </summary>
+    /// <returns>pole udajo SVETOV</returns>
+    public static World[] GetSavedWorlds()
+    {
+        // Ak priecinok neexistuje vytvori ho
+        if (!Directory.Exists(WorldPath))
+            Directory.CreateDirectory(WorldPath);
+
+        // Ziska vsetky cesty ulozenych svetom
+        string[] wrs = Directory.GetFiles(WorldPath);
+        // Nastavi velkost pola svetov
+        World[] worlds= new World[wrs.Length];
+
+        // Ziska udaje kazdeho sveta
+        for (int i = 0; i < wrs.Length; i++) 
+            worlds[i] = ReadWorld(wrs[i]);
+
+        return worlds;
+    }
+    /// <summary>
+    /// Ziska svet na ceste
+    /// </summary>
+    /// <param name="path">CESTA a nazov sveta</param>
+    /// <returns>SVET na ceste</returns>
+    public static World ReadWorld(string path)
+    {
+        FileStream stream= null;
+        World w= null;
+        try {
+            BinaryFormatter formatter = new();
+            stream = new(path, FileMode.Open);
+            w = formatter.Deserialize(stream) as World;
+        } finally {
+            stream?.Close();
+        }
+        return w;
+    }
+    /// <summary>
+    /// Zapise do udaje sveta binarneho suboru
+    /// </summary>
+    /// <param name="path">CESTA na zapis</param>
+    /// <param name="world">SVET s udajmi</param>
+    public static void WriteWorld(string path, ref World world)
+    {
+        FileStream stream= null;
+        try {
+            BinaryFormatter formatter = new();
+            stream = new(path, FileMode.Create);
+            formatter.Serialize(stream, world);
+        } finally {
+            stream?.Close();
+        }
+    }
+
+    /// <summary>
+    /// Spustanie sveta
+    /// </summary>
+    /// <param name="name"></param>
+    public static void StartWorld(string name = "")
+    {
+        if (name == "")
+        {
+            // enable tutor
+        }
+        else
+        {
+            WorldData(NameWorldPath(name));
+        }
+    }
+
     /// <summary>
     /// Ulozi data jedneho hraca pri jeho odpojeni
     /// </summary>
@@ -87,61 +138,56 @@ public static class FileManager
             world = new();
     }
     /// <summary>
-    /// Ulozenie aktualneho sveta do binarneho suboru
+    /// Ulozenie aktualneho sveta do binarneho suboru <br />
+    /// Alebo nacitanie sveta zo suboru
     /// </summary>
-    /// <param name="path">cesta a nazov suboru</param>
+    /// <param name="path">cesta a nazov SUBORU</param>
+    /// <param name="load">PRAVDA ak ma nacitat</param>
     /// <returns>PRAVDA ak prebehlo uspesne</returns>
-    private static bool SaveWorldData(string path)
+    private static bool WorldData(string path, bool load= true)
     {
-        bool saved = false;
-        FileStream stream = null;
+        bool 
+            fileExists = File.Exists(path),
+            success = false;
+
+        // napr. 
+        //  path= "$PREFIX/saves/world.sav"
+        //  worldName= "world" 
+        string worldName = path.Split('/')[^1].Split('.')[0];
+        World w = new(worldName);
+
+        // Ak je uz svet spusteny
+        if (world != null)
+            w.AddOfflinePlayers(world.players);
 
         try {
-            stream = new(path, FileMode.Create);
-            BinaryFormatter formatter = new();
+            // ak ma zo suboru citat
+            if (load && fileExists)
+            {
+                w= ReadWorld(path);
+                success = true;
+            }
+            // ak ma do suboru pisat
+            else if (!load)
+            {
+                WriteWorld(path, ref w);
+                world = w;
+                success = true;
+                Log($"World was {(fileExists ? "overwriten" : "new")}", FileLogType.RECORD);
+            }
+            else
+                Log($"World was {(fileExists ? "overwriten" : "new")}", FileLogType.RECORD);
 
-            World w = new();
+        } catch {
+            Log($"World file doesn't exist on path={path}", FileLogType.WARNING);
+        } finally {
+            // Nakoniec zatvori tok ak je otvoreny
             if (world != null)
                 w.AddOfflinePlayers(world.players);
-
-            formatter.Serialize(stream, w);
-            saved = File.Exists(path);
-            if (saved)
-                world = w;
-        } finally {
-            stream.Close();
-            Log($"World ({(saved ? "was" : "wasn't")}) saved: {world}");
+            world = w;
         }
 
-        return saved;
-    }
-    /// <summary>
-    /// Nacitanie sveta zo suboru
-    /// </summary>
-    /// <param name="path">cesta a nazov suboru</param>
-    /// <returns>PRAVDA ak prebehlo uspesne</returns>
-    private static bool LoadWorldData(string path)
-    {
-        bool loaded = false;
-
-        if (File.Exists(path))
-        {
-            FileStream stream = null;
-            try {
-                stream = new(path, FileMode.Open);
-                BinaryFormatter formatter = new();
-                World w = formatter.Deserialize(stream) as World;
-                world = w;
-                loaded = true;
-            } finally {
-                stream.Close();
-                Log($"World ({(loaded ? "was" : "wasn't")}) loaded: {world}");                
-            }
-        }
-        else
-            Log("Savefile not found: " + path, MessageType.ERROR);
-
-        return loaded;
+        return success;
     }
     /// <summary>
     /// Vytvori novy subor nastaveni podla aktualnych hodnot <br /> 
@@ -267,11 +313,11 @@ public static class FileManager
     /// </summary>
     /// <param name="message">sprava s udajmi</param>
     /// <param name="type">typ spravy</param>
-    public static void Log(string message, MessageType type = MessageType.LOG)
+    public static void Log(string message, FileLogType type = FileLogType.LOG)
     {
         // Zapise aktualny cas
         string log = $"[{DateTime.Now}] ";
-        bool writeToFile = type != MessageType.LOG;
+        bool writeToFile = type != FileLogType.LOG;
         if (writeToFile)
             log = "[RECORDED] " + log;
         log += message;
@@ -289,15 +335,15 @@ public static class FileManager
         switch (type)
         {
             default:                    Debug.Log(log);         break;
-            case MessageType.ERROR:     Debug.LogError(log);    break;
-            case MessageType.WARNING:   Debug.LogWarning(log);  break;
+            case FileLogType.ERROR:     Debug.LogError(log);    break;
+            case FileLogType.WARNING:   Debug.LogWarning(log);  break;
         }
     }
-    /// <summary>
-    /// Typ zapisu v denniku ("LOG" sa do suboru nepise)
-    /// </summary>
-    public enum MessageType { LOG, RECORD, ERROR, WARNING }
 }
+/// <summary>
+/// Typ zapisu v denniku ("LOG" sa do suboru nepise)
+/// </summary>
+public enum FileLogType { LOG, RECORD, ERROR, WARNING }
 
 /// <summary>
 /// Drzi informacie o poslednej konfiguracii nastaveni
@@ -322,10 +368,10 @@ public static class FileManager
             playerName = GameManager.UI.PlayerName;
             quality = GameManager.UI.Quality;
             audioS = GameManager.UI.Audios;
-            online = GameManager.UI.Online;
+            online = !GameManager.UI.onlyLAN;
             fullSc = GameManager.UI.FullSc;
         } catch (Exception ex) {
-            FileManager.Log($"Setting Creation Error \nExeption: {ex.Message}\nData: {ex.Data}", FileManager.MessageType.WARNING);
+            FileManager.Log($"Setting Creation Error \nExeption: {ex.Message}\nData: {ex.Data}", FileLogType.WARNING);
         }
     }
     /// <summary>
@@ -347,7 +393,7 @@ public static class FileManager
         GameManager.instance.PlayerName = playerName;
         GameManager.UI.Audios = audioS;
         GameManager.UI.Quality = quality;
-        GameManager.UI.Online = online;
+        GameManager.UI.onlyLAN = !online;
         GameManager.UI.FullSc = fullSc;
     }
     /// <summary>
@@ -464,7 +510,7 @@ public static class FileManager
         else
             players.Add(player);
 
-        FileManager.Log($"Player {player.etName} save {(0 < index ? "rewriten" : "added")} with values {player}", FileManager.MessageType.RECORD);
+        FileManager.Log($"Player {player.etName} save {(0 < index ? "rewriten" : "added")} with values {player}", FileLogType.RECORD);
     }    
     /// <summary>
     /// Ziska udaje hraca na zaklade mena
@@ -476,7 +522,7 @@ public static class FileManager
     {
         player = null;
         player = players.Find(p => p.etName == name);
-        FileManager.Log($"Player {name} requested save file: {(player != null ? player : "NOT FOUND")}", FileManager.MessageType.RECORD);
+        FileManager.Log($"Player {name} requested save file: {(player != null ? player : "NOT FOUND")}", FileLogType.RECORD);
         return player != null;
     }
     /// <summary>

@@ -39,7 +39,7 @@ public class Connector : MonoBehaviour
             instance = this;
         else
             Debug.LogError("More than one instance of Connection Manager");
-        FileManager.WorldAct("", FileManager.WorldAction.Create);
+        //FileManager.WorldAct(""/*, .Create*/);
     }
     async void Start()
     {
@@ -47,7 +47,7 @@ public class Connector : MonoBehaviour
         // Potrebne pripojenie na Internet
         netMan = NetworkManager.Singleton;
 
-        netMan.OnServerStopped += delegate { FileManager.WorldAct("", FileManager.WorldAction.Save); };
+        netMan.OnServerStopped += delegate { /*FileManager.WorldAct("", FileManager.WorldAction.Save); */};
 
         await UnityServices.InitializeAsync();
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
@@ -181,25 +181,33 @@ public class Connector : MonoBehaviour
     /// Vytvori hru pre jendneho hraca 
     /// Tym ze sa vytvori server na loopback adrese
     /// </summary>
-    public void CreateSolo()
+    public void CreateSolo(bool loadLast = false)
     {
         tporter.SetConnectionData("127.0.0.1", 7777);
-        netMan.StartHost(); 
-        //if ()
-        LoadWorld(false);
+        netMan.StartHost();
+        StartWorld(loadLast);
     }
     /// <summary>
     /// Nacita udaje z pamate pri nacitani sveta zo suboru
     /// </summary>
     /// <param name="load"></param>
     /// <param name="host"></param>
-    private void LoadWorld(bool load = false, bool host = true)
+    private void StartWorld(bool load = false)
     {
-        if      (host && load)
+        /*if      (host && load)
             FileManager.WorldAct("", FileManager.WorldAction.Load);
         else if (host && !load)
-            FileManager.WorldAct("", FileManager.WorldAction.Create);
+            FileManager.WorldAct("", FileManager.WorldAction.Create);*/
         // nacitat svet
+        if (load)
+        {
+
+        }
+        else
+        {
+            // vytvori novy svet
+            FileManager.StartWorld();
+        }
     }
     /// <summary>
     /// Na klientovy vypne pripojenie a na servere odpoji konkretneho klienta
@@ -222,6 +230,6 @@ public class Connector : MonoBehaviour
         Transform t = netMan.ConnectedClients[id].PlayerObject.transform;
         t.position = PlayerRandomSpawn;
         FileManager.World.SaveRewritePlayer(new (t.GetComponent<PlayerStats>()));
-        FileManager.Log($"Player respawned {t.name} ", FileManager.MessageType.RECORD);
+        FileManager.Log($"Player respawned {t.name} ", FileLogType.RECORD);
     }
 }

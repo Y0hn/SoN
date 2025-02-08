@@ -167,6 +167,7 @@ public class GameManager : MonoBehaviour
     void Quit()
     {
         SetGameUI(false);
+        UI.gameObject.SetActive(true);
         conn.Quit(player.OwnerClientId);
     }
     public Slider GetHpBar()
