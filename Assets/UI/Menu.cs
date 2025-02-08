@@ -93,10 +93,8 @@ public class Menu : MonoBehaviour
         {"SubSett"}
         {"SubLoad"}
     */
-    
-    const float ANIMATION_DURATION = 15f/60f + 25f/60f;
-    Stack<string> currentLayer;  
-    float timer;  
+    Stack<string> currentLayer;
+    bool goesUP; string disable;
 
     public string PlayerName { get => inputFields["playerName"].text; set => inputFields["playerName"].text = value; }
     public bool onlyLAN { get => lanToggle.isOn;  set => lanToggle.isOn = value;   }
@@ -140,15 +138,15 @@ public class Menu : MonoBehaviour
         ResetUI();   
     }
     /// <summary>
-    /// Sluzi pre animovanie "farebneho" prechodu
+    /// Sluzi pre stridanie ponuk - spusta nanimator
     /// </summary>
-    void FixedUpdate()
+    void SwitchActiveMenu()
     {
-        if (0 < timer && timer < Time.time)
-        {
-            uis[currentLayer.Peek()].SetActive(true);
-            timer = -1;
-        }
+        string last = goesUP ? currentLayer.Pop() : disable;
+
+        uis[last].SetActive(false);
+        uis[currentLayer.Peek()].SetActive(true);
+        goesUP = false;
     }
     /// <summary>
     /// Resetuje nastavenie UI elementov, cize zapne vsetky zakladne a vypne vsetky podradene ponuky
@@ -172,7 +170,7 @@ public class Menu : MonoBehaviour
         // Vypne vsetky "sub" ponuky
         foreach(string key in uis.Keys.ToList().FindAll(k => k.Contains("Sub")))
             uis[key].SetActive(false);
-        timer = -1;
+        goesUP = false;
     }
     void HideUI()
     {
@@ -238,9 +236,8 @@ public class Menu : MonoBehaviour
         if (1 < currentLayer.Count)
         {
             // Posun sa na predchadzajucu vrstvu -> vypni sucasnu
-            uis[currentLayer.Pop()].SetActive(false);
+            goesUP = true;
             animator.SetTrigger("change");
-            timer = Time.time + ANIMATION_DURATION;
         }
         else
         {
@@ -256,7 +253,7 @@ public class Menu : MonoBehaviour
     void MenuNavigation(sbyte to, sbyte from = 0)
     {
         int layer = 10*from + to;
-        uis[currentLayer.Peek()].SetActive(false);
+        disable = currentLayer.Peek();
         switch (layer)
         {
             // HLAVNE menu
@@ -306,7 +303,6 @@ public class Menu : MonoBehaviour
 
         FileManager.Log($"Navigation set to {currentLayer}");
         animator.SetTrigger("change");
-        timer = Time.time + ANIMATION_DURATION;
     }
     /// <summary>
     /// Po stlaceni tlacidla pre nacitanie konkretneho suboru hry
