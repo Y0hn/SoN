@@ -59,7 +59,12 @@ public class BosStats : NPStats
         base.OnNetworkSpawn();
 
         if (IsServer)
-            LoadSavedData(FileManager.World.boss);
+        {
+            if (FileManager.World.boss == null)
+                FileManager.World.boss = new (this);
+            else                
+                LoadSavedData(FileManager.World.boss);
+        }
     }
     /// <summary>
     /// <inheritdoc/>

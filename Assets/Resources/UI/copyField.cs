@@ -22,7 +22,8 @@ public class CopyField : MonoBehaviour
     public void SetUp(string connection)
     {
         string[] c = connection.Split('-');
-        
+        FileManager.Log(connection);
+
         if (c[0] == "solo")
             gameObject.SetActive(false);
         else

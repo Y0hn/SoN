@@ -195,6 +195,7 @@ public class PlayerStats : EntityStats
             xpBar = game.GetXpBar();
             xpBar.SliderValue = xp.Value;
             xpBar.LevelUP(1, xpMax.Value);
+            cam.gameObject.SetActive(true);
 
             // Nastavenie 
             int length = Enum.GetNames(typeof(Equipment.Slot)).Length-1;

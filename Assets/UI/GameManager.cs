@@ -188,7 +188,6 @@ public class GameManager : MonoBehaviour
         if (player == null) return;
         SetPlayerUI();
         AnimateFace(player.HP);
-        copy.SetUp(conn.GetConnection());
     }
     void SetGameUI(bool active = false)
     {
@@ -247,6 +246,7 @@ public class GameManager : MonoBehaviour
         inventory.ReloadAttacks();
 
         playerLives = lives;
+        copy.SetUp(conn.GetConnection());
     }
     
 

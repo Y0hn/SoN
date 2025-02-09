@@ -109,7 +109,7 @@ public class Connector : MonoBehaviour
         tporter.SetRelayServerData(relayServerData);
 
         // Zapne server
-        netMan.StartServer();
+        netMan.StartHost();
     }
     /// <summary>
     /// Zapne lokalny server
