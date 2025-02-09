@@ -35,7 +35,7 @@ public class PlayerController : EntityController
         if (IsOwner)
         {
             game = GameManager.instance;
-            game.PlayerSpawned((PlayerStats)stats);
+            game.PlayerSpawned(Stats);
             input_actions["attack"].action.started += Fire;
             input_actions["attack"].action.canceled += Fire;
             input_actions["q1"].action.started += Q1;
@@ -149,8 +149,8 @@ public class PlayerController : EntityController
         wasAttacking = false;
         if (Stats.TryInteruptAttack())
         {
-            stats.Animator.SetTrigger("attack");
-            stats.Animator.SetTrigger("interuptAttack");
+            Stats.Animator.SetTrigger("attack");
+            Stats.Animator.SetTrigger("interuptAttack");
             FileManager.Log("Attack interupted");
         }
     }
@@ -162,6 +162,6 @@ public class PlayerController : EntityController
     [Rpc(SendTo.Server)] protected void SetLiveRpc(ulong playerId)
     {
         Stats.IsAlive.Value = true;
-        Connector.instance.RespawnPlayer(playerId);
+        MapScript.map.SpawnPlayer(transform);
     }
 }

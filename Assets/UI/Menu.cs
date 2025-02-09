@@ -39,7 +39,7 @@ public class Menu : MonoBehaviour
         {"joinMultiJoin",   - }
     */
     [SerializedDictionary("Name", "InputField"), SerializeField]
-    private SerializedDictionary<string, TMP_InputField> inputFields = new();
+    private SerializedDictionary<string, InputFieldCheck> inputFields = new();
      /* OBSAH
         {"playerName",  - },
         {"ipCode",      - }
@@ -96,7 +96,17 @@ public class Menu : MonoBehaviour
     Stack<string> currentLayer;
     bool goesUP; string disable;
 
-    public string PlayerName { get => inputFields["playerName"].text; set => inputFields["playerName"].text = value; }
+    [HideInInspector] public string playerName;
+    public string PlayerName 
+    { 
+        get => playerName;
+        set
+        {
+            inputFields["playerN1"].Text = value;
+            inputFields["playerN2"].Text = value;
+            playerName = value;
+        }
+    }
     public bool onlyLAN { get => lanToggle.isOn;  set => lanToggle.isOn = value;   }
     public bool FullSc { get => fullScToggle.isOn;  set => fullScToggle.isOn = value;   }
     public int Quality { get => quality.Q;          set => quality.Q = value;           }
@@ -176,6 +186,7 @@ public class Menu : MonoBehaviour
     {
         meneTheme.Stop();
         gameObject.SetActive(false);
+        FileManager.RegeneradeSettings();
         FileManager.Log($"Game Started => Menu Disabled => MenuTheme Stoped", FileLogType.RECORD);
     }
     /// <summary>
@@ -262,7 +273,10 @@ public class Menu : MonoBehaviour
             case 3: currentLayer.Push("SubSett"); break;
 
             // PODPONUKA pre JEDNEHO hraca                          (localhost)
-            case 11: /* Pokracuje v poslednom svete */ conn.CreateSolo(); layer= -1; break;
+            case 11: /* Pokracuje v poslednom svete */ 
+                conn.CreateSolo(); 
+                layer= -1; 
+                break;
             case 12: /* Nacita zo subora hru    */ currentLayer.Push("SubLoad"); break; 
             case 13: /* Vytvorit novu hru       */ currentLayer.Push("SubCreate"); break;
 
@@ -271,25 +285,27 @@ public class Menu : MonoBehaviour
             case 22: currentLayer.Push("SubMultiJoin");  break;  // vnori sa do ponuky pre klienta
 
             // PODPONUKA pre ZALOZENIE hry pre VIAC hracov          (pre server)
-            case 211: /* Nacita zo subora hru   */  if(NameTagCheck()) currentLayer.Push("SubLoad"); break;
-            case 212: /* Vytvorit novu hru      */  if(NameTagCheck()) currentLayer.Push("SubCreate"); break;
+            case 211: /* Nacita zo subora hru   */  currentLayer.Push("SubLoad"); break;
+            case 212: /* Vytvorit novu hru      */  currentLayer.Push("SubCreate"); break;
 
             /// PODPONUKA pre VYTVORENIE sveta
             case 0:
-                string s = inputFields["worldName"].text.Trim();
-                if (s == "") 
-                    s = "my-world";
-                FileManager.StartWorld(s);
+                if (inputFields["worldName"].Check)
+                {
+                    FileManager.StartWorld(inputFields["worldName"].Text);
+                    layer= -1;
+                }
                 break;
 
             // PODPONUKA pre PRIPOJENIE sa ho hry pre VIAC hracov   (pre klienta)
             case 221: 
                 /* Pripoji sa do uz existujucej hry */
-                if (ConnectionCheck())
-                    layer= -1;
+                //if (ConnectionCheck())
+                layer= -1;
                 break;
 
             case -1: 
+                FileManager.Log("Hiding UI");
                 break;
             default: 
                 FileManager.Log("Bad layer [" + layer + "] on MenuNavigation!", FileLogType.WARNING); 
@@ -299,7 +315,10 @@ public class Menu : MonoBehaviour
         // v niektorych pripadoch v prepinaci je "layer= -1;" to znamena ze hrac chce vstupit do hry,
         // cize hlavne menu sa vypne
         if (layer < 0)
+        {
             HideUI();
+
+        }
 
         FileManager.Log($"Navigation set to {currentLayer}");
         animator.SetTrigger("change");
@@ -313,67 +332,29 @@ public class Menu : MonoBehaviour
         FileManager.StartWorld(worldName);
         MenuNavigation(-1);
     }
-
-    /// <summary>
-    /// Overi spravnost mena hraca
-    /// </summary>
-    /// <returns>PRAVDA ak je spravne</returns>
-    bool NameTagCheck()
-    {
-        bool check = false;
-
-        string player = inputFields["playerName"].text.Trim();
-
-        if (player == "")
-        {
-            textFields["UserNameError"].text = "Type your name";
-        }
-        else if (player.Length < 2)
-        {
-            textFields["UserNameError"].text = "Name must be longer";
-        }
-        else
-        {
-            textFields["UserNameError"].text = "";
-            check = true;
-        }
-
-        if (check)
-            FileManager.RegeneradeSettings();
-        return check;
-    }
-    /// <summary>
+    /* <summary>
     /// Spusti hru ako hostitel
     /// </summary>
     /// <param name="online">PRAVDA spusti online inak lokane</param>
     /// <param name="load">PRAVDA nacita hru zo suboru</param>
     void StartConnection(bool online, bool load = false)
     {
-        meneTheme.Stop();
-        FileManager.RegeneradeSettings();
         if (!load)
         {
             conn.StartConnection(online);
         }
-        else
-        {
-            Debug.LogError("NONIMPLEMENTED EXEPTION");
-        }
-    }
+    }*/
+
     /// <summary>
-    /// Pokusi sa pripojit do hry pre viac hracov
+    /// Sluzi pre nacitanie hodnot z nastaveni
     /// </summary>
-    /// <returns>PRAVDA ak je pokus uspasny</returns>
-    bool ConnectionCheck()
+    /// <param name="settings">hodnoty NASTAVENI</param>
+    public void LoadSettings(Settings settings)
     {
-        meneTheme.Stop();
-        FileManager.RegeneradeSettings();
-        string ipCode = inputFields["ipCode"].text.Trim();
-        bool check = conn.JoinConnection(ipCode, out string e);
-
-        if (!check)
-            textFields["IPCodeError"].text = e;
-
-        return check;
+        Audios = settings.audioS;
+        Quality= settings.quality;
+        onlyLAN=!settings.Online;
+        FullSc = settings.fullSc;
+        PlayerName = settings.playerName;
     }
 }

@@ -9,6 +9,7 @@ public class MapScript : MapSizer
     public static MapScript map;
     [SerializeField] Transform spawLines;
     [SerializeField] Transform extractions;
+    [SerializeField] Vector2 playerSpawnRange = new(5,5);
     [SerializeField] Transform PlayerSpawnPoint;
     [SerializeField] Transform BossSpawnPoint;
     [SerializeField] GameObject[] regularEnemiesTier1;
@@ -16,6 +17,9 @@ public class MapScript : MapSizer
 
     public Transform PlaySpawn => PlayerSpawnPoint;
     public Transform BossSpawn => BossSpawnPoint;
+    public Vector2 PlayerRandomSpawn => 
+        new(PlaySpawn.position.x + Random.Range(-playerSpawnRange.x, playerSpawnRange.x), 
+            PlaySpawn.position.y + Random.Range(-playerSpawnRange.y, playerSpawnRange.y));
 
     /// <summary>
     /// Zavola sa pred prvym snimkom obrazovky hry
@@ -26,7 +30,10 @@ public class MapScript : MapSizer
     /// </summary>
     protected override void Start()
     {
-
+        if (FileManager.World.boss == null)
+        {
+            SpawnBoss();
+        }
     }
     /// <summary>
     /// <inheritdoc/>
@@ -34,6 +41,16 @@ public class MapScript : MapSizer
     protected override void DrawWireCube()
     {        
         Gizmos.DrawWireCube(transform.position + offset, size);
+    }
+    /// <summary>
+    /// Je volana z hraca, pri prvom pripojeni alebo zo servera ked sa hrac ozivy. <br />
+    /// Presunie hraca do okruhu zaciatocneho bodu
+    /// </summary>
+    /// <param name="player">HRAC</param>
+    public void SpawnPlayer(Transform player)
+    {
+        player.position = PlayerRandomSpawn;
+        FileManager.Log($"Player respawned {player.name} on position ({player.position.x},{player.position.y})", FileLogType.RECORD);
     }
     /// <summary>
     /// Musi byt server aby spustil tuto funkciu
@@ -82,6 +99,10 @@ public class MapScript : MapSizer
         Transform target = extractions.GetChild(Random.Range(0,extractions.childCount));
         enemy.GetComponent<NPController>().SetDefaultTarget(target);
     }
+    /// <summary>
+    /// Musi byt server aby spustil tuto funkciu. <br />
+    /// Spusta sa len pri vytvarani noveho sveta.
+    /// </summary>
     void SpawnBoss()
     {
         GameObject v = Resources.Load<GameObject>("Entities/Veles/Veles");

@@ -139,7 +139,7 @@ public class PlayerStats : EntityStats
             LoadSavedData(saved);
         else 
             // ak data o hracovi nenajde nastavi jeho poziciu v okruhu zaciatocneho bodu
-            transform.position = Connector.instance.PlayerRandomSpawn;
+            MapScript.map.SpawnPlayer(transform);
     }
     /// <summary>
     /// <inheritdoc/>
@@ -201,7 +201,7 @@ public class PlayerStats : EntityStats
             for (; equipment.Count < length;)
                 equipment.Add("");
 
-            playerName.Value = game.PlayerName;
+            playerName.Value = Menu.menu.PlayerName;
         }
         chatTimer = 0;
         chatBox.text = "";

@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 using Unity.Services.Core;
 using Unity.Services.Relay;
@@ -7,39 +6,33 @@ using Unity.Services.Authentication;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
-using System.IO;
 
 /// <summary>
 /// Sluzi na zhrnutie parametrov potrebnych pre pripojenie
 /// </summary>
 public class Connector : MonoBehaviour
 {
+    private const string LOCALHOST = "127.0.0.1";
     public static Connector instance;
 
-    [SerializeField] Vector2 spawnRange = new(5,5);
     [SerializeField] int maxConnections = 10;
     [SerializeField] UnityTransport tporter;
     public NetworkManager netMan;
-    public TMP_Text codeText;
+    private string serverIPcode;
+    private bool running;
 
-    public Transform SpawnPoint { get; set;}
+    public bool Online => Application.internetReachability != NetworkReachability.NotReachable;
 
     /// <summary>
     /// Ziska si lokanu ip adresu pocitaca
     /// </summary>
     /// <returns>IP_ADRESA</returns>
     private string ServerIP => IPManager.GetIP();
-    public Vector2 PlayerRandomSpawn => 
-        new(MapScript.map.PlaySpawn.position.x + Random.Range(-spawnRange.x, spawnRange.x), 
-            MapScript.map.PlaySpawn.position.y + Random.Range(-spawnRange.y, spawnRange.y));
 
     void Awake()
     {
-        if (instance == null)
-            instance = this;
-        else
-            Debug.LogError("More than one instance of Connection Manager");
-        //FileManager.WorldAct(""/*, .Create*/);
+        instance = this;
+        running = false;
     }
     async void Start()
     {
@@ -52,14 +45,27 @@ public class Connector : MonoBehaviour
         await UnityServices.InitializeAsync();
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
     }
-    /*
-           ____         __             
-          / __ \ ___   / /____ _ __  __
-         / /_/ // _ \ / // __ `// / / /
-        / _, _//  __// // /_/ // /_/ / 
-       /_/ |_| \___//_/ \__,_/ \__, /  
-                              /____/   
-    */
+
+
+    public string GetConnection()
+    {
+        string conn = "";
+        
+        if (running)
+            if (serverIPcode != LOCALHOST)
+            {
+                conn += netMan.IsServer ? "server-" : "client-";
+                conn += serverIPcode;
+            }
+            else
+            {
+                conn += "solo-";
+                conn += FileManager.World.worldName;
+            }
+
+        return conn;
+    }
+
     /// <summary>
     /// Vytvori server pre vzdialene pripojenie  
     /// </summary>
@@ -78,8 +84,8 @@ public class Connector : MonoBehaviour
             netMan.StartHost();
         else
             netMan.StartServer();
+        
 
-        codeText.text = joinCode;        
     }
     /// <summary>
     /// Pripoji sa n a vzdialeny server
@@ -92,8 +98,8 @@ public class Connector : MonoBehaviour
         var relayServerData = new RelayServerData(JoinAllocation, "dtls");
         netMan.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
-        if (netMan.StartClient())
-            codeText.text = joinCode;
+        /*if (netMan.StartClient())
+            codeText.text = joinCode;*/
     }
     /*
             __     ___     _   __
@@ -115,7 +121,7 @@ public class Connector : MonoBehaviour
         else
             netMan.StartServer();
 
-        codeText.text = ServerIP;
+        //codeText.text = ServerIP;
     }
     /// <summary>
     /// Pripoji sa na server v lokalnej sieti
@@ -124,8 +130,8 @@ public class Connector : MonoBehaviour
     void JoinLAN(string serverIP)
     {
         tporter.SetConnectionData(ServerIP, 7777);
-        if (netMan.StartClient())
-            codeText.text = ServerIP;
+        /*if (netMan.StartClient())
+            codeText.text = ServerIP;*/
     }
     /// <summary>
     /// Zapne server na lokalnej sieti alebo na online prepojeni
@@ -196,16 +202,5 @@ public class Connector : MonoBehaviour
             netMan.DisconnectClient(id);
         else
             netMan.Shutdown();
-    }
-    /// <summary>
-    /// Je volana z hraca, ktory sa chce ozivit. <br />
-    /// Nastavi jeho poziciu na vychodiskovu poziciu a ulozi jeho data
-    /// </summary>
-    /// <param name="id"></param>
-    public void RespawnPlayer(ulong id)
-    {
-        Transform t = netMan.ConnectedClients[id].PlayerObject.transform;
-        t.position = PlayerRandomSpawn;
-        FileManager.Log($"Player respawned {t.name} ", FileLogType.RECORD);
     }
 }

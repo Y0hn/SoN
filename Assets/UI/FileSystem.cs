@@ -4,12 +4,14 @@ using System.Xml.Serialization;
 using System.IO;
 using System;
 using UnityEngine;
+using System.Linq;
 
 /// <summary>
 /// Sluzi pre ziskavanie, nastavenie a ukladanie dat
 /// </summary>
 public static class FileManager
 {
+    #region File Paths
     // relativna cesta v priecinku "RECOURCES"
     public const string ITEM_DEFAULT_PATH = @"Items";
     public const string SKILLS_ICONS_PATH = @"UI/skills/";
@@ -29,13 +31,23 @@ public static class FileManager
     public static string SettingsPath   => AppData + SETTINGS_DEFAULT_PATH;
     public static string LogPath        => AppData + LOG_DEFAULT_PATH;
     public static string WorldPath      => AppData + WORLD_DEFAULT_PATH;
-    
+
+    // Vsetky subory svetov
+    public static string[] Worlds       => Directory.GetFiles(WorldPath);
+
     /// <summary>
     /// K menu sveta prida cestu a priponu
     /// </summary>
     /// <param name="name">nazov SVETA (napr. world)</param>
     /// <returns>CESTU k svetu (napr. "/saves/world.sav")</returns>
-    public static string NameWorldPath(string name)      => WorldPath + name + ".sav";
+    public static string NameToWorldPath(string name)      => WorldPath + name + ".sav";
+    /// <summary>
+    /// Z cesty ku svetu ziska jeho nazov
+    /// </summary>
+    /// <param name="path">CESTA ku suboru sveta (napr. "./saves/novysvet.sav")</param>
+    /// <returns>NAZOV sveta (napr. novysvet)</returns>
+    public static string WorldPathToName(string path)      => path.Split('/')[^1].Split('.')[0];
+    #endregion
 
     /// <summary>
     /// Drzi udaje o aktualnom ulozeni sveta <br />
@@ -58,6 +70,8 @@ public static class FileManager
         world= null;
         LoadSettings();
     }
+
+    #region WorldLoader
     /// <summary>
     /// Ziska vsetky ulozene svety
     /// </summary>
@@ -69,7 +83,7 @@ public static class FileManager
             Directory.CreateDirectory(WorldPath);
 
         // Ziska vsetky cesty ulozenych svetom
-        string[] wrs = Directory.GetFiles(WorldPath);
+        string[] wrs = Worlds;
         // Nastavi velkost pola svetov
         World[] worlds= new World[wrs.Length];
 
@@ -119,7 +133,7 @@ public static class FileManager
     /// <param name="name"></param>
     public static void StartWorld(string name) 
     {
-        string path = NameWorldPath(name);
+        string path = NameToWorldPath(name);
 
         if (File.Exists(path))
         {
@@ -135,7 +149,7 @@ public static class FileManager
     }
     public static void EndWorld()
     {
-        string path = NameWorldPath(world.worldName);
+        string path = NameToWorldPath(world.worldName);
         
         // Ziska aktualne udaje o svete
         World w = new(world.worldName);
@@ -159,6 +173,8 @@ public static class FileManager
         else
             world = new();
     }
+    #endregion
+    #region SettingsLoader
     /// <summary>
     /// Vytvori novy subor nastaveni podla aktualnych hodnot <br /> 
     /// ulozi ho vo formate .xml a prepise ten stary
@@ -198,7 +214,7 @@ public static class FileManager
 
                 // Nacitane hodnoty zo suboru nastavi ako aktuale
                 settings ??= new();
-                settings?.LoadSettings((Settings)serializer.Deserialize(reader));
+                settings.LoadSettings((Settings)serializer.Deserialize(reader));
             }
             finally
             {
@@ -207,9 +223,8 @@ public static class FileManager
             }
         }
     }
-    
-    
-    
+    #endregion
+    #region References
     /// <summary>
     /// Vrati cestu k ikone utoku podla typu utoku 
     /// </summary>
@@ -281,8 +296,8 @@ public static class FileManager
         return list.ToArray();
     }
 
-    
-    
+    #endregion
+    #region LOG
     /// <summary>
     /// Ziskavanie a zapisovanie blizsich informacii o stave hry
     /// </summary>
@@ -319,19 +334,26 @@ public static class FileManager
 /// Typ zapisu v denniku ("LOG" sa do suboru nepise)
 /// </summary>
 public enum FileLogType { LOG, RECORD, ERROR, WARNING }
-
+#endregion
+#region SETTINGS
 /// <summary>
 /// Drzi informacie o poslednej konfiguracii nastaveni
 /// </summary>
 [Serializable] public class Settings
 {
-    public bool online;
     public bool fullSc;
     public int quality;
     public string playerName;
-    public string lastConnection;
     public float[] audioS;
-    // ...
+    
+    /// <summary>
+    /// Multifukcne pole textu sluziace ako posledne
+    /// </summary>
+    public string lastConnection;
+    public bool Solo => lastConnection.Contains("solo-");
+    public bool Server => lastConnection.Contains("server-");
+    public bool Online => lastConnection.Count(o => o == '.') == 3;
+    public bool Client => !(Solo || Server);
 
     /// <summary>
     /// Ziska si hodnoty zo statickych clenov menu
@@ -339,11 +361,10 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
     public Settings()
     {
         try {
-            lastConnection = Connector.instance.codeText.text;
+            lastConnection = Connector.instance.GetConnection();
             playerName = Menu.menu.PlayerName;
             quality = Menu.menu.Quality;
             audioS = Menu.menu.Audios;
-            online = !Menu.menu.onlyLAN;
             fullSc = Menu.menu.FullSc;
         } catch (Exception ex) {
             FileManager.Log($"Setting Creation Error \nExeption: {ex.Message}\nData: {ex.Data}", FileLogType.WARNING);
@@ -356,7 +377,6 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
     public void LoadSettings(Settings settings)
     {
         // Nastavi hodnoty z 
-        online = settings.online;
         fullSc = settings.fullSc;
         audioS = settings.audioS;
         quality = settings.quality;
@@ -364,12 +384,7 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
         lastConnection = settings.lastConnection;
         
         // Nastavi vlastnosti hry podla novych hodnot
-        Connector.instance.codeText.text = lastConnection;
-        GameManager.instance.PlayerName = playerName;
-        Menu.menu.Audios = audioS;
-        Menu.menu.Quality = quality;
-        Menu.menu.onlyLAN = !online;
-        Menu.menu.FullSc = fullSc;
+        Menu.menu.LoadSettings(settings);
     }
     /// <summary>
     /// Sluzi ako moznost kontroly spravnosti ulozenia nastaveni
@@ -389,14 +404,14 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
 
         return
             $"Player NameTag= {playerName}\n"+
-            $"Last played online= {online}\n"+
-            $"Last game Connected= {lastConnection}\n"+
+            $"Last connection= {lastConnection}\n"+
             $"Quality setting= {quality}\n"+
             $"Fullscreen= {fullSc}\n"+
             $"Auidos list: {auL}";
     }
 }
-
+#endregion
+#region WORLD
 /// <summary>
 /// Drzi hodnoty potrebne pre bezproblemove nacitanie zo suboru
 /// </summary>
@@ -708,3 +723,4 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
         }
     }
 }
+#endregion

@@ -10,21 +10,18 @@ using TMPro;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-    void Awake() => instance = this;
-    public static GameManager instance;
-    public static Menu UI         { get => instance.menu; }    
+    public static GameManager instance;  
     [SerializeField] SkillPanel skillTree;
+    [SerializeField] CopyField copy;
+    [SerializeField] Button quit;
     [SerializeField] Menu menu;
     [SerializeField] Connector conn;
     [SerializeField] Animator anima;
     [SerializeField] UpperPanel uPl;
+    [SerializeField] TMP_InputField chat;
     private bool paused;
     private bool chatting;
     private PlayerStats player;
-    [SerializedDictionary("Name", "buttn"), SerializeField]         SerializedDictionary<string, Button> buttons = new();           /*  OBSAH
-        {"copy"},
-        {"quit"},
-    */
     [SerializedDictionary("Name", "Field"), SerializeField]         SerializedDictionary<string, TMP_Text> textFields = new();      /*  OBSAH   */
     [SerializedDictionary("Name", "Objkt"), SerializeField]         SerializedDictionary<string, GameObject> uiPanels = new();          /*  OBSAH
         {"mainCam",         -},
@@ -39,10 +36,6 @@ public class GameManager : MonoBehaviour
         {"playerUIxpBar",   -},
 
         {"quitUI",          -}
-    */
-    [SerializedDictionary("Name", "Field"), SerializeField]         SerializedDictionary<string, TMP_InputField> inputFields = new();   /*  OBSAH   
-        {"name"},
-        {"chat"},
     */
     [SerializedDictionary("Name", "input"), SerializeField]         SerializedDictionary<string, InputActionReference> inputs = new();  /*  OBSAH
         {"pause"},
@@ -73,10 +66,10 @@ public class GameManager : MonoBehaviour
     public PlayerStats LocalPlayer  { get => player; } 
     public SkillPanel SkillTree     { get => skillTree; }
     public bool PlayerAble          { get => !(paused || chatting || inventory.open); }
-    public string PlayerName        { get { return inputFields["name"].text.Trim(); } set { inputFields["name"].text = value; } }
     public bool IsServer            { get { bool? b = conn.netMan?.IsServer; return b != null && b.Value; } }
-    void Start()
+    void Awake()
     {
+        instance = this;
         uiPanels["mainCam"].SetActive(true);
         SetUpTextFields();
         SubscribeInput();
@@ -102,13 +95,12 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void SubscribeInput()
     {
-        // Stanovuje vstupy pre input system
+        // Stanovuje vstupy pre "input system"
         inputs["pause"].action.started += OC_Pause;
         inputs["chat"].action.started += OpenChat;
         inputs["submit"].action.started += SendMess;
 
-        buttons["copy"].onClick.AddListener(Copy);
-        buttons["quit"].onClick.AddListener(Quit);
+        quit.onClick.AddListener(Quit);
     }
     /// <summary>
     /// Otvori/Zavrie pauzove menu
@@ -148,20 +140,24 @@ public class GameManager : MonoBehaviour
         {
             chatting = true;
             uiPanels["chatUI"].SetActive(chatting);
-            inputFields["chat"].Select();
-            inputFields["chat"].ActivateInputField();
+            chat.Select();
+            chat.ActivateInputField();
         }
     }
+    /// <summary>
+    /// Odosle spravu do cetu
+    /// </summary>
+    /// <param name="context"></param>
     void SendMess(InputAction.CallbackContext context)
     {
         if (chatting)
         {
             chatting = false;
             uiPanels["chatUI"].SetActive(chatting);
-            string mess = inputFields["chat"].text.Trim()/*.Substring(0, 64)*/;
-            if (inputFields["chat"].text.Trim() == "") return;
+            string mess = chat.text.Trim()/*.Substring(0, 64)*/;
+            if (chat.text.Trim() == "") return;
             player.message.Value = mess;
-            inputFields["chat"].text = "";
+            chat.text = "";
         }
     }
     void Quit()
@@ -170,6 +166,7 @@ public class GameManager : MonoBehaviour
         Menu.menu.gameObject.SetActive(true);
         conn.Quit(player.OwnerClientId);
     }
+    
     public Slider GetHpBar()
     {
         return uiPanels["playerUIhpBar"].GetComponent<Slider>();
@@ -242,11 +239,6 @@ public class GameManager : MonoBehaviour
         inventory.ReloadAttacks();
 
         playerLives = lives;
-    }
-    public void Copy()
-    { 
-        GUIUtility.systemCopyBuffer = conn.codeText.text; 
-        anima.SetTrigger("copy"); 
     }
     
 

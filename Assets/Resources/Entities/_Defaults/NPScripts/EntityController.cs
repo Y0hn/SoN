@@ -47,32 +47,32 @@ public abstract class EntityController : NetworkBehaviour
     /// </summary>
     protected virtual void AnimateMovement()
     {
-        if (stats.Animator == null) return;
+        if (Stats.Animator == null) return;
         if (moveDir.magnitude > MIN_MOVE_TOL)
         {
-            if (!stats.Animator.GetBool("move"))
-                stats.Animator.SetBool("move", true);
+            if (!Stats.Animator.GetBool("move"))
+                Stats.Animator.SetBool("move", true);
 
-            stats.Animator.SetFloat("horizontal", moveDir.x);
-            stats.Animator.SetFloat("vertical", moveDir.y);
+            Stats.Animator.SetFloat("horizontal", moveDir.x);
+            Stats.Animator.SetFloat("vertical", moveDir.y);
 
-            float mod = stats.speed.Value * Time.deltaTime;
-            stats.RigidBody2D.linearVelocity = moveDir * mod;
+            float mod = Stats.speed.Value * Time.deltaTime;
+            Stats.RigidBody2D.linearVelocity = moveDir * mod;
             
             if (stepTimer == 0)
             {
-                stepTimer = Time.time + 1/(stats.speed.Value/100f)/8f;
+                stepTimer = Time.time + 1/(Stats.speed.Value/100f)/8f;
             }
             if (stepTimer < Time.time)
             {
                 Stats.PlaySoundRpc("step");
-                stepTimer = Time.time + 1/(stats.speed.Value/100f)/2f;
+                stepTimer = Time.time + 1/(Stats.speed.Value/100f)/2f;
             }
         }
         else
         {
-            stats.RigidBody2D.linearVelocity = Vector2.zero;
-            stats.Animator.SetBool("move", false);
+            Stats.RigidBody2D.linearVelocity = Vector2.zero;
+            Stats.Animator.SetBool("move", false);
             stepTimer = 0;
         }
     }
@@ -81,18 +81,18 @@ public abstract class EntityController : NetworkBehaviour
     /// </summary>
     protected virtual void Attack()
     {
-        if (stats.AttackTrigger())
+        if (Stats.AttackTrigger())
         {
             // sem sa dostane ak moze utocit (uz utoci) 
             // ak je casovac utoku < cas
-            if (stats.AttackBoth)   
+            if (Stats.AttackBoth)   
             {
                 // ak utok pouziva obe ruky tak sa meni utociaca ruka
-                float atBlend = stats.Animator.GetFloat("atBlend") * -1;
-                stats.Animator.SetFloat("atBlend", atBlend);
+                float atBlend = Stats.Animator.GetFloat("atBlend") * -1;
+                Stats.Animator.SetFloat("atBlend", atBlend);
             }
             // zanimuje utok
-            stats.Animator.SetTrigger("attack");
+            Stats.Animator.SetTrigger("attack");
         }
     }
 }

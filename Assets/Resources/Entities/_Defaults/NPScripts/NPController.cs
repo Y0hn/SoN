@@ -25,12 +25,12 @@ public class NPController : EntityController
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        ((NPStats)stats).OnHit += delegate { ForceDecision = true; };
+        Stats.OnHit += delegate { ForceDecision = true; };
         if (IsServer)
         {
             sensor.targetChange += SetTarget;
-            stats.OnDeath += sensor.DisableSensor;
-            path.endReachedDistance = ((NPStats)stats).AttackDistance;
+            Stats.OnDeath += sensor.DisableSensor;
+            path.endReachedDistance = Stats.AttackDistance;
         }
     }
     /// <summary>
@@ -38,7 +38,7 @@ public class NPController : EntityController
     /// </summary>
     protected override void Update()
     {
-        if (!IsServer || path == null || !stats.IsAlive.Value) return;
+        if (!IsServer || path == null || !Stats.IsAlive.Value) return;
             
         if (selfTarget && moveDir != Vector2.zero)
         {
@@ -124,8 +124,8 @@ public class NPController : EntityController
         
         if (viewDir != Vector2.zero)
         {
-            stats.Animator.SetFloat("horizontal", viewDir.x);
-            stats.Animator.SetFloat("vertical", viewDir.y);
+            Stats.Animator.SetFloat("horizontal", viewDir.x);
+            Stats.Animator.SetFloat("vertical", viewDir.y);
         }
     }
 }
