@@ -30,10 +30,7 @@ public class MapScript : MapSizer
     /// </summary>
     protected override void Start()
     {
-        if (FileManager.World.boss == null)
-        {
-            SpawnBoss();
-        }
+
     }
     /// <summary>
     /// <inheritdoc/>
@@ -103,7 +100,7 @@ public class MapScript : MapSizer
     /// Musi byt server aby spustil tuto funkciu. <br />
     /// Spusta sa len pri vytvarani noveho sveta.
     /// </summary>
-    void SpawnBoss()
+    public void SpawnBoss()
     {
         GameObject v = Resources.Load<GameObject>("Entities/Veles/Veles");
         Instantiate(v, BossSpawn).GetComponent<NetworkObject>().Spawn();

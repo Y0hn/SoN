@@ -5,6 +5,7 @@ using System.IO;
 using System;
 using UnityEngine;
 using System.Linq;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Sluzi pre ziskavanie, nastavenie a ukladanie dat
@@ -131,7 +132,7 @@ public static class FileManager
     /// Spustanie sveta
     /// </summary>
     /// <param name="name"></param>
-    public static void StartWorld(string name) 
+    public static async Task StartWorld(string name, bool online = true) 
     {
         string path = NameToWorldPath(name);
 
@@ -145,6 +146,7 @@ public static class FileManager
             world.worldName = name;
         }
 
+        await Connector.instance.StartServer(online);
         Log("World has been opened");
     }
     public static void EndWorld()

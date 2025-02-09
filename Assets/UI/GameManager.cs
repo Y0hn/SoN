@@ -70,15 +70,22 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         instance = this;
-        uiPanels["mainCam"].SetActive(true);
+        //uiPanels["mainCam"].SetActive(true);
         SetUpTextFields();
         SubscribeInput();
         SetGameUI();
     }
     void Update()
     {
-        if (IsServer && MapScript.map != null && NPStats.NPCount < MAX_NPC_COUNT)
-            MapScript.map.SpawnEnemy();
+        if (IsServer && FileManager.World != null && MapScript.map != null)
+        {
+            if (NPStats.NPCount < MAX_NPC_COUNT)
+               MapScript.map.SpawnEnemy();
+
+            else if (FileManager.World.boss == null)
+                MapScript.map.SpawnBoss();
+            
+        }
     }
     /// <summary>
     /// Nastavi hodnoty pre textove polia <br />
@@ -181,6 +188,7 @@ public class GameManager : MonoBehaviour
         if (player == null) return;
         SetPlayerUI();
         AnimateFace(player.HP);
+        copy.SetUp(conn.GetConnection());
     }
     void SetGameUI(bool active = false)
     {
@@ -192,7 +200,7 @@ public class GameManager : MonoBehaviour
         uiPanels["chatUI"].SetActive(false);
         chatting = false;
         
-        uiPanels["mainCam"].SetActive(!active);
+        //uiPanels["mainCam"].SetActive(!active);
     }
     
     public void LevelUP(byte level)

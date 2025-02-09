@@ -1,3 +1,6 @@
+/// <summary>
+/// <inheritdoc/> mena hraca
+/// </summary>
 public class PlayerNameField : InputFieldCheck
 {
     public override bool Check => base.Check || !gameObject.activeInHierarchy;
@@ -27,8 +30,8 @@ public class PlayerNameField : InputFieldCheck
 
         if (check)
         {
-            FileManager.RegeneradeSettings();
             Menu.menu.playerName = player;
+            FileManager.RegeneradeSettings();
         }
         return check;
     }

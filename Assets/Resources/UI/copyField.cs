@@ -1,6 +1,7 @@
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
 
 public class CopyField : MonoBehaviour
 {
@@ -21,8 +22,16 @@ public class CopyField : MonoBehaviour
     public void SetUp(string connection)
     {
         string[] c = connection.Split('-');
-        label.text = c[0];
-        text.text = c[1];
-        gameObject.SetActive(!c[0].Contains("solo"));
+        
+        if (c[0] == "solo")
+            gameObject.SetActive(false);
+        else
+        {
+            label.text = c[0].FirstCharacterToUpper();
+            label.text+= $" {(c[1].Contains('.') ? "address" : "code")}";
+            label.text+= ": ";
+            text.text = c[1];
+            gameObject.SetActive(!c[0].Contains("solo"));
+        }
     }
 }

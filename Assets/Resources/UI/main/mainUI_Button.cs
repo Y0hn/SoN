@@ -17,6 +17,11 @@ public class MainUIButton : MonoBehaviour
         get => text.text;
         set => text.text = value;
     }*/
+    public bool Interactable 
+    {
+        get => button.interactable;
+        set => button.interactable = value;
+    }
 
     protected virtual void Awake()
     {

@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
-
+/// <summary>
+/// Kontroluje udaja zadane pouzivatelom ohladom
+/// </summary>
 public abstract class InputFieldCheck : MonoBehaviour
 {
     [SerializeField] protected TMP_InputField field;
@@ -36,29 +38,8 @@ public abstract class InputFieldCheck : MonoBehaviour
     /// Overi spravnost vstupu
     /// </summary>
     /// <returns>PRAVDA ak je spravne</returns>
-    protected virtual bool FieldCheck()
-    {
-        bool check = false;
-        string player = Text.Trim();
-
-        if (player == "")
-        {
-            ErrorMessage("Type your name");
-        }
-        else if (player.Length < 2)
-        {
-            ErrorMessage("Name must be longer");
-        }
-        else
-        {
-            ErrorMessage("");
-            check = true;
-        }
-
-        if (check)
-            FileManager.RegeneradeSettings();
-        return check;
-    }
+    protected abstract bool FieldCheck();
+    
     /// <summary>
     /// Vypise chybovu spravu v textovom poli
     /// </summary>

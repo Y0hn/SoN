@@ -4,6 +4,8 @@ using UnityEngine;
 using TMPro;
 using System.Linq;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using System.Threading.Tasks;
 /// <summary>
 /// Spravuje hlavnu ponuku
 /// </summary>
@@ -95,6 +97,7 @@ public class Menu : MonoBehaviour
     */
     Stack<string> currentLayer;
     bool goesUP; string disable;
+    string lastConnection;
 
     [HideInInspector] public string playerName;
     public string PlayerName 
@@ -145,7 +148,7 @@ public class Menu : MonoBehaviour
             conn = Connector.instance;
         FileManager.Renew();
         meneTheme.Play();
-        ResetUI();   
+        ResetUI();
     }
     /// <summary>
     /// Sluzi pre stridanie ponuk - spusta nanimator
@@ -199,9 +202,6 @@ public class Menu : MonoBehaviour
         textFields["TITLE"].text = Application.productName;
         textFields["VERSION"].text = "Version: " + Application.version;
         textFields["COMPANY"].text = Application.companyName;
-
-        textFields["IPCodeError"].text = "";
-        textFields["UserNameError"].text = "";
     }
     /// <summary>
     /// Prida posluchcov na stlacenie tlacidiel podla slovnika "buttons"
@@ -274,8 +274,8 @@ public class Menu : MonoBehaviour
 
             // PODPONUKA pre JEDNEHO hraca                          (localhost)
             case 11: /* Pokracuje v poslednom svete */ 
-                conn.CreateSolo(); 
-                layer= -1; 
+                /*conn.CreateSolo(); */
+                //layer= -1; 
                 break;
             case 12: /* Nacita zo subora hru    */ currentLayer.Push("SubLoad"); break; 
             case 13: /* Vytvorit novu hru       */ currentLayer.Push("SubCreate"); break;
@@ -285,23 +285,32 @@ public class Menu : MonoBehaviour
             case 22: currentLayer.Push("SubMultiJoin");  break;  // vnori sa do ponuky pre klienta
 
             // PODPONUKA pre ZALOZENIE hry pre VIAC hracov          (pre server)
-            case 211: /* Nacita zo subora hru   */  currentLayer.Push("SubLoad"); break;
-            case 212: /* Vytvorit novu hru      */  currentLayer.Push("SubCreate"); break;
+            case 211: /* Nacitat zo subora hru   */ 
+            case 212: /* Vytvorit novu hru      */ 
+                string next = layer == 211 ? "SubLoad" : "SubCreate";
+                if (inputFields["playerN2"].Check) 
+                    currentLayer.Push(next);
+                else 
+                    layer= 0;
+                break;
 
             /// PODPONUKA pre VYTVORENIE sveta
-            case 0:
+            case 0: /* Vytvori svet */
                 if (inputFields["worldName"].Check)
                 {
-                    FileManager.StartWorld(inputFields["worldName"].Text);
+                    _ = FileManager.StartWorld(inputFields["worldName"].Text);
                     layer= -1;
                 }
+                else
+                    layer= 0;
                 break;
 
             // PODPONUKA pre PRIPOJENIE sa ho hry pre VIAC hracov   (pre klienta)
-            case 221: 
-                /* Pripoji sa do uz existujucej hry */
-                //if (ConnectionCheck())
-                layer= -1;
+            case 221: /* Pripoji sa do uz existujucej hry */
+                if (inputFields["playerN1"].Check && inputFields["ipCode"].Check)
+                    layer= -1;
+                else
+                    layer= 0;
                 break;
 
             case -1: 
@@ -313,23 +322,25 @@ public class Menu : MonoBehaviour
         }
 
         // v niektorych pripadoch v prepinaci je "layer= -1;" to znamena ze hrac chce vstupit do hry,
+        // v inych je "layer= 0" to znamena ze sa nema prepinat ponuka lebo nebola spnena podmienka 
         // cize hlavne menu sa vypne
         if (layer < 0)
         {
             HideUI();
-
         }
-
-        FileManager.Log($"Navigation set to {currentLayer}");
-        animator.SetTrigger("change");
+        else if (0 < layer)
+        {
+            FileManager.Log($"Navigation set to {currentLayer}");
+            animator.SetTrigger("change");
+        }
     }
     /// <summary>
     /// Po stlaceni tlacidla pre nacitanie konkretneho suboru hry
     /// </summary>
     /// <param name="worldName"></param>
-    public void PressLoad(string worldName)
+    public async Task PressLoad(string worldName)
     {
-        FileManager.StartWorld(worldName);
+        await FileManager.StartWorld(worldName);
         MenuNavigation(-1);
     }
     /* <summary>
@@ -356,5 +367,13 @@ public class Menu : MonoBehaviour
         onlyLAN=!settings.Online;
         FullSc = settings.fullSc;
         PlayerName = settings.playerName;
+        lastConnection = settings.lastConnection;
+        if (lastConnection != "")
+        {
+            bool solo = lastConnection.Contains("solo-");
+            buttons["soloCont"].Interactable = solo;
+            if (solo)
+                inputFields["ipCode"].Text = lastConnection;
+        }
     }
 }
