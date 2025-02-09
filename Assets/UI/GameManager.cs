@@ -246,6 +246,9 @@ public class GameManager : MonoBehaviour
         inventory.ReloadAttacks();
 
         playerLives = lives;
+    }
+    public void SetUpCopyField()
+    {
         copy.SetUp(conn.GetConnection());
     }
     

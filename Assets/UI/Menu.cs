@@ -4,7 +4,6 @@ using UnityEngine;
 using TMPro;
 using System.Linq;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using System.Threading.Tasks;
 /// <summary>
 /// Spravuje hlavnu ponuku
@@ -13,7 +12,7 @@ public class Menu : MonoBehaviour
 {
     public static Menu menu;
     [SerializeField] Connector conn;
-    [SerializeField] new Camera camera;
+    [SerializeField] Camera cam;
     [SerializeField] Animator animator;
     [SerializeField] Toggle lanToggle;
     [SerializeField] Toggle fullScToggle;
@@ -98,6 +97,7 @@ public class Menu : MonoBehaviour
     Stack<string> currentLayer;
     bool goesUP; string disable;
     string lastConnection;
+    GameType choosenGame;
 
     [HideInInspector] public string playerName;
     public string PlayerName 
@@ -110,7 +110,7 @@ public class Menu : MonoBehaviour
             playerName = value;
         }
     }
-    public bool onlyLAN { get => lanToggle.isOn;  set => lanToggle.isOn = value;   }
+    public bool OnlineGame { get => !lanToggle.isOn;  set => lanToggle.isOn = !value;   }
     public bool FullSc { get => fullScToggle.isOn;  set => fullScToggle.isOn = value;   }
     public int Quality { get => quality.Q;          set => quality.Q = value;           }
     public float[] Audios 
@@ -166,7 +166,7 @@ public class Menu : MonoBehaviour
     /// </summary>
     public void ResetUI()
     {
-        camera.gameObject.SetActive(true);
+        cam.gameObject.SetActive(true);
         
         uis["BG"].SetActive(true);
         uis["PT"].SetActive(true);
@@ -268,14 +268,14 @@ public class Menu : MonoBehaviour
         switch (layer)
         {
             // HLAVNE menu
-            case 1: currentLayer.Push("SubSolo"); break;
+            case 1: currentLayer.Push("SubSolo"); choosenGame = GameType.Solo; break;
             case 2: currentLayer.Push("SubMulti"); break;
             case 3: currentLayer.Push("SubSett"); break;
 
             // PODPONUKA pre JEDNEHO hraca                          (localhost)
             case 11: /* Pokracuje v poslednom svete */ 
-                /*conn.CreateSolo(); */
-                //layer= -1; 
+                _ = FileManager.StartWorld(inputFields["worldName"].Text, choosenGame);
+                layer= -1; 
                 break;
             case 12: /* Nacita zo subora hru    */ currentLayer.Push("SubLoad"); break; 
             case 13: /* Vytvorit novu hru       */ currentLayer.Push("SubCreate"); break;
@@ -287,6 +287,7 @@ public class Menu : MonoBehaviour
             // PODPONUKA pre ZALOZENIE hry pre VIAC hracov          (pre server)
             case 211: /* Nacitat zo subora hru   */ 
             case 212: /* Vytvorit novu hru      */ 
+                choosenGame = !OnlineGame ? GameType.Online : GameType.Local;
                 string next = layer == 211 ? "SubLoad" : "SubCreate";
                 if (inputFields["playerN2"].Check) 
                     currentLayer.Push(next);
@@ -298,7 +299,7 @@ public class Menu : MonoBehaviour
             case 0: /* Vytvori svet */
                 if (inputFields["worldName"].Check)
                 {
-                    _ = FileManager.StartWorld(inputFields["worldName"].Text);
+                    _ = FileManager.StartWorld(inputFields["worldName"].Text, choosenGame);
                     layer= -1;
                 }
                 else
@@ -308,7 +309,10 @@ public class Menu : MonoBehaviour
             // PODPONUKA pre PRIPOJENIE sa ho hry pre VIAC hracov   (pre klienta)
             case 221: /* Pripoji sa do uz existujucej hry */
                 if (inputFields["playerN1"].Check && inputFields["ipCode"].Check)
+                {
+                    _ = Connector.instance.JoinServer(inputFields["ipCode"].Text);
                     layer= -1;
+                }
                 else
                     layer= 0;
                 break;
@@ -364,7 +368,7 @@ public class Menu : MonoBehaviour
     {
         Audios = settings.audioS;
         Quality= settings.quality;
-        onlyLAN=!settings.Online;
+        OnlineGame=settings.Online;
         FullSc = settings.fullSc;
         PlayerName = settings.playerName;
         lastConnection = settings.lastConnection;

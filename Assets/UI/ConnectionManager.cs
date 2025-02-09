@@ -20,8 +20,15 @@ public class Connector : MonoBehaviour
     [SerializeField] UnityTransport tporter;
     public NetworkManager netMan;
     private string hostingAddress;
-    private bool running;
 
+    public string HostAddress
+    {
+        get => hostingAddress;
+        set 
+        {
+            hostingAddress = value;
+        }
+    }
     public bool Solo => hostingAddress == LOCALHOST;
     public bool LanConnection => hostingAddress.Contains(".");
     public bool Online => Application.internetReachability != NetworkReachability.NotReachable;
@@ -35,7 +42,6 @@ public class Connector : MonoBehaviour
     void Awake()
     {
         instance = this;
-        running = false;
     }
     async void Start()
     {
@@ -43,7 +49,7 @@ public class Connector : MonoBehaviour
         // Potrebne pripojenie na Internet
         netMan = NetworkManager.Singleton;
 
-        netMan.OnServerStopped += delegate { /*FileManager.WorldAct("", FileManager.WorldAction.Save); */};
+        netMan.OnServerStopped += delegate { FileManager.EndWorld(); };
 
         if (Online)
         {
@@ -60,17 +66,20 @@ public class Connector : MonoBehaviour
     {
         string conn = "";
         
-        if (running)
-            if (Solo)
-            {
-                conn += "solo-";
-                conn += FileManager.World.worldName;
-            }
-            else
-            {
-                conn += netMan.IsServer ? "server-" : "client-";
-                conn += hostingAddress;
-            }
+        if (hostingAddress == "")
+        {
+
+        }
+        else if (Solo)
+        {
+            conn += "solo-";
+            conn += FileManager.World.worldName;
+        }
+        else
+        {
+            conn += netMan.IsServer ? "server-" : "client-";
+            conn += hostingAddress;
+        }
 
         return conn;
     }
@@ -87,6 +96,41 @@ public class Connector : MonoBehaviour
         else
             CreateLAN(ServerIP);
     }
+    /// <summary>
+    /// Pokusi sa pripojit na server pomocou adresy alebo kodu
+    /// </summary>
+    /// <param name="connection">ADRESA alebo KOD pripojenia</param>
+    /// <returns>PRAVDA ak sa pripojenie podarilo</returns>
+    public async Task<bool> JoinServer(string connection)
+    {
+        bool joined = true;
+
+        try {
+            if (LanConnection)  // nastaveine parametrov pre pripojenie na LOKALNEJ sieti
+            {
+                tporter.SetConnectionData(ServerIP, 7777);
+            }            
+            else                // nastaveine parametrov pre pripojenia prepinacim KODOM
+            {
+                // Ziska udaje z prepinaca o pripojeni podla zadanehu kodu
+                var JoinAllocation = await RelayService.Instance.JoinAllocationAsync(connection);
+
+                // Vytvori parametere pre prenos
+                var relayServerData = new RelayServerData(JoinAllocation, "dtls");
+
+                // Nastavi vytvorene prarametre
+                tporter.SetRelayServerData(relayServerData);
+            }
+            // pokusi sa o nadvizanie spojenia
+            netMan.StartClient();
+        } catch  {
+            FileManager.Log($"Join connection failed with ipcode= {connection}", FileLogType.ERROR);
+            joined = false;
+        }
+
+        return joined;
+    }
+
     /// <summary>
     /// Vytvori server pre vzdialene pripojenie  
     /// </summary>
@@ -121,46 +165,12 @@ public class Connector : MonoBehaviour
         hostingAddress = ip_address;
         netMan.StartHost();
     }
-    /// <summary>
-    /// Pokusi sa pripojit na server pomocou adresy alebo kodu
-    /// </summary>
-    /// <param name="connection">ADRESA alebo KOD pripojenia</param>
-    /// <returns>PRAVDA ak sa pripojenie podarilo</returns>
-    public async Task<bool> JoinConnection(string connection)
-    {
-        bool joined = false;
-
-        try {
-            if (LanConnection)  // nastaveine parametrov pre pripojenie na LOKALNEJ sieti
-            {
-                tporter.SetConnectionData(ServerIP, 7777);
-            }            
-            else                // nastaveine parametrov pre pripojenia prepinacim KODOM
-            {
-                // Ziska udaje z prepinaca o pripojeni podla zadanehu kodu
-                var JoinAllocation = await RelayService.Instance.JoinAllocationAsync(connection);
-
-                // Vytvori parametere pre prenos
-                var relayServerData = new RelayServerData(JoinAllocation, "dtls");
-
-                // Nastavi vytvorene prarametre
-                tporter.SetRelayServerData(relayServerData);
-            }
-            // pokusi sa o nadvizanie spojenia
-            netMan.StartClient();
-        } catch  {
-            FileManager.Log($"Join connection failed with ipcode= {connection}", FileLogType.ERROR);
-            joined = false;
-        }
-
-        return joined;
-    }
 
     /// <summary>
     /// Vytvori hru pre jendneho hraca.
     /// Tym ze sa vytvori server na loopback adrese.
     /// </summary>
-    public void CreateSolo()
+    public void StartSolo()
     {
         CreateLAN(LOCALHOST);
         netMan.StartHost();

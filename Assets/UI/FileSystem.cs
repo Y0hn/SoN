@@ -132,7 +132,7 @@ public static class FileManager
     /// Spustanie sveta
     /// </summary>
     /// <param name="name"></param>
-    public static async Task StartWorld(string name, bool online = true) 
+    public static async Task StartWorld(string name, GameType type = GameType.Online) 
     {
         string path = NameToWorldPath(name);
 
@@ -146,8 +146,16 @@ public static class FileManager
             world.worldName = name;
         }
 
-        await Connector.instance.StartServer(online);
-        Log("World has been opened");
+        if (type == GameType.Solo)
+        {
+            Connector.instance.StartSolo();
+        }
+        else
+        {
+            bool online = type == GameType.Online;
+            await Connector.instance.StartServer(online);
+        }
+        Log($"World {world.worldName} has been opened");
     }
     public static void EndWorld()
     {
@@ -162,7 +170,8 @@ public static class FileManager
         // Zapise do suboru
         WriteWorld(path, ref w);
 
-        Log("World has been closed");
+        GameManager.instance.SetUpCopyField();
+        Log($"World {w.worldName} has been closed");
     }
     /// <summary>
     /// Ulozi data jedneho hraca pri jeho odpojeni
@@ -448,6 +457,7 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
 /// <summary>
 /// Drzi hodnoty potrebne pre bezproblemove nacitanie zo suboru
 /// </summary>
+public enum GameType { Online, Local, Solo }
 [Serializable] public class World
 {
     public string worldName;
