@@ -182,7 +182,8 @@ public static class FileManager
     public static void RegeneradeSettings() // Called on ConnectToSever/SettingsClose
     {
         // Ziska hodnoty aktualneho nastavenia 
-        settings = new Settings();
+        settings ??= new();
+        settings.RegeneradeSettings();
 
         TextWriter writer = null;
         try
@@ -213,8 +214,7 @@ public static class FileManager
                 reader = new StreamReader(SettingsPath);
 
                 // Nacitane hodnoty zo suboru nastavi ako aktuale
-                settings ??= new();
-                settings.LoadSettings((Settings)serializer.Deserialize(reader));
+                settings = serializer.Deserialize(reader) as Settings;
             }
             finally
             {
@@ -370,21 +370,52 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
             FileManager.Log($"Setting Creation Error \nExeption: {ex.Message}\nData: {ex.Data}", FileLogType.WARNING);
         }
     }
+    public void RegeneradeSettings()
+    {
+        if (ReNewSettings(new()))
+            ApplySettings();
+    }
     /// <summary>
     /// Nastavi hodnoty do statickych clenov menu
     /// </summary>
     /// <param name="settings"></param>
-    public void LoadSettings(Settings settings)
+    private bool ReNewSettings(Settings settings)
     {
-        // Nastavi hodnoty z 
+        bool changed = !Equals(settings);
+
         fullSc = settings.fullSc;
         audioS = settings.audioS;
         quality = settings.quality;
-        playerName = settings.playerName;
-        lastConnection = settings.lastConnection;
+        playerName = settings.playerName;     
+
+        if (changed && settings.lastConnection != "")
+            lastConnection = settings.lastConnection;
         
+        return changed;
+    }
+    private void ApplySettings()
+    {
         // Nastavi vlastnosti hry podla novych hodnot
-        Menu.menu.LoadSettings(settings);
+        Menu.menu.LoadSettings(this);
+    }
+    /// <summary>
+    /// Pororvnanie hodnot
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public bool Equals(Settings other)
+    {
+        bool eq = true;
+
+        eq &= fullSc == other.fullSc;
+        eq &= audioS == other.audioS;
+        eq &= quality == other.quality;
+        eq &= playerName == other.playerName;
+
+        if (other.lastConnection != "")
+            eq &= lastConnection == other.lastConnection;
+        
+        return eq;
     }
     /// <summary>
     /// Sluzi ako moznost kontroly spravnosti ulozenia nastaveni
