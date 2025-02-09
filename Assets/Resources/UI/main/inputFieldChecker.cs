@@ -23,7 +23,11 @@ public abstract class InputFieldCheck : MonoBehaviour
     /// <summary>
     /// Spustane len raz
     /// </summary>
-    protected virtual void Awake() => field.onSubmit.AddListener(OnSubmit);
+    protected virtual void Awake()
+    {
+        field.onSubmit.AddListener(OnSubmit);
+        ErrorMessage("");
+    } 
 
     /// <summary>
     /// Zavolane po potvrdeni vstupu
