@@ -26,11 +26,12 @@ public class ColorChain : MonoBehaviour
         SetColor(reference.Color);
     }
     /// <summary>
-    /// Nastavuje  farbu podla vstupu
+    /// Postupne prechadza komponenty a ked najde nastavi jeho farbu podla vstup
     /// </summary>
     /// <param name="color">vstupna FARBA</param>
     void SetColor(Color color)
     {
+
         if (TryGetComponent(out SpriteRenderer spr))
         {
             spr.color = color;
@@ -47,6 +48,6 @@ public class ColorChain : MonoBehaviour
         {
             txt.color = color;
         }
-        sFileManager.Log($"{name} color setted to: " + color);
+        //FileManager.Log($"{name} color setted to: " + color);
     }
 }

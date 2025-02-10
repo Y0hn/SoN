@@ -84,20 +84,6 @@ public class GameManager : MonoBehaviour
         SetGameUI();
     }
     /// <summary>
-    /// Spustene pri kazdom frame
-    /// </summary>
-    void Update()
-    {
-        if (IsServer && FileManager.World != null && MapScript.map != null)
-        {
-            if (NPStats.NPCount < MAX_NPC_COUNT)
-               MapScript.map.SpawnEnemy();
-
-            else if (FileManager.World.boss == null)
-                MapScript.map.SpawnBoss();            
-        }
-    }
-    /// <summary>
     /// Nastavi hodnoty pre textove polia <br />
     /// (moznost prekladu UI)
     /// </summary>
@@ -178,6 +164,33 @@ public class GameManager : MonoBehaviour
         }
     }
     /// <summary>
+    /// Nastavi zapnutie hry
+    /// </summary>
+    public void StartGame()
+    {
+        // Nastavi obsah kopirovacieho pola
+        copy.SetUp(conn.GetConnection());
+
+        if (IsServer)
+            NPStats.npcDied += EnemySpawner;
+
+        // Ak su ulzene nejake data nepriatelov
+        if (0 < FileManager.World.entities.Count)
+        {
+            foreach (var entity in FileManager.World.entities)
+                MapScript.map.SpawnFromSave(entity);
+        }
+
+        // Ak je svet bez hlavneho nepriatela tak ho vytvori
+        if (FileManager.World.boss == null)
+            MapScript.map.SpawnBoss();
+        // Inak ho nacita zo suboru
+        else
+            MapScript.map.SpawnFromSave(FileManager.World.boss);
+
+        EnemySpawner();
+    }
+    /// <summary>
     /// Odide z hry -> do hlavneho menu
     /// </summary>
     void Quit()
@@ -185,6 +198,14 @@ public class GameManager : MonoBehaviour
         SetGameUI(false);
         Menu.menu.gameObject.SetActive(true);
         conn.Quit(player.OwnerClientId);
+    }
+    /// <summary>
+    /// Bezi na servery ak zomrie nepriatel
+    /// </summary>
+    void EnemySpawner()
+    {
+        while (NPStats.NPCount < MAX_NPC_COUNT)
+            MapScript.map.SpawnEnemy();
     }
     /// <summary>
     /// Vrati lokalny zobrazovac zivorov
@@ -294,13 +315,6 @@ public class GameManager : MonoBehaviour
         inventory.ReloadAttacks();
 
         playerLives = lives;
-    } 
-    /// <summary>
-    /// Nastavi kopirovacie pole
-    /// </summary>
-    public void SetUpCopyField()
-    {
-        copy.SetUp(conn.GetConnection());
     }
     
 

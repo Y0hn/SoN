@@ -96,6 +96,29 @@ public class MapScript : MapSizer
         Transform target = extractions.GetChild(Random.Range(0,extractions.childCount));
         enemy.GetComponent<NPController>().SetDefaultTarget(target);
     }
+    public void SpawnFromSave (World.EntitySave save)
+    {
+        GameObject e = null;
+        if (save is World.BossSave boss)
+        {
+            e = Resources.Load<GameObject>("Entities/Veles/Veles");
+        }
+        else
+        {
+            e = regularEnemiesTier1.First(r => r.name == save.etName);
+            e ??= regularEnemiesTier2.First(r => r.name == save.etName);
+        }
+
+        if (e != null)
+        {
+            e = Instantiate(e, save.Position, Quaternion.identity);
+            e.GetComponent<NetworkObject>().Spawn();
+            e.GetComponent<NPStats>().Load(save);
+            FileManager.Log($"Entity {save.etName} Save loaded ");
+        }
+        else
+            FileManager.Log($"Entity Save name not found similiar {save.etName}", FileLogType.WARNING);
+    }
     /// <summary>
     /// Musi byt server aby spustil tuto funkciu. <br />
     /// Spusta sa len pri vytvarani noveho sveta.

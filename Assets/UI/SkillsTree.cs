@@ -18,7 +18,7 @@ public class SkillTree
     /// Ziska Udaje o stromu schopnosti pre ulozenie do suboru
     /// </summary>
     /// <returns></returns>
-    public World.PlayerSave.SkillTreeSave SkillTreeSave get => new (skills.ToArray(), uSkils);
+    public World.PlayerSave.SkillTreeSave SkillTreeSave => new (skills.ToArray(), uSkils);
 
     /// <summary>
     /// Vytvorenie cisto noveho stromu schopnosti

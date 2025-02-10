@@ -155,6 +155,7 @@ public static class FileManager
             bool online = type == GameType.Online;
             await Connector.instance.StartServer(online);
         }
+        GameManager.instance.StartGame();
         Log($"World {world.worldName} has been opened");
     }
     public static void EndWorld()
@@ -169,8 +170,6 @@ public static class FileManager
         
         // Zapise do suboru
         WriteWorld(path, ref w);
-
-        GameManager.instance.SetUpCopyField();
         Log($"World {w.worldName} has been closed");
     }
     /// <summary>
@@ -600,6 +599,7 @@ public enum GameType { Online, Local, Solo }
     [Serializable] public class EntitySave
     {
         public Cordinates position;
+        public WeaponIndex weapon;
         public string etName;
         public float hp;
 
@@ -608,6 +608,7 @@ public enum GameType { Online, Local, Solo }
         public EntitySave(EntityStats entity)
         {
             position = new(entity.transform.position.x,entity.transform.position.y);
+            weapon = entity.WeaponPrameter;
             etName = entity.transform.name;
             hp = entity.HP;
         }

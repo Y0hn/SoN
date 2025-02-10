@@ -56,6 +56,7 @@ public class NPStats : EntityStats
         ATTACK_DISTANCE_PERCENTAGE = 0.3f;
 
     public static byte NPCount = 0;
+    public static Action npcDied;
 
     public override Quaternion Rotation => body.transform.rotation;
     public float AttackDistance             
@@ -91,6 +92,8 @@ public class NPStats : EntityStats
     {
         base.OnNetworkDespawn();
         AddToCount(-1);
+        if (IsServer)
+            npcDied.Invoke();
     }
     /// <summary>
     /// <inheritdoc/>
@@ -180,6 +183,10 @@ public class NPStats : EntityStats
     public override void KilledEnemy(EntityStats died)
     {
         
+    }
+    public virtual void Load(World.EntitySave save)
+    {
+        base.LoadSavedData(save);
     }
 #pragma warning disable IDE0051 // Remove unused private members
     /// <summary>

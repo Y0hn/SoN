@@ -42,12 +42,13 @@ public abstract class EntityStats : NetworkBehaviour
     public float HP                     => (float)hp.Value/(float)maxHp.Value;
 #pragma warning restore IDE0004
     public virtual Quaternion Rotation  => transform.rotation;
+    public WeaponIndex WeaponPrameter   => weapE.Value; 
     protected virtual Weapon[] Weapons  => rase.weapons;
     public Weapon EquipedWeapon         => Weapons[weapE.Value.eIndex];
     public NetworkObject NetObject      => netObject;
     public Rigidbody2D RigidBody2D      => rb;
     public Transform AttackPoint        => attackPoint;
-    public virtual Attack Attack        => GetAttackByWeaponIndex(weapE.Value);  
+    public virtual Attack Attack        => GetAttackByWeaponIndex(weapE.Value);
     public AITarget TargetTeam          => aiTeam;
     public Animator Animator            => animator.Animator;
     public Vector2 View                 => controller.View;
@@ -332,6 +333,7 @@ public abstract class EntityStats : NetworkBehaviour
     {
         hp.Value = Mathf.RoundToInt(save.hp * (float)maxHp.Value);
         transform.position = save.Position;
+        SetWeaponIndex(save.weapon);
     }
     /// <summary>
     /// Zisti utok z dostupnych zbrani podla 
