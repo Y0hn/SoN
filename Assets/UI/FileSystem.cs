@@ -611,6 +611,9 @@ public enum GameType { Online, Local, Solo }
             weapon = entity.WeaponPrameter;
             etName = entity.transform.name;
             hp = entity.HP;
+
+            if (entity is NPStats nps && entity is not BosStats)
+                etName += "-" + nps.GetComponent<NPController>().DefaultTarget;
         }
 
         /// <summary>

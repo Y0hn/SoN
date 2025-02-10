@@ -17,6 +17,7 @@ public class NPController : EntityController
     protected bool selfTarget;
 
     protected new NPStats Stats => (NPStats)base.Stats;
+    public string DefaultTarget => defaultTarget.name;
     public bool ForceDecision       { get; protected set; }
 
     /// <summary>

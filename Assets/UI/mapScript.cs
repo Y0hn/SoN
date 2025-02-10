@@ -99,21 +99,31 @@ public class MapScript : MapSizer
     public void SpawnFromSave (World.EntitySave save)
     {
         GameObject e = null;
+        string[] n = save.etName.Split('-');
         if (save is World.BossSave boss)
         {
             e = Resources.Load<GameObject>("Entities/Veles/Veles");
         }
         else
         {
-            e = regularEnemiesTier1.First(r => r.name == save.etName);
-            e ??= regularEnemiesTier2.First(r => r.name == save.etName);
+            e = regularEnemiesTier1.First(r => r.name == n[0]);
+            e ??= regularEnemiesTier2.First(r => r.name == n[0]);
         }
 
         if (e != null)
         {
-            e = Instantiate(e, save.Position, Quaternion.identity);
-            e.GetComponent<NetworkObject>().Spawn();
-            e.GetComponent<NPStats>().Load(save);
+            NetworkObject netO = Instantiate(e, save.Position, Quaternion.identity).GetComponent<NetworkObject>();
+            netO.Spawn();
+            netO.GetComponent<NPStats>().Load(save);
+
+            if (1 < n.Length)
+                for (int i = 0; i < extractions.childCount; i++)
+                    if (extractions.GetChild(i).name == n[1])
+                    {
+                        // Nastavi ciel pre nepriatela
+                        netO.GetComponent<NPController>().SetDefaultTarget(extractions.GetChild(i));
+                        break;
+                    }
             FileManager.Log($"Entity {save.etName} Save loaded ");
         }
         else
