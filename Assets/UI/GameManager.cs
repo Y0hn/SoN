@@ -47,10 +47,15 @@ public class GameManager : MonoBehaviour
     */
     [HideInInspector] public bool playerLives;
     /*[SerializedDictionary("Utility", "Aquired")]public SerializedDictionary*/ 
+    
     public event Action<Utility> UtilityUpdate;
     public Inventory inventory;
     private List<Utility.Function> utilities = new();
     private const byte MAX_NPC_COUNT = 25;
+    /// <summary>
+    /// Ziska polohu mysi relativnu voci stredu obrazovky
+    /// </summary>
+    /// <value>VEKTOR pozicie mysi</value>
     public Vector2 MousePos
     { 
         get 
@@ -67,6 +72,9 @@ public class GameManager : MonoBehaviour
     public SkillPanel SkillTree     { get => skillTree; }
     public bool PlayerAble          { get => !(paused || chatting || inventory.open); }
     public bool IsServer            { get { bool? b = conn.netMan?.IsServer; return b != null && b.Value; } }
+    /// <summary>
+    /// Spudti sa raz po nacitani objektu
+    /// </summary>
     void Awake()
     {
         instance = this;
@@ -75,6 +83,9 @@ public class GameManager : MonoBehaviour
         SubscribeInput();
         SetGameUI();
     }
+    /// <summary>
+    /// Spustene pri kazdom frame
+    /// </summary>
     void Update()
     {
         if (IsServer && FileManager.World != null && MapScript.map != null)
@@ -83,8 +94,7 @@ public class GameManager : MonoBehaviour
                MapScript.map.SpawnEnemy();
 
             else if (FileManager.World.boss == null)
-                MapScript.map.SpawnBoss();
-            
+                MapScript.map.SpawnBoss();            
         }
     }
     /// <summary>
@@ -167,21 +177,35 @@ public class GameManager : MonoBehaviour
             chat.text = "";
         }
     }
+    /// <summary>
+    /// Odide z hry -> do hlavneho menu
+    /// </summary>
     void Quit()
     {
         SetGameUI(false);
         Menu.menu.gameObject.SetActive(true);
         conn.Quit(player.OwnerClientId);
     }
-    
+    /// <summary>
+    /// Vrati lokalny zobrazovac zivorov
+    /// </summary>
+    /// <returns>POSUVNIK zivotov</returns>
     public Slider GetHpBar()
     {
         return uiPanels["playerUIhpBar"].GetComponent<Slider>();
     }
+    /// <summary>
+    /// Vrati lokalny zobrazovac skusenosti
+    /// </summary>
+    /// <returns>POSUVNIK skosenosti</returns>
     public XpSliderScript GetXpBar()
     {
         return uiPanels["playerUIxpBar"].GetComponent<XpSliderScript>();
     } 
+    /// <summary>
+    /// Spusta sa po pripojeni a vzniku hraca pariaceho lokalnemu pocitacu
+    /// </summary>
+    /// <param name="plStats"></param>
     public void PlayerSpawned(PlayerStats plStats)
     {
         player = plStats;
@@ -189,6 +213,10 @@ public class GameManager : MonoBehaviour
         SetPlayerUI();
         AnimateFace(player.HP);
     }
+    /// <summary>
+    /// Nastavi 
+    /// </summary>
+    /// <param name="active"></param>
     void SetGameUI(bool active = false)
     {
         uiPanels["deathScreen"].SetActive(false);
@@ -201,26 +229,46 @@ public class GameManager : MonoBehaviour
         
         //uiPanels["mainCam"].SetActive(!active);
     }
-    
+    /// <summary>
+    /// Po ziskani dalsej urovne
+    /// </summary>
+    /// <param name="level"></param>
     public void LevelUP(byte level)
     {
         skillTree.LevelUP(level);
         //Debug.Log("Player leveled UP to " + level);
     }
+    /// <summary>
+    /// Prida odomknutu schopnost
+    /// </summary>
+    /// <param name="utility"></param>
     public void AddUtility(Utility utility)
     {
         utilities.Add(utility.function);
         UtilityUpdate?.Invoke(utility);
     }
+    /// <summary>
+    /// Odstrani schopnost
+    /// </summary>
+    /// <param name="utility"></param>
     public void RemUtility(Utility utility)
     {
         utilities.Remove(utility.function);
         UtilityUpdate?.Invoke(new Utility (utility.name, utility.function));
     }
+    /// <summary>
+    /// Zisti ci je povolena schopnost
+    /// </summary>
+    /// <param name="f"></param>
+    /// <returns></returns>
     public bool IsUtilityEnabled (Utility.Function f)
     {
         return utilities.Contains(f);
     }
+    /// <summary>
+    /// Zapne/Vypne UI hraca 
+    /// </summary>
+    /// <param name="lives"></param>
     public void SetPlayerUI(bool lives = true)
     {
         if (!lives)
@@ -246,7 +294,10 @@ public class GameManager : MonoBehaviour
         inventory.ReloadAttacks();
 
         playerLives = lives;
-    }
+    } 
+    /// <summary>
+    /// Nastavi kopirovacie pole
+    /// </summary>
     public void SetUpCopyField()
     {
         copy.SetUp(conn.GetConnection());
