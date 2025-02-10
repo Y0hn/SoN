@@ -8,15 +8,26 @@ using System.Collections.Generic;
 [Serializable] public class Defence
 {
     List<Resistance> resistances;
+    /// <summary>
+    /// Vznik na cisto
+    /// </summary>
     public Defence()
     {
         resistances = new();
     }
+    /// <summary>
+    /// Vznik z jednej obrany
+    /// </summary>
+    /// <param name="res"></param>
     public Defence(Resistance res)
     {
         resistances = new();
         Add(res);
     }
+    /// <summary>
+    /// Vznik z listu obran
+    /// </summary>
+    /// <param name="resists"></param>
     public Defence(List<Resistance> resists)
     {
         resistances = new();
@@ -26,7 +37,7 @@ using System.Collections.Generic;
     /// Prida obranu
     /// </summary>
     /// <param name="r"></param>
-    /// <returns></returns>
+    /// <returns>PRAVDA ak uspesne</returns>
     public bool Add     (Resistance r)
     {
         if (!resistances.Contains(r))
@@ -36,6 +47,11 @@ using System.Collections.Generic;
         }
         return false;
     }
+    /// <summary>
+    /// Odsrani konkretnu ochranu 
+    /// </summary>
+    /// <param name="a"></param>
+    /// <returns>PRAVDA ak uspesne</returns>
     public bool Remove  (Resistance a)
     {
         if (resistances.Contains(a))

@@ -1,10 +1,5 @@
 # TO DO LIST
 
-## BUGS
-```
-TOO MANY
-```
-
 ## PLAN
 ```
 LOOT SYSTEM

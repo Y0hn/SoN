@@ -1,6 +1,6 @@
 using Unity.Netcode.Components;
 /// <summary>
-/// Povoluje animovanie pre vlasnika
+/// Povoluje animovanie pre vlasnika objektu hraca
 /// </summary>
 public class ClientNetworkAnimator : NetworkAnimator
 {

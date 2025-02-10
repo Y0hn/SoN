@@ -18,19 +18,20 @@ public class ColorChain : MonoBehaviour
         if (reference != null)
             SetColor();
     }
+    /// <summary>
+    /// Sluzi ako prostriedok pre volanie nastavenia farby 
+    /// </summary>
     void SetColor()
     {
         SetColor(reference.Color);
     }
+    /// <summary>
+    /// Nastavuje  farbu podla vstupu
+    /// </summary>
+    /// <param name="color">vstupna FARBA</param>
     void SetColor(Color color)
     {
-        /*if      (TryGetComponent(out Button btn))
-        {
-            var v = btn.colors;
-            v.normalColor = reference.Color;
-            btn.colors = v;
-        }
-        else */if (TryGetComponent(out SpriteRenderer spr))
+        if (TryGetComponent(out SpriteRenderer spr))
         {
             spr.color = color;
         }
@@ -46,6 +47,6 @@ public class ColorChain : MonoBehaviour
         {
             txt.color = color;
         }
-        // Debug.Log("Setted to: " + color);
+        sFileManager.Log($"{name} color setted to: " + color);
     }
 }

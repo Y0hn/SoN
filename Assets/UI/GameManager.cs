@@ -125,27 +125,27 @@ public class GameManager : MonoBehaviour
     /// <param name="context"></param>
     void OC_Pause(InputAction.CallbackContext context)
     {
-        if (PlayerAble)
+        if (PlayerAble)     // ak sa hrac moze pohybovat
         {
             paused = !paused;
             uiPanels["pauseUI"].SetActive(paused);
         }
-        else if (chatting)
+        else if (chatting)  // ak ma hrac otvoreny cet
         {
             chatting = false;
             uiPanels["chatUI"].SetActive(chatting);
         }
-        else if (inventory.open)
+        else if (inventory.open)    // ak je otvoreny inventar
         {
             inventory.OC_Inventory();
         }
-        else if (player.IsAlive.Value && paused) 
+        else if (player.IsAlive.Value && paused)    // ak hrac zije a hra je pozastavena
         {
             paused = !paused;
             uiPanels["pauseUI"].SetActive(paused);
         }
-        else
-            player.GetComponent<PlayerController>().Fire(new());
+        else    // inak (hrac je mrtvy) 
+            player.ReviveRpc();
     }
     /// <summary>
     /// Otvori pole na 
@@ -304,7 +304,7 @@ public class GameManager : MonoBehaviour
     }
     
 
-    // ANIMATION //
+    // ANIMACIE POUZIVATELSKEHO ROZHRANIA //
     public void AnimateFace(float state)            => anima.SetFloat("faceState", Mathf.Floor(state*10)/10f);
     public void AnimateFace(string action)          => anima.SetTrigger(action);   
     public void AnimateUI(string name, float value) => anima.SetFloat(name, value);

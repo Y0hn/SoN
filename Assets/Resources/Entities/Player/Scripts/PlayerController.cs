@@ -128,7 +128,7 @@ public class PlayerController : EntityController
     {
         if (!Stats.IsAlive.Value)
         {
-            SetLiveRpc(OwnerClientId);
+            Stats.ReviveRpc();
             return;
         }
         FileManager.Log($"Player {name} is attacking, Alive= {Stats.IsAlive.Value}");
@@ -153,15 +153,5 @@ public class PlayerController : EntityController
             Stats.Animator.SetTrigger("interuptAttack");
             FileManager.Log("Attack interupted");
         }
-    }
-
-    // RPCs
-    /// <summary>
-    /// Znovu zrodi hraca
-    /// </summary>
-    [Rpc(SendTo.Server)] protected void SetLiveRpc(ulong playerId)
-    {
-        Stats.IsAlive.Value = true;
-        MapScript.map.SpawnPlayer(transform);
     }
 }

@@ -13,12 +13,34 @@ using Unity.VisualScripting;
 /// </summary>
 public class Inventory : MonoBehaviour
 {
+    [SerializeField] ushort size = 1;
+    [SerializeField] TMP_Text btn;
+    [SerializeField] Button button;
+    [SerializeField] Transform parent;
+    [SerializeField] Animator animator;
+    [SerializeField] GameObject slotPreFab;
+    [SerializeField] GameObject dropPreFab;
+    [SerializeField] GridLayoutGroup inventoryGrid;
+    [SerializeField] InputActionReference input;
+    [SerializeField] Vector2 pixelSize = new(1200, 500);
+    [SerializeField] bool onGizmos = true;
+    [SerializeField] List<AttackSlotActive> acSlots;
+    [SerializeField] PassiveAttackSlotScript[] atSlots;
+
     public static Inventory instance;
+    /// <summary>
+    /// Velskot pola inventara
+    /// </summary>
+    /// <value></value>
     public ushort Size 
     { 
         get { return size; } 
         set { size = value; onSizeChange.Invoke(); } 
     }
+    /// <summary>
+    /// Vysunuty/Zasunuty horny panel
+    /// </summary>
+    /// <value>PRAVDA ak je otvoreny</value>
     public bool open { get; private set; }
     public bool FreeSpace { get { return itemSlots.Find(iS => iS.empty == true) != null; } }
     
@@ -46,22 +68,7 @@ public class Inventory : MonoBehaviour
                 references[i] = equipSlots[(Equipment.Slot)i].Item.GetReferency;
         }
         return references;
-    }
-
-    [SerializeField] ushort size = 1;
-    [SerializeField] TMP_Text btn;
-    [SerializeField] Button button;
-    [SerializeField] Transform parent;
-    [SerializeField] Animator animator;
-    [SerializeField] GameObject slotPreFab;
-    [SerializeField] GameObject dropPreFab;
-    [SerializeField] GridLayoutGroup inventoryGrid;
-    [SerializeField] InputActionReference input;
-    [SerializeField] Vector2 pixelSize = new(1200, 500);
-    [SerializeField] bool onGizmos = true;
-    [SerializeField] List<AttackSlotActive> acSlots;
-    [SerializeField] PassiveAttackSlotScript[] atSlots;
-    
+    }    
     /// <summary>
     /// lokalny inventar
     /// </summary>

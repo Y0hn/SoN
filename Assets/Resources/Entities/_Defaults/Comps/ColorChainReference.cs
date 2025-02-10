@@ -13,6 +13,9 @@ public class ColorChainReference : MonoBehaviour
     {
         oldColor = color;
     }
+    /// <summary>
+    /// Kontroluje zmenu farby
+    /// </summary>
     void Update()
     {
         if (color != oldColor)  // for updates in animator
@@ -21,6 +24,10 @@ public class ColorChainReference : MonoBehaviour
             oldColor = color;
         }
     }
+    /// <summary>
+    /// Nastavuje fagbu podla vstupu
+    /// </summary>
+    /// <param name="color">vstupna FARBA</param>
     public void SetColor(Color color)
     {
         this.color = color;

@@ -142,6 +142,9 @@ public class Menu : MonoBehaviour
         ResetTextFields();
         menu = this;
     }
+    /// <summary>
+    /// Zapne sa pri povoleni objektu
+    /// </summary>
     void Start() 
     {
         if (conn == null)
@@ -185,6 +188,9 @@ public class Menu : MonoBehaviour
             uis[key].SetActive(false);
         goesUP = false;
     }
+    /// <summary>
+    /// Pri zapnuti hry vypne menu
+    /// </summary>
     void HideUI()
     {
         meneTheme.Stop();
@@ -204,7 +210,7 @@ public class Menu : MonoBehaviour
         textFields["COMPANY"].text = Application.companyName;
     }
     /// <summary>
-    /// Prida posluchcov na stlacenie tlacidiel podla slovnika "buttons"
+    /// Prida pocuvajuce metody na stlacenie tlacidiel podla slovnika "buttons"
     /// </summary>
     void SubscribeToButtons()
     {
@@ -347,19 +353,6 @@ public class Menu : MonoBehaviour
         await FileManager.StartWorld(worldName);
         MenuNavigation(-1);
     }
-    /* <summary>
-    /// Spusti hru ako hostitel
-    /// </summary>
-    /// <param name="online">PRAVDA spusti online inak lokane</param>
-    /// <param name="load">PRAVDA nacita hru zo suboru</param>
-    void StartConnection(bool online, bool load = false)
-    {
-        if (!load)
-        {
-            conn.StartConnection(online);
-        }
-    }*/
-
     /// <summary>
     /// Sluzi pre nacitanie hodnot z nastaveni
     /// </summary>

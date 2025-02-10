@@ -36,6 +36,9 @@ public class SkillPanel : MonoBehaviour
         skillCounterText.text = freePointCouter.ToString();
         //OnChangeAvailablePoints += (bool change) => { Debug.Log($"OnChangeAvailablePoints.Invoked({change})"); };
     }
+    /// <summary>
+    /// Animovanie tahania stromu schopnosti
+    /// </summary>
     void FixedUpdate()
     {
         if (button.isHolding)
@@ -59,6 +62,10 @@ public class SkillPanel : MonoBehaviour
             Mathf.Round(transform.position.y+limitPosition.x-limitOffset.x), 
             Mathf.Round(transform.position.y+limitPosition.y-limitOffset.y));
     }
+    /// <summary>
+    /// Pripocitanie bodu po dosiahnuti urovne
+    /// </summary>
+    /// <param name="level"></param>
     public void LevelUP (byte level)
     {
         freePointCouter = (byte)(level - usedPointsCounter);

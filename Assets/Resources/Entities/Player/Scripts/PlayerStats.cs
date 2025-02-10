@@ -464,4 +464,12 @@ public class PlayerStats : EntityStats
         //Debug.Log("XP added to player");
         xp.Value = xpMax.Value;
     }
+    /// <summary>
+    /// Znovu zrodi hraca
+    /// </summary>
+    [Rpc(SendTo.Server)] public void ReviveRpc()
+    {
+        IsAlive.Value = true;
+        MapScript.map.SpawnPlayer(transform);
+    }
 }

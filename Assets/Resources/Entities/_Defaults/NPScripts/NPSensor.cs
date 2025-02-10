@@ -145,6 +145,9 @@ public class NPSensor : NetworkBehaviour
 }
 #if UNITY_EDITOR
 [CustomEditor(typeof(NPSensor))]
+/// <summary>
+/// Sluzi pre specialne zobrazenie v Unity editore a dovoluje obnovit zameriavanie 
+/// </summary>
 public class MyButtonExampleEditor : Editor
 {
     public override void OnInspectorGUI()
