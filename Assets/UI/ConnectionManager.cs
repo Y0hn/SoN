@@ -173,7 +173,6 @@ public class Connector : MonoBehaviour
     public void StartSolo()
     {
         CreateLAN(LOCALHOST);
-        netMan.StartHost();
     }
     /// <summary>
     /// Na klientovy vypne pripojenie a na servere odpoji konkretneho klienta

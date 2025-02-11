@@ -26,7 +26,7 @@ public class MainUIButton : MonoBehaviour
     protected virtual void Awake()
     {
         AddListener(OnClick);
-        FileManager.Log($"{name} awoken");
+        //FileManager.Log($"{name} awoken");
     }
     protected virtual void Start()
     {

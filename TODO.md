@@ -13,3 +13,5 @@ BOSS
 balanced sence
 
 Solo game continue on same world
+
+load sa zasekne nedkde

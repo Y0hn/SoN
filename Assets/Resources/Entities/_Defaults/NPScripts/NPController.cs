@@ -1,7 +1,8 @@
 using UnityEngine;
-using System.Collections.Generic;
 using Pathfinding;
-
+/// <summary>
+/// <inheritdoc/> Serverom
+/// </summary>
 public class NPController : EntityController
 {
     /* ZDEDENE ATRIBUTY
@@ -115,6 +116,16 @@ public class NPController : EntityController
         //Debug.Log("Default target setted to " + t.name);
         defaultTarget = t;
         SetTarget(t);
+    }
+    /// <summary>
+    /// Nastavuje ciel pri nacitani zo suboru charakteru
+    /// </summary>
+    /// <param name="t"></param>
+    public virtual void SetDefaultTarget(string t)
+    {
+        //Debug.Log("Default target setted to " + t.name);
+        defaultTarget = MapScript.map.RequestDefaultTarget(t);
+        SetTarget(defaultTarget);
     }
     /// <summary>
     /// <inheritdoc/>

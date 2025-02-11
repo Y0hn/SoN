@@ -129,11 +129,22 @@ public static class FileManager
         }
     }
     /// <summary>
+    /// Vymaze subor ulozeneho sveta podla jeho nazvu
+    /// </summary>
+    /// <param name="name">NAZOV sveta</param>
+    public static void DeleteWorld(string name)
+    {
+        // odstrani svet
+        File.Delete(NameToWorldPath(name));
+        Log("Svet bol odstraneny: " + name, FileLogType.RECORD);
+    }
+    /// <summary>
     /// Spustanie sveta
     /// </summary>
     /// <param name="name"></param>
     public static async Task StartWorld(string name, GameType type = GameType.Online) 
     {
+        Log($"World {name} is loading", FileLogType.WARNING);
         string path = NameToWorldPath(name);
 
         if (File.Exists(path))
@@ -146,6 +157,8 @@ public static class FileManager
             world.worldName = name;
         }
 
+        Log($"World {name} is in process of loading", FileLogType.WARNING);
+
         if (type == GameType.Solo)
         {
             Connector.instance.StartSolo();
@@ -155,8 +168,9 @@ public static class FileManager
             bool online = type == GameType.Online;
             await Connector.instance.StartServer(online);
         }
+
         GameManager.instance.StartGame();
-        Log($"World {world.worldName} has been opened");
+        Log($"World {world.worldName} has been opened", FileLogType.WARNING);
     }
     public static void EndWorld()
     {

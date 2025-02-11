@@ -21,6 +21,8 @@ public class MapScript : MapSizer
         new(PlaySpawn.position.x + Random.Range(-playerSpawnRange.x, playerSpawnRange.x), 
             PlaySpawn.position.y + Random.Range(-playerSpawnRange.y, playerSpawnRange.y));
 
+    public static byte npCouter = 0;
+
     /// <summary>
     /// Zavola sa pred prvym snimkom obrazovky hry
     /// </summary>
@@ -30,7 +32,7 @@ public class MapScript : MapSizer
     /// </summary>
     protected override void Start()
     {
-
+        
     }
     /// <summary>
     /// <inheritdoc/>
@@ -90,12 +92,21 @@ public class MapScript : MapSizer
 
         // Vytvori objekt nepriatela na pozicii
         enemy = Instantiate(enemy, pos, Quaternion.identity);
-        enemy.GetComponent<NetworkObject>().Spawn();
+        NPStats npc = enemy.GetComponent<NPStats>();
+        npc.NetObject.Spawn();
 
-        // Zvoli nahodny ale mal by si vybrat najblizsi
-        Transform target = extractions.GetChild(Random.Range(0,extractions.childCount));
-        enemy.GetComponent<NPController>().SetDefaultTarget(target);
+        npc.OnDeath += delegate { npCouter--; };
+
+        // Zvoli nahodny ciel
+        npc.GetComponent<NPController>().SetDefaultTarget(extractions.GetChild(Random.Range(0,extractions.childCount)));
+        npCouter++;
+
+        FileManager.Log($"Enemy spawned {enemy.name} current number of em= {npCouter}");
     }
+    /// <summary>
+    /// Nacita charakter nepiratela z ulozenych dat
+    /// </summary>
+    /// <param name="save">ulozene DATA</param>
     public void SpawnFromSave (World.EntitySave save)
     {
         GameObject e = null;
@@ -116,14 +127,6 @@ public class MapScript : MapSizer
             netO.Spawn();
             netO.GetComponent<NPStats>().Load(save);
 
-            if (1 < n.Length)
-                for (int i = 0; i < extractions.childCount; i++)
-                    if (extractions.GetChild(i).name == n[1])
-                    {
-                        // Nastavi ciel pre nepriatela
-                        netO.GetComponent<NPController>().SetDefaultTarget(extractions.GetChild(i));
-                        break;
-                    }
             FileManager.Log($"Entity {save.etName} Save loaded ");
         }
         else
@@ -137,6 +140,24 @@ public class MapScript : MapSizer
     {
         GameObject v = Resources.Load<GameObject>("Entities/Veles/Veles");
         Instantiate(v, BossSpawn).GetComponent<NetworkObject>().Spawn();
+    }
+    /// <summary>
+    /// Ziska ciel pre nepriatela podla jeho nazvu
+    /// </summary>
+    /// <param name="_name"></param>
+    /// <returns></returns>
+    public Transform RequestDefaultTarget(string _name)
+    {
+        Transform dTarget = null;
+
+        for (int i = 0; i < extractions.childCount; i++)
+            if (extractions.GetChild(i).name == _name)
+            {
+                dTarget = extractions.GetChild(i);
+                break;
+            }
+
+        return dTarget;
     }
 }
  

@@ -55,7 +55,6 @@ public class NPStats : EntityStats
         RANGED_ATTACK_INACURRACY = 0.4f,
         ATTACK_DISTANCE_PERCENTAGE = 0.3f;
 
-    public static byte NPCount = 0;
     public static Action npcDied;
 
     public override Quaternion Rotation => body.transform.rotation;
@@ -80,7 +79,6 @@ public class NPStats : EntityStats
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        AddToCount(1);
         
         SetWeaponIndex(0,0);
     }
@@ -91,7 +89,6 @@ public class NPStats : EntityStats
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
-        AddToCount(-1);
         if (IsServer)
             npcDied.Invoke();
     }
@@ -148,16 +145,6 @@ public class NPStats : EntityStats
         base.Die();
     }
     /// <summary>
-    /// Prida nepriatela do pocitadla
-    /// </summary>
-    /// <param name="b"></param>
-    protected virtual void AddToCount(sbyte b)
-    {
-        // iba na servery
-        if (!IsServer) return;    
-        NPCount = (byte)(NPCount + b);
-    }
-    /// <summary>
     /// Zastavuje ziskavanie pozicie ciela na urcity cas pred vystrelenim
     /// <param name="proj"></param>
     /// </summary>
@@ -187,6 +174,8 @@ public class NPStats : EntityStats
     public virtual void Load(World.EntitySave save)
     {
         base.LoadSavedData(save);
+        string target = save.etName.Split('-')[1];
+        GetComponent<NPController>().SetDefaultTarget(target);
     }
 #pragma warning disable IDE0051 // Remove unused private members
     /// <summary>

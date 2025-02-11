@@ -172,14 +172,18 @@ public class GameManager : MonoBehaviour
         copy.SetUp(conn.GetConnection());
 
         if (IsServer)
-            NPStats.npcDied += EnemySpawner;
-
-        // Ak su ulzene nejake data nepriatelov
-        if (0 < FileManager.World.entities.Count)
         {
-            foreach (var entity in FileManager.World.entities)
-                MapScript.map.SpawnFromSave(entity);
-        }
+            NPStats.npcDied ??= EnemySpawner;
+
+            // Ak su ulzene nejake data nepriatelov
+            if (0 < FileManager.World.entities.Count)
+            {
+                foreach (var entity in FileManager.World.entities)
+                    MapScript.map.SpawnFromSave(entity);
+            }
+
+            NPStats.npcDied.Invoke();
+        } 
 
         // Ak je svet bez hlavneho nepriatela tak ho vytvori
         if (FileManager.World.boss == null)
@@ -188,7 +192,7 @@ public class GameManager : MonoBehaviour
         else
             MapScript.map.SpawnFromSave(FileManager.World.boss);
 
-        EnemySpawner();
+        FileManager.Log("Game started");
     }
     /// <summary>
     /// Odide z hry -> do hlavneho menu
@@ -204,8 +208,12 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void EnemySpawner()
     {
-        while (NPStats.NPCount < MAX_NPC_COUNT)
+        while (MapScript.npCouter < MAX_NPC_COUNT)
+        {
+            FileManager.Log($"Enemy spawing {MapScript.npCouter} < {MAX_NPC_COUNT}");
             MapScript.map.SpawnEnemy();
+        }
+        
     }
     /// <summary>
     /// Vrati lokalny zobrazovac zivorov
