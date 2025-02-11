@@ -12,7 +12,7 @@ public class PlayerNameField : InputFieldCheck
     {
         bool check = false;
 
-        string player = field.text.Trim();
+        string player = Text;
 
         if (player == "")
         {

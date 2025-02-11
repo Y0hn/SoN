@@ -153,7 +153,7 @@ public class GameManager : MonoBehaviour
     /// <param name="context"></param>
     void SendMess(InputAction.CallbackContext context)
     {
-        if (chatting)
+        if (chatting && player != null)
         {
             chatting = false;
             uiPanels["chatUI"].SetActive(chatting);

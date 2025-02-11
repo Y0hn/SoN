@@ -5,12 +5,18 @@ public class WorldNameField : PlayerNameField
 {
     protected override bool FieldCheck()
     {
-        bool check =  base.FieldCheck();
+        bool check = true;
 
         string tt = Text;
-        
-        if (!check)
-            return check;
+
+        if (tt == "")
+        {
+            ErrorMessage("Type your name");
+        }
+        else if (tt.Length < 2)
+        {
+            ErrorMessage("World name must be longer");
+        }
         else if (tt.Contains('-'))
         {
             ErrorMessage("World name contains bad symbols");
@@ -27,6 +33,8 @@ public class WorldNameField : PlayerNameField
                 }
             }
 
+        if (check)
+            ErrorMessage("");
         return check;
     }
 }
