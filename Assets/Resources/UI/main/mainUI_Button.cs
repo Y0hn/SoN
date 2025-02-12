@@ -35,7 +35,7 @@ public class MainUIButton : MonoBehaviour
     protected virtual void OnClick()
     {
         source.PlayOneShot(clip);
-        FileManager.Log($"{name} clicked");
+        //FileManager.Log($"{name} clicked");
     }
     public virtual void AddListener(UnityAction call)
     {

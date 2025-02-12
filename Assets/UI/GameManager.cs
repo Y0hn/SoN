@@ -205,10 +205,12 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void Quit()
     {
+        if (IsServer)
+            NPStats.npcDied -= EnemySpawner;
+
         SetGameUI(false);
         Menu.menu.gameObject.SetActive(true);
         conn.Quit(player.OwnerClientId);
-        NPStats.npcDied -= EnemySpawner;
     }
     /// <summary>
     /// Bezi na servery ak zomrie nepriatel
@@ -216,10 +218,8 @@ public class GameManager : MonoBehaviour
     void EnemySpawner()
     {
         while (MapScript.npCouter < MAX_NPC_COUNT)
-        {
-            FileManager.Log($"Enemy spawing {MapScript.npCouter} < {MAX_NPC_COUNT}");
+            //FileManager.Log($"Enemy spawing {MapScript.npCouter} < {MAX_NPC_COUNT}");
             MapScript.map.SpawnEnemy();
-        }        
     }
     /// <summary>
     /// Vrati lokalny zobrazovac zivorov

@@ -32,7 +32,7 @@ public class MapScript : MapSizer
     /// </summary>
     protected override void Start()
     {
-        NPStats.npcDied += delegate { npCouter--; };        
+        NPStats.npcDied += delegate { if (0 < npCouter) npCouter--; };        
     }
     /// <summary>
     /// <inheritdoc/>

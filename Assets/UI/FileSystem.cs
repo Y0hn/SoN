@@ -68,7 +68,6 @@ public static class FileManager
     /// </summary>
     public static void Renew()
     {
-        world= null;
         LoadSettings();
     }
 
@@ -192,10 +191,7 @@ public static class FileManager
     /// <param name="player">odpajany HRAC</param>
     public static void SaveClientData(World.PlayerSave player)
     {
-        if (world != null)
-            world.SaveRewritePlayer(player);
-        else
-            world = new();
+        world.SaveRewritePlayer(player);
     }
     #endregion
     #region SettingsLoader

@@ -198,7 +198,7 @@ public class Menu : MonoBehaviour
     /// </summary>
     public void TiggerHideUI() => animator.SetTrigger("change");
     /// <summary>
-    /// Pri zapnuti hry vypne menu
+    /// Pri zapnuti hry vypne menu volane z animatora
     /// </summary>
     void HideUI()
     {
