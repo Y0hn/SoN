@@ -8,21 +8,28 @@ public class SubMenuLoad : MonoBehaviour
     [SerializeField] Transform content;
     [SerializeField] AudioSource source;
     /// <summary>
-    /// Nacita vsetky ulozenia a vytvori pre kazdy objekt v ponuke
+    /// Obnoví ponuku uloženia <br />
+    /// Načíta všetky uložené svety a vytvorí pre každý zápis v ponuke
     /// </summary>
-    void Start()
+    void OnEnable()
     {
-        // Vynuluje ponuku -> vymaze vsetky stare objekty ulozenia
+        // Vynuluje ponuku -> vymaže všetky staré zápisy uloženia
         for (int i = 0; i < content.childCount; i++)
             Destroy(content.GetChild(i).gameObject);
 
-        // Ziska vsetky cesty k uloznym suborom
+        // Získa všetky cesty k uloženým súborom
         World[] saves = FileManager.GetSavedWorlds();
 
+        // Pre každý získany svet
         for (int i = 0; i < saves.Length; i++)
         {
+            // Vytvorí zápis v zozname
             MainUISave mus = Instantiate(save, content).GetComponent<MainUISave>();
+
+            // Nastaví zápisu hodnoty sveta
             mus.SetUp(ref saves[i]);
+
+            // Nastaví zvuk prehraný po kliknutí 
             mus.SetAudioSource(source);
         }
     }

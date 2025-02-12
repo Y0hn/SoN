@@ -143,15 +143,20 @@ public class Menu : MonoBehaviour
         menu = this;
     }
     /// <summary>
-    /// Zapne sa pri povoleni objektu
+    /// Zavolane pri prvom povoleni objektu
     /// </summary>
     void Start() 
     {
-        if (conn == null)
-            conn = Connector.instance;
+        conn = Connector.instance;
+    }
+    /// <summary>
+    /// Zapne sa pri povoleni objektu
+    /// </summary>
+    void OnEnable()
+    {
         FileManager.Renew();
         meneTheme.Play();
-        ResetUI();
+        ResetUI();        
     }
     /// <summary>
     /// Sluzi pre stridanie ponuk - spusta nanimator
@@ -189,11 +194,16 @@ public class Menu : MonoBehaviour
         goesUP = false;
     }
     /// <summary>
+    /// Vypne objekt hlavneho menu po postupnom ubudani pozadia
+    /// </summary>
+    public void TiggerHideUI() => animator.SetTrigger("change");
+    /// <summary>
     /// Pri zapnuti hry vypne menu
     /// </summary>
     void HideUI()
     {
         meneTheme.Stop();
+        animator.Rebind();
         gameObject.SetActive(false);
         FileManager.RegeneradeSettings();
         FileManager.Log($"Game Started => Menu Disabled => MenuTheme Stoped", FileLogType.RECORD);
@@ -255,6 +265,10 @@ public class Menu : MonoBehaviour
             // Posun sa na predchadzajucu vrstvu -> vypni sucasnu
             goesUP = true;
             animator.SetTrigger("change");
+
+            // Ak odchadza z nastaveni ulozi ich
+            if (currentLayer.Peek() == "SubSett")
+                FileManager.RegeneradeSettings();
         }
         else
         {
@@ -336,11 +350,12 @@ public class Menu : MonoBehaviour
         // cize hlavne menu sa vypne
         if (layer < 0)
         {
-            HideUI();
+            FileManager.Log($"Navigation is hiding");
+            animator.SetTrigger("game");
         }
         else if (0 < layer)
         {
-            FileManager.Log($"Navigation set to {currentLayer}");
+            FileManager.Log($"Navigation set to {currentLayer.Peek()}");
             animator.SetTrigger("change");
         }
     }
@@ -348,9 +363,9 @@ public class Menu : MonoBehaviour
     /// Po stlaceni tlacidla pre nacitanie konkretneho suboru hry
     /// </summary>
     /// <param name="worldName"></param>
-    public async Task PressLoad(string worldName)
+    public void PressLoad(string worldName)
     {
-        await FileManager.StartWorld(worldName);
+        _ = FileManager.StartWorld(worldName);
         MenuNavigation(-1);
     }
     /// <summary>

@@ -86,4 +86,8 @@ public class BosStats : NPStats
         else
             base.LoadSavedData(save);
     }
+    public override void Load(World.EntitySave save)
+    {
+        LoadSavedData(save);
+    }
 }

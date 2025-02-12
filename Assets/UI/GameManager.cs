@@ -173,25 +173,31 @@ public class GameManager : MonoBehaviour
 
         if (IsServer)
         {
-            NPStats.npcDied ??= EnemySpawner;
+            FileManager.Log("NPCs setuping");
+            // pre istovu iba ak je null v pripade viacnasobneho spustania hry
+            NPStats.npcDied += EnemySpawner;
 
             // Ak su ulzene nejake data nepriatelov
             if (0 < FileManager.World.entities.Count)
-            {
                 foreach (var entity in FileManager.World.entities)
                     MapScript.map.SpawnFromSave(entity);
+            else
+            {
+                MapScript.npCouter = 0;
+                NPStats.npcDied.Invoke();
             }
+                
+            FileManager.Log("Bos setuping");
 
-            NPStats.npcDied.Invoke();
+            // Ak je svet bez hlavneho nepriatela tak ho vytvori
+            if (FileManager.World.boss == null)
+                MapScript.map.SpawnBoss();
+            // Inak ho nacita zo suboru
+            else
+                MapScript.map.SpawnFromSave(FileManager.World.boss);
         } 
 
-        // Ak je svet bez hlavneho nepriatela tak ho vytvori
-        if (FileManager.World.boss == null)
-            MapScript.map.SpawnBoss();
-        // Inak ho nacita zo suboru
-        else
-            MapScript.map.SpawnFromSave(FileManager.World.boss);
-
+        menu.TiggerHideUI();
         FileManager.Log("Game started");
     }
     /// <summary>
@@ -202,6 +208,7 @@ public class GameManager : MonoBehaviour
         SetGameUI(false);
         Menu.menu.gameObject.SetActive(true);
         conn.Quit(player.OwnerClientId);
+        NPStats.npcDied -= EnemySpawner;
     }
     /// <summary>
     /// Bezi na servery ak zomrie nepriatel
@@ -212,8 +219,7 @@ public class GameManager : MonoBehaviour
         {
             FileManager.Log($"Enemy spawing {MapScript.npCouter} < {MAX_NPC_COUNT}");
             MapScript.map.SpawnEnemy();
-        }
-        
+        }        
     }
     /// <summary>
     /// Vrati lokalny zobrazovac zivorov

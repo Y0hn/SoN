@@ -15,7 +15,7 @@ public class MainUISave : MainUIButton
         name = world.worldName;
         saveName.text = world.worldName;
         saveDate.text = $"[{world.writeDate.Split(' ')[0]}]";
-        AddListener(delegate { _=Menu.menu.PressLoad(name); });
+        AddListener(delegate { Menu.menu.PressLoad(name); });
         deleteButton.onClick.AddListener(DeleteSave);
     }
     void DeleteSave()

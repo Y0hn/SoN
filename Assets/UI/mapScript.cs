@@ -32,7 +32,7 @@ public class MapScript : MapSizer
     /// </summary>
     protected override void Start()
     {
-        
+        NPStats.npcDied += delegate { npCouter--; };        
     }
     /// <summary>
     /// <inheritdoc/>
@@ -95,8 +95,6 @@ public class MapScript : MapSizer
         NPStats npc = enemy.GetComponent<NPStats>();
         npc.NetObject.Spawn();
 
-        npc.OnDeath += delegate { npCouter--; };
-
         // Zvoli nahodny ciel
         npc.GetComponent<NPController>().SetDefaultTarget(extractions.GetChild(Random.Range(0,extractions.childCount)));
         npCouter++;
@@ -148,14 +146,8 @@ public class MapScript : MapSizer
     /// <returns></returns>
     public Transform RequestDefaultTarget(string _name)
     {
-        Transform dTarget = null;
-
-        for (int i = 0; i < extractions.childCount; i++)
-            if (extractions.GetChild(i).name == _name)
-            {
-                dTarget = extractions.GetChild(i);
-                break;
-            }
+        // Ziska cilovy bod podla nazvu
+        Transform dTarget = extractions.GetComponentsInChildren<Transform>().ToList().Find(t => t.name == _name);
 
         return dTarget;
     }
