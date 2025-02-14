@@ -1,17 +1,22 @@
 # TO DO LIST
 
-## PLAN
+## HIGH PRIORITY
 ```
-LOOT SYSTEM
-PLAYER AFTER DEATH REAINMATION
-PLAYER TIMED REGENERATION
+LOOT SYSTEM 
+SOUND SYSTEM
+PLAYER QUICK ATTACK LOAD
+BOSS MOVESET
 ```
-### ENEMY AI
-BOSS
 
-### SKILL TREE
-balanced sence
+## Medium Priority
+```
+Ranged Attacks depends on Munition
+More Weapons
+```
 
-Solo game continue on same world
+## low priority
+```
+player timed regereration
+balanced skills in skill tree
+```
 
-load sa zasekne nedkde
