@@ -254,7 +254,8 @@ public abstract class EntityStats : NetworkBehaviour
     {
         float value = HP;
         hpBar.value = value;
-        PlaySound("onDeath");
+        if (prev > now)
+            PlaySound("onHitted");
         if (now <= 0)
             Die();
     }
@@ -263,7 +264,7 @@ public abstract class EntityStats : NetworkBehaviour
     /// </summary>
     protected virtual void Die()
     {
-        PlaySoundRpc("die");
+        PlaySound("onDeath");
         if (onDeathWait)
             timeToDespawn = Time.time + TIME_TO_DESPAWN;
         foreach (Delegate d in OnDeath?.GetInvocationList())
@@ -380,7 +381,7 @@ public abstract class EntityStats : NetworkBehaviour
             else
                 volume = 0.05f;
         }
-        else if (soundType == "onHit")
+        else if (soundType.Contains("onHit"))
             volume = 0.5f;
 
         // Ziska kaudio podla nazvu a cisla

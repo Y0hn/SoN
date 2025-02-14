@@ -15,7 +15,7 @@ Hlavným cieľom maturitnej práce bude realizácia počítačovej hry žánru R
 - [x] Vytvoriť bojovú inteligenciu nepriateľov, ktorá bude riadiť ich správanie a útoky.
 - [ ] Vytvoriť systém koristi, kde z porazených nepriateľov hráč získava predmety, použiteľné ako aj nositeľné predmety.
 - [ ] Vytvoriť “strom schopností” kde hráč môže investovať získané body schopností na získanie nových schopností a permanentné vylepšenie svojich vlastností.
-- [ ] Použiť pokročilejšie princípy programovania pri vytváraní funkcionalít hry.
+- [x] Použiť pokročilejšie princípy programovania pri vytváraní funkcionalít hry.
 - [ ] Vložiť vhodnú hudbu do pozadia a ozvučiť všetky akcie hráča a nepriateľov.
 
 ### Všeobecné čiastkové ciele:
