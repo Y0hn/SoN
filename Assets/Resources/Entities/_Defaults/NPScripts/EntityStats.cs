@@ -100,12 +100,20 @@ public abstract class EntityStats : NetworkBehaviour
         SubsOnNetValChanged();
     }
     /// <summary>
+    /// Zavolane pri zaniku abjektu v sieti
+    /// </summary>
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+        FileManager.Log($"{name} despawned");
+    }
+    /// <summary>
     /// Zabezpecuje spravne nastavenie a chod 
     /// </summary>
     protected virtual void ServerSubsOnNetValChanged()
     {
         if (!IsServer) return;
-        weapE.OnValueChanged += (WeaponIndex old, WeaponIndex now) =>
+        weapE.OnValueChanged += (old, now) =>
         {
             Attack a = GetAttackByWeaponIndex(now);
             if      (Attack.MeleeAttack(a.type))
@@ -119,11 +127,11 @@ public abstract class EntityStats : NetworkBehaviour
                 //Debug.Log($"{name}'s attack point position set to [{attackPoint.localPosition.x},{attackPoint.localPosition.y}]");
             }
         };
-        maxHp.OnValueChanged += (int prevValue, int newValue) => 
+        maxHp.OnValueChanged += (prevValue, newValue) => 
         {
             hp.Value = maxHp.Value;
         };
-        IsAlive.OnValueChanged += (bool old, bool now) =>
+        IsAlive.OnValueChanged += (old, now) =>
         {            
             if (now)
                 hp.Value = maxHp.Value;
@@ -136,7 +144,7 @@ public abstract class EntityStats : NetworkBehaviour
     /// </summary>
     protected virtual void SubsOnNetValChanged()
     {
-        weapE.OnValueChanged   += (WeaponIndex old, WeaponIndex now) => 
+        weapE.OnValueChanged   += (old, now) => 
         {
             bool 
                 R = false, 
@@ -166,7 +174,7 @@ public abstract class EntityStats : NetworkBehaviour
                 Animator.SetFloat("atBlend", atBlend);
             }
         };
-        IsAlive.OnValueChanged  += (bool prev, bool alive) => 
+        IsAlive.OnValueChanged  += (prev, alive) => 
         {
             hpBar.gameObject.SetActive(alive);
             coll.enabled = alive;
@@ -180,7 +188,7 @@ public abstract class EntityStats : NetworkBehaviour
     protected virtual void OwnerSubsOnNetValChanged()
     {
         // Server / Owner
-        weapE.OnValueChanged += (WeaponIndex old, WeaponIndex now) =>
+        weapE.OnValueChanged += (old, now) =>
         {
             Animator.SetFloat("weapon", (float)Attack.type);
 
@@ -189,11 +197,11 @@ public abstract class EntityStats : NetworkBehaviour
             Animator.SetFloat("atSpeed", aSpeed);
             //Debug.Log($"Attack animation set on weapon {Animator.GetFloat("weapon")} to speed {speed}");
         };
-        speed.OnValueChanged += (float old, float now) =>
+        speed.OnValueChanged += (old, now) =>
         {
             Animator.SetFloat("wSpeed", now/100f);
         };
-        IsAlive.OnValueChanged += (bool old, bool now) =>
+        IsAlive.OnValueChanged += (old, now) =>
         {            
             Animator.SetBool("isAlive", now);
         };
@@ -246,6 +254,7 @@ public abstract class EntityStats : NetworkBehaviour
     {
         float value = HP;
         hpBar.value = value;
+        PlaySound("onDeath");
         if (now <= 0)
             Die();
     }
@@ -352,6 +361,26 @@ public abstract class EntityStats : NetworkBehaviour
         }
         return Weapons[wIndex.eIndex].attack[wIndex.aIndex];
     }
+    /// <summary>
+    /// Zahra zvuk len na jednom positaci
+    /// </summary>
+    /// <param name="soundType"></param>
+    /// <param name="index"></param>
+    protected void PlaySound(string soundType, int index = -1)
+    {
+        if (index < 0)
+            index = Random.Range(1, 4);
+
+        if (soundType == "step")
+            soundType = (onPath.Value ? "stone" :"grass" ) + "Step";
+
+        // Ziska kaudio podla nazvu a cisla
+        string i = (soundType != "onDeath") ? index.ToString() : "";
+        AudioClip clip = rase.sounds[soundType + i];
+
+        // Prehra ho raz v prehravaci
+        audioSource.PlayOneShot(clip);
+    }
     
     /*   _____  _____   _____     
      *  |  __ \|  __ \ / ____|    
@@ -399,28 +428,14 @@ public abstract class EntityStats : NetworkBehaviour
 
             speed.Value *= speedMod;
         } catch {
-
+            //FileManager.Log("Error in speed change");
         }
     }
     /// <summary>
     /// Vyda zvuk pre vsetkych, budu ho vsak pocut len ti v blizkosti
     /// </summary>
     /// <param name="name">KLUCova hodnota zdroja zvuku</param>
-    [Rpc(SendTo.Everyone)] public virtual void PlaySoundRpc (string soundType, int index = -1)
-    {
-        if (index < 0)
-            index = Random.Range(1, 4);
-
-        if (soundType == "step")
-            soundType = (onPath.Value ? "stone" :"grass" ) + "Step";
-
-        // Ziska kaudio podla nazvu a cisla
-        string i = (soundType != "onDeath") ? index.ToString() : "";
-        AudioClip clip = rase.sounds[soundType + i];
-
-        // Prehra ho raz v prehravaci
-        audioSource.PlayOneShot(clip);
-    }
+    [Rpc(SendTo.Everyone)] public virtual void PlaySoundRpc (string soundType, int index = -1) => PlaySound(soundType, index);
 
     /// <summary>
     /// Urcuje skupinu pre cielenie a ublizovanie si navzajom ;)

@@ -206,7 +206,8 @@ public class Menu : MonoBehaviour
         animator.Rebind();
         gameObject.SetActive(false);
         FileManager.RegeneradeSettings();
-        FileManager.Log($"Game Started => Menu Disabled => MenuTheme Stoped", FileLogType.RECORD);
+        GameManager.instance.GameStarted();
+        FileManager.Log($"Game Started => Menu Disabled => MenuTheme Stoped => GameManager Took Lead", FileLogType.RECORD);
     }
     /// <summary>
     /// Resetuje textove polia, <br />

@@ -8,6 +8,7 @@ public class UtilitySkillScript : MonoBehaviour
     [SerializeField] bool refreshOnChange = true;
     [SerializeField] bool defaultState = false;
     [SerializeField] bool requestStateOnStart = false;
+    [SerializeField] bool requestStateOnEnable = false;
     [SerializeField] List<GameObject> gameObjects;
     GameManager game;
     /// <summary>
@@ -15,14 +16,22 @@ public class UtilitySkillScript : MonoBehaviour
     /// </summary>
     void Start()
     {
-        game = GameManager.instance;
+        game ??= GameManager.instance;
         if (refreshOnChange)
             game.UtilityUpdate += UtilityUpdate;
 
         if (requestStateOnStart)
             SetGameObjects(game.IsUtilityEnabled(condition));
         else
-            SetGameObjects(defaultState);                
+            SetGameObjects(defaultState);           
+    }
+    /// <summary>
+    /// Pri povoleni
+    /// </summary>
+    void OnEnable()
+    {
+        if (requestStateOnEnable)
+            SetGameObjects(game.IsUtilityEnabled(condition));
     }
     /// <summary>
     /// Pri zmene (pridani/odobrani) schopnosti <br />

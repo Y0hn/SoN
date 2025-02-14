@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] Animator anima;
     [SerializeField] UpperPanel uPl;
     [SerializeField] TMP_InputField chat;
+    [SerializeField] AudioSource uiAudioSource;
+    [SerializeField] AudioSource themeAudio;
     private bool paused;
     private bool chatting;
     private PlayerStats player;
@@ -201,6 +203,14 @@ public class GameManager : MonoBehaviour
         FileManager.Log("Game started");
     }
     /// <summary>
+    /// 
+    /// </summary>
+    public void GameStarted()
+    {
+        themeAudio.Play();
+        SetGameUI(true);
+    }
+    /// <summary>
     /// Odide z hry -> do hlavneho menu
     /// </summary>
     void Quit()
@@ -208,7 +218,7 @@ public class GameManager : MonoBehaviour
         if (IsServer)
             NPStats.npcDied -= EnemySpawner;
 
-        SetGameUI(false);
+        themeAudio.Stop();
         Menu.menu.gameObject.SetActive(true);
         conn.Quit(player.OwnerClientId);
     }
@@ -330,12 +340,12 @@ public class GameManager : MonoBehaviour
 
         playerLives = lives;
     }
-    
+
 
     // ANIMACIE POUZIVATELSKEHO ROZHRANIA //
     public void AnimateFace(float state)            => anima.SetFloat("faceState", Mathf.Floor(state*10)/10f);
     public void AnimateFace(string action)          => anima.SetTrigger(action);   
     public void AnimateUI(string name, float value) => anima.SetFloat(name, value);
     public void AnimateUI(string name, bool value)  => anima.SetBool(name,value);  
-    public void AnimateUI(string name)              => anima.SetTrigger(name);     
+    public void AnimateUI(string name)              => anima.SetTrigger(name);
 }

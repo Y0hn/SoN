@@ -89,6 +89,7 @@ public class NPStats : EntityStats
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
+        
         if (IsServer)
             npcDied.Invoke();
     }

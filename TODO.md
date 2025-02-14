@@ -10,6 +10,7 @@ BOSS MOVESET
 
 ## Medium Priority
 ```
+Contnue Game Crashes
 Ranged Attacks depends on Munition
 More Weapons
 ```
