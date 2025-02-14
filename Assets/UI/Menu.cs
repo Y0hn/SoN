@@ -295,7 +295,7 @@ public class Menu : MonoBehaviour
 
             // PODPONUKA pre JEDNEHO hraca                          (localhost)
             case 11: /* Pokracuje v poslednom svete */ 
-                _ = FileManager.StartWorld(inputFields["worldName"].Text, choosenGame);
+                _ = FileManager.StartWorld(FileManager.LastSavedWorld, choosenGame);
                 layer= -1; 
                 break;
             case 12: /* Nacita zo subora hru    */ currentLayer.Push("SubLoad"); break; 

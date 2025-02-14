@@ -28,9 +28,10 @@ public class MainUIButton : MonoBehaviour
         AddListener(OnClick);
         //FileManager.Log($"{name} awoken");
     }
-    protected virtual void Start()
+    protected virtual void OnEnable()
     {
-        
+        if (name == "Continue")
+            button.interactable = FileManager.LastSavedWorld != "";
     }
     protected virtual void OnClick()
     {

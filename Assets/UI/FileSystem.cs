@@ -36,6 +36,22 @@ public static class FileManager
     // Vsetky subory svetov
     public static string[] Worlds       => Directory.GetFiles(WorldPath);
 
+    public static string LastSavedWorld
+    {
+        get 
+        {            
+            if (!settings.Client)
+            {
+                string[] s = settings.lastConnection.Split('-');
+                
+                if (1 < s.Length)
+                    return s[1];
+            }
+
+            return "";
+        }
+    } 
+
     /// <summary>
     /// K menu sveta prida cestu a priponu
     /// </summary>

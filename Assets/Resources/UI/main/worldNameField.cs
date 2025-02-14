@@ -11,11 +11,13 @@ public class WorldNameField : PlayerNameField
 
         if (tt == "")
         {
-            ErrorMessage("Type your name");
+            ErrorMessage("Type world name");
+            check = false;
         }
         else if (tt.Length < 2)
         {
             ErrorMessage("World name must be longer");
+            check = false;
         }
         else if (tt.Contains('-'))
         {
