@@ -16,7 +16,7 @@ public class StonePath : MonoBehaviour
     {
         if (Active && collider.TryGetComponent(out EntityStats es))
         {
-            es.TerrainChangeRpc(speedModifier);
+            es.TerrainChangeRpc(speedModifier, true);
         }
     }
     /// <summary>
@@ -26,6 +26,6 @@ public class StonePath : MonoBehaviour
     void OnTriggerExit2D(Collider2D collider)
     {
         if (Active && collider.TryGetComponent(out EntityStats es) && es.IsSpawned)
-            es.TerrainChangeRpc(1f/speedModifier);
+            es.TerrainChangeRpc(1f/speedModifier, true);
     }
 }

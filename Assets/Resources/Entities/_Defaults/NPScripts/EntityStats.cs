@@ -6,6 +6,7 @@ using System;
 using TMPro;
 using AYellowpaper.SerializedCollections;
 using Random = UnityEngine.Random;
+using NUnit.Framework.Internal;
 /// <summary>
 /// Drzi hodnoty pre entitu
 /// </summary>
@@ -25,15 +26,15 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected Collider2D coll;
     [SerializeField] protected AITarget aiTeam = AITarget.Team_2;
     [SerializeField] protected EntityController controller;
-    [SerializeField, SerializedDictionary("Nazov","Audios")] protected SerializedDictionary<string, AudioSource> audioSources;
+    [SerializeField] protected AudioSource audioSource;
 
     protected   NetworkVariable<int> maxHp = new(100);    
     protected   NetworkVariable<int> hp = new(100);
     [HideInInspector] public NetworkVariable<float> speed = new(100);
     [HideInInspector] public NetworkVariable<byte> level = new(1);
     [HideInInspector] public NetworkVariable<bool> IsAlive = new(true);
-    protected   NetworkVariable<byte> stepIndex = new(0);
     protected   NetworkVariable<WeaponIndex> weapE = new(new(0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    protected NetworkVariable<bool> onPath = new(false);
 
 #pragma warning disable IDE0004
     /// <summary>
@@ -325,7 +326,6 @@ public abstract class EntityStats : NetworkBehaviour
     {
         SetWeaponIndex(WeI.aIndex, WeI.eIndex);
     }
-
     /// <summary>
     /// Vyziada si uložené dáta 
     /// </summary>
@@ -391,10 +391,12 @@ public abstract class EntityStats : NetworkBehaviour
     /// Meni rychlost charakteru, pri zmene terenu
     /// </summary>
     /// <param name="speedMod"></param>
-    [Rpc(SendTo.Server)] public virtual void TerrainChangeRpc(float speedMod)
+    [Rpc(SendTo.Server)] public virtual void TerrainChangeRpc(float speedMod, bool path = false)
     {
         try {
-            stepIndex.Value = (byte)(speedMod < 1 ? 0 : 1);
+            if (path)
+                onPath.Value = 1 < speedMod;
+
             speed.Value *= speedMod;
         } catch {
 
@@ -404,11 +406,20 @@ public abstract class EntityStats : NetworkBehaviour
     /// Vyda zvuk pre vsetkych, budu ho vsak pocut len ti v blizkosti
     /// </summary>
     /// <param name="name">KLUCova hodnota zdroja zvuku</param>
-    [Rpc(SendTo.Everyone)] public virtual void PlaySoundRpc (string name)
+    [Rpc(SendTo.Everyone)] public virtual void PlaySoundRpc (string soundType, int index = -1)
     {
-        if (name.Equals("step"))
-            name += "-" + stepIndex.Value;
-        audioSources[name].Play();
+        if (index < 0)
+            index = Random.Range(1, 4);
+
+        if (soundType == "step")
+            soundType = (onPath.Value ? "stone" :"grass" ) + "Step";
+
+        // Ziska kaudio podla nazvu a cisla
+        string i = (soundType != "onDeath") ? index.ToString() : "";
+        AudioClip clip = rase.sounds[soundType + i];
+
+        // Prehra ho raz v prehravaci
+        audioSource.PlayOneShot(clip);
     }
 
     /// <summary>

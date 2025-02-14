@@ -175,7 +175,8 @@ public class PlayerStats : EntityStats
         FileManager.SaveClientData(new (this));
     }
     /// <summary>
-    /// Nastavi zacinajuce hodnoty pre charakter
+    /// Nastavi zacinajuce hodnoty pre charakter hraca na vsetkych klientoch, <br /> 
+    /// ale niktrore len pre vlasnika alebo len kilenta
     /// </summary>
     protected override void EntitySetUp()
     {
@@ -209,8 +210,12 @@ public class PlayerStats : EntityStats
         chatField.SetActive(false);
         name = playerName.Value.ToString();
         nameTag.text = name;
+        
+        // Povoli pole mena len pre nevlasniaceho hraca
+        nameTag.gameObject.SetActive(/*Connector.instance.Solo || */!IsOwner);
+
         onDeathWait = false;
-        GetComponent<NetworkObject>().name = nameTag.text;
+        GetComponent<NetworkObject>().name = nameTag.text;        
     }
     /// <summary>
     /// <inheritdoc/>

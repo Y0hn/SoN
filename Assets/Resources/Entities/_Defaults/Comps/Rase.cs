@@ -1,6 +1,7 @@
+using AYellowpaper.SerializedCollections;
 using UnityEngine;
-using System;
 using System.Collections.Generic;
+using System;
 /// <summary>
 /// Drzi informacie, na zaklade ktorych sa vypnaju informacie o charakteroch
 /// </summary>
@@ -26,4 +27,22 @@ using System.Collections.Generic;
 
     // List ochran proti poskodeniu
     public List<Resistance> resists = new();
+
+    [SerializedDictionary("name","sound")] 
+    public SerializedDictionary<string, AudioClip> sounds = new SerializedDictionary<string, AudioClip>()
+    {
+        { "grassStep1", null},
+        { "grassStep2", null},
+        { "grassStep3", null},
+
+        { "stoneStep1", null},
+        { "stoneStep2", null},
+        { "stoneStep3", null},
+
+        { "onHitted1",  null},
+        { "onHitted2",  null},
+        { "onHitted3",  null},
+        
+        { "onDeath",    null},
+    };
 }
