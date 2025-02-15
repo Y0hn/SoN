@@ -57,7 +57,7 @@ using System;
     /// </summary>
     /// <param name="self">utocnik</param>
     /// <returns></returns>
-    public /*readonly*/ List<EntityStats> Trigger(EntityStats self)
+    public List<EntityStats> Trigger(EntityStats self)
     {
         List<EntityStats> etS = new();
 

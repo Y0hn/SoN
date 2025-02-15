@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using System.Linq;
+/// <summary>
+/// Pouziva sa na utocenie
+/// </summary>
 [CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Weapon"), Serializable] 
 public class Weapon : Equipment
 {
     public List<Attack> attack;
+    public List<AudioClip> clips;
     /// <summary>
     /// Ziska predmet na zaklade referencnej cesty
     /// Tato metoda ma byt "prepisana" (overwrite)

@@ -114,10 +114,15 @@ public class Projectile : NetworkBehaviour
     public void SetUp(EntityStats entityStats)
     {
         Attack a = entityStats.Attack;
-        delay = a.AttackTime * 2/3;
-        graficDelay = delay  * 1/3;
+
+        delay = 0;
+        graficDelay = 0;
+
         damage = a.damage;
         range = a.range;
+        /*delay = a.AttackTime * 2/3;
+        graficDelay = delay  * 1/3;*/
+
         shooter = entityStats;
         shooter.OnDeath += TryToDestoy;
         //Debug.Log($"Shoted projectile \nwith attack: {attack}\nwith shoot out delay: {delay}\ngrafical delay: {graficDelay}");

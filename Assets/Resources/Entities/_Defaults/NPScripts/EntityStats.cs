@@ -306,7 +306,7 @@ public abstract class EntityStats : NetworkBehaviour
     {
         if (atTime < Time.time)
         {
-            AttackRpc();
+            //AttackRpc();
             atTime = Time.time + Attack.AttackTime;
             return true;
         }
@@ -418,11 +418,13 @@ public abstract class EntityStats : NetworkBehaviour
         GameObject i = Instantiate(Resources.Load<GameObject>("Items/ItemDrop"), pos, Quaternion.identity);
         i.GetComponent<ItemDrop>().Item = Item.GetItem(itemPath);
         i.GetComponent<NetworkObject>().Spawn();
+
+        FileManager.Log($"Item {itemPath} droped");
     }
     /// <summary>
     /// Utocí za entitu podla typu útoku
     /// </summary>
-    [Rpc(SendTo.Server)] protected virtual void AttackRpc()
+    [Rpc(SendTo.Server)] public virtual void AttackRpc()
     {
         foreach(EntityStats et in Attack.Trigger(this))                 // ak ranged tak count = 0
             if (et.IsAlive.Value && et.TakeDamage(Attack.damage))    // pravdive ak target zomrie

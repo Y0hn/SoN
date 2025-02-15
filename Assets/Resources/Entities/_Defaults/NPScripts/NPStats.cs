@@ -156,7 +156,7 @@ public class NPStats : EntityStats
 
             if (0 < maxQ)
             {
-                string weapon = FileManager.WEAPONS_DEFAULT_PATH;
+                string weapon = FileManager.WEAPONS_DEFAULT_PATH + "/";
 
                 // Nahodne vyberie typ zbrane
                 weapon += Random.value < 0.5 ? "sword" : "bow";   
@@ -165,7 +165,7 @@ public class NPStats : EntityStats
                 weapon += "-" + maxQ;
 
                 // Vyhodi zbran
-                DropRpc(weapon, new (1,1));
+                DropRpc(weapon, new (0.5f,0.5f));
             }
         }
     }
