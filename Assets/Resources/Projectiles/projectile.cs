@@ -9,6 +9,7 @@ public class Projectile : NetworkBehaviour
     [SerializeField] Collider2D coll;
     [SerializeField] Transform line;
     [SerializeField] SpriteRenderer lineSpr;
+    [SerializeField] string releaseSound;
 
     EntityStats shooter;
     Damage damage;
@@ -51,6 +52,7 @@ public class Projectile : NetworkBehaviour
         }
         else if (TimerReached(timers[0]))  // vystrelenie projektilu
         {
+            shooter.PlaySoundRpc(releaseSound);
             transform.SetParent(null);
             coll.enabled = true;
             force = transform.up;

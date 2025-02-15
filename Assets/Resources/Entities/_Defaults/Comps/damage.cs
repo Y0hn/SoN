@@ -24,13 +24,10 @@ using System;
     }
     [Serializable] public enum Type
     {
-        // STANDARD
-        bludgeoning, slashing, piercing, 
-        // ELEMENTAL
-        cold, fire, holy, lightning, dark, acid,
-        //  OVER TIME
-        poison,
-        None
+        None,
+        FIST, POLE,
+        SWORD_SLASH, SWORD_TRUST, 
+        BOW_SINLE, BOW_MULTI
     }
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {

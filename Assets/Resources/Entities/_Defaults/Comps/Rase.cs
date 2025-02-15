@@ -29,20 +29,20 @@ using System;
     public List<Resistance> resists = new();
 
     [SerializedDictionary("name","sound")] 
-    public SerializedDictionary<string, AudioClip> sounds = new SerializedDictionary<string, AudioClip>()
+    public SerializedDictionary<string, Sound> sounds = new()
     {
-        { "grassStep1", null},
-        { "grassStep2", null},
-        { "grassStep3", null},
+        { "grassStep1", new(null, 0.05f) },
+        { "grassStep2", new(null, 0.05f) },
+        { "grassStep3", new(null, 0.05f) },
 
-        { "stoneStep1", null},
-        { "stoneStep2", null},
-        { "stoneStep3", null},
+        { "stoneStep1", new(null, 0.5f ) },
+        { "stoneStep2", new(null, 0.5f ) },
+        { "stoneStep3", new(null, 0.5f ) },
 
-        { "onHitted1",  null},
-        { "onHitted2",  null},
-        { "onHitted3",  null},
+        { "onHitted1",  new(null, 0.5f ) },
+        { "onHitted2",  new(null, 0.5f ) },
+        { "onHitted3",  new(null, 0.5f ) },
         
-        { "onDeath",    null},
+        { "onDeath",    new(null, 1) },
     };
 }

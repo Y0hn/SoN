@@ -22,16 +22,21 @@ MonoBehaviour:
   sprite: sword-1
   attack:
   - damage:
-      type: 1
+      type: 3
       amount: 10
     range: 0.7
     rate: 1.5
     type: 1
     bothHanded: 0
   - damage:
-      type: 2
+      type: 4
       amount: 15
     range: 1
     rate: 1
     type: 2
     bothHanded: 0
+  clips:
+  - audioClip: {fileID: 8300000, guid: 994aaf4272610db4d83f165256e43229, type: 3}
+    volume: 0.05
+  - audioClip: {fileID: 8300000, guid: 76d2cda0963a3d64bbe54195d84e1a5e, type: 3}
+    volume: 0.1

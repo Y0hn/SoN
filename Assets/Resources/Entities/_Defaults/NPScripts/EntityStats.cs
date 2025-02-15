@@ -52,6 +52,7 @@ public abstract class EntityStats : NetworkBehaviour
     public virtual Attack Attack        => GetAttackByWeaponIndex(weapE.Value);
     public AITarget TargetTeam          => aiTeam;
     public Animator Animator            => animator.Animator;
+    public Sound AtackSound             => Weapons[weapE.Value.eIndex].clips[weapE.Value.aIndex];
     public Vector2 View                 => controller.View;
     public Color Color                  => color.Color;
     public float ViewAngle              => Mathf.Atan2(View.x, View.y);
@@ -306,7 +307,6 @@ public abstract class EntityStats : NetworkBehaviour
     {
         if (atTime < Time.time)
         {
-            //AttackRpc();
             atTime = Time.time + Attack.AttackTime;
             return true;
         }
@@ -369,29 +369,19 @@ public abstract class EntityStats : NetworkBehaviour
     /// </summary>
     /// <param name="soundType"></param>
     /// <param name="index"></param>
-    protected void PlaySound(string soundType, int index = -1, float volume = 1)
+    protected void PlaySound(string soundType, int index = -1)
     {
         if (index < 0)
             index = Random.Range(1, 4);
 
         if (soundType == "step")
-        {
             soundType = (onPath.Value ? "stone" :"grass" ) + "Step";
-
-            if (onPath.Value)
-                volume = 0.5f;
-            else
-                volume = 0.05f;
-        }
-        else if (soundType.Contains("onHit"))
-            volume = 0.5f;
 
         // Ziska kaudio podla nazvu a cisla
         string i = (soundType != "onDeath") ? index.ToString() : "";
-        AudioClip clip = rase.sounds[soundType + i];
-
-        // Prehra ho raz v prehravaci
-        audioSource.PlayOneShot(clip, volume);
+        
+        // Prehra ho zvuk
+        rase.sounds[soundType + i].Play(ref audioSource);
     }
     
     /*   _____  _____   _____     
@@ -450,6 +440,16 @@ public abstract class EntityStats : NetworkBehaviour
     /// </summary>
     /// <param name="name">KLUCova hodnota zdroja zvuku</param>
     [Rpc(SendTo.Everyone)] public virtual void PlaySoundRpc (string soundType, int index = -1) => PlaySound(soundType, index);
+    /// <summary>
+    /// Prehra klip pre vsetkych, podla jeho cesty
+    /// </summary>
+    /// <param name="clip"></param>
+    /// <param name="vol"></param>
+    [Rpc(SendTo.Everyone)] public virtual void PlaySoundRpc (string clipPath, float vol)
+    {
+        AudioClip ac = Resources.Load<AudioClip>(clipPath);
+        audioSource.PlayOneShot(ac, vol);
+    }
 
     /// <summary>
     /// Urcuje skupinu pre cielenie a ublizovanie si navzajom ;)

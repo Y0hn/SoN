@@ -8,7 +8,7 @@ using System;
 public class Weapon : Equipment
 {
     public List<Attack> attack;
-    public List<AudioClip> clips;
+    public List<Sound> clips;   // pre kazdy utok jeden zvuk
     /// <summary>
     /// Ziska predmet na zaklade referencnej cesty
     /// Tato metoda ma byt "prepisana" (overwrite)
