@@ -7,6 +7,7 @@ using System;
 using TMPro;
 using System.Linq;
 using Unity.VisualScripting;
+using System.IO;
 
 /// <summary>
 /// Uklada inventar hraca lokalne
@@ -326,6 +327,7 @@ public class Inventory : MonoBehaviour
     {
         if (equipSlots.Keys.Contains(eq.slot))
         {
+            FileManager.Log($"Game {game != null}, Game.LocalPlayer {game.LocalPlayer != null}");
             equipSlots[eq.slot].Item = eq;
 
             game.LocalPlayer.SetEquipmentRpc(eq.GetReferency, eq.slot);

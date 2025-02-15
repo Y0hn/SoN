@@ -678,7 +678,9 @@ public enum GameType { Online, Local, Solo }
             /// <returns>pocetPredmetov pocetPoredmetovNaSebe</returns>
             public override string ToString()
             {
-                return $"items.Lenght= {items.Length} equiped.Lenght= {equiped.Length}";
+                string e = "";
+                foreach (string item in equiped) e += item + ", ";
+                return $"items.Lenght= {items.Length} equiped.Lenght= {equiped.Length}\n{e}";
             }
         }
         /// <summary>

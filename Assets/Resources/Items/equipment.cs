@@ -11,8 +11,6 @@ public class Equipment : Item
     public virtual string SpriteRef => sprite;
     public enum Slot
     {
-        //Head, Torso, Legs,
-        //Body,
         WeaponR, WeaponL, WeaponBoth/*, NoPreference*/
     }
     /// <summary>

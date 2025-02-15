@@ -4,7 +4,7 @@ public class SpawnLine : MonoBehaviour
     [SerializeField] float up;
     [SerializeField] float down;
 
-    public Vector2 Position => new (transform.position.x, Random.Range(down, up));
+    public Vector2 Position => new (transform.position.x, Random.Range(transform.position.y-down, transform.position.y+up));
 
     void OnDrawGizmosSelected()
     {

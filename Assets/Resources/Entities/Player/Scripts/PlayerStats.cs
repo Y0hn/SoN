@@ -146,23 +146,38 @@ public class PlayerStats : EntityStats
     /// </summary>
     protected override void LoadSavedData(World.EntitySave save)
     {
-        if (!IsServer) return;
         var pSave = (World.PlayerSave)save;
+
+        // inhereted
+        hp.Value = Mathf.RoundToInt(save.hp * (float)maxHp.Value);
+        transform.position = save.Position;
+
+        if (IsOwner)
+        {
+            game.LocalPlayer = this;
+            // Nacita data o pouzitych predmetoch
+            for (int i = 0; i < pSave.inventory.equiped.Length; i++)
+                if (pSave.inventory.equiped[i] != "")
+                {
+                    string path= pSave.inventory.equiped[i];
+                    Equipment eq = Resources.Load<Weapon>(path);
+                    game.inventory.Equip(eq);
+                }
+        }
+        if (!IsServer) 
+            return;
 
         // Nacitaj data inventara
         foreach (var item in pSave.inventory.items)
             inventory.Add(item);
-        // Nacita data o pouzitych predmetoch
-        foreach (var eq in pSave.inventory.equiped)
-            equipment.Add(eq);
 
-
+        // Nacita data o shtrome schopnosti
         foreach (var skill in pSave.skillTree.skills)
             AddSkill(skill);
         /*foreach (var uSill in pSave.skillTree.usingUtils)
             skillTree.*/
 
-        base.LoadSavedData(pSave);
+        FileManager.Log("Player Data loaded: " + pSave);
     }
 
     /// <summary>
@@ -199,8 +214,7 @@ public class PlayerStats : EntityStats
             cam.gameObject.SetActive(true);
 
             // Nastavenie 
-            int length = Enum.GetNames(typeof(Equipment.Slot)).Length-1;
-            for (; equipment.Count < length;)
+            for (; equipment.Count < 2;)
                 equipment.Add("");
 
             playerName.Value = Menu.menu.PlayerName;
@@ -448,7 +462,7 @@ public class PlayerStats : EntityStats
     /// </summary>
     /// <param name="reference"></param>
     /// <param name="slot"></param>
-    [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot/* = Equipment.Slot.NoPreference*/)
+    [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot)
     {
         equipment[(int)slot] = reference;
         //Debug.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");

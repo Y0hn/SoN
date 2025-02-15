@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
             return v;
         }
     }
-    public PlayerStats LocalPlayer  { get => player; } 
+    public PlayerStats LocalPlayer  { get => player; set => player = value; } 
     public SkillPanel SkillTree     { get => skillTree; }
     public bool PlayerAble          { get => !(paused || chatting || inventory.open); }
     public bool IsServer            { get { bool? b = conn.netMan?.IsServer; return b != null && b.Value; } }

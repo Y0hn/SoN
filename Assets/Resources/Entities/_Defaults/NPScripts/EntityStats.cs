@@ -176,7 +176,8 @@ public abstract class EntityStats : NetworkBehaviour
         };
         IsAlive.OnValueChanged  += (prev, alive) => 
         {
-            hpBar.gameObject.SetActive(alive);
+            if (this is not PlayerStats)
+                hpBar.gameObject.SetActive(alive);
             coll.enabled = alive;
         };
         hp.OnValueChanged += OnHpUpdate;
@@ -353,14 +354,14 @@ public abstract class EntityStats : NetworkBehaviour
     /// <returns>UTOK zo zbrane</returns>
     protected virtual Attack GetAttackByWeaponIndex(WeaponIndex wIndex)
     {
-        string debug = $"GetAttackByWeaponIndex({wIndex})\nReturning:";
+        /*string debug = $"GetAttackByWeaponIndex({wIndex})\nReturning:";
         try {
             debug += $"\nFrom Weapons: {Weapons.Length}";
             debug += $"\nFrom Attacks: {Weapons[wIndex.eIndex].attack.Count}";
         } finally {
             if (false && this is PlayerStats)
                 Debug.Log(debug);
-        }
+        }*/
         return Weapons[wIndex.eIndex].attack[wIndex.aIndex];
     }
     /// <summary>
