@@ -36,21 +36,10 @@ public static class FileManager
     // Vsetky subory svetov
     public static string[] Worlds       => Directory.GetFiles(WorldPath);
 
-    public static string LastSavedWorld
-    {
-        get 
-        {            
-            if (!settings.Client)
-            {
-                string[] s = settings.lastConnection.Split('-');
-                
-                if (1 < s.Length)
-                    return s[1];
-            }
-
-            return "";
-        }
-    } 
+    /// <summary>
+    /// Ziska poslede pripojenie pre pokracovanie solo hry
+    /// </summary>
+    public static string LastSavedWorld => settings.Solo ? settings.lastConnection.Split('-')[1] : "";
 
     /// <summary>
     /// K menu sveta prida cestu a priponu
