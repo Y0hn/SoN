@@ -5,6 +5,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using TMPro;
+using Random = UnityEngine.Random;
+
 /// <summary>
 /// Managing Game and PLayerUI - has 'instance'
 /// </summary>
@@ -340,7 +342,6 @@ public class GameManager : MonoBehaviour
 
         playerLives = lives;
     }
-
 
     // ANIMACIE POUZIVATELSKEHO ROZHRANIA //
     public void AnimateFace(float state)            => anima.SetFloat("faceState", Mathf.Floor(state*10)/10f);

@@ -265,6 +265,7 @@ public abstract class EntityStats : NetworkBehaviour
     protected virtual void Die()
     {
         PlaySound("onDeath");
+
         if (onDeathWait)
             timeToDespawn = Time.time + TIME_TO_DESPAWN;
         foreach (Delegate d in OnDeath?.GetInvocationList())

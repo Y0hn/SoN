@@ -123,6 +123,7 @@ public class Connector : MonoBehaviour
             }
             // pokusi sa o nadvizanie spojenia
             netMan.StartClient();
+            FileManager.Log($"Joined Relay on {hostingAddress}", FileLogType.RECORD);
         } catch  {
             FileManager.Log($"Join connection failed with ipcode= {connection}", FileLogType.ERROR);
             joined = false;
@@ -154,6 +155,8 @@ public class Connector : MonoBehaviour
 
         // Zapne server
         netMan.StartHost();
+
+        FileManager.Log($"Creating Relay on {hostingAddress}", FileLogType.RECORD);
     }
     /// <summary>
     /// Zapne lokalny server
@@ -164,6 +167,8 @@ public class Connector : MonoBehaviour
         tporter.SetConnectionData(ip_address, 7777);
         hostingAddress = ip_address;
         netMan.StartHost();
+
+        FileManager.Log($"Creating LAN on {hostingAddress}", FileLogType.RECORD);
     }
 
     /// <summary>

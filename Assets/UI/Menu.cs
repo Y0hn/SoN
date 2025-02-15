@@ -294,9 +294,13 @@ public class Menu : MonoBehaviour
             case 3: currentLayer.Push("SubSett"); break;
 
             // PODPONUKA pre JEDNEHO hraca                          (localhost)
-            case 11: /* Pokracuje v poslednom svete */ 
-                _ = FileManager.StartWorld(FileManager.LastSavedWorld, choosenGame);
-                layer= -1; 
+            case 11: /* Pokracuje v poslednom svete */
+                if (FileManager.LastSavedWorld != "")
+                {
+                    _ = FileManager.StartWorld(FileManager.LastSavedWorld, choosenGame);
+                    layer= -1; 
+                }
+                else layer = 0;
                 break;
             case 12: /* Nacita zo subora hru    */ currentLayer.Push("SubLoad"); break; 
             case 13: /* Vytvorit novu hru       */ currentLayer.Push("SubCreate"); break;
@@ -366,7 +370,7 @@ public class Menu : MonoBehaviour
     /// <param name="worldName"></param>
     public void PressLoad(string worldName)
     {
-        _ = FileManager.StartWorld(worldName);
+        _ = FileManager.StartWorld(worldName, choosenGame);
         MenuNavigation(-1);
     }
     /// <summary>

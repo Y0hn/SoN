@@ -22,6 +22,7 @@ public abstract class EntityController : NetworkBehaviour
     {
         moveDir = Vector2.zero;
         attacking = false;
+        Stats.OnDeath += delegate { attacking = false; };
     }
     /// <summary>
     /// Stara sa aby sa co narychlejsie vykonala zmena spravania

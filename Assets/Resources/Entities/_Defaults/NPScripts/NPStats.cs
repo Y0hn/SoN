@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using Pathfinding;
+using Random = UnityEngine.Random;
 public class NPStats : EntityStats
 {
     /*  ZDEDENE ATRIBUTY
@@ -139,11 +140,34 @@ public class NPStats : EntityStats
         OnHit.Invoke();
     }
     /// <summary>
-    /// <inheritdoc/>
+    /// <inheritdoc/> <br />
+    /// Ma 2-3 alebo 4-5 sancu ze vyhodi nahodny item
     /// </summary>
     protected override void Die()
     {
         base.Die();
+
+        if (IsOwner)
+        {            
+            // Urci maximalnu kvalitu podla levela
+            int maxQ = level.Value < 10 ? 3 : 5;
+            // Nahodne vyberie kvalitu zbrane
+            maxQ = Random.Range(0, maxQ);
+
+            if (0 < maxQ)
+            {
+                string weapon = FileManager.WEAPONS_DEFAULT_PATH;
+
+                // Nahodne vyberie typ zbrane
+                weapon += Random.value < 0.5 ? "sword" : "bow";   
+
+                // Prida kvalitu             
+                weapon += "-" + maxQ;
+
+                // Vyhodi zbran
+                DropRpc(weapon, new (1,1));
+            }
+        }
     }
     /// <summary>
     /// Zastavuje ziskavanie pozicie ciela na urcity cas pred vystrelenim
@@ -174,7 +198,8 @@ public class NPStats : EntityStats
     }
     public virtual void Load(World.EntitySave save)
     {
-        base.LoadSavedData(save);
+        LoadSavedData(save);        
+        MapScript.npCouter++;
         string target = save.etName.Split('-')[1];
         GetComponent<NPController>().SetDefaultTarget(target);
     }
