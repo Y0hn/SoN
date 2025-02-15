@@ -13,7 +13,7 @@ Hlavným cieľom maturitnej práce bude realizácia počítačovej hry žánru R
 - [x] Vytvoriť 5 typov bežných nepriateľov z pohľadu funkčnosti, každý v 2 variantoch.
 - [ ] Vytvoriť jedného finálneho bossa, s rôznymi typmi útokov meniacich sa v podľa počtu životov bossa.
 - [x] Vytvoriť bojovú inteligenciu nepriateľov, ktorá bude riadiť ich správanie a útoky.
-- [ ] Vytvoriť systém koristi, kde z porazených nepriateľov hráč získava predmety, použiteľné ako aj nositeľné predmety.
+- [x] Vytvoriť systém koristi, kde z porazených nepriateľov hráč získava predmety, použiteľné ako aj nositeľné predmety.
 - [ ] Vytvoriť “strom schopností” kde hráč môže investovať získané body schopností na získanie nových schopností a permanentné vylepšenie svojich vlastností.
 - [x] Použiť pokročilejšie princípy programovania pri vytváraní funkcionalít hry.
 - [ ] Vložiť vhodnú hudbu do pozadia a ozvučiť všetky akcie hráča a nepriateľov.
