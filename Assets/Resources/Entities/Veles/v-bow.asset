@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b663a2d908cea242bdda3a338f4d2ea, type: 3}
+  m_Name: v-bow
+  m_EditorClassIdentifier: 
+  title: null
+  description: 
+  iconRef: Items/textures/bow-5
+  color: {r: 1, g: 1, b: 1, a: 1}
+  rarity: {r: 1, g: 1, b: 1, a: 1}
+  path: Entities/VELES/v-bow
+  slot: 0
+  sprite: bow-5
+  attack:
+  - damage:
+      type: 5
+      amount: 20
+    range: 20
+    rate: 0.7
+    type: 3
+    bothHanded: 0
+  - damage:
+      type: 6
+      amount: 20
+    range: 20
+    rate: 0.7
+    type: 4
+    bothHanded: 0
+  clips: []
