@@ -13,8 +13,14 @@ public class BosSensor : MonoBehaviour
     public bool TargetInRange       {get; private set;}
     public EntityStats.AITarget me              { get; set; }
     public Action<Transform> targetChange;
+    GameManager game;
 
 #pragma warning disable IDE0051 // Remove unused private members
+
+    void Start()
+    {
+        game = GameManager.instance;   
+    }
     /// <summary>
     /// Do senzoru nieco voslo, ak je to v inom AI time ako ja 
     /// => prida sa to na zoznam cielov a prepocita sa najblizsi ciel
@@ -22,7 +28,7 @@ public class BosSensor : MonoBehaviour
     /// <param name="other"></param>
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.TryGetComponent(out EntityStats et) && et.TargetTeam != me)
+        if (game.IsServer && other.TryGetComponent(out EntityStats et) && et.TargetTeam != me)
         {
             FileManager.Log($"Sensor of {transform.parent.name} cought {et.name}");
             inRange.Add(other.transform);
@@ -38,7 +44,7 @@ public class BosSensor : MonoBehaviour
     /// <param name="other"></param>
     void OnTriggerExit2D(Collider2D other)
     {
-        if (inRange.Contains(other.transform))
+        if (game.IsServer && inRange.Contains(other.transform))
         {
             FileManager.Log($"Sensor of {transform.parent.name} lost {other.name}");
             inRange.Remove(other.transform);
@@ -52,6 +58,7 @@ public class BosSensor : MonoBehaviour
     /// </summary>
     public void ResetTargeting()
     {
+        if (!Connector.instance.netMan.IsServer) return;
         Collider2D[] colls = new Collider2D[0];
         ClosestTarget = null;
         inRange.Clear();

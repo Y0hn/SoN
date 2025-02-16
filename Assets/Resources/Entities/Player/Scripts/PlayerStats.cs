@@ -491,4 +491,8 @@ public class PlayerStats : EntityStats
         IsAlive.Value = true;
         MapScript.map.SpawnPlayer(transform);
     }
+    [Rpc(SendTo.Owner)] public void QuitRpc()
+    {
+        game.Quit();
+    }
 }

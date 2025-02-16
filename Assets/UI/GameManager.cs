@@ -215,7 +215,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Odide z hry -> do hlavneho menu
     /// </summary>
-    void Quit()
+    public void Quit()
     {
         if (IsServer)
             NPStats.npcDied -= EnemySpawner;

@@ -104,6 +104,7 @@ public class Connector : MonoBehaviour
     public async Task<bool> JoinServer(string connection)
     {
         bool joined = true;
+        hostingAddress = connection;
 
         try {
             if (LanConnection)  // nastaveine parametrov pre pripojenie na LOKALNEJ sieti
@@ -123,7 +124,8 @@ public class Connector : MonoBehaviour
             }
             // pokusi sa o nadvizanie spojenia
             netMan.StartClient();
-            FileManager.Log($"Joined Relay on {hostingAddress}", FileLogType.RECORD);
+            GameManager.instance.StartGame();
+            FileManager.Log($"Joined Relay on {connection}", FileLogType.RECORD);
         } catch  {
             FileManager.Log($"Join connection failed with ipcode= {connection}", FileLogType.ERROR);
             joined = false;
@@ -185,9 +187,14 @@ public class Connector : MonoBehaviour
     /// <param name="id">ID hraca</param>
     public void Quit(ulong id)
     {
-        if (!netMan.IsServer)
-            netMan.DisconnectClient(id);
-        else
+        if (netMan.IsServer)
+        {
+            foreach (var client in netMan.ConnectedClients)
+                if (client.Value.ClientId != id)
+                client.Value.PlayerObject.GetComponent<PlayerStats>().QuitRpc();
             netMan.Shutdown();
+        }
+        else   
+            netMan.DisconnectClient(id);
     }
 }

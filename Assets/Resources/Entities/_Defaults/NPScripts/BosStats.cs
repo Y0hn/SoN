@@ -53,9 +53,9 @@ public class BosStats : NPStats
      *  public Action OnHit;
      *  protected float aToFire;
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
-    protected new BosSensor sensor;
+    protected BosSensor sensorB;
     
-    public BosSensor Sensor { get => sensor; set => sensor = value; } 
+    public BosSensor Sensor { get => sensorB; set => sensorB = value; } 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -76,8 +76,8 @@ public class BosStats : NPStats
         base.EntitySetUp();
         if (IsServer)
         {
-            sensor.me = aiTeam;
-            sensor.SetRange(rase.view);
+            sensorB.me = aiTeam;
+            sensorB.SetRange(rase.view);
             aIPath.maxSpeed = speed.Value/100f;
         }
     }

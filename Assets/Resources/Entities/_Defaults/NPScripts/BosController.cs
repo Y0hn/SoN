@@ -17,9 +17,9 @@ public class BosController : NPController
      *
      *  public bool ForceDecision       { get; protected set; }
      *  protected Vector3 TargetPosition => sensor.ClosestTarget.position;    
-     *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
+     *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
     [SerializeField] protected GameObject canvas;
-    protected new BosSensor sensor;
+    protected BosSensor sensorB;
 
     protected bool dfTargeted;
     public new BosStats Stats => (BosStats)base.Stats;
@@ -29,8 +29,8 @@ public class BosController : NPController
         SetDefaultTarget();
         if (IsServer)
         {
-            sensor.targetChange += SetTarget;
-            Stats.OnDeath += sensor.DisableSensor;
+            sensorB.targetChange += SetTarget;
+            Stats.OnDeath += sensorB.DisableSensor;
             path.endReachedDistance = Stats.AttackDistance;
         }
         base.OnNetworkSpawn();
@@ -127,6 +127,6 @@ public class BosController : NPController
     public void SetSensor(BosSensor s) 
     {
         Stats.Sensor = s;
-        sensor = s;
+        sensorB = s;
     }
 }
