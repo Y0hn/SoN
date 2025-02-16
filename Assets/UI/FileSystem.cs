@@ -333,8 +333,6 @@ public static class FileManager
         // Zapise aktualny cas
         string log = $"[{DateTime.Now}] ";
         bool writeToFile = type != FileLogType.LOG;
-        if (writeToFile)
-            log = "[RECORDED] " + log;
         log += message;
 
         // Zapise spravu do suboru
@@ -344,6 +342,7 @@ public static class FileManager
             sw.WriteLine(log);
             sw.Flush();
             sw.Close();
+            log = "[RECORDED] " + log;
         }
 
         // Vypise spravu do konzoly v editore

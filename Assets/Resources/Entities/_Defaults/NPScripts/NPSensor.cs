@@ -25,7 +25,7 @@ public class NPSensor : NetworkBehaviour
     {
         if (IsServer && other.TryGetComponent(out EntityStats et) && et.TargetTeam != me)
         {
-            //Debug.Log("Collision with sensor of " + transform.parent.name);
+            FileManager.Log($"Sensor of {transform.parent.name} cought {et.name}");
             inRange.Add(other.transform);
             FindClosestTarget();
             targetChange.Invoke(ClosestTarget);
@@ -41,6 +41,7 @@ public class NPSensor : NetworkBehaviour
     {
         if (IsServer && inRange.Contains(other.transform))
         {
+            FileManager.Log($"Sensor of {transform.parent.name} lost {other.name}");
             inRange.Remove(other.transform);
             if (ClosestTarget != null && ClosestTarget.Equals(other.transform))
                 FindClosestTarget();
@@ -148,7 +149,7 @@ public class NPSensor : NetworkBehaviour
 /// <summary>
 /// Sluzi pre specialne zobrazenie v Unity editore a dovoluje obnovit zameriavanie 
 /// </summary>
-public class MyButtonExampleEditor : Editor
+public class ResetButton : Editor
 {
     public override void OnInspectorGUI()
     {
@@ -160,6 +161,7 @@ public class MyButtonExampleEditor : Editor
         // Tlačidlo v inspektore
         if (GUILayout.Button("Reset Targeting"))
         {
+            FileManager.Log("Target reseting");
             example.ResetTargeting();
         }
     }

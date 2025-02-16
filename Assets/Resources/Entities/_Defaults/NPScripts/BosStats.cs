@@ -52,8 +52,13 @@ public class BosStats : NPStats
      *  public float NextAttackTime=> atTime;
      *  public Action OnHit;
      *  protected float aToFire;
-     *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
-
+     *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
+    protected new BosSensor sensor;
+    
+    public BosSensor Sensor { get => sensor; set => sensor = value; } 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -66,6 +71,16 @@ public class BosStats : NPStats
                 LoadSavedData(FileManager.World.boss);
         }
     }
+    protected override void EntitySetUp()
+    {
+        base.EntitySetUp();
+        if (IsServer)
+        {
+            sensor.me = aiTeam;
+            sensor.SetRange(rase.view);
+            aIPath.maxSpeed = speed.Value/100f;
+        }
+    }
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -75,7 +90,7 @@ public class BosStats : NPStats
         base.OwnerSubsOnNetValChanged();
     }
     /// <summary>
-    /// <inheritdoc/>
+    /// <inheritdoc/> Hlavneho nepriatela
     /// </summary>
     /// <param name="save">ulozene DATA hlavneho nepriatela</param>
     protected override void LoadSavedData(World.EntitySave save)
@@ -86,6 +101,10 @@ public class BosStats : NPStats
         else
             base.LoadSavedData(save);
     }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="save"></param>
     public override void Load(World.EntitySave save)
     {
         LoadSavedData(save);

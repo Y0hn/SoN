@@ -100,7 +100,7 @@ public class NPStats : EntityStats
     protected override void EntitySetUp()
     {
         base.EntitySetUp();
-        if (IsServer)
+        if (IsServer && sensor != null)
         {
             sensor.me = aiTeam;
             sensor.SetRange(rase.view);

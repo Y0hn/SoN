@@ -110,7 +110,8 @@ public class MapScript : MapSizer
     {
         GameObject e = null;
         string[] n = save.etName.Split('-');
-        if (save is World.BossSave boss)
+        bool boss = save is World.BossSave;
+        if (boss)
         {
             e = Resources.Load<GameObject>("Entities/Veles/Veles");
         }
@@ -123,8 +124,14 @@ public class MapScript : MapSizer
         if (e != null)
         {
             NetworkObject netO = Instantiate(e, save.Position, Quaternion.identity).GetComponent<NetworkObject>();
+
+            if (boss)
+                netO.GetComponent<BosController>().SetSensor(BossSpawn.GetComponent<BosSensor>());
+
             netO.Spawn();
-            netO.GetComponent<NPStats>().Load(save);
+
+            if (netO.TryGetComponent(out NPStats npS) && npS is not BosStats)
+                npS.Load(save);
 
             FileManager.Log($"Entity {save.etName} Save loaded ");
         }
@@ -138,7 +145,10 @@ public class MapScript : MapSizer
     public void SpawnBoss()
     {
         GameObject v = Resources.Load<GameObject>("Entities/Veles/Veles");
-        Instantiate(v, BossSpawn).GetComponent<NetworkObject>().Spawn();
+        BosController bc = Instantiate(v, BossSpawn).GetComponent<BosController>();
+        bc.SetSensor(BossSpawn.GetComponent<BosSensor>());
+        bc.SetDefaultTarget(BossSpawn);
+        bc.Stats.NetObject.Spawn();
     }
     /// <summary>
     /// Ziska ciel pre nepriatela podla jeho nazvu

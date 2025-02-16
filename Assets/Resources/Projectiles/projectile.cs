@@ -52,7 +52,7 @@ public class Projectile : NetworkBehaviour
         }
         else if (TimerReached(timers[0]))  // vystrelenie projektilu
         {
-            shooter.PlaySoundRpc(releaseSound);
+            shooter.PlaySoundRpc(releaseSound, 0.5f);
             transform.SetParent(null);
             coll.enabled = true;
             force = transform.up;

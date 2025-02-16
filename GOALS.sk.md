@@ -4,7 +4,9 @@
 
 ### Hlavný cieľ:
 
-Hlavným cieľom maturitnej práce bude realizácia počítačovej hry žánru RPG s možnosťou hry pre viacerých hráčov s použitím technológií Unity. Výstupom projektu bude ucelená, funkčná počítačová hra primeranej náročnosti s dĺžkou hrateľnosti približne 40 minút. Podstatným znakom hry bude vlastná grafika, rôznorodosť herných mechaník a potreba kooperácie s ostatnými.
+Hlavným cieľom maturitnej práce bude realizácia počítačovej hry žánru RPG s možnosťou hry pre viacerých hráčov s použitím technológií Unity. 
+Výstupom projektu bude ucelená, funkčná počítačová hra primeranej náročnosti s dĺžkou hrateľnosti približne 40 minút. 
+Podstatným znakom hry bude vlastná grafika, rôznorodosť herných mechaník a potreba kooperácie s ostatnými.
 
 ### Čiastkové ciele z pohľadu funkčnosti:
 

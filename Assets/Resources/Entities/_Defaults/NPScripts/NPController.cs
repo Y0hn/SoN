@@ -11,9 +11,9 @@ public class NPController : EntityController
      *  protected bool attacking;
      *  protected const float MIN_MOVE_TOL = 0.1f;
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
-    [SerializeField] AIDestinationSetter destinationSetter;
-    [SerializeField] AIPath path;
-    [SerializeField] NPSensor sensor;
+    [SerializeField] protected AIDestinationSetter destinationSetter;
+    [SerializeField] protected AIPath path;
+    [SerializeField] protected NPSensor sensor;
     protected Transform defaultTarget;
     protected bool selfTarget;
 
@@ -28,7 +28,7 @@ public class NPController : EntityController
     {
         base.OnNetworkSpawn();
         Stats.OnHit += delegate { ForceDecision = true; };
-        if (IsServer)
+        if (IsServer && sensor != null)
         {
             sensor.targetChange += SetTarget;
             Stats.OnDeath += sensor.DisableSensor;
