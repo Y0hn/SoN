@@ -64,6 +64,7 @@ using System;
     public override void SetShow(bool show = false)
     {
         base.SetShow(show);
+        background.gameObject.SetActive(show);
         foreground.enabled = show;
         placeHolder.enabled = show;
         button.interactable = show;

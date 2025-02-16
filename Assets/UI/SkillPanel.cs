@@ -110,6 +110,9 @@ public class SkillPanel : MonoBehaviour
     /// <param name="loadSkills"></param>
     public void LoadSkills(Skill[] loadSkills)
     {
+        if (skillSlots.Count == 0)
+            Awake();
+
         List<string> skills= new();
         foreach (Skill skill in loadSkills)
             skills.Add(skill.name);
@@ -125,6 +128,9 @@ public class SkillPanel : MonoBehaviour
     /// <param name="skillName"></param>
     public void BuySkill(string skillName)
     {
-         skillSlots[skillName].BuySkill();
+        if (skillSlots.ContainsKey(skillName))
+            skillSlots[skillName].BuySkill();
+        else
+            FileManager.Log($"Load Skill failed {skillName}, count= {skillSlots.Count}", FileLogType.ERROR);
     }
 }
