@@ -14,6 +14,7 @@ public abstract class EntityController : NetworkBehaviour
     protected const float MIN_MOVE_TOL = 0.1f;
     protected EntityStats Stats => stats; 
     public virtual Vector2 View => viewDir;
+    protected float atTime;
 
     /// <summary>
     /// Vykovana sa pri Vzniku objektu v ramci siete
@@ -82,7 +83,7 @@ public abstract class EntityController : NetworkBehaviour
     /// </summary>
     protected virtual void Attack()
     {
-        if (Stats.AttackTrigger())
+        if (atTime < Time.time)
         {
             // sem sa dostane ak moze utocit (uz utoci) 
             // ak je casovac utoku < cas
@@ -92,6 +93,8 @@ public abstract class EntityController : NetworkBehaviour
                 float atBlend = Stats.Animator.GetFloat("atBlend") * -1;
                 Stats.Animator.SetFloat("atBlend", atBlend);
             }
+            atTime = Time.time + Stats.Attack.AttackTime;
+
             // zanimuje utok
             Stats.Animator.SetTrigger("attack");
         }

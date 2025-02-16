@@ -162,8 +162,8 @@ public class PlayerStats : EntityStats
 
         if (IsOwner)
         {
-            /*game.LocalPlayer = this;
-            // Nacita data o pouzitych predmetoch
+            game.LocalPlayer = this;
+            /*// Nacita data o pouzitych predmetoch
             for (int i = 0; i < pSave.inventory.equiped.Length; i++)
                 if (pSave.inventory.equiped[i] != "")
                 {
@@ -171,6 +171,7 @@ public class PlayerStats : EntityStats
                     Equipment eq = Resources.Load<Weapon>(path);
                     game.inventory.Equip(eq);
                 }*/
+            game.inventory.ReloadAttacks();
         }
         if (IsServer) 
         {
@@ -179,8 +180,6 @@ public class PlayerStats : EntityStats
                 AddSkill(skill);
             /*foreach (var uSill in pSave.skillTree.usingUtils)
                 skillTree.*/
-
-            game.inventory.ReloadAttacks();
 
         }
         FileManager.Log("Player Data loaded: " + pSave);
@@ -377,14 +376,6 @@ public class PlayerStats : EntityStats
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <returns><inheritdoc/></returns>
-    public override bool AttackTrigger()
-    {
-        return base.AttackTrigger();
-    }
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
     /// <param name="died"><inheritdoc/></param>
     public override void KilledEnemy(EntityStats died)
     {
@@ -402,7 +393,7 @@ public class PlayerStats : EntityStats
         if (canStop)
         {
             StopRanAttackRpc();
-            atTime = 0;
+            GetComponent<PlayerController>().ResetAttack();
         }
 
         return canStop;
@@ -469,7 +460,7 @@ public class PlayerStats : EntityStats
     [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot)
     {
         equipment[(int)slot] = reference;    
-        inventory[inventory.IndexOf(reference)] = "";
+        inventory.Remove(reference);
         //Debug.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
     }
     /// <summary>

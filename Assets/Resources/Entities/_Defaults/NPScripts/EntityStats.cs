@@ -77,7 +77,6 @@ public abstract class EntityStats : NetworkBehaviour
     public Action OnDeath;
     protected Defence defence;  // iba na servery/hoste
     protected float timeToDespawn = 0f;
-    protected float atTime = 0;
     protected bool onDeathWait;
     
 
@@ -99,6 +98,8 @@ public abstract class EntityStats : NetworkBehaviour
         ServerSubsOnNetValChanged();
         OwnerSubsOnNetValChanged(); 
         SubsOnNetValChanged();
+
+        weapE.OnValueChanged.Invoke( weapE.Value, weapE.Value);
     }
     /// <summary>
     /// Zavolane pri zaniku abjektu v sieti
@@ -166,6 +167,14 @@ public abstract class EntityStats : NetworkBehaviour
                 L = w.slot == Equipment.Slot.WeaponL;
                 B = w.slot == Equipment.Slot.WeaponBoth;
             }
+            
+            Animator.SetFloat("weapon", (float)Attack.type);
+
+            float aSpeed = Attack.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
+            aSpeed /= Attack.AttackTime;
+            Animator.SetFloat("atSpeed", aSpeed);
+            
+            Debug.Log($"Attack animation set on weapon {Animator.GetFloat("weapon")} to speed {speed}");
 
             weaponR.gameObject.SetActive(R || B); 
             weaponL.gameObject.SetActive(L || B);
@@ -189,16 +198,6 @@ public abstract class EntityStats : NetworkBehaviour
     /// </summary>
     protected virtual void OwnerSubsOnNetValChanged()
     {
-        // Server / Owner
-        weapE.OnValueChanged += (old, now) =>
-        {
-            Animator.SetFloat("weapon", (float)Attack.type);
-
-            float aSpeed = Attack.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
-            aSpeed /= Attack.AttackTime;
-            Animator.SetFloat("atSpeed", aSpeed);
-            //Debug.Log($"Attack animation set on weapon {Animator.GetFloat("weapon")} to speed {speed}");
-        };
         speed.OnValueChanged += (old, now) =>
         {
             Animator.SetFloat("wSpeed", now/100f);
@@ -298,19 +297,6 @@ public abstract class EntityStats : NetworkBehaviour
             IsAlive.Value = false;
 
         return !IsAlive.Value;
-    }
-    /// <summary>
-    /// Posle serveru prikaz na utok
-    /// </summary>
-    /// <returns>PRAVDA ak moze utocit</returns>
-    public virtual bool AttackTrigger()
-    {
-        if (atTime < Time.time)
-        {
-            atTime = Time.time + Attack.AttackTime;
-            return true;
-        }
-        return false;
     }
     /// <summary>
     /// Vykoná sa po zabití entity

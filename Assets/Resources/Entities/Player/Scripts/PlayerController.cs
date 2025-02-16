@@ -2,6 +2,9 @@ using UnityEngine.InputSystem;
 using Unity.Netcode;
 using UnityEngine;
 using AYellowpaper.SerializedCollections;
+using System;
+using Random = UnityEngine.Random;
+
 /// <summary>
 /// Umoznuje klientovi ovladat svoj charakter
 /// </summary>
@@ -129,6 +132,7 @@ public class PlayerController : EntityController
         if (!Stats.IsAlive.Value)
         {
             Stats.ReviveRpc();
+            attacking = false;
             return;
         }
         FileManager.Log($"Player {name} is attacking, Alive= {Stats.IsAlive.Value}");
@@ -154,4 +158,6 @@ public class PlayerController : EntityController
             FileManager.Log("Attack interupted");
         }
     }
+
+    public void ResetAttack() => atTime = 0;
 }

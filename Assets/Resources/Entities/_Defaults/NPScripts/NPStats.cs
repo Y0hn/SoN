@@ -73,7 +73,6 @@ public class NPStats : EntityStats
         }
     }
     public bool AboutToFire { get; set; }
-    public float NextAttackTime=> atTime;
     
     /// <summary>
     /// <inheritdoc/>
@@ -137,7 +136,10 @@ public class NPStats : EntityStats
         base.OnHpUpdate(prev, now);
         for (int i = rase.swapons.Length-1; 0 <= i; i--)
             if (i < rase.swapons.Length && rase.swapons[i].ReachedHP(HP))
+            {
                 SetWeaponIndex(rase.swapons[i].weaponIndex);
+                FileManager.Log("Swapon used on " + name);
+            }
         OnHit.Invoke();
     }
     /// <summary>
