@@ -14,9 +14,11 @@ public class StonePath : MonoBehaviour
     /// <param name="collider"></param>
     void OnTriggerEnter2D(Collider2D collider)
     {
-        if (Active && collider.TryGetComponent(out EntityStats es))
-        {
-            es.TerrainChangeRpc(speedModifier, true);
+        try {
+            if (Active && collider.TryGetComponent(out EntityStats es))
+                es.TerrainChangeRpc(speedModifier, true);
+        } catch {
+
         }
     }
     /// <summary>
@@ -25,7 +27,11 @@ public class StonePath : MonoBehaviour
     /// <param name="collider"></param>
     void OnTriggerExit2D(Collider2D collider)
     {
-        if (Active && collider.TryGetComponent(out EntityStats es) && es.IsSpawned)
-            es.TerrainChangeRpc(1f/speedModifier, true);
+        try {
+            if (Active && collider.TryGetComponent(out EntityStats es) && es.IsSpawned)
+                es.TerrainChangeRpc(1f/speedModifier, true);
+        } catch {
+
+        }
     }
 }

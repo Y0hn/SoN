@@ -5,7 +5,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using TMPro;
-using Random = UnityEngine.Random;
+//using Random = UnityEngine.Random;
 
 /// <summary>
 /// Managing Game and PLayerUI - has 'instance'
@@ -200,7 +200,6 @@ public class GameManager : MonoBehaviour
             else
                 MapScript.map.SpawnFromSave(FileManager.World.boss);
         } 
-
         menu.TiggerHideUI();
         FileManager.Log("Game started");
     }
@@ -221,6 +220,7 @@ public class GameManager : MonoBehaviour
             NPStats.npcDied -= EnemySpawner;
 
         themeAudio.Stop();
+        inventory.Clear();
         Menu.menu.gameObject.SetActive(true);
         conn.Quit(player.OwnerClientId);
     }
@@ -259,6 +259,9 @@ public class GameManager : MonoBehaviour
         if (player == null) return;
         SetPlayerUI();
         AnimateFace(player.HP);
+
+        if (!IsServer)
+            StartGame();
     }
     /// <summary>
     /// Nastavi 

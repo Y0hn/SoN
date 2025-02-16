@@ -7,7 +7,6 @@ using System;
 using TMPro;
 using System.Linq;
 using Unity.VisualScripting;
-using System.IO;
 
 /// <summary>
 /// Uklada inventar hraca lokalne
@@ -29,6 +28,7 @@ public class Inventory : MonoBehaviour
     [SerializeField] PassiveAttackSlotScript[] atSlots;
 
     public static Inventory instance;
+
     /// <summary>
     /// Velskot pola inventara
     /// </summary>
@@ -283,6 +283,8 @@ public class Inventory : MonoBehaviour
         Item item = Item.GetItem(refItem);
         bool add = FreeSpace;
 
+        FileManager.Log($"Item added to inventory= {refItem} FreeSpace= {add}");
+
         string a = item.name;
         if (add)
         {
@@ -382,7 +384,7 @@ public class Inventory : MonoBehaviour
                     case Equipment.Slot.WeaponR:    i = 0; break;
                     case Equipment.Slot.WeaponBoth: 
                         i = 0;
-                        equipSlots[eq.slot].Item = eq;
+                        equipSlots[eq.slot].Item = null;
                         equipSlots[eq.slot].SetTransparent(false);
                         break;
                 }
@@ -470,5 +472,22 @@ public class Inventory : MonoBehaviour
 
         // ak je stale povodny utok zapnuty tak zostane zapnuty
         acSlots.Find(acS => acS.Identity == prev)?.Select();
+    }
+    /// <summary>
+    /// Vrati inventar do povodneho stavu
+    /// </summary>
+    public void Clear()
+    {
+        // reset inventar
+        itemSlots.ForEach(i => i.Item = null);
+
+        // reset equipment
+        foreach (var eq in equipSlots)
+            eq.Value.Item = null;
+
+        // reset utoky
+        foreach(var at in atSlots)
+            at.UnsetAttacks();
+        ReloadAttacks();
     }
 }

@@ -331,7 +331,7 @@ public abstract class EntityStats : NetworkBehaviour
 
         weapE.Value = new (weapon, attack);
 
-        weapE.OnValueChanged.Invoke(wi, weapE.Value);
+        //weapE.OnValueChanged.Invoke(wi, weapE.Value);
         //Debug.Log($"Setted Weapon Index= {weapE.Value}");
     }
     public virtual void SetWeaponIndex (WeaponIndex WeI)

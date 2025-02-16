@@ -110,7 +110,7 @@ public class Menu : MonoBehaviour
             playerName = value;
         }
     }
-    public bool OnlineGame { get => !lanToggle.isOn;  set => lanToggle.isOn = !value;   }
+    public bool localGame { get => lanToggle.isOn;  set => lanToggle.isOn = value;   }
     public bool FullSc { get => fullScToggle.isOn;  set => fullScToggle.isOn = value;   }
     public int Quality { get => quality.Q;          set => quality.Q = value;           }
     public float[] Audios 
@@ -312,7 +312,7 @@ public class Menu : MonoBehaviour
             // PODPONUKA pre ZALOZENIE hry pre VIAC hracov          (pre server)
             case 211: /* Nacitat zo subora hru   */ 
             case 212: /* Vytvorit novu hru      */ 
-                choosenGame = !OnlineGame ? GameType.Online : GameType.Local;
+                choosenGame = localGame ? GameType.Local : GameType.Online;
                 string next = layer == 211 ? "SubLoad" : "SubCreate";
                 if (inputFields["playerN2"].Check) 
                     currentLayer.Push(next);
@@ -381,7 +381,7 @@ public class Menu : MonoBehaviour
     {
         Audios = settings.audioS;
         Quality= settings.quality;
-        OnlineGame=settings.Online;
+        //localGame= !settings.Online;
         FullSc = settings.fullSc;
         PlayerName = settings.playerName;
         lastConnection = settings.lastConnection;

@@ -240,6 +240,7 @@ public static class FileManager
 
                 // Nacitane hodnoty zo suboru nastavi ako aktuale
                 settings = serializer.Deserialize(reader) as Settings;
+                Menu.menu.LoadSettings(settings);
             }
             finally
             {
@@ -247,6 +248,8 @@ public static class FileManager
                 Log("Settings loaded:\n"+settings);
             }
         }
+        else
+            Log("Settings not found go to setting to gegenerate", FileLogType.WARNING);
     }
     #endregion
     #region References

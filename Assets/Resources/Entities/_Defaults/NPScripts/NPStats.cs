@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Pathfinding;
 using Random = UnityEngine.Random;
+using Unity.Netcode;
 public class NPStats : EntityStats
 {
     /*  ZDEDENE ATRIBUTY
@@ -71,7 +72,7 @@ public class NPStats : EntityStats
                 return 0f;
         }
     }
-    public bool AboutToFire    => aToFire <= Time.time;
+    public bool AboutToFire { get; set; }
     public float NextAttackTime=> atTime;
     
     /// <summary>
@@ -261,4 +262,16 @@ public class NPStats : EntityStats
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members
+
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    [Rpc(SendTo.Server)] public override void AttackRpc()
+    {
+        AboutToFire = false;
+        foreach(EntityStats et in Attack.Trigger(this))                 // ak ranged tak count = 0
+            if (et.IsAlive.Value && et.TakeDamage(Attack.damage))    // pravdive ak target zomrie
+                KilledEnemy(et);
+    }
 }

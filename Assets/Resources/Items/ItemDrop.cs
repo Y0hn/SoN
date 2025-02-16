@@ -76,9 +76,9 @@ public class ItemDrop : NetworkBehaviour
     /// Pri kolizii sa pokusi pridat sa do inventara hraca 
     /// </summary>
     /// <param name="collision"></param>
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.transform.TryGetComponent(out PlayerStats pl))
+        if (IsServer && collision.transform.TryGetComponent(out PlayerStats pl))
         {
             pl.PickedUpRpc(Item.GetReferency);
             PickedUpRpc();

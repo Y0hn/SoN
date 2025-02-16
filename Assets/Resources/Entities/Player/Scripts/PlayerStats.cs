@@ -59,7 +59,7 @@ public class PlayerStats : EntityStats
 
     protected NetworkVariable<uint> xp = new(0);
     protected NetworkVariable<uint> xpMax = new(10, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
-    protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
+    protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
     protected NetworkList<FixedString64Bytes> equipment = new(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // je to list ale sprava sa ako Dictionary
     protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -95,7 +95,7 @@ public class PlayerStats : EntityStats
         get
         {
             string[] inv = new string[inventory.Count];
-            string[] eq = new string[equipment.Count];
+            string[] eq = new string[2];
             for (int i = 0; i < inventory.Count; i++)
                 inv[i] = inventory[i].ToString();
             for (int i = 0; i < equipment.Count; i++)
@@ -148,13 +148,21 @@ public class PlayerStats : EntityStats
     {
         var pSave = (World.PlayerSave)save;
 
+        // Nacitaj data do inventara
+        foreach (var item in pSave.inventory.items)
+            if (item != "")
+                inventory.Add(item);
+        foreach (var item in pSave.inventory.equiped)
+            if (item != "")
+                inventory.Add(item);
+
         // inhereted
         hp.Value = Mathf.RoundToInt(save.hp * (float)maxHp.Value);
         transform.position = save.Position;
 
         if (IsOwner)
         {
-            game.LocalPlayer = this;
+            /*game.LocalPlayer = this;
             // Nacita data o pouzitych predmetoch
             for (int i = 0; i < pSave.inventory.equiped.Length; i++)
                 if (pSave.inventory.equiped[i] != "")
@@ -162,21 +170,19 @@ public class PlayerStats : EntityStats
                     string path= pSave.inventory.equiped[i];
                     Equipment eq = Resources.Load<Weapon>(path);
                     game.inventory.Equip(eq);
-                }
+                }*/
         }
-        if (!IsServer) 
-            return;
+        if (IsServer) 
+        {
+            // Nacita data o strome schopnosti
+            foreach (var skill in pSave.skillTree.skills)
+                AddSkill(skill);
+            /*foreach (var uSill in pSave.skillTree.usingUtils)
+                skillTree.*/
 
-        // Nacitaj data inventara
-        foreach (var item in pSave.inventory.items)
-            inventory.Add(item);
+            game.inventory.ReloadAttacks();
 
-        // Nacita data o shtrome schopnosti
-        foreach (var skill in pSave.skillTree.skills)
-            AddSkill(skill);
-        /*foreach (var uSill in pSave.skillTree.usingUtils)
-            skillTree.*/
-
+        }
         FileManager.Log("Player Data loaded: " + pSave);
     }
 
@@ -316,8 +322,6 @@ public class PlayerStats : EntityStats
                 break;
             case NetworkListEvent<FixedString64Bytes>.EventType.Remove:
             case NetworkListEvent<FixedString64Bytes>.EventType.RemoveAt:
-                inventUI.Remove(changeEvent.Value.ToString());
-                break;
             case NetworkListEvent<FixedString64Bytes>.EventType.Full:
             case NetworkListEvent<FixedString64Bytes>.EventType.Clear:
             case NetworkListEvent<FixedString64Bytes>.EventType.Value:
@@ -464,7 +468,8 @@ public class PlayerStats : EntityStats
     /// <param name="slot"></param>
     [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot)
     {
-        equipment[(int)slot] = reference;
+        equipment[(int)slot] = reference;    
+        inventory[inventory.IndexOf(reference)] = "";
         //Debug.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
     }
     /// <summary>

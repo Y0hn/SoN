@@ -124,7 +124,6 @@ public class Connector : MonoBehaviour
             }
             // pokusi sa o nadvizanie spojenia
             netMan.StartClient();
-            GameManager.instance.StartGame();
             FileManager.Log($"Joined Relay on {connection}", FileLogType.RECORD);
         } catch  {
             FileManager.Log($"Join connection failed with ipcode= {connection}", FileLogType.ERROR);

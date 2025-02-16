@@ -14,7 +14,12 @@ public class QualityScript : MonoBehaviour
     public int Q 
     { 
         get => quality; 
-        set { quality=value; SetQuality(quality); } 
+        set 
+        { 
+            quality= value; 
+            text.text = QualitySettings.names[quality];
+            QualitySettings.SetQualityLevel(quality);
+        } 
     }
     int quality = 0;
     /// <summary>
@@ -31,15 +36,5 @@ public class QualityScript : MonoBehaviour
     {
         int q = (Q+1 < QualitySettings.count) ? Q+1 : 0;
         Q = q;
-    }
-    /// <summary>
-    /// Nastavuje kvalitu
-    /// </summary>
-    /// <param name="q"></param>
-    void SetQuality(int q)
-    {
-        //Debug.Log($"Quality set to [{q} / {quals.Length}]");
-        text.text = QualitySettings.names[q];
-        QualitySettings.SetQualityLevel(q);
     }
 }
