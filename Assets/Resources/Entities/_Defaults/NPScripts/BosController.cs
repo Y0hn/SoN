@@ -88,6 +88,12 @@ public class BosController : NPController
         else
             SetTarget(defaultTarget);
     }
+    protected override void TurnForTarget()
+    {
+        if (sensorB.ClosestTarget == null) return;
+        viewDir = sensorB.ClosestTarget.position - transform.position;
+        viewDir = viewDir.normalized;
+    }
     /// <summary>
     /// <inheritdoc/> hlavnemu nepriatelovi
     /// </summary>

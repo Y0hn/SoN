@@ -2,19 +2,14 @@
 
 ## HIGH PRIORITY
 ```
-SOUND SYSTEM
-BOSS MOVESET
+BALANCING
 ```
 
 ## Medium Priority
 ```
-Ranged Attacks depends on Munition
-More Weapons
 ```
 
 ## low priority
 ```
-player timed regereration
-balanced skills in skill tree
 ```
 

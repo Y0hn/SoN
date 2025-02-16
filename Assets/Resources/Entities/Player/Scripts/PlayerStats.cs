@@ -250,7 +250,7 @@ public class PlayerStats : EntityStats
                 if (xpMax.Value <= newValue)
                 {
                     // prida potrebne exp do dalsieho levelu
-                    int add = (level.Value+1) * 10;
+                    int add = /*(level.Value+1) * 10;*/ 100;
                     xpMax.Value += (uint)(xpMax.Value + add);
                 }
             };
@@ -319,12 +319,6 @@ public class PlayerStats : EntityStats
                 //int index = changeEvent.Index; // the position of the added value in the list
                 inventUI.Add(changeEvent.Value.ToString()); // the new value at the index position
                 break;
-            case NetworkListEvent<FixedString64Bytes>.EventType.Remove:
-            case NetworkListEvent<FixedString64Bytes>.EventType.RemoveAt:
-            case NetworkListEvent<FixedString64Bytes>.EventType.Full:
-            case NetworkListEvent<FixedString64Bytes>.EventType.Clear:
-            case NetworkListEvent<FixedString64Bytes>.EventType.Value:
-            case NetworkListEvent<FixedString64Bytes>.EventType.Insert:
             default:
                 break;
         }
@@ -459,6 +453,8 @@ public class PlayerStats : EntityStats
     /// <param name="slot"></param>
     [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot)
     {
+        if (equipment[(int)slot] != "")
+            inventory.Add(reference);
         equipment[(int)slot] = reference;    
         inventory.Remove(reference);
         //Debug.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");

@@ -9,30 +9,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b663a2d908cea242bdda3a338f4d2ea, type: 3}
+  m_Script: {fileID: 11500000, guid: fd18eea97bb415c4880c28c6e70526ef, type: 3}
   m_Name: v-bow
   m_EditorClassIdentifier: 
-  title: null
+  title: Bow
   description: 
   iconRef: Items/textures/bow-5
   color: {r: 1, g: 1, b: 1, a: 1}
   rarity: {r: 1, g: 1, b: 1, a: 1}
   path: Entities/VELES/v-bow
-  slot: 0
-  sprite: bow-5
+  slot: 1
+  sprite: bow-2
   attack:
   - damage:
       type: 5
       amount: 20
     range: 20
-    rate: 0.7
-    type: 3
-    bothHanded: 0
-  - damage:
-      type: 6
-      amount: 20
-    range: 20
-    rate: 0.7
+    rate: 0.5
     type: 4
     bothHanded: 0
-  clips: []
+  clips:
+  - audioClip: {fileID: 8300000, guid: 9c2c434f50febf44999d2b63961d76cd, type: 3}
+    volume: 0.7
+  projectile: arrow 3
+  projSpawnPosition: {x: 0, y: 1}
