@@ -3,6 +3,7 @@ using UnityEngine;
 public class StonePath : MonoBehaviour
 {
     [SerializeField] float speedModifier = 1.2f;
+    [SerializeField] bool playerOnly = true;
     /// <summary>
     /// Aktivne len na servery
     /// </summary>
@@ -15,7 +16,7 @@ public class StonePath : MonoBehaviour
     void OnTriggerEnter2D(Collider2D collider)
     {
         try {
-            if (Active && collider.TryGetComponent(out EntityStats es))
+            if (Active && collider.TryGetComponent(out EntityStats es)&& (!playerOnly || es is not NPStats))
                 es.TerrainChangeRpc(speedModifier, true);
         } catch {
 
@@ -28,7 +29,7 @@ public class StonePath : MonoBehaviour
     void OnTriggerExit2D(Collider2D collider)
     {
         try {
-            if (Active && collider.TryGetComponent(out EntityStats es) && es.IsSpawned)
+            if (Active && collider.TryGetComponent(out EntityStats es) && es.IsSpawned && (!playerOnly || es is not NPStats))
                 es.TerrainChangeRpc(1f/speedModifier, true);
         } catch {
 
