@@ -133,4 +133,14 @@ public class SkillPanel : MonoBehaviour
         else
             FileManager.Log($"Load Skill failed {skillName}, count= {skillSlots.Count}", FileLogType.ERROR);
     }
+    /// <summary>
+    /// Nastavi sa podla levela
+    /// </summary>
+    /// <param name="free"></param>
+    /// <param name="used"></param>
+    public void SetTotalPoits(byte level)
+    {
+        freePointCouter = level;
+        usedPointsCounter = 0;
+    }
 }

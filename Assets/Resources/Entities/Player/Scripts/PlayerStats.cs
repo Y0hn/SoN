@@ -160,6 +160,7 @@ public class PlayerStats : EntityStats
         hp.Value = Mathf.RoundToInt(save.hp * (float)maxHp.Value);
         transform.position = save.Position;
 
+
         if (IsOwner)
         {
             game.LocalPlayer = this;
@@ -171,10 +172,12 @@ public class PlayerStats : EntityStats
                     Equipment eq = Resources.Load<Weapon>(path);
                     game.inventory.Equip(eq);
                 }*/
+            game.SkillTree.SetTotalPoits(pSave.level);
             game.inventory.ReloadAttacks();
         }
         if (IsServer) 
         {
+            level.Value = pSave.level;
             // Nacita data o strome schopnosti
             foreach (var skill in pSave.skillTree.skills)
                 AddSkill(skill);
