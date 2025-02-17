@@ -102,11 +102,18 @@ public class Projectile : NetworkBehaviour
     /// <param name="other"></param>
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (IsServer && other.TryGetComponent(out EntityStats et) && et != shooter)
+        if (IsServer)
         {
-            if (et.TakeDamage(damage))
-                shooter.KilledEnemy(et);
-            TryToDestoy();
+            if (other.TryGetComponent(out EntityStats et) && et != shooter)
+            {
+                if (et.TakeDamage(damage))
+                    shooter.KilledEnemy(et);
+                TryToDestoy();
+            }
+            else if (other.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
+            {
+                TryToDestoy();
+            }
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members

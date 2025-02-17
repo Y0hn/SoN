@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class BosController : NPController
@@ -114,7 +115,9 @@ public class BosController : NPController
             dfTargeted = false;
         }
 
-        canvas.SetActive(!(dfTargeted || selfTarget));
+        if (!(selfTarget || defaultTarget))
+            EnableCanvasRpc();
+        FileManager.Log($"canvas set to {!(dfTargeted || selfTarget)}", FileLogType.RECORD);
         attacking = false;
     }
     /// <summary>
@@ -134,5 +137,9 @@ public class BosController : NPController
     {
         Stats.Sensor = s;
         sensorB = s;
+    }
+    [Rpc(SendTo.Everyone)] void EnableCanvasRpc()
+    {
+        canvas.SetActive(true);        
     }
 }
