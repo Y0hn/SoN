@@ -31,7 +31,9 @@ public class MainUIButton : MonoBehaviour
     protected virtual void OnEnable()
     {
         if (name == "Continue")
-            button.interactable = FileManager.LastSavedWorld != "";
+        {
+            Menu.menu.ReloadContinue();
+        }
     }
     protected virtual void OnClick()
     {

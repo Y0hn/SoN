@@ -387,10 +387,26 @@ public class Menu : MonoBehaviour
         lastConnection = settings.lastConnection;
         if (lastConnection != "")
         {
-            bool solo = lastConnection.Contains("solo-");
-            buttons["soloCont"].Interactable = solo;
-            if (solo)
-                inputFields["ipCode"].Text = lastConnection;
+            ReloadContinue();
         }
+    }
+    /// <summary>
+    /// Obnevi tlacidlo pokracovat podla sveta
+    /// </summary>
+    public void ReloadContinue()
+    {
+        bool solo = lastConnection.Contains("solo-");
+        string s = lastConnection.Split('-')[1];
+        bool found = false;
+
+        if (solo)
+            FileManager.Worlds.ToList().ForEach(w => found |= w.Contains(s));
+        
+        solo &= found;
+        buttons["soloCont"].Interactable = solo;
+        if (solo)
+            inputFields["ipCode"].Text = lastConnection;
+
+        FileManager.Log("Btn reloaded to " + solo ,FileLogType.RECORD);
     }
 }

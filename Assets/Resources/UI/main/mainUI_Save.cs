@@ -21,6 +21,7 @@ public class MainUISave : MainUIButton
     void DeleteSave()
     {
         FileManager.DeleteWorld(name);
+        Menu.menu.ReloadContinue();
         Destroy(gameObject);
     }
 }
