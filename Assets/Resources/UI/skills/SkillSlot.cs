@@ -23,6 +23,7 @@ public class SkillSlot : MonoBehaviour
     [SerializeField] TMP_Text amountT;
     [SerializeField] List<SkillSlot> dependentcySkills = new();
     [SerializeField] bool needsAllDependecies = false;
+    bool started = false;
     
     /// <summary>
     /// Urcuje zmenu farby podla zmneny stavu pre konkretne casti grafiky schopnosti
@@ -66,6 +67,9 @@ public class SkillSlot : MonoBehaviour
     }
     void Start()
     {
+        if (started) return;
+        started = true;
+
         skillCreator.name = name;
         defaultColors = new Color[4];
         button.onClick.AddListener(ActivateSkill);
@@ -74,6 +78,7 @@ public class SkillSlot : MonoBehaviour
         SetInteractable(false);
         game = GameManager.instance;
         game.SkillTree.OnChangeAvailablePoints += PurchableSkill;
+
     }
     /// <summary>
     /// Nastavi grafiku do vychodiskovej podoby
@@ -93,6 +98,7 @@ public class SkillSlot : MonoBehaviour
     /// </summary>
     public void ActivateSkill()
     {
+        game ??= GameManager.instance;
         game.LocalPlayer.AddSkill(Skill);
     }
     /// <summary>
@@ -153,6 +159,7 @@ public class SkillSlot : MonoBehaviour
     /// <param name="colorMod"></param>
     void SetGraficColor(Color colorIcon, Color colorBG, Color colorMod)
     {
+        if (!started) Start();
         background.color = colorBG * defaultColors[0];
         moddifier.color = colorMod * defaultColors[2];
         icon.color = colorIcon * defaultColors[1];

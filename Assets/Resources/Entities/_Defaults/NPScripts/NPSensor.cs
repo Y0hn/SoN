@@ -25,7 +25,7 @@ public class NPSensor : NetworkBehaviour
     {
         if (IsServer && other.TryGetComponent(out EntityStats et) && et.TargetTeam != me)
         {
-            FileManager.Log($"Sensor of {transform.parent.name} cought {et.name}");
+            //FileManager.Log($"Sensor of {transform.parent.name} cought {et.name}");
             inRange.Add(other.transform);
             FindClosestTarget();
             targetChange.Invoke(ClosestTarget);
@@ -41,7 +41,7 @@ public class NPSensor : NetworkBehaviour
     {
         if (IsServer && inRange.Contains(other.transform))
         {
-            FileManager.Log($"Sensor of {transform.parent.name} lost {other.name}");
+            //FileManager.Log($"Sensor of {transform.parent.name} lost {other.name}");
             inRange.Remove(other.transform);
             if (ClosestTarget != null && ClosestTarget.Equals(other.transform))
                 FindClosestTarget();

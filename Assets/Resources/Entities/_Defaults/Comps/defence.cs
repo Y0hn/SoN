@@ -84,6 +84,9 @@ using System.Collections.Generic;
         int recieved = Mathf.RoundToInt(damage.amount - (sum + per));
         if (clamp)
             recieved = Math.Clamp(recieved, 0, int.MaxValue);
+
+        FileManager.Log($"Damage dealt {damage.amount} to {recieved}");
+
         return recieved;
     }
 }

@@ -83,6 +83,7 @@ public class GameManager : MonoBehaviour
     {
         instance = this;
         //uiPanels["mainCam"].SetActive(true);
+        skillTree.Awake();
         SetUpTextFields();
         SubscribeInput();
         SetGameUI();

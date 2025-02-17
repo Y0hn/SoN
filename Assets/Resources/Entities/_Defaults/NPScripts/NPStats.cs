@@ -138,7 +138,7 @@ public class NPStats : EntityStats
             if (i < rase.swapons.Length && rase.swapons[i].ReachedHP(HP))
             {
                 SetWeaponIndex(rase.swapons[i].weaponIndex);
-                FileManager.Log("Swapon used on " + name);
+                //FileManager.Log("Swapon used on " + name);
             }
         OnHit.Invoke();
     }

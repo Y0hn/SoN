@@ -172,9 +172,9 @@ public class PlayerStats : EntityStats
                     Equipment eq = Resources.Load<Weapon>(path);
                     game.inventory.Equip(eq);
                 }*/
-            game.SkillTree.SetTotalPoits(pSave.level);
+            game.SkillTree.LoadSkills(pSave);
             game.inventory.ReloadAttacks();
-        }
+        }/*
         if (IsServer) 
         {
             level.Value = pSave.level;
@@ -182,9 +182,9 @@ public class PlayerStats : EntityStats
             foreach (var skill in pSave.skillTree.skills)
                 AddSkill(skill);
             /*foreach (var uSill in pSave.skillTree.usingUtils)
-                skillTree.*/
+                skillTree.
 
-        }
+        }*/
         FileManager.Log("Player Data loaded: " + pSave);
     }
 

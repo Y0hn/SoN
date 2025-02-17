@@ -21,12 +21,15 @@ public class SkillPanel : MonoBehaviour
     Vector2 startMouse;
     Dictionary<string, SkillSlot> skillSlots = new();
     byte usedPointsCounter = 0, freePointCouter = 0;
+    bool awoken = false;
     /// <summary>
     /// Nastavi pociatocne hodnoty pre pocitadla <br />
     /// Vypocita limity pohybu stromu
     /// </summary>
-    void Awake()
+    public void Awake()
     {
+        if (awoken) return;
+
         freePointCouter = 0; 
         usedPointsCounter = 0;
         button.onEnterHold += delegate { startMouse = game.MousePos; };
@@ -34,6 +37,8 @@ public class SkillPanel : MonoBehaviour
         foreach (var skS in transform.GetComponentsInChildren<SkillSlot>())
             skillSlots.Add(skS.name, skS);
         skillCounterText.text = freePointCouter.ToString();
+
+        awoken = true;
         //OnChangeAvailablePoints += (bool change) => { Debug.Log($"OnChangeAvailablePoints.Invoked({change})"); };
     }
     /// <summary>
@@ -108,13 +113,12 @@ public class SkillPanel : MonoBehaviour
     /// Nacitava schopnosti zo suboru
     /// </summary>
     /// <param name="loadSkills"></param>
-    public void LoadSkills(Skill[] loadSkills)
+    public void LoadSkills(World.PlayerSave player)
     {
-        if (skillSlots.Count == 0)
-            Awake();
-
+        FileManager.Log($"Skills loaded {player.etName} count={player.skillTree.skills.Length} level={player.level}",FileLogType.RECORD);
+        freePointCouter = player.level;
         List<string> skills= new();
-        foreach (Skill skill in loadSkills)
+        foreach (Skill skill in player.skillTree.skills)
             skills.Add(skill.name);
 
         SkillSlot[] sSlots = GetComponentsInChildren<SkillSlot>();
@@ -132,15 +136,5 @@ public class SkillPanel : MonoBehaviour
             skillSlots[skillName].BuySkill();
         else
             FileManager.Log($"Load Skill failed {skillName}, count= {skillSlots.Count}", FileLogType.ERROR);
-    }
-    /// <summary>
-    /// Nastavi sa podla levela
-    /// </summary>
-    /// <param name="free"></param>
-    /// <param name="used"></param>
-    public void SetTotalPoits(byte level)
-    {
-        freePointCouter = level;
-        usedPointsCounter = 0;
     }
 }

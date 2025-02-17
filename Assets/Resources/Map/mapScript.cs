@@ -100,7 +100,7 @@ public class MapScript : MapSizer
         npc.GetComponent<NPController>().SetDefaultTarget(extractions.GetChild(Random.Range(0,extractions.childCount)));
         npCouter++;
 
-        FileManager.Log($"Enemy spawned {enemy.name} current number of em= {npCouter}");
+        //FileManager.Log($"Enemy spawned {enemy.name} current number of em= {npCouter}");
     }
     /// <summary>
     /// Nacita charakter nepiratela z ulozenych dat
@@ -133,7 +133,7 @@ public class MapScript : MapSizer
             if (netO.TryGetComponent(out NPStats npS) && npS is not BosStats)
                 npS.Load(save);
 
-            FileManager.Log($"Entity {save.etName} Save loaded ");
+            //FileManager.Log($"Entity {save.etName} Save loaded ");
         }
         else
             FileManager.Log($"Entity Save name not found similiar {save.etName}", FileLogType.WARNING);

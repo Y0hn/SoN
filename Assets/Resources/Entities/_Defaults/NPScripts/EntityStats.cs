@@ -107,7 +107,7 @@ public abstract class EntityStats : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
-        FileManager.Log($"{name} despawned");
+        //FileManager.Log($"{name} despawned");
     }
     /// <summary>
     /// Zabezpecuje spravne nastavenie a chod 
