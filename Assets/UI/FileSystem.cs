@@ -147,7 +147,10 @@ public static class FileManager
     /// </summary>
     /// <param name="name"></param>
     public static async Task StartWorld(string name, GameType type = GameType.Online) 
-    {
+    {        
+        if (!Directory.Exists(WorldPath)) 
+            Directory.CreateDirectory(WorldPath);
+            
         Log($"World {name} is loading", FileLogType.WARNING);
         string path = NameToWorldPath(name);
 

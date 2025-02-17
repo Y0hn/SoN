@@ -5,11 +5,3 @@
 BALANCING
 ```
 
-## Medium Priority
-```
-```
-
-## low priority
-```
-```
-

@@ -136,10 +136,10 @@ using System;
     {
         aRef = FileManager.GetAttackRefferency(aType);
         foreground.sprite = Resources.Load<Sprite>(aRef);
-        if (id > 0)
+        //if (id > 0)
             foreground.color = defaultC;
-        else
-            foreground.color = GameManager.instance.LocalPlayer.Color;
+        /*else
+            foreground.color = GameManager.instance.LocalPlayer.Color;*/
         attackType = aType;
         this.id = id;
         SetShow(true);

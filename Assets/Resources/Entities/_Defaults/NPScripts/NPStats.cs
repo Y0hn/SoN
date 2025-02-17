@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Pathfinding;
 using Random = UnityEngine.Random;
 using Unity.Netcode;
-using Microsoft.Unity.VisualStudio.Editor;
 public class NPStats : EntityStats
 {
     /*  ZDEDENE ATRIBUTY
