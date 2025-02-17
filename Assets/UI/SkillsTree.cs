@@ -7,6 +7,7 @@ using UnityEngine;
 public class SkillTree
 {
 #pragma warning disable IDE0044 // Add readonly modifier
+    public bool hasImunityToCoruption;
     List<Skill> skills;
     PlayerStats player;
     Dictionary<Damage.Type, Modifier> offence;
@@ -29,6 +30,7 @@ public class SkillTree
         offence = new ();
         offRate = new ();
         uSkils = new string[2];
+        hasImunityToCoruption = false;
     }
     /// <summary>
     /// Vytvorenie noveho stromu schopnosti pre konkretneho hraca
@@ -103,6 +105,7 @@ public class SkillTree
         else if (skill is Utility ut)   // ak je schopnost specialna
         {
             // Prida odomknutu schopnost
+            hasImunityToCoruption |= ut.function == Utility.Function.BecomeImuneCorruption;
             player.UnlockUtilityRpc(ut);
             debug += "Utility";
         }

@@ -106,6 +106,7 @@ public class PlayerStats : EntityStats
         }
     }
     public override Attack Attack => IsServer && skillTree != null ? skillTree.ModAttack(base.Attack) : base.Attack;    
+    public bool ImunityToCoruption => skillTree.hasImunityToCoruption;
     /// <summary>
     /// <inheritdoc/>
     /// </summary>

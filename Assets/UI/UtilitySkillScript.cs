@@ -10,6 +10,7 @@ public class UtilitySkillScript : MonoBehaviour
     [SerializeField] bool requestStateOnStart = false;
     [SerializeField] bool requestStateOnEnable = false;
     [SerializeField] List<GameObject> gameObjects;
+    [SerializeField] List<GameObject> gameObjectsToDisable;
     GameManager game;
     /// <summary>
     /// Pri psusteni
@@ -56,5 +57,6 @@ public class UtilitySkillScript : MonoBehaviour
     void SetGameObjects(bool setTo = true)
     {
         gameObjects.ForEach(g => {if (gameObject != null) g.SetActive(setTo); });
+        gameObjectsToDisable.ForEach(g => {if (gameObject != null) g.SetActive(!setTo); });
     }
 }

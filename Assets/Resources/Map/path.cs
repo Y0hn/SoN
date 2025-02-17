@@ -4,6 +4,7 @@ public class StonePath : MonoBehaviour
 {
     [SerializeField] float speedModifier = 1.2f;
     [SerializeField] bool playerOnly = true;
+    [SerializeField] bool isCoruption = false;
     /// <summary>
     /// Aktivne len na servery
     /// </summary>
@@ -17,7 +18,10 @@ public class StonePath : MonoBehaviour
     {
         try {
             if (Active && collider.TryGetComponent(out EntityStats es)&& (!playerOnly || es is not NPStats))
-                es.TerrainChangeRpc(speedModifier, true);
+            {
+                if (!isCoruption || !(es is PlayerStats pl && pl.ImunityToCoruption))
+                    es.TerrainChangeRpc(speedModifier, true);
+            }
         } catch {
 
         }
@@ -30,7 +34,8 @@ public class StonePath : MonoBehaviour
     {
         try {
             if (Active && collider.TryGetComponent(out EntityStats es) && es.IsSpawned && (!playerOnly || es is not NPStats))
-                es.TerrainChangeRpc(1f/speedModifier, true);
+                if (!isCoruption || !(es is PlayerStats pl && pl.ImunityToCoruption))
+                    es.TerrainChangeRpc(1f/speedModifier, true);
         } catch {
 
         }
