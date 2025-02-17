@@ -194,6 +194,7 @@ public class Connector : MonoBehaviour
             netMan.Shutdown();
         }
         else   
-            netMan.DisconnectClient(id);
+            //netMan.DisconnectClient(id);
+            netMan.Shutdown();
     }
 }

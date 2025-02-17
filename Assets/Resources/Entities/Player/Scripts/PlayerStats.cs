@@ -325,6 +325,9 @@ public class PlayerStats : EntityStats
                 //int index = changeEvent.Index; // the position of the added value in the list
                 inventUI.Add(changeEvent.Value.ToString()); // the new value at the index position
                 break;
+            case NetworkListEvent<FixedString64Bytes>.EventType.Remove:
+                inventUI.Delete(changeEvent.Value.ToString());
+                break;
             default:
                 break;
         }
@@ -464,9 +467,10 @@ public class PlayerStats : EntityStats
     {
         if (equipment[(int)slot] != "")
             inventory.Add(reference);
+            
         equipment[(int)slot] = reference;    
         inventory.Remove(reference);
-        //Debug.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
+        FileManager.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
     }
     /// <summary>
     /// Zbiera a equipuje zbrane

@@ -35,11 +35,13 @@ public class ItemSlot : MonoBehaviour
         if (empty)
         {
             button.onClick.RemoveAllListeners();
+
             if (remove != null)
             {
                 remove.onClick.RemoveAllListeners();
                 remove.gameObject.SetActive(false);
             }
+
             background.color = defaultColor;
             icon.sprite = null;
         }
@@ -48,11 +50,13 @@ public class ItemSlot : MonoBehaviour
             icon.sprite = Resources.Load<Sprite>(Item.iconRef);
             button.onClick.AddListener( delegate { Item.Use(this); });
             string s =Item.GetReferency; 
+
             if (remove != null)
             {
                 remove.onClick.AddListener( delegate { GameManager.instance.inventory.Remove(s); });
                 remove.gameObject.SetActive(true);
             }
+            
             background.color = Item.rarity;
             icon.color = Item.color;
         }

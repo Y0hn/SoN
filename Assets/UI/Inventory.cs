@@ -307,7 +307,6 @@ public class Inventory : MonoBehaviour
         if (itemSlots.Count > 0 && item != null)
         {
             game.LocalPlayer.RemoveItemFromInventoryRpc(refItem);
-            itemSlots.Find(i => i.Item == item).Item = null;
         }
     }
     /// <summary>
@@ -480,5 +479,11 @@ public class Inventory : MonoBehaviour
         foreach(var at in atSlots)
             at.UnsetAttacks();
         ReloadAttacks();
+    }
+
+    public void Delete(string v)
+    {
+        Item item = Item.GetItem(v);
+        itemSlots.Find(i => i.Item == item).Item = null;
     }
 }

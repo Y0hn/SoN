@@ -174,7 +174,7 @@ public abstract class EntityStats : NetworkBehaviour
             aSpeed /= Attack.AttackTime;
             Animator.SetFloat("atSpeed", aSpeed);
             
-            Debug.Log($"Attack animation set on weapon {Animator.GetFloat("weapon")} to speed {speed}");
+            //FileManager.Log($"Attack animation set on weapon {Animator.GetFloat("weapon")} to speed {speed}");
 
             weaponR.gameObject.SetActive(R || B); 
             weaponL.gameObject.SetActive(L || B);

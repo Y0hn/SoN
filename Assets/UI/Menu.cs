@@ -229,23 +229,23 @@ public class Menu : MonoBehaviour
             b.Value.SetAudioSource(ui_sfx);
 
         buttons["exit"].AddListener(delegate { Exit();});
-        buttons["solo"].AddListener(delegate { MenuNavigation(1); });
-        buttons["multi"].AddListener(delegate { MenuNavigation(2); });
-        buttons["sett"].AddListener(delegate { MenuNavigation(3); });
+        buttons["solo"].AddListener(delegate {  _ = MenuNavigation(1); });
+        buttons["multi"].AddListener(delegate {  _ = MenuNavigation(2); });
+        buttons["sett"].AddListener(delegate {  _ = MenuNavigation(3); });
 
-        buttons["soloCont"].AddListener(delegate { MenuNavigation(1, 1); });
-        buttons["soloLoad"].AddListener(delegate { MenuNavigation(2, 1); });
-        buttons["soloCreate"].AddListener(delegate { MenuNavigation(3, 1); });
+        buttons["soloCont"].AddListener(delegate {  _ = MenuNavigation(1, 1); });
+        buttons["soloLoad"].AddListener(delegate {  _ = MenuNavigation(2, 1); });
+        buttons["soloCreate"].AddListener(delegate {  _ = MenuNavigation(3, 1); });
 
-        buttons["multiStart"].AddListener(delegate { MenuNavigation(1, 2); });
-        buttons["multiJoin"].AddListener(delegate { MenuNavigation(2, 2); });
+        buttons["multiStart"].AddListener(delegate {  _ = MenuNavigation(1, 2); });
+        buttons["multiJoin"].AddListener(delegate {  _ = MenuNavigation(2, 2); });
 
-        buttons["multiLoad"].AddListener(delegate { MenuNavigation(1, 21); });
-        buttons["multiCreate"].AddListener(delegate { MenuNavigation(2, 21); });
+        buttons["multiLoad"].AddListener(delegate {  _ = MenuNavigation(1, 21); });
+        buttons["multiCreate"].AddListener(delegate {  _ = MenuNavigation(2, 21); });
 
-        buttons["joinMultiJoin"].AddListener(delegate {MenuNavigation(1, 22); });
+        buttons["joinMultiJoin"].AddListener(delegate { _ = MenuNavigation(1, 22); });
 
-        buttons["createWorld"].AddListener(delegate {MenuNavigation(0);});
+        buttons["createWorld"].AddListener(delegate { _ = MenuNavigation(0);});
 
 
         
@@ -282,7 +282,7 @@ public class Menu : MonoBehaviour
     /// Spravuje navigaciu v hlavnom menu
     /// </summary>
     /// <param name="to">VOLBA podla tlacitka</param>
-    void MenuNavigation(sbyte to, sbyte from = 0)
+    async Task MenuNavigation(sbyte to, sbyte from = 0)
     {
         int layer = 10*from + to;
         disable = currentLayer.Peek();
@@ -335,8 +335,11 @@ public class Menu : MonoBehaviour
             case 221: /* Pripoji sa do uz existujucej hry */
                 if (inputFields["playerN1"].Check && inputFields["ipCode"].Check)
                 {
-                    _ = Connector.instance.JoinServer(inputFields["ipCode"].Text);
-                    layer= -1;
+                    bool b = await Connector.instance.JoinServer(inputFields["ipCode"].Text);
+                    if (b)
+                        layer= -1;
+                    else
+                        inputFields["ipCode"].ErrorMessage("Failed to connect");
                 }
                 else
                     layer= 0;
@@ -371,7 +374,7 @@ public class Menu : MonoBehaviour
     public void PressLoad(string worldName)
     {
         _ = FileManager.StartWorld(worldName, choosenGame);
-        MenuNavigation(-1);
+        _ = MenuNavigation(-1);
     }
     /// <summary>
     /// Sluzi pre nacitanie hodnot z nastaveni
