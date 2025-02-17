@@ -342,6 +342,8 @@ public class GameManager : MonoBehaviour
         chatting = false;
 
         uPl.Reset();
+        if (inventory.open)
+            inventory.OC_Inventory();
         inventory.ReloadAttacks();
 
         playerLives = lives;

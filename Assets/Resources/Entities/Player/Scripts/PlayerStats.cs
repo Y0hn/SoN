@@ -481,8 +481,8 @@ public class PlayerStats : EntityStats
     /// </summary>
     [Rpc(SendTo.Server)] public void AddLvlRpc()
     {
-        //Debug.Log("XP added to player");
         xp.Value = xpMax.Value;
+        FileManager.Log($"XP {xp.Value}-{xpMax.Value} set to player", FileLogType.RECORD);
     }
     /// <summary>
     /// Znovu zrodi hraca
@@ -490,10 +490,16 @@ public class PlayerStats : EntityStats
     [Rpc(SendTo.Server)] public void ReviveRpc()
     {
         IsAlive.Value = true;
+        Animator.SetBool("isAlive", true);
         MapScript.map.SpawnPlayer(transform);
     }
     [Rpc(SendTo.Owner)] public void QuitRpc()
     {
         game.Quit();
+    }
+    [Rpc(SendTo.Server)] public void RemoveItemFromInventoryRpc(string i)
+    {
+        inventory.Remove(i);
+        DropRpc(i, new (2,2), new (1,1));
     }
 }

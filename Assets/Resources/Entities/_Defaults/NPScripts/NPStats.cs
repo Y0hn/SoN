@@ -162,7 +162,7 @@ public class NPStats : EntityStats
     {
         base.Die();
 
-        if (IsOwner)
+        if (IsServer)
         {            
             // Urci maximalnu kvalitu podla levela
             int maxQ = level.Value < 10 ? 3 : 5;
@@ -180,7 +180,7 @@ public class NPStats : EntityStats
                 weapon += "-" + maxQ;
 
                 // Vyhodi zbran
-                DropRpc(weapon, new (0.5f,0.5f));
+                DropRpc(weapon, new (0.2f,0.2f), new (0,0));
             }
         }
     }

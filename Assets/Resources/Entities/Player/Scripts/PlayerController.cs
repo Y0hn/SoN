@@ -83,7 +83,7 @@ public class PlayerController : EntityController
         if (Input.GetKeyDown(KeyCode.P))
         {
             int e = Random.Range(0, equipmentPool.Length);
-            Stats.DropRpc(equipmentPool[e].GetReferency, new(2,2));
+            Stats.DropRpc(equipmentPool[e].GetReferency, new(2,2), new(1,1));
         }
         else if (Input.GetKeyDown(KeyCode.L))
         {

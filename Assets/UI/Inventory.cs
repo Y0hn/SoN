@@ -303,20 +303,11 @@ public class Inventory : MonoBehaviour
     /// <param name="refItem">cesta ku predmetu</param>
     public void Remove(string refItem)
     {
-        
         Item item = Item.GetItem(refItem);
-        if (itemSlots.Count > 0)
+        if (itemSlots.Count > 0 && item != null)
         {
-            int i = itemSlots.Count - 1;
-            if (item != null)
-                i = itemSlots.FindIndex(it => it.Item == item);
-
-            item = itemSlots[i].Item;
-            if (item != null)
-            {
-                Instantiate(dropPreFab).GetComponent<ItemDrop>().Item = item;
-                itemSlots[i].Item = null;
-            }
+            game.LocalPlayer.RemoveItemFromInventoryRpc(refItem);
+            itemSlots.Find(i => i.Item == item).Item = null;
         }
     }
     /// <summary>

@@ -9,6 +9,7 @@ public class ItemSlot : MonoBehaviour
     public bool empty = true;
     [SerializeField] protected Image icon;
     [SerializeField] protected Button button;
+    [SerializeField] protected Button remove;
     [SerializeField] protected Image background;
     [SerializeField] protected Color defaultColor;
     private Item item;
@@ -34,6 +35,11 @@ public class ItemSlot : MonoBehaviour
         if (empty)
         {
             button.onClick.RemoveAllListeners();
+            if (remove != null)
+            {
+                remove.onClick.RemoveAllListeners();
+                remove.gameObject.SetActive(false);
+            }
             background.color = defaultColor;
             icon.sprite = null;
         }
@@ -41,6 +47,12 @@ public class ItemSlot : MonoBehaviour
         {
             icon.sprite = Resources.Load<Sprite>(Item.iconRef);
             button.onClick.AddListener( delegate { Item.Use(this); });
+            string s =Item.GetReferency; 
+            if (remove != null)
+            {
+                remove.onClick.AddListener( delegate { GameManager.instance.inventory.Remove(s); });
+                remove.gameObject.SetActive(true);
+            }
             background.color = Item.rarity;
             icon.color = Item.color;
         }

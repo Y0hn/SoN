@@ -128,7 +128,7 @@ public class SkillPanel : MonoBehaviour
             if (skills.Contains(s.name))
                 s.ActivateSkill();
 
-        OnChangeAvailablePoints.Invoke(AvailablePoints);
+        OnChangeAvailablePoints?.Invoke(AvailablePoints);
     }
     /// <summary>
     /// Sluzi pre kupu schopnosti v okruznou cestou

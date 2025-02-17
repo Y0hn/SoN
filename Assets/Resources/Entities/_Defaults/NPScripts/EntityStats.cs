@@ -257,8 +257,8 @@ public abstract class EntityStats : NetworkBehaviour
         hpBar.value = value;
         if (prev > now)
             PlaySound("onHitted");
-        if (now <= 0)
-            Die();
+        if (now <= 0 && IsServer)
+            IsAlive.Value = false;
     }
     /// <summary>
     /// Zavolana ak zivoty chraktera dosiahnu 0
@@ -383,13 +383,20 @@ public abstract class EntityStats : NetworkBehaviour
     /// </summary>
     /// <param name="itemPath"></param>
     /// <param name="dropRange"></param>
-    [Rpc(SendTo.Server)] public void DropRpc(string itemPath, Vector2 dropRange)
+    [Rpc(SendTo.Server)] public void DropRpc(string itemPath, Vector2 dropRange, Vector2 minRange)
     {
+        // nahodna pozicia v medziach
         Vector2 pos = new (
-            transform.position.x + 
-                Random.Range(-dropRange.x, dropRange.x), 
-            transform.position.y + 
-                Random.Range(-dropRange.y, dropRange.y));
+                Random.Range(minRange.x, dropRange.x), 
+                Random.Range(minRange.y, dropRange.y));
+
+        // smer
+        pos.x *= Random.Range(0, 2) < 1 ? -1 : 1;
+        pos.y *= Random.Range(0, 2) < 1 ? -1 : 1;
+
+        // okolie
+        pos.x += transform.position.x;
+        pos.y += transform.position.y;
 
         GameObject i = Instantiate(Resources.Load<GameObject>("Items/ItemDrop"), pos, Quaternion.identity);
         i.GetComponent<ItemDrop>().Item = Item.GetItem(itemPath);
