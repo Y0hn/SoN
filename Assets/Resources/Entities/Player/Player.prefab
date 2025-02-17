@@ -594,7 +594,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5630875124356528717, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 2665253785
+      value: 2457329736
       objectReference: {fileID: 0}
     - target: {fileID: 5630875124356528717, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
@@ -698,6 +698,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4991143687992300023, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
       insertIndex: 4
       addedObject: {fileID: 9034705145765597162}
+    - targetCorrespondingSourceObject: {fileID: 4991143687992300023, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
+      insertIndex: 9
+      addedObject: {fileID: 2108350297413084823}
     - targetCorrespondingSourceObject: {fileID: 4991143687992300023, guid: 9e74e3a586717dc4896507ea0c396092, type: 3}
       insertIndex: -1
       addedObject: {fileID: -3433707315503268182}
@@ -824,6 +827,18 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &2108350297413084823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6354480860298503831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25f6d0a2cf3a27a4bb00778192d1c240, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &-3433707315503268182
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1012,6 +1027,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stats: {fileID: -3433707315503268182}
   cam: {fileID: 8620589130980003894}
+  respawn: {fileID: 2108350297413084823}
   input_actions:
     _serializedList:
     - Key: move

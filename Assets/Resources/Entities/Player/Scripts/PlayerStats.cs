@@ -489,8 +489,8 @@ public class PlayerStats : EntityStats
     /// </summary>
     [Rpc(SendTo.Server)] public void ReviveRpc()
     {
-        IsAlive.Value = true;
         Animator.SetBool("isAlive", true);
+        IsAlive.Value = true;
         MapScript.map.SpawnPlayer(transform);
     }
     [Rpc(SendTo.Owner)] public void QuitRpc()

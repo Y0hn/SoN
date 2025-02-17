@@ -22,6 +22,7 @@ public class PlayerController : EntityController
      * public virtual Vector2 View => viewDir;
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
     [SerializeField] GameObject cam;
+    [SerializeField] AbleToRespawn respawn;
     [SerializedDictionary("Key", "Input"),SerializeField] SerializedDictionary<string, InputActionReference> input_actions;
 #if UNITY_EDITOR
     [SerializeField] Equipment[] equipmentPool;
@@ -129,7 +130,7 @@ public class PlayerController : EntityController
     /// <param name="context"></param>
     public void Fire(InputAction.CallbackContext context)
     {
-        if (!Stats.IsAlive.Value)
+        if (respawn.Respawnable && !Stats.IsAlive.Value)
         {
             Stats.ReviveRpc();
             attacking = false;
