@@ -118,13 +118,17 @@ public class SkillPanel : MonoBehaviour
         FileManager.Log($"Skills loaded {player.etName} count={player.skillTree.skills.Length} level={player.level}",FileLogType.RECORD);
         freePointCouter = player.level;
         List<string> skills= new();
+
         foreach (Skill skill in player.skillTree.skills)
             skills.Add(skill.name);
 
         SkillSlot[] sSlots = GetComponentsInChildren<SkillSlot>();
+
         foreach (SkillSlot s in sSlots)
             if (skills.Contains(s.name))
                 s.ActivateSkill();
+
+        OnChangeAvailablePoints.Invoke(AvailablePoints);
     }
     /// <summary>
     /// Sluzi pre kupu schopnosti v okruznou cestou

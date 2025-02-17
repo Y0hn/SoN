@@ -65,7 +65,8 @@ public class PlayerStats : EntityStats
     public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     
     protected SkillTree skillTree;  // iba na servery
-   
+    public int MaxHP => maxHp.Value;
+
     public Projectile Projectile { get; set; }
     protected Equipment[] Equipments     
     { 
@@ -156,10 +157,6 @@ public class PlayerStats : EntityStats
             if (item != "")
                 inventory.Add(item);
 
-        // inhereted
-        hp.Value = Mathf.RoundToInt(save.hp * (float)maxHp.Value);
-        transform.position = save.Position;
-
 
         if (IsOwner)
         {
@@ -174,17 +171,19 @@ public class PlayerStats : EntityStats
                 }*/
             game.SkillTree.LoadSkills(pSave);
             game.inventory.ReloadAttacks();
-        }/*
+        }
         if (IsServer) 
         {
             level.Value = pSave.level;
-            // Nacita data o strome schopnosti
-            foreach (var skill in pSave.skillTree.skills)
-                AddSkill(skill);
-            /*foreach (var uSill in pSave.skillTree.usingUtils)
-                skillTree.
+            maxHp.Value = pSave.maxHp;
+            //speed.Value = pSave.speed;
 
-        }*/
+            // inhereted
+            hp.Value = Mathf.RoundToInt(save.hp * (float)pSave.maxHp);
+            transform.position = save.Position;
+        }
+                
+
         FileManager.Log("Player Data loaded: " + pSave);
     }
 

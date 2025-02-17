@@ -656,6 +656,8 @@ public enum GameType { Online, Local, Solo }
             inventory = player.InventorySave;
             skillTree = player.SkillTreeSave;
             level = player.level.Value;
+            //speed = player.speed.Value;
+            maxHp = player.MaxHP;
         }
         /// <summary>
         /// Zrdi informacie o inventari hraca
@@ -682,9 +684,7 @@ public enum GameType { Online, Local, Solo }
             /// <returns>pocetPredmetov pocetPoredmetovNaSebe</returns>
             public override string ToString()
             {
-                string e = "";
-                foreach (string item in equiped) e += item + ", ";
-                return $"items.Lenght= {items.Length} equiped.Lenght= {equiped.Length}\n{e}";
+                return $"items.Lenght= {items.Length}";
             }
         }
         /// <summary>
@@ -722,6 +722,7 @@ public enum GameType { Online, Local, Solo }
         public override string ToString()
         {
             string s = base.ToString();
+            s += $", level= {level}";
             s += $", MaxHP= {maxHp}";
             s += $", Inventar= {inventory}";
             s += $", SkillTree= {skillTree}";
