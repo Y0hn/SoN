@@ -183,10 +183,10 @@ using UnityEngine;
     public enum Function
     {
         None, 
-        ViewOwnHP, ViewOwnMeleeAttack, ViewOwnRangedAttack,
-        ViewOthersHP, ViewOthersMeleeAttack, ViewOthersRangedAttack,
+        ViewOwnHP,/* ViewOwnMeleeAttack, ViewOwnRangedAttack,*/
+        ViewOthersHP,/* ViewOthersMeleeAttack,*/ ViewRangedAttack,
         ViewOthersDefence, 
         VisionSizeIncrease, 
-        ViewCorruptionAndBecomeImune
+        BecomeImuneCorruption
     }
 }

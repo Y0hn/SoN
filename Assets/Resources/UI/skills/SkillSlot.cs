@@ -175,7 +175,6 @@ public class SkillSlot : MonoBehaviour
     [Serializable] public class SkillCreator
     {
         [HideInInspector] public string name;
-
         [SerializeField] Utility.Function function;
         [SerializeField] Damage.Type condition;
         [SerializeField] bool isAttack;

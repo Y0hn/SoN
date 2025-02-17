@@ -403,7 +403,8 @@ public class PlayerStats : EntityStats
      *  |_|  \_\_|     \_____|___/
      *  *  *  *  *  *  *  *  *  *  */
     /// <summary>
-    /// Prida schopnost do stromu schopnosti
+    /// Prida schopnost do stromu schopnosti <br />
+    /// Dvolezite rozdelenie kvoli prenosu cez RPC -cka
     /// </summary>
     /// <param name="skill"></param>
     public void AddSkill(Skill skill)

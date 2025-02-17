@@ -62,7 +62,7 @@ public class SkillTree
                 if (mD.isSpeed)
                 {
                     if (offRate.ContainsKey(type))
-                        offRate[type] *= mD.amount;
+                        offRate[type] *= Mathf.Abs(mD.amount);
                     else
                         offRate.Add(type, mD.amount);
                     debug += "Rate";
