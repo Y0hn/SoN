@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Pathfinding;
 using Random = UnityEngine.Random;
 using Unity.Netcode;
+using Microsoft.Unity.VisualStudio.Editor;
 public class NPStats : EntityStats
 {
     /*  ZDEDENE ATRIBUTY
@@ -49,6 +50,8 @@ public class NPStats : EntityStats
     [SerializeField] protected NPSensor sensor;
     [SerializeField] protected AIPath aIPath;
     [SerializeField] protected bool drawGizmo = false;
+    [SerializeField] protected Transform rezists;
+    [SerializeField] protected GameObject def;
     protected float aToFire;
     public Action OnHit;
 
@@ -105,6 +108,16 @@ public class NPStats : EntityStats
             sensor.me = aiTeam;
             sensor.SetRange(rase.view);
             aIPath.maxSpeed = speed.Value/100f;
+        }
+        // Nastavi obrany
+        foreach (var d in rase.resists)
+        {
+            try {
+                Sprite s = Resources.Load<Sprite>(FileManager.GetDamageReff(d.defenceType));
+                Instantiate(def, rezists).GetComponent<DefType>().image.sprite = s;
+            } catch {
+                FileManager.Log($"{name} failed to set up rezists", FileLogType.ERROR);
+            }
         }
     }
     /// <summary>

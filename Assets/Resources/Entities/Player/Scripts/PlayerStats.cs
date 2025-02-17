@@ -2,7 +2,6 @@ using UnityEngine;
 using Unity.Netcode;
 using Unity.Collections;
 using Unity.VisualScripting;
-using System;
 using System.Collections.Generic;
 using TMPro;
 using System.Linq;
@@ -49,6 +48,7 @@ public class PlayerStats : EntityStats
      * public bool AttackBoth              => Attack.bothHanded;
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
     [SerializeField] GameObject chatField;
+    [SerializeField] Transform canvas;
     [SerializeField] TMP_Text chatBox;
     [SerializeField] Camera cam;
     //public RpcParams OwnerRPC { get { return RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp); } }
@@ -220,6 +220,9 @@ public class PlayerStats : EntityStats
             xpBar.SliderValue = xp.Value;
             xpBar.LevelUP(1, xpMax.Value);
             cam.gameObject.SetActive(true);
+
+            // zursi si valstne povolenie na zivoty
+            Destroy(canvas.GetComponent<UtilitySkillScript>());
 
             // Nastavenie 
             for (; equipment.Count < 2;)
@@ -438,10 +441,12 @@ public class PlayerStats : EntityStats
     /// <param name="addHealth"></param>
     [Rpc(SendTo.Server)] public virtual void AddMaxHealthRpc (float addHealth)
     {
-        if (addHealth % 100 == 0)
+        //if (addHealth % 100 == 0)
             maxHp.Value += (int)addHealth;
-        else
-            maxHp.Value = Mathf.RoundToInt((float)maxHp.Value * (float)(1+addHealth));
+        //else
+            //maxHp.Value = Mathf.RoundToInt((float)maxHp.Value * (float)(1+addHealth));
+
+        FileManager.Log($"Player hp changed to {maxHp.Value}",FileLogType.RECORD);
     }
     /// <summary>
     /// Zastavi aktualne prebiehajuci strelny utok znicenim projektilu

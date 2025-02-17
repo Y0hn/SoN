@@ -285,6 +285,27 @@ public static class FileManager
         //Debug.Log("Returning at ref on: " + refer);
         return refer;
     }
+    public static string GetDamageReff(Damage.Type type)
+    {
+        string refer = ATTACKS_ICONS_PATH + "/";
+        switch (type)
+        {
+            case Damage.Type.SWORD_SLASH:   refer += "sword-slash";
+                break;
+            case Damage.Type.SWORD_TRUST:   refer += "sword-thrust";
+                break;
+            case Damage.Type.FIST:          refer += "fist";
+                break;
+            case Damage.Type.BOW_SINLE:     refer += "bow-single";
+                break;
+            case Damage.Type.BOW_MULTI:     refer += "bow-triple";
+                break;
+            case Damage.Type.POLE:          refer += "bat-swing";
+                break;
+        }
+        //Debug.Log("Returning at ref on: " + refer);
+        return refer;
+    }
     /// <summary>
     /// Ziska ikonu schopnosti podla Schopnosti
     /// </summary>

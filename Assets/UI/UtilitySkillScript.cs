@@ -26,9 +26,10 @@ public class UtilitySkillScript : MonoBehaviour
         else
             SetGameObjects(defaultState);           
     }
-    void Oestroy()
+    void OnDestroy()
     {
-        game.UtilityUpdate -= UtilityUpdate;
+        if (game != null)
+            game.UtilityUpdate -= UtilityUpdate;
     }
     /// <summary>
     /// Pri povoleni
