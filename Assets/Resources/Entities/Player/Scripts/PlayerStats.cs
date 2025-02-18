@@ -478,7 +478,7 @@ public class PlayerStats : EntityStats
     /// <param name="reference"></param>tile.Stop();
     [Rpc(SendTo.Server)] public virtual void PickedUpRpc(string reference)
     {
-        if (reference != "")
+        if (reference != "" && !inventory.Contains(reference))
             inventory.Add(reference);
     }
     /// <summary>

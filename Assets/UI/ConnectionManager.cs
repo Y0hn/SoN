@@ -104,12 +104,14 @@ public class Connector : MonoBehaviour
     public async Task<bool> JoinServer(string connection)
     {
         bool joined = true;
+        string type = "";
         hostingAddress = connection;
 
         try {
             if (LanConnection)  // nastaveine parametrov pre pripojenie na LOKALNEJ sieti
             {
                 tporter.SetConnectionData(ServerIP, 7777);
+                type = "LAN";
             }            
             else                // nastaveine parametrov pre pripojenia prepinacim KODOM
             {
@@ -121,10 +123,12 @@ public class Connector : MonoBehaviour
 
                 // Nastavi vytvorene prarametre
                 tporter.SetRelayServerData(relayServerData);
+
+                type = "RELAY";
             }
             // pokusi sa o nadvizanie spojenia
             netMan.StartClient();
-            FileManager.Log($"Joined Relay on {connection}", FileLogType.RECORD);
+            FileManager.Log($"Joined {type} on {connection}", FileLogType.RECORD);
         } catch  {
             FileManager.Log($"Join connection failed with ipcode= {connection}", FileLogType.ERROR);
             joined = false;
