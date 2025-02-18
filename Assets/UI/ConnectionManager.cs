@@ -66,11 +66,7 @@ public class Connector : MonoBehaviour
     {
         string conn = "";
         
-        if (hostingAddress == "")
-        {
-
-        }
-        else if (Solo)
+        if (Solo)
         {
             conn += "solo-";
             conn += FileManager.World.worldName;
@@ -169,8 +165,8 @@ public class Connector : MonoBehaviour
     /// <param name="host"></param>
     void CreateLAN(string ip_address)
     {
-        tporter.SetConnectionData(ip_address, 7777);
         hostingAddress = ip_address;
+        tporter.SetConnectionData(ip_address, 7777);
         netMan.StartHost();
 
         FileManager.Log($"Creating LAN on {hostingAddress}", FileLogType.RECORD);
@@ -194,7 +190,7 @@ public class Connector : MonoBehaviour
         {
             foreach (var client in netMan.ConnectedClients)
                 if (client.Value.ClientId != id)
-                client.Value.PlayerObject.GetComponent<PlayerStats>().QuitRpc();
+                    client.Value.PlayerObject.GetComponent<PlayerStats>().QuitRpc();
             netMan.Shutdown();
         }
         else   

@@ -97,12 +97,12 @@ public class Menu : MonoBehaviour
     Stack<string> currentLayer;
     bool goesUP; string disable;
     string lastConnection;
-    GameType choosenGame;
+    public GameType choosenGame;
 
     [HideInInspector] public string playerName;
     public string PlayerName 
     { 
-        get => playerName;
+        get => conn.Solo ? "" : playerName;
         set
         {
             inputFields["playerN1"].Text = value;

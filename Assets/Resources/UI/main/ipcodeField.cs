@@ -1,6 +1,11 @@
 using System.Linq;
 public class IpCodeField : InputFieldCheck
 {
+    public override string Text 
+    { 
+        get => base.Text.ToUpper();
+        set => base.Text = value.ToUpper(); 
+    }
     protected override bool FieldCheck()
     {        
         bool check = false;

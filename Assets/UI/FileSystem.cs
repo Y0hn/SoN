@@ -500,6 +500,7 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
 public enum GameType { Online, Local, Solo }
 [Serializable] public class World
 {
+    public bool singlePlayer;
     public string worldName;
     public string writeDate;
     public List<ItemOnFoor> items;
@@ -516,6 +517,7 @@ public enum GameType { Online, Local, Solo }
         items = new ();
         players = new ();
         entities = new ();
+        singlePlayer = false;
         boss = null;
     }
     /// <summary>
@@ -525,6 +527,7 @@ public enum GameType { Online, Local, Solo }
     public World(string name)
     {
         worldName = name;
+        singlePlayer = Connector.instance.Solo;
         writeDate = DateTime.Now.ToString();
         if (Connector.instance.netMan.IsServer)
         {

@@ -182,15 +182,13 @@ public class GameManager : MonoBehaviour
             // pre istovu iba ak je null v pripade viacnasobneho spustania hry
             NPStats.npcDied += EnemySpawner;
 
+            MapScript.npCouter = 0;
             // Ak su ulzene nejake data nepriatelov
             if (0 < FileManager.World.entities.Count)
                 foreach (var entity in FileManager.World.entities)
                     MapScript.map.SpawnFromSave(entity);
             else
-            {
-                MapScript.npCouter = 0;
                 NPStats.npcDied.Invoke();
-            }
                 
             FileManager.Log("Bos setuping");
 

@@ -13,6 +13,8 @@ public class SubMenuLoad : MonoBehaviour
     /// </summary>
     void OnEnable()
     {
+        bool solo = Menu.menu.choosenGame == GameType.Solo;
+
         // Vynuluje ponuku -> vymaže všetky staré zápisy uloženia
         for (int i = 0; i < content.childCount; i++)
             Destroy(content.GetChild(i).gameObject);
@@ -23,14 +25,17 @@ public class SubMenuLoad : MonoBehaviour
         // Pre každý získany svet
         for (int i = 0; i < saves.Length; i++)
         {
-            // Vytvorí zápis v zozname
-            MainUISave mus = Instantiate(save, content).GetComponent<MainUISave>();
+            if (saves[i].singlePlayer == solo)
+            {                
+                // Vytvorí zápis v zozname
+                MainUISave mus = Instantiate(save, content).GetComponent<MainUISave>();
 
-            // Nastaví zápisu hodnoty sveta
-            mus.SetUp(ref saves[i]);
+                // Nastaví zápisu hodnoty sveta
+                mus.SetUp(ref saves[i]);
 
-            // Nastaví zvuk prehraný po kliknutí 
-            mus.SetAudioSource(source);
+                // Nastaví zvuk prehraný po kliknutí 
+                mus.SetAudioSource(source);
+            }
         }
     }
 }

@@ -461,7 +461,14 @@ public class Inventory : MonoBehaviour
             acSlots[ii].Set(Attack.Type.RaseUnnarmed, -1);
 
         // ak je stale povodny utok zapnuty tak zostane zapnuty
-        acSlots.Find(acS => acS.Identity == prev)?.Select();
+        AttackSlotActive ac = acSlots.Find(acS => acS.Identity == prev);
+
+        // ak nie nastavi sa zakladny utok
+        ac ??= acSlots[0];
+        
+        ac.SetActive(true);
+
+        FileManager.Log($"Attacks reloaded selected {ac.Identity} => {Enum.GetName(typeof(Attack.Type), ac.attackType)}");
     }
     /// <summary>
     /// Vrati inventar do povodneho stavu

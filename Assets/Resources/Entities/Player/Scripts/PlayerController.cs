@@ -90,6 +90,10 @@ public class PlayerController : EntityController
         {
             Stats.AddLvlRpc();
         }
+        else if (Input.GetKeyDown(KeyCode.K))
+        {
+            //Stats.TakeDamage();
+        }
 #endif
     }
     void Q1(InputAction.CallbackContext context) { Q(1); }
@@ -132,6 +136,7 @@ public class PlayerController : EntityController
     {
         if (respawn.Respawnable && !Stats.IsAlive.Value)
         {
+            Stats.Animator.SetBool("isAlive", true);
             Stats.ReviveRpc();
             attacking = false;
             return;

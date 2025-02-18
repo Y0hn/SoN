@@ -127,7 +127,7 @@ public class MapScript : MapSizer
 
             if (boss)
                 netO.GetComponent<BosController>().SetSensor(BossSpawn.GetComponent<BosSensor>());
-
+            
             netO.Spawn();
 
             if (netO.TryGetComponent(out NPStats npS) && npS is not BosStats)

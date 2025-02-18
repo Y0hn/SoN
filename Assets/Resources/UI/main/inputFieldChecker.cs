@@ -9,7 +9,7 @@ public abstract class InputFieldCheck : MonoBehaviour
     [SerializeField] protected TMP_Text placeHolder;
     [SerializeField] protected TMP_Text errorMsg;
 
-    public string Text 
+    public virtual string Text 
     {
         get => (field.text == "") ? placeHolder.text : field.text;
         set => placeHolder.text = value;
