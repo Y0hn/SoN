@@ -11,7 +11,7 @@ public class PassiveAttackSlotScript : MonoBehaviour
         for (int i = 0; i < attackSlots.Count; i++)
         {
             if (i < attacks.Count)
-                attackSlots[i].Set(attacks[i].type);
+                attackSlots[i].Set(attacks[i].damage.type);
             else
                 attackSlots[i].SetShow(false);
         } 

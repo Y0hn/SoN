@@ -261,27 +261,27 @@ public static class FileManager
     /// </summary>
     /// <param name="type">typ utoku</param>
     /// <returns>CESTA k ikone</returns>
-    public static string GetAttackRefferency(Attack.Type type)
+    public static string GetAttackRefferency(Damage.Type type)
     {
         string refer = ATTACKS_ICONS_PATH + "/";
         switch (type)
         {
-            case Attack.Type.MeleeSlash:
+            case Damage.Type.SWORD_SLASH:
                 refer += "sword-slash";
                 break;
-            case Attack.Type.MeleeStab:
+            case Damage.Type.SWORD_TRUST:
                 refer += "sword-thrust";
                 break;
-            case Attack.Type.RaseUnnarmed:
+            case Damage.Type.FIST:
                 refer += "fist";
                 break;
-            case Attack.Type.BowSingle:
+            case Damage.Type.BOW_SINLE:
                 refer += "bow-single";
                 break;
-            case Attack.Type.BowMulti:
+            case Damage.Type.BOW_MULTI:
                 refer += "bow-triple";
                 break;
-            case Attack.Type.BatSwing:
+            case Damage.Type.POLE:
                 refer += "bat-swing";
                 break;
         }

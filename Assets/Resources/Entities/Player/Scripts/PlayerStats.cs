@@ -319,18 +319,19 @@ public class PlayerStats : EntityStats
     /// <param name="changeEvent"></param>
     protected void OnInventoryUpdate(NetworkListEvent<FixedString64Bytes> changeEvent)
     {        
-        switch (changeEvent.Type)
-        {
-            case NetworkListEvent<FixedString64Bytes>.EventType.Add:
-                //int index = changeEvent.Index; // the position of the added value in the list
-                inventUI.Add(changeEvent.Value.ToString()); // the new value at the index position
-                break;
-            case NetworkListEvent<FixedString64Bytes>.EventType.Remove:
-                inventUI.Delete(changeEvent.Value.ToString());
-                break;
-            default:
-                break;
-        }
+        if (changeEvent.Value != "")
+            switch (changeEvent.Type)
+            {
+                case NetworkListEvent<FixedString64Bytes>.EventType.Add:
+                    //int index = changeEvent.Index; // the position of the added value in the list
+                    inventUI.Add(changeEvent.Value.ToString()); // the new value at the index position
+                    break;
+                case NetworkListEvent<FixedString64Bytes>.EventType.Remove:
+                    inventUI.Delete(changeEvent.Value.ToString());
+                    break;
+                default:
+                    break;
+            }
     }
     /// <summary>
     /// zmena utkou podla ID rychlej volby utku

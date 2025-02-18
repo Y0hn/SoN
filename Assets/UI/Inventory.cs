@@ -452,13 +452,13 @@ public class Inventory : MonoBehaviour
         for (int i = 0; i < atSlots.Length;i++)
             foreach (AttackSlotPassive aS in atSlots[i].GetActive())
             {
-                acSlots[ii].Set(aS.attackType, aS.id);
+                acSlots[ii].Set(aS.type, aS.id);
                 ii++;
             }
 
         // ak je miesto nastavi unarmened utok
         if (acSlots.FindAll(acS => acS.show).Count < acSlots.Count)
-            acSlots[ii].Set(Attack.Type.RaseUnnarmed, -1);
+            acSlots[ii].Set(Damage.Type.FIST, -1);
 
         // ak je stale povodny utok zapnuty tak zostane zapnuty
         AttackSlotActive ac = acSlots.Find(acS => acS.Identity == prev);
@@ -468,7 +468,7 @@ public class Inventory : MonoBehaviour
         
         ac.SetActive(true);
 
-        FileManager.Log($"Attacks reloaded selected {ac.Identity} => {Enum.GetName(typeof(Attack.Type), ac.attackType)}");
+        FileManager.Log($"Attacks reloaded selected {ac.Identity} => {Enum.GetName(typeof(Damage.Type), ac.type)}");
     }
     /// <summary>
     /// Vrati inventar do povodneho stavu

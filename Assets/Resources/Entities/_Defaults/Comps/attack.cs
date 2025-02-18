@@ -7,21 +7,19 @@ using System;
     public Damage damage;
     public float range;
     public float rate;
-    public Type type;
     public bool bothHanded;
 
-    public readonly float AttackTime { get => 1/rate; }
-    public readonly bool IsMelee    { get => MeleeAttack(type); }
-    public readonly bool IsRanged   { get => RangedAttack(type); }
-    public readonly bool IsSet      { get => range != 0 && rate != 0; }
+    public readonly float AttackTime=> 1/rate;
+    public readonly bool IsMelee    => damage.Melee; 
+    public readonly bool IsRanged   => damage.Ranged; 
+    public readonly bool IsSet      => range != 0 && rate != 0; 
 
-    public Attack (Damage damage, float range, float rate, Type type, bool both = false)
+    public Attack (Damage damage, float range, float rate, bool both = false)
     {
         this.bothHanded = both;
         this.damage = damage;
         this.range = range;
         this.rate = rate;
-        this.type = type;
     }
     public Attack (Attack attack)
     {
@@ -29,20 +27,7 @@ using System;
         this.damage =  attack.damage;
         this.range = attack.range;
         this.rate =  attack.rate;
-        this.type =  attack.type;
 
-    }
-    public enum Type
-    {
-        RaseUnnarmed, MeleeSlash, MeleeStab, BowSingle, BowMulti, BatSwing // Magi
-    }
-    public static bool MeleeAttack(Type t)
-    {
-        return Type.RaseUnnarmed == t || t == Type.MeleeSlash || Type.MeleeStab == t;
-    }
-    public static bool RangedAttack(Type t)
-    {
-        return Type.BowSingle == t || t == Type.BowMulti;
     }
     /// <summary>
     /// Utoku prida poskodenie
@@ -86,12 +71,15 @@ using System;
     private static void RangedTrigger(ref EntityStats self)
     {
         Ranged r = (Ranged)self.EquipedWeapon;
-        GameObject p = GameObject.Instantiate(r.GetProjectile, self.AttackPoint.position, self.Rotation);
+        GameObject p = Ranged.Projectile(self.Attack.damage.type);
+        Transform par = self.transform;
+        
+        p = GameObject.Instantiate(p, par.position, self.Rotation);
         Projectile proj = p.GetComponent<Projectile>();
         proj.SetUp(self);
         NetworkObject netP = p.GetComponent<NetworkObject>();
         netP.Spawn(true);
-        netP.TrySetParent(self.transform);
+        netP.TrySetParent(par);
 
         if      (self is PlayerStats plS)
             plS.Projectile = proj;
@@ -106,7 +94,6 @@ using System;
     public bool Equals (Attack other)
     {
         return
-        other.type.Equals(type) &&
         other.rate.Equals(rate) &&
         other.range.Equals(range) && 
         other.damage.Equals(damage);
@@ -122,7 +109,6 @@ using System;
         serializer.SerializeValue(ref damage);
         serializer.SerializeValue(ref range);
         serializer.SerializeValue(ref rate);
-        serializer.SerializeValue(ref type);
     }
     /// <summary>
     /// Vypis
@@ -137,7 +123,6 @@ using System;
         s += $"Range: {range} tiles | ";
         s += $"Rate: {rate} ac/s | ";
         s += $"Time: {AttackTime} s | ";
-        s += $"Attack Type: {Enum.GetName(typeof(Type), type)}";
 
         return s;
     }

@@ -29,6 +29,23 @@ using System;
         SWORD_SLASH, SWORD_TRUST, 
         BOW_SINLE, BOW_MULTI
     }
+    /// <summary>
+    /// Podla typu poskodenia vrati ci je na blizku
+    /// </summary>
+    public readonly bool Melee => type switch
+    {
+        Type.FIST or Type.POLE or Type.SWORD_SLASH or Type.SWORD_TRUST => true,
+        _ => false
+    };
+    /// <summary>
+    /// Podla typu poskodenia vrati ci je na dialku
+    /// </summary>
+    public readonly bool Ranged => type switch
+    {
+        Type.BOW_SINLE or Type.BOW_MULTI => true,
+        _ => false
+    };
+
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref type);

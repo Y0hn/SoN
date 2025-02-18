@@ -118,11 +118,11 @@ public abstract class EntityStats : NetworkBehaviour
         weapE.OnValueChanged += (old, now) =>
         {
             Attack a = GetAttackByWeaponIndex(now);
-            if      (Attack.MeleeAttack(a.type))
+            if      (a.IsMelee)
             {
                 attackPoint.localPosition = new(attackPoint.localPosition.x, Attack.range);
             }
-            else if (Attack.RangedAttack(a.type))
+            else if (a.IsRanged)
             {
                 Ranged r = (Ranged)Weapons[now.eIndex];
                 attackPoint.localPosition = new(r.projSpawnPosition.x, r.projSpawnPosition.y);
@@ -154,7 +154,7 @@ public abstract class EntityStats : NetworkBehaviour
                 B = false;
             Attack a = GetAttackByWeaponIndex(now);
 
-            if (a.type != Attack.Type.RaseUnnarmed)
+            if (a.damage.type != Damage.Type.FIST)
             {
                 Weapon w = Weapons[now.eIndex];
                 Sprite sprite = Resources.Load<Sprite>(w.SpriteRef);
@@ -168,7 +168,7 @@ public abstract class EntityStats : NetworkBehaviour
                 B = w.slot == Equipment.Slot.WeaponBoth;
             }
             
-            Animator.SetFloat("weapon", (float)Attack.type);
+            Animator.SetFloat("weapon", (float)Attack.damage.type);
 
             float aSpeed = Attack.IsMelee ? MELEE_ANIMATION_DUR : RANGED_ANIMATION_DUR;
             aSpeed /= Attack.AttackTime;
@@ -232,7 +232,7 @@ public abstract class EntityStats : NetworkBehaviour
 
             // Nastavenie zakladneho utoku
             weapE.Value = new (0);
-            Animator.SetFloat("weapon", (float)Weapons[0].attack[0].type);
+            Animator.SetFloat("weapon", (float)Weapons[0].attack[0].damage.type);
 
             // Oneskorenie zmiznutia po smrti
             onDeathWait = true;

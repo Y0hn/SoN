@@ -5,17 +5,9 @@ using System;
 public class Ranged : Weapon
 {
     /// <summary>
-    /// Cesta ku strele
-    /// </summary>
-    [SerializeField] string projectile;
-    /// <summary>
     /// Lokalna pozicia miesta na ktorej sa ma vytvorit strela tak aby to davalo zmysel
     /// </summary>
     public Vector2 projSpawnPosition;
-    /// <summary>
-    /// Vrati strelu urcenu pre tuto zbran podla cesty
-    /// </summary>
-    public GameObject GetProjectile => Resources.Load<GameObject>(FileManager.PROJECTILES_OBJECTS_PATH + projectile);
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -24,7 +16,22 @@ public class Ranged : Weapon
     {
         return 
             base.ToString() + "\n" +
-            $"Projectile Referency \"{projectile}\"\n" +
             $"Projectile spawn position [{projSpawnPosition.x},{projSpawnPosition.y}]\n";
+    }
+    /// <summary>
+    /// Ziska strelu
+    /// </summary>
+    public static GameObject Projectile(Damage.Type type)
+    {
+        string path= FileManager.PROJECTILES_OBJECTS_PATH;
+
+        switch (type)
+        {
+            case Damage.Type.BOW_SINLE: path+= "arrow";     break; 
+            case Damage.Type.BOW_MULTI: path+= "arrow 3";   break;
+            default: return null;
+        }
+
+        return Resources.Load<GameObject>(path);
     }
 }

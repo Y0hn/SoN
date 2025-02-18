@@ -94,6 +94,10 @@ public class PlayerController : EntityController
         {
             //Stats.TakeDamage();
         }
+        else if (Input.GetKeyDown(KeyCode.O))
+        {
+            //Stats.KilledEnemy();
+        }
 #endif
     }
     void Q1(InputAction.CallbackContext context) { Q(1); }

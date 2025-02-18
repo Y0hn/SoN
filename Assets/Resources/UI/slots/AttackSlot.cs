@@ -12,7 +12,7 @@ using System;
     public sbyte id;
     [field:SerializeField] protected Image background;
     [field:SerializeField] protected Image foreground;
-    [HideInInspector] public Attack.Type attackType;
+    [HideInInspector] public Damage.Type type;
     public bool active = false, show = false;
     public virtual void SetShow(bool show = false)
     {
@@ -46,13 +46,13 @@ using System;
     /// </summary>
     /// <param name="aType"></param>
     /// <param name="active"></param>
-    public void Set(Attack.Type aType, bool active = false)
+    public void Set(Damage.Type aType, bool active = false)
     {
         string aref = FileManager.GetAttackRefferency(aType);
         foreground.sprite = Resources.Load<Sprite>(aref);
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(OnButtonClick);
-        attackType = aType;
+        type = aType;
         SetActive(active);
         SetShow(true);
         //Debug.Log("Active attcak slot setted \naref= " + aref);
@@ -132,7 +132,7 @@ using System;
     /// </summary>
     /// <param name="aType"></param>
     /// <param name="id"></param>
-    public void Set(Attack.Type aType, sbyte id)
+    public void Set(Damage.Type aType, sbyte id)
     {
         aRef = FileManager.GetAttackRefferency(aType);
         foreground.sprite = Resources.Load<Sprite>(aRef);
@@ -140,7 +140,7 @@ using System;
             foreground.color = defaultC;
         /*else
             foreground.color = GameManager.instance.LocalPlayer.Color;*/
-        attackType = aType;
+        type = aType;
         this.id = id;
         SetShow(true);
 
