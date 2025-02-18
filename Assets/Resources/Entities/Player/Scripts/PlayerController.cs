@@ -71,7 +71,7 @@ public class PlayerController : EntityController
         {
             base.Update();
 
-            if (!attacking && wasAttacking)
+            if (!attacking && wasAttacking || attacking && !Application.isFocused)
                 AttackInterupt();
 
             moveDir = input_actions["move"].action.ReadValue<Vector2>();
@@ -151,6 +151,7 @@ public class PlayerController : EntityController
     /// </summary>
     protected virtual void AttackInterupt()
     {
+        attacking = false;
         wasAttacking = false;
         if (Stats.TryInteruptAttack())
         {

@@ -115,8 +115,7 @@ public class BosController : NPController
             dfTargeted = false;
         }
 
-        if (!(selfTarget || defaultTarget))
-            EnableCanvasRpc();
+        //EnableCanvasRpc(!(selfTarget || defaultTarget));
         FileManager.Log($"canvas set to {!(dfTargeted || selfTarget)}", FileLogType.RECORD);
         attacking = false;
     }
@@ -138,7 +137,7 @@ public class BosController : NPController
         Stats.Sensor = s;
         sensorB = s;
     }
-    [Rpc(SendTo.Everyone)] void EnableCanvasRpc()
+    [Rpc(SendTo.Everyone)] void EnableCanvasRpc(bool b)
     {
         canvas.SetActive(true);        
     }

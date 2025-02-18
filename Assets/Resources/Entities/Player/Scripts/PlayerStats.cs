@@ -470,7 +470,7 @@ public class PlayerStats : EntityStats
             
         equipment[(int)slot] = reference;    
         inventory.Remove(reference);
-        FileManager.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
+        //FileManager.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
     }
     /// <summary>
     /// Zbiera a equipuje zbrane
@@ -478,7 +478,8 @@ public class PlayerStats : EntityStats
     /// <param name="reference"></param>tile.Stop();
     [Rpc(SendTo.Server)] public virtual void PickedUpRpc(string reference)
     {
-        inventory.Add(reference);
+        if (reference != "")
+            inventory.Add(reference);
     }
     /// <summary>
     /// prida level hracovi

@@ -484,6 +484,8 @@ public class Inventory : MonoBehaviour
     public void Delete(string v)
     {
         Item item = Item.GetItem(v);
-        itemSlots.Find(i => i.Item == item).Item = null;
+        ItemSlot its = itemSlots.Find(i => i.Item == item);
+        if (its != null)
+            its.Item = null;
     }
 }

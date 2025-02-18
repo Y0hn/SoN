@@ -10,7 +10,7 @@ public class ItemDrop : NetworkBehaviour
     [SerializeField] CircleCollider2D colli;
     [SerializeField] private Item item;
     [SerializeField] bool tester = false;
-    private static List<World.ItemOnFoor> itemsOnFoor = new();     // iba na Servery
+    //private static List<World.ItemOnFoor> itemsOnFoor = new();     // iba na Servery
     private World.ItemOnFoor itFoor;
     /// <summary>
     /// Atribut nastavujuci spadnuty predmet <br />
@@ -49,16 +49,16 @@ public class ItemDrop : NetworkBehaviour
     {
         if (!IsServer || itFoor != null)  return;
         itFoor = new (transform.position, item.GetReferency);
-        itemsOnFoor.Add(itFoor);
+        //itemsOnFoor.Add(itFoor);
         name = name.Split('-')[0] + "-" + item.name;
     }
     /// <summary>
     /// Vykona sa pred zanikom objektu v sieti
     /// </summary>
     public override void OnNetworkDespawn()
-    {
+    {/*
         if (IsServer && itFoor != null)
-            itemsOnFoor.Remove(itFoor);       
+            itemsOnFoor.Remove(itFoor);       */
     }
 #pragma warning disable IDE0051 // Remove unused private members
     /// <summary>

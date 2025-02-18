@@ -167,12 +167,16 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 702104719103247102, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1139956155394810156, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: stats
       value: 
       objectReference: {fileID: 4624331282188720162}
+    - target: {fileID: 1495048454696510040, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2600596091621849960, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: step
       value: 
@@ -181,6 +185,10 @@ PrefabInstance:
       propertyPath: hpBar
       value: 
       objectReference: {fileID: 3107799953027872772}
+    - target: {fileID: 2600596091621849960, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
+      propertyPath: canvas
+      value: 
+      objectReference: {fileID: 8836067633308055617}
     - target: {fileID: 2600596091621849960, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: sensor
       value: 
@@ -219,19 +227,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4179672853324592778, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4179672853324592778, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4192468035751449072, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: m_PresetInfoIsWorld
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4392157942218727686, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4956322951046876544, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1749880267
+      value: 582546325
       objectReference: {fileID: 0}
     - target: {fileID: 5740010194347206202, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: m_Name
@@ -239,7 +251,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6358937128928461499, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6940803972882625263, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -313,3 +325,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b43434a3566578b459d965d713c80163, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &8836067633308055617 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 702104719103247102, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
+  m_PrefabInstance: {fileID: 8295177754402454207}
+  m_PrefabAsset: {fileID: 0}

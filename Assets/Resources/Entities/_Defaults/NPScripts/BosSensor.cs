@@ -131,7 +131,7 @@ public class BosSensor : MonoBehaviour
             target.GetComponent<EntityStats>().OnDeath += ResetTargeting;
 
         TargetInRange = inRange;
-        targetChange.Invoke(ClosestTarget);
+        targetChange?.Invoke(ClosestTarget);
     }
     /// <summary>
     /// Nastavuje vzdialenost snimania od stredu
