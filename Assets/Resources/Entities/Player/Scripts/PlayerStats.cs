@@ -51,13 +51,16 @@ public class PlayerStats : EntityStats
     [SerializeField] Transform canvas;
     [SerializeField] TMP_Text chatBox;
     [SerializeField] Camera cam;
-    //public RpcParams OwnerRPC { get { return RpcTarget.Single(OwnerClientId, RpcTargetUse.Temp); } }
+    
+    protected const uint NEEDED_XP_TO_NEXT_LEVEL = 100;
+    protected const float REGAIN_HP_ON_LEVEL_UP = 0.3f;
+
     protected float chatTimer; const float chatTime = 5.0f;
     protected XpSliderScript xpBar;       // UI nastavene len pre Ownera
     protected GameManager game;
     protected Inventory inventUI;
 
-    protected NetworkVariable<uint> xp = new(0);
+    public NetworkVariable<uint> xp = new(0);
     protected NetworkVariable<uint> xpMax = new(10, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
     protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
     protected NetworkList<FixedString64Bytes> equipment = new(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // je to list ale sprava sa ako Dictionary
@@ -107,6 +110,9 @@ public class PlayerStats : EntityStats
     }
     public override Attack Attack => IsServer && skillTree != null ? skillTree.ModAttack(base.Attack) : base.Attack;    
     public bool ImunityToCoruption => skillTree.hasImunityToCoruption;
+
+
+#region SetUp
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -128,66 +134,6 @@ public class PlayerStats : EntityStats
             chatTimer = 0;
         }
     }
-    /// <summary>
-    /// Server sa pokusi nacitat data o hracovi z ulozenia sveta <br />
-    /// Ak sa podari, zavola metodu pre nacitanie ziskanych udajov. <br />
-    /// Ak nie nastavi poziciu v okruhu miesta zrodenia.
-    /// </summary>
-    protected void ServerRequestData()
-    {
-        if (!IsServer) return;
-        
-        if (FileManager.World.TryGetPlayerSave(name, out var saved))
-            LoadSavedData(saved);
-        else 
-            // ak data o hracovi nenajde nastavi jeho poziciu v okruhu zaciatocneho bodu
-            MapScript.map.SpawnPlayer(transform);
-    }
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    protected override void LoadSavedData(World.EntitySave save)
-    {
-        var pSave = (World.PlayerSave)save;
-
-        // Nacitaj data do inventara
-        foreach (var item in pSave.inventory.items)
-            if (item != "")
-                inventory.Add(item);
-        foreach (var item in pSave.inventory.equiped)
-            if (item != "")
-                inventory.Add(item);
-
-
-        if (IsOwner)
-        {
-            game.LocalPlayer = this;
-            /*// Nacita data o pouzitych predmetoch
-            for (int i = 0; i < pSave.inventory.equiped.Length; i++)
-                if (pSave.inventory.equiped[i] != "")
-                {
-                    string path= pSave.inventory.equiped[i];
-                    Equipment eq = Resources.Load<Weapon>(path);
-                    game.inventory.Equip(eq);
-                }*/
-            game.SkillTree.LoadSkills(pSave);
-            game.inventory.ReloadAttacks();
-        }
-        if (IsServer) 
-        {
-            level.Value = pSave.level;
-            maxHp.Value = pSave.maxHp;
-            //speed.Value = pSave.speed;
-
-            // inhereted
-            hp.Value = Mathf.RoundToInt(save.hp * (float)pSave.maxHp);
-            transform.position = save.Position;
-        }
-                
-
-        FileManager.Log("Player Data loaded: " + pSave);
-    }
-
     /// <summary>
     /// Pri odpojeni hraca ulozi jeho data na server
     /// </summary>
@@ -218,7 +164,8 @@ public class PlayerStats : EntityStats
             hpBar = game.GetHpBar();
             xpBar = game.GetXpBar();
             xpBar.SliderValue = xp.Value;
-            xpBar.LevelUP(1, xpMax.Value);
+            xpBar.LevelUP(0);
+            xpBar.LevelUP(1);
             cam.gameObject.SetActive(true);
 
             // zursi si valstne povolenie na zivoty
@@ -242,25 +189,37 @@ public class PlayerStats : EntityStats
         onDeathWait = false;
         GetComponent<NetworkObject>().name = nameTag.text;        
     }
+#endregion
+#region ZmenyHodnot
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     protected override void SubsOnNetValChanged()
     {
         base.SubsOnNetValChanged();
+
+        // Len pre server
         if (IsServer)
         {
-            xpMax.OnValueChanged += (uint prev, uint newValue) => level.Value++;
-            xp.OnValueChanged += (uint prevValue, uint newValue) => 
+            xp.OnValueChanged += (old, now) => 
             {
-                if (xpMax.Value <= newValue)
-                {
-                    // prida potrebne exp do dalsieho levelu
-                    int add = /*(level.Value+1) * 10;*/ 100;
-                    xpMax.Value += (uint)(xpMax.Value + add);
-                }
+                if (xpMax.Value <= now)
+                    level.Value++;
+            };
+            level.OnValueChanged += (old, now) => 
+            {
+                // prida potrebne exp do dalsieho levelu
+                xpMax.Value += NEEDED_XP_TO_NEXT_LEVEL;
+
+                // prida zivoty
+                float addingHP = maxHp.Value * REGAIN_HP_ON_LEVEL_UP;
+                addingHP += hp.Value;
+                addingHP = Mathf.Clamp(addingHP, hp.Value, maxHp.Value);
+                hp.Value = Mathf.RoundToInt(addingHP);
             };
         }
+
+        // Pre vstkych
         playerName.OnValueChanged += (FixedString32Bytes prevValue, FixedString32Bytes newValue) => 
         { 
             nameTag.text = newValue.ToString(); 
@@ -279,39 +238,31 @@ public class PlayerStats : EntityStats
     {
         if (!IsOwner) return;
         base.OwnerSubsOnNetValChanged();
-        xp.OnValueChanged += (uint prevValue, uint newValue) => 
-        { 
-            xpBar.SliderValue = newValue; 
-            
-        };
-        hp.OnValueChanged += (int prev, int now) => 
+        xp.OnValueChanged += (old, now) => 
         {
-            if (now < prev)
+            xpBar.SliderValue = now;
+        };
+        hp.OnValueChanged += (old, now) => 
+        {
+            if (now < old)
                 game.AnimateFace("got-hit");
             game.AnimateFace(HP);
         };
-        inventory.OnListChanged += (NetworkListEvent<FixedString64Bytes> changeEvent) => 
+        inventory.OnListChanged += changeEvent =>
         {
             OnInventoryUpdate(changeEvent);
         };
-        IsAlive.OnValueChanged  += (bool perv, bool now) => 
+        IsAlive.OnValueChanged  += (old, now) => 
         {
             game.AnimateUI("isAlive", now);
             cam.gameObject.SetActive(now);
             game.SetPlayerUI(now);
         };
-        level.OnValueChanged += (byte prev, byte now) =>
+        level.OnValueChanged += (old, now) =>
         {
-            xpBar.LevelUP((byte)(now+1), xpMax.Value);
+            byte l = (byte)(now+1);
+            xpBar.LevelUP(l);
         };
-    }
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    protected override void Die()
-    {
-        OnDeath?.Invoke();
-        OnDeath = null;
     }
     /// <summary>
     /// Volane lokalne pre klienta ak sa zmeni inventar
@@ -332,6 +283,16 @@ public class PlayerStats : EntityStats
                 default:
                     break;
             }
+    }
+#endregion
+#region Udalosti
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    protected override void Die()
+    {
+        OnDeath?.Invoke();
+        OnDeath = null;
     }
     /// <summary>
     /// zmena utkou podla ID rychlej volby utku
@@ -402,14 +363,79 @@ public class PlayerStats : EntityStats
 
         return canStop;
     }
+#endregion
+#region LoadSavedData
+    /// <summary>
+    /// Server sa pokusi nacitat data o hracovi z ulozenia sveta <br />
+    /// Ak sa podari, zavola metodu pre nacitanie ziskanych udajov. <br />
+    /// Ak nie nastavi poziciu v okruhu miesta zrodenia.
+    /// </summary>
+    protected void ServerRequestData()
+    {
+        if (!IsServer) return;
+        
+        if (FileManager.World.TryGetPlayerSave(name, out var saved))
+            LoadSavedData(saved);
+        else 
+            // ak data o hracovi nenajde nastavi jeho poziciu v okruhu zaciatocneho bodu
+            MapScript.map.SpawnPlayer(transform);
+    }
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    protected override void LoadSavedData(World.EntitySave save)
+    {
+        var pSave = (World.PlayerSave)save;
 
-    /*   _____  _____   _____     
-     *  |  __ \|  __ \ / ____|    
-     *  | |__) | |__) | |     ___ 
-     *  |  _  /|  ___/| |    / __|
-     *  | | \ \| |    | |____\__ \
-     *  |_|  \_\_|     \_____|___/
-     *  *  *  *  *  *  *  *  *  *  */
+        // Nacitaj data do inventara
+        foreach (var item in pSave.inventory.items)
+            if (item != "")
+                inventory.Add(item);
+        foreach (var item in pSave.inventory.equiped)
+            if (item != "")
+                inventory.Add(item);
+
+
+        if (IsOwner)
+        {
+            game.LocalPlayer = this;
+
+
+            xpBar.Load(pSave.xp, pSave.level);
+            game.SkillTree.LoadSkills(pSave);
+            game.inventory.ReloadAttacks();
+        }
+        if (IsServer) 
+        {
+            level.Value = pSave.level;
+            xp.Value = pSave.xp;
+            //maxHp.Value = pSave.level*100+50;
+            //speed.Value = pSave.speed;
+
+            // inhereted
+            hp.Value = Mathf.RoundToInt(save.hp * (float)pSave.maxHp);
+            transform.position = save.Position;
+        }
+                
+
+        FileManager.Log("Player Data loaded: " + pSave);
+    }
+    /// <summary>
+    /// Zbiera a equipuje zbrane <br />
+    /// Volane len zo servera z vypadnuteho itemu pre navratovu hodnotu
+    /// </summary>
+    /// <param name="reference"></param>tile.Stop();
+    public virtual bool PickedUp(string reference)
+    {
+        bool free = reference != "" && !inventory.Contains(reference) && !equipment.Contains(reference);
+
+        if (free)
+            inventory.Add(reference);
+
+        return free;
+    }
+#endregion
+#region RPCs
     /// <summary>
     /// Prida schopnost do stromu schopnosti <br />
     /// Dvolezite rozdelenie kvoli prenosu cez RPC -cka
@@ -474,20 +500,6 @@ public class PlayerStats : EntityStats
         //FileManager.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
     }
     /// <summary>
-    /// Zbiera a equipuje zbrane <br />
-    /// Neralne RPC volane len zo servera pre navratovu hodnotu
-    /// </summary>
-    /// <param name="reference"></param>tile.Stop();
-    public virtual bool PickedUpRpc(string reference)
-    {
-        bool free = reference != "" && !inventory.Contains(reference) && !equipment.Contains(reference);
-
-        if (free)
-            inventory.Add(reference);
-
-        return free;
-    }
-    /// <summary>
     /// prida level hracovi
     /// </summary>
     [Rpc(SendTo.Server)] public void AddLvlRpc()
@@ -512,4 +524,5 @@ public class PlayerStats : EntityStats
         inventory.Remove(i);
         DropRpc(i, new (2,2), new (1,1));
     }
+#endregion
 }

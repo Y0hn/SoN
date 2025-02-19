@@ -36,12 +36,11 @@ public abstract class EntityStats : NetworkBehaviour
     protected   NetworkVariable<WeaponIndex> weapE = new(new(0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected NetworkVariable<bool> onPath = new(false);
 
-#pragma warning disable IDE0004
+#region Ukazovace
     /// <summary>
     /// Vrati pomer hp/maxHp
     /// </summary>
     public float HP                     => (float)hp.Value/(float)maxHp.Value;
-#pragma warning restore IDE0004
     public virtual Quaternion Rotation  => transform.rotation;
     public WeaponIndex WeaponPrameter   => weapE.Value; 
     protected virtual Weapon[] Weapons  => rase.weapons;
@@ -78,14 +77,20 @@ public abstract class EntityStats : NetworkBehaviour
     protected Defence defence;  // iba na servery/hoste
     protected float timeToDespawn = 0f;
     protected bool onDeathWait;
+    /// <summary>
+    /// Zisti utok z dostupnych zbrani podla 
+    /// </summary>
+    /// <param name="wIndex">Index zbrane</param>
+    /// <returns>UTOK zo zbrane</returns>
+    protected virtual Attack GetAttackByWeaponIndex(WeaponIndex wIndex) => Weapons[wIndex.eIndex].attack[wIndex.aIndex];
     
 
     public const float 
         RANGED_ANIMATION_DUR = 1.5f, 
         MELEE_ANIMATION_DUR  = 1,
         TIME_TO_DESPAWN      = 5;
-
-
+#endregion
+#region SetUp
     /// <summary>
     /// Zavolane pri vzniku objektu v sieti
     /// </summary>
@@ -109,6 +114,47 @@ public abstract class EntityStats : NetworkBehaviour
         base.OnNetworkDespawn();
         //FileManager.Log($"{name} despawned");
     }
+	/// <summary>
+	/// Nataví zakladné vlastnosti entity
+	/// </summary>
+    protected virtual void EntitySetUp()
+    {
+        name = name.Split('(')[0].Trim();
+        if (IsServer)
+        {
+            // Nastavenie zivotov
+            maxHp.Value = rase.maxHp;
+            hp.Value = maxHp.Value;
+
+            // Nastavenie zaciatocneho levelu
+            level.Value = rase.level;
+
+            // Nastavenie rychlosti chodze
+            speed.Value = rase.speed;
+            Animator.SetFloat("wSpeed", rase.speed/(100f*transform.localScale.x));
+            
+            // Nastavenie obrany
+            Defence = new(rase.resists);
+            IsAlive.Value = true;
+
+            // Nastavenie zakladneho utoku
+            weapE.Value = new (0);
+            Animator.SetFloat("weapon", (float)Weapons[0].attack[0].damage.type);
+
+            // Oneskorenie zmiznutia po smrti
+            onDeathWait = true;
+        }
+    }
+    /// <summary>
+    /// Spúšta sa kazdy frame a stará sa o despawn po smrti
+    /// </summary>
+    protected virtual void Update()
+    {
+        if (IsServer && timeToDespawn != 0 && timeToDespawn < Time.time)
+            netObject.Despawn();
+    }
+#endregion
+#region NetValueSubscribe
     /// <summary>
     /// Zabezpecuje spravne nastavenie a chod 
     /// </summary>
@@ -207,45 +253,8 @@ public abstract class EntityStats : NetworkBehaviour
             Animator.SetBool("isAlive", now);
         };
     }
-	/// <summary>
-	/// Nataví zakladné vlastnosti entity
-	/// </summary>
-    protected virtual void EntitySetUp()
-    {
-        name = name.Split('(')[0].Trim();
-        if (IsServer)
-        {
-            // Nastavenie zivotov
-            maxHp.Value = rase.maxHp;
-            hp.Value = maxHp.Value;
-
-            // Nastavenie zaciatocneho levelu
-            level.Value = rase.level;
-
-            // Nastavenie rychlosti chodze
-            speed.Value = rase.speed;
-            Animator.SetFloat("wSpeed", rase.speed/(100f*transform.localScale.x));
-            
-            // Nastavenie obrany
-            Defence = new(rase.resists);
-            IsAlive.Value = true;
-
-            // Nastavenie zakladneho utoku
-            weapE.Value = new (0);
-            Animator.SetFloat("weapon", (float)Weapons[0].attack[0].damage.type);
-
-            // Oneskorenie zmiznutia po smrti
-            onDeathWait = true;
-        }
-    }
-    /// <summary>
-    /// Spúšta sa kazdy frame a stará sa o despawn po smrti
-    /// </summary>
-    protected virtual void Update()
-    {
-        if (IsServer && timeToDespawn != 0 && timeToDespawn < Time.time)
-            netObject.Despawn();
-    }
+#endregion
+#region Events
     /// <summary>
     /// Spúšta sa po každej zmene životov, 
     /// </summary>
@@ -324,6 +333,8 @@ public abstract class EntityStats : NetworkBehaviour
     {
         SetWeaponIndex(WeI.aIndex, WeI.eIndex);
     }
+#endregion
+#region LoadSavedData
     /// <summary>
     /// Vyziada si uložené dáta 
     /// </summary>
@@ -333,23 +344,8 @@ public abstract class EntityStats : NetworkBehaviour
         transform.position = save.Position;
         SetWeaponIndex(save.weapon);
     }
-    /// <summary>
-    /// Zisti utok z dostupnych zbrani podla 
-    /// </summary>
-    /// <param name="wIndex">Index zbrane</param>
-    /// <returns>UTOK zo zbrane</returns>
-    protected virtual Attack GetAttackByWeaponIndex(WeaponIndex wIndex)
-    {
-        /*string debug = $"GetAttackByWeaponIndex({wIndex})\nReturning:";
-        try {
-            debug += $"\nFrom Weapons: {Weapons.Length}";
-            debug += $"\nFrom Attacks: {Weapons[wIndex.eIndex].attack.Count}";
-        } finally {
-            if (false && this is PlayerStats)
-                Debug.Log(debug);
-        }*/
-        return Weapons[wIndex.eIndex].attack[wIndex.aIndex];
-    }
+#endregion
+#region Sounds
     /// <summary>
     /// Zahra zvuk len na jednom positaci
     /// </summary>
@@ -369,14 +365,8 @@ public abstract class EntityStats : NetworkBehaviour
         // Prehra ho zvuk
         rase.sounds[soundType + i].Play(ref audioSource);
     }
-    
-    /*   _____  _____   _____     
-     *  |  __ \|  __ \ / ____|    
-     *  | |__) | |__) | |     ___ 
-     *  |  _  /|  ___/| |    / __|
-     *  | | \ \| |    | |____\__ \
-     *  |_|  \_\_|     \_____|___/
-     *  *  *  *  *  *  *  *  *  *  */
+#endregion
+#region RPCs
     /// <summary>
     /// Vyhodi item, tak ze vytvori objekt na nahodnych suradniciach v dosahu
     /// a prida mu ho aku atribut
@@ -443,7 +433,7 @@ public abstract class EntityStats : NetworkBehaviour
         AudioClip ac = Resources.Load<AudioClip>(clipPath);
         audioSource.PlayOneShot(ac, vol);
     }
-
+#endregion
     /// <summary>
     /// Urcuje skupinu pre cielenie a ublizovanie si navzajom ;)
     /// (skupiny sa navzajom nemaju radi a None je  neutralna)

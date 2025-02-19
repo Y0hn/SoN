@@ -1,6 +1,6 @@
 using UnityEngine;
 /// <summary>
-/// Set if player is able to be respawned
+/// Povoluje lokalne hracovi ozivenie sa
 /// </summary>
 public class AbleToRespawn : MonoBehaviour
 {

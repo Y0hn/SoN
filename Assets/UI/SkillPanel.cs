@@ -8,7 +8,6 @@ using System.Collections.Generic;
 public class SkillPanel : MonoBehaviour
 {
     public event Action<bool> OnChangeAvailablePoints;
-    public bool AvailablePoints => 0 < freePointCouter;
     [SerializeField] TMP_Text skillCounterText;
     [SerializeField] Transform skills;
     [SerializeField] HoldButton button;
@@ -20,7 +19,13 @@ public class SkillPanel : MonoBehaviour
     Vector2[] limits = new Vector2[2];
     Vector2 startMouse;
     Dictionary<string, SkillSlot> skillSlots = new();
-    byte usedPointsCounter = 0, freePointCouter = 0;
+    byte 
+        usedPoints = 0, 
+        totalPoints = 0;
+
+    public bool AvailablePoints => 0 < Points;
+    private int Points => totalPoints > usedPoints ? totalPoints - usedPoints : 0; 
+
     bool awoken = false;
     /// <summary>
     /// Nastavi pociatocne hodnoty pre pocitadla <br />
@@ -30,17 +35,18 @@ public class SkillPanel : MonoBehaviour
     {
         if (awoken) return;
 
-        freePointCouter = 0; 
-        usedPointsCounter = 0;
         button.onEnterHold += delegate { startMouse = game.MousePos; };
         CalculateLimits();
         foreach (var skS in transform.GetComponentsInChildren<SkillSlot>())
             skillSlots.Add(skS.name, skS);
-        skillCounterText.text = freePointCouter.ToString();
+        skillCounterText.text = Points.ToString();
 
         awoken = true;
-        //OnChangeAvailablePoints += (bool change) => { Debug.Log($"OnChangeAvailablePoints.Invoked({change})"); };
     }
+    /// <summary>
+    /// Znova prepocita limity
+    /// </summary>
+    void OnEnable() => CalculateLimits();
     /// <summary>
     /// Animovanie tahania stromu schopnosti
     /// </summary>
@@ -73,8 +79,8 @@ public class SkillPanel : MonoBehaviour
     /// <param name="level"></param>
     public void LevelUP (byte level)
     {
-        freePointCouter = (byte)(level - usedPointsCounter);
-        skillCounterText.text = freePointCouter.ToString();
+        totalPoints = level;
+        skillCounterText.text = Points.ToString();
         OnChangeAvailablePoints?.Invoke(AvailablePoints);
     }
     /// <summary>
@@ -84,9 +90,8 @@ public class SkillPanel : MonoBehaviour
     {
         if (AvailablePoints)
         {
-            usedPointsCounter++;
-            freePointCouter--;
-            skillCounterText.text = freePointCouter.ToString();
+            usedPoints++;
+            skillCounterText.text = Points.ToString();
             OnChangeAvailablePoints?.Invoke(AvailablePoints);
         }
     }
@@ -116,7 +121,7 @@ public class SkillPanel : MonoBehaviour
     public void LoadSkills(World.PlayerSave player)
     {
         FileManager.Log($"Skills loaded {player.etName} count={player.skillTree.skills.Length} level={player.level}",FileLogType.RECORD);
-        freePointCouter = player.level;
+        totalPoints = player.level;
         List<string> skills= new();
 
         foreach (Skill skill in player.skillTree.skills)
@@ -140,5 +145,14 @@ public class SkillPanel : MonoBehaviour
             skillSlots[skillName].BuySkill();
         else
             FileManager.Log($"Load Skill failed {skillName}, count= {skillSlots.Count}", FileLogType.ERROR);
+    }
+    /// <summary>
+    /// Resetuje cely strom schopnosti
+    /// </summary>
+    public void Clear()
+    {
+        SkillSlot[] sSlots = GetComponentsInChildren<SkillSlot>();
+        foreach (SkillSlot s in sSlots)
+            s.Restart();
     }
 }

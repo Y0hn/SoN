@@ -65,23 +65,39 @@ public class SkillSlot : MonoBehaviour
                 return false;
         }
     }
+    /// <summary>
+    /// Nastavi zaciatocne vlastnosti
+    /// </summary>
     void Start()
     {
         if (started) return;
         started = true;
-
+        
         skillCreator.name = name;
         defaultColors = new Color[4];
         button.onClick.AddListener(ActivateSkill);
         ResetGrafic();
-        SetGraficColor(pallete["unavailableIc"], pallete["unavailableBG"], pallete["unavailableIc"]);
-        SetInteractable(false);
+        StartSlot();
         game = GameManager.instance;
         game.SkillTree.OnChangeAvailablePoints += PurchableSkill;
-
+    }
+    void StartSlot()
+    {
+        isPurchased = false;
+        value.enabled = !skillCreator.IsUtility;
+        moddifier.enabled = true;
+        SetGraficColor(pallete["unavailableIc"], pallete["unavailableBG"], pallete["unavailableIc"]);
+        SetInteractable(false);
     }
     /// <summary>
-    /// Nastavi grafiku do vychodiskovej podoby
+    /// Znova nastavi pociatocne hodnoty
+    /// </summary>
+    public void Restart()
+    {
+        StartSlot();
+    }
+    /// <summary>
+    /// Nastavi grafiku vychodiskovej podoby
     /// </summary>
     void ResetGrafic()
     {
@@ -140,7 +156,6 @@ public class SkillSlot : MonoBehaviour
         amountT.text = interactable ? skillCreator.Amount : "";
         button.interactable = interactable;
         background.raycastTarget = interactable;
-        background.raycastTarget = interactable;
     }
     /// <summary>
     /// Sluzi ako skrateny zapis <br />
@@ -180,6 +195,8 @@ public class SkillSlot : MonoBehaviour
         [SerializeField] bool isAttack;
         [SerializeField] bool speed;
         [SerializeField] float amount;
+
+        public bool IsUtility => function != Utility.Function.None;
 
         /// <summary>
         /// Vytvori nanovo celeho tvrocu schopnosti

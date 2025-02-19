@@ -25,8 +25,8 @@ public class XpSliderScript : MonoBehaviour
         } 
     }
     float sliderValue;
-    Queue<byte> levelUPs = new();
-    Queue<float> maxValueQ = new();
+    Queue<byte> levelUPs;
+    Queue<float> maxValueQ;
     bool valueChangedUP = false, valueChangedDOWN = false;
     /// <summary>
     /// Zisti ci je dostupna dalsia uroven
@@ -36,19 +36,44 @@ public class XpSliderScript : MonoBehaviour
     /// Sluzi pre rovnomerne posuvanie hodnoty posuvnika bez ohladu na velkost
     /// </summary>
     /// <returns></returns>
-    float Update => (maxValueQ.Peek() - slider.minValue) / 150f ;
-#pragma warning disable IDE0051 // Remove unused private members
-    
+    float Update => (maxValueQ.Peek() - slider.minValue) / 150f;
+
+    bool awoken = false;
+
     /// <summary>
     /// Volane pri spusteni
     /// </summary>
-    void Start()
+    void Awake()
     {
+        levelUPs = new();
+        maxValueQ = new();
         sliderValue = 0f;
         slider.minValue = 0f;
         valueChangedUP= false;
         valueChangedDOWN= false;
         slider.value = sliderValue;
+
+        awoken = true;
+    }
+    public void Load(uint xp, byte level)
+    {
+        Awake();
+        
+        // Zaciatok je koncom predchadzjucej urovne
+        // Prva uroven potrebuje len 50 xp
+        int minimalXP = 1 <= level ? 50 : 0;
+
+        // A pre kazdy ziskany level sa prida 100 xp
+        if (0 < level)
+            minimalXP += (level-1)*100; 
+        
+        slider.minValue = minimalXP;
+        sliderValue = xp;
+        slider.value = sliderValue;
+
+        // Zada 2 levely do slidera
+        for (int i = 0; i < 2; i++, level++)
+            LevelUP(level);
     }
     /// <summary>
     /// Volany v rovnakych intervaloch
@@ -58,11 +83,6 @@ public class XpSliderScript : MonoBehaviour
         // Zacne menit hodnotu posuvnika k novej urovni
         if      (valueChangedUP)
         {
-            if  (slider.value < SliderValue)
-                slider.value += Update;
-            else
-                valueChangedUP = false;
-
             // ak je pridana uz nova uroven a posuvnik ju dosiahol zmeni rozsahy posuvnika
             if (QueuedLevelUP && maxValueQ.Peek() <= slider.value)
             {
@@ -70,6 +90,11 @@ public class XpSliderScript : MonoBehaviour
                 slider.maxValue = maxValueQ.Peek();
                 game.LevelUP(levelUPs.Dequeue());
             }
+
+            if  (slider.value < SliderValue)
+                slider.value += Update;
+            else
+                valueChangedUP = false;
         }   
         else if (valueChangedDOWN)
         {
@@ -78,23 +103,27 @@ public class XpSliderScript : MonoBehaviour
             else
                 valueChangedDOWN = false;
         }
-        //Debug.Log($"Update \nUP[{valueChangedUP}] \nDOWN[{valueChangedDOWN}] \nmaxValueQ[{maxValueQ.Count}]\nSlider [{SliderValue}] <{slider.minValue}, {slider.maxValue}>");
+        //FileManager.Log($"Update \nUP[{valueChangedUP}] \nDOWN[{valueChangedDOWN}] \nmaxValueQ[{maxValueQ.Count}]\nSlider [{SliderValue}] <{slider.minValue}, {slider.maxValue}>");
     }
     /// <summary>
     /// Prida novu uroven za predchazajucu
     /// </summary>
     /// <param name="level"></param>
     /// <param name="nMax"></param>
-    public void LevelUP(byte level, float nMax)
+    public void LevelUP(byte level)
     {
-        if (maxValueQ.Count < 1)
-            slider.maxValue = nMax;
+        if (!awoken)
+            Awake();
 
-        maxValueQ.Enqueue(nMax);
-        level++;
+        // Koniec je o uroven vyssie ako aktualny level
+        // Cize level x 100 a 1. level ma hodnotu 50
+        int maxXP = level*100 + 50; 
+        if (maxValueQ.Count < 1)
+            slider.maxValue = maxXP;
+
+        maxValueQ.Enqueue(maxXP);
         levelUPs.Enqueue(level);
 
-        //Debug.Log("Level UP queued to " + level);
+        FileManager.Log("Level UP queued to " + level, FileLogType.RECORD);
     }
-#pragma warning restore IDE0051 // Remove unused private members
 }

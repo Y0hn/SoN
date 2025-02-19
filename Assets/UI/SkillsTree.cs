@@ -133,7 +133,7 @@ public class SkillTree
 
         // Zmeni utkoku rychlost
         if (offRate.ContainsKey(dt))
-            baseAttack.rate *= offRate[dt];
+            baseAttack.rate *= Mathf.Abs(offRate[dt]);
 
         return baseAttack;
     }

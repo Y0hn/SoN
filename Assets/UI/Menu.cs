@@ -259,7 +259,7 @@ public class Menu : MonoBehaviour
     /// <summary>
     /// Odide z vnorenej navigacie alebo zavire hru
     /// </summary>
-    void Exit()
+    public void Exit()
     {
         if (1 < currentLayer.Count)
         {

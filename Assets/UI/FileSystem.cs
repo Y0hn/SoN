@@ -676,6 +676,7 @@ public enum GameType { Online, Local, Solo }
     {
         public InventorySave inventory;
         public SkillTreeSave skillTree;
+        public uint xp;
         public int maxHp;
         public byte level;
         public PlayerSave(PlayerStats player) : base(player)
@@ -683,8 +684,8 @@ public enum GameType { Online, Local, Solo }
             inventory = player.InventorySave;
             skillTree = player.SkillTreeSave;
             level = player.level.Value;
-            //speed = player.speed.Value;
             maxHp = player.MaxHP;
+            xp = player.xp.Value;
         }
         /// <summary>
         /// Zrdi informacie o inventari hraca

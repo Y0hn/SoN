@@ -75,7 +75,8 @@ public class NPStats : EntityStats
         }
     }
     public bool AboutToFire { get; set; }
-    
+
+#region SetUp
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -126,6 +127,8 @@ public class NPStats : EntityStats
     {
         base.Update();
     }
+#endregion
+#region ZmenyHodnot
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -154,6 +157,8 @@ public class NPStats : EntityStats
             }
         OnHit.Invoke();
     }
+#endregion
+#region Udalosti
     /// <summary>
     /// <inheritdoc/> <br />
     /// Ma 2-3 alebo 4-5 sancu ze vyhodi nahodny item
@@ -211,6 +216,8 @@ public class NPStats : EntityStats
     {
         
     }
+#endregion
+#region NacitanieZoSuboru
     public virtual void Load(World.EntitySave save)
     {
         LoadSavedData(save);        
@@ -276,7 +283,8 @@ public class NPStats : EntityStats
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members
-
+#endregion
+#region RPCs
 
     /// <summary>
     /// <inheritdoc/>
@@ -288,4 +296,5 @@ public class NPStats : EntityStats
             if (et.IsAlive.Value && et.TakeDamage(Attack.damage))    // pravdive ak target zomrie
                 KilledEnemy(et);
     }
+#endregion
 }

@@ -115,26 +115,36 @@ public class GameManager : MonoBehaviour
     /// <param name="context"></param>
     void OC_Pause(InputAction.CallbackContext context)
     {
-        if (PlayerAble)     // ak sa hrac moze pohybovat
+        // ak je menu este otvorene
+        if (menu.gameObject.activeSelf)
+        {
+            menu.Exit();
+        }
+        // ak sa hrac moze pohybovat
+        else if (PlayerAble)     
         {
             paused = !paused;
             uiPanels["pauseUI"].SetActive(paused);
         }
-        else if (chatting)  // ak ma hrac otvoreny cet
+        // ak ma hrac otvoreny cet
+        else if (chatting)  
         {
             chatting = false;
             uiPanels["chatUI"].SetActive(chatting);
         }
-        else if (inventory.open)    // ak je otvoreny inventar
+        // ak je otvoreny inventar
+        else if (inventory.open)    
         {
             inventory.OC_Inventory();
         }
-        else if (player.IsAlive.Value && paused)    // ak hrac zije a hra je pozastavena
+        // ak hrac zije a hra je pozastavena
+        else if (player.IsAlive.Value && paused)    
         {
             paused = !paused;
             uiPanels["pauseUI"].SetActive(paused);
         }
-        else    // inak (hrac je mrtvy) 
+        // inak (hrac je mrtvy) 
+        else    
             player.ReviveRpc();
     }
     /// <summary>
@@ -143,7 +153,7 @@ public class GameManager : MonoBehaviour
     /// <param name="context"></param>
     void OpenChat(InputAction.CallbackContext context)
     {
-        if (PlayerAble)
+        if (!menu.gameObject.activeSelf && PlayerAble)
         {
             chatting = true;
             uiPanels["chatUI"].SetActive(chatting);
@@ -157,7 +167,7 @@ public class GameManager : MonoBehaviour
     /// <param name="context"></param>
     void SendMess(InputAction.CallbackContext context)
     {
-        if (chatting && player != null)
+        if (!menu.gameObject.activeSelf && chatting && player != null)
         {
             chatting = false;
             uiPanels["chatUI"].SetActive(chatting);
@@ -219,6 +229,7 @@ public class GameManager : MonoBehaviour
 
         themeAudio.Stop();
         inventory.Clear();
+        skillTree.Clear();
         Menu.menu.gameObject.SetActive(true);
         conn.Quit(player.OwnerClientId);
     }
