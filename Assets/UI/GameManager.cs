@@ -12,7 +12,8 @@ using TMPro;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance;  
+    public static GameManager instance;
+    public static Action GameQuit;
     [SerializeField] SkillPanel skillTree;
     [SerializeField] CopyField copy;
     [SerializeField] Button quit;
@@ -227,10 +228,9 @@ public class GameManager : MonoBehaviour
         if (IsServer)
             NPStats.npcDied -= EnemySpawner;
 
+        GameQuit.Invoke();
+
         themeAudio.Stop();
-        inventory.Clear();
-        skillTree.Clear();
-        Menu.menu.gameObject.SetActive(true);
         conn.Quit(player.OwnerClientId);
     }
     /// <summary>
@@ -292,10 +292,9 @@ public class GameManager : MonoBehaviour
     /// Po ziskani dalsej urovne
     /// </summary>
     /// <param name="level"></param>
-    public void LevelUP(byte level)
+    public void LevelUP()
     {
-        skillTree.LevelUP(level);
-        //Debug.Log("Player leveled UP to " + level);
+        skillTree.LevelUP(LocalPlayer.Level);
     }
     /// <summary>
     /// Prida odomknutu schopnost

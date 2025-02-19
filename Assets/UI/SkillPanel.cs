@@ -41,6 +41,8 @@ public class SkillPanel : MonoBehaviour
             skillSlots.Add(skS.name, skS);
         skillCounterText.text = Points.ToString();
 
+        GameManager.GameQuit += Clear;
+
         awoken = true;
     }
     /// <summary>
@@ -125,13 +127,7 @@ public class SkillPanel : MonoBehaviour
         List<string> skills= new();
 
         foreach (Skill skill in player.skillTree.skills)
-            skills.Add(skill.name);
-
-        SkillSlot[] sSlots = GetComponentsInChildren<SkillSlot>();
-
-        foreach (SkillSlot s in sSlots)
-            if (skills.Contains(s.name))
-                s.ActivateSkill();
+            skillSlots[skill.name].ActivateSkill();
 
         OnChangeAvailablePoints?.Invoke(AvailablePoints);
     }
@@ -151,8 +147,7 @@ public class SkillPanel : MonoBehaviour
     /// </summary>
     public void Clear()
     {
-        SkillSlot[] sSlots = GetComponentsInChildren<SkillSlot>();
-        foreach (SkillSlot s in sSlots)
-            s.Restart();
+        foreach (var s in skillSlots)
+            s.Value.Restart();
     }
 }

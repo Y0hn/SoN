@@ -106,6 +106,7 @@ public class Inventory : MonoBehaviour
         if (instance == null) 
             instance = this;
         Sizing();
+        GameManager.GameQuit += Clear;
     }
     /// <summary>
     /// Nastavi predvolene hodnoty pre rychle moznosti utoku 

@@ -28,11 +28,11 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected EntityController controller;
     [SerializeField] protected AudioSource audioSource;
 
+    [HideInInspector] public NetworkVariable<float> speed = new(100);
+    [HideInInspector] public NetworkVariable<bool> IsAlive = new(true);
     protected   NetworkVariable<int> maxHp = new(100);    
     protected   NetworkVariable<int> hp = new(100);
-    [HideInInspector] public NetworkVariable<float> speed = new(100);
-    [HideInInspector] public NetworkVariable<byte> level = new(1);
-    [HideInInspector] public NetworkVariable<bool> IsAlive = new(true);
+    protected NetworkVariable<byte> level = new(1);    
     protected   NetworkVariable<WeaponIndex> weapE = new(new(0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected NetworkVariable<bool> onPath = new(false);
 
@@ -56,6 +56,7 @@ public abstract class EntityStats : NetworkBehaviour
     public Color Color                  => color.Color;
     public float ViewAngle              => Mathf.Atan2(View.x, View.y);
     public bool AttackBoth              => Attack.bothHanded;
+    public byte Level                    => level.Value;
     public virtual Defence Defence      
     { 
         get 

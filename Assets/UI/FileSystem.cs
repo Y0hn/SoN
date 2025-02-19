@@ -360,6 +360,8 @@ public static class FileManager
         // Zapise aktualny cas
         string log = $"[{DateTime.Now}] ";
         bool writeToFile = type != FileLogType.LOG;
+        log += type == FileLogType.ERROR || FileLogType.WARNING == type ? $"[{Enum.GetName(typeof(FileLogType), type)}]" : "";
+
         log += message;
 
         // Zapise spravu do suboru
@@ -375,7 +377,7 @@ public static class FileManager
         // Vypise spravu do konzoly v editore
         switch (type)
         {
-            default:                    Debug.Log(log);         break;
+            default:                    Debug.Log(log+" [RECORDED]");         break;
             case FileLogType.ERROR:     Debug.LogError(log);    break;
             case FileLogType.WARNING:   Debug.LogWarning(log);  break;
         }
@@ -683,9 +685,9 @@ public enum GameType { Online, Local, Solo }
         {
             inventory = player.InventorySave;
             skillTree = player.SkillTreeSave;
-            level = player.level.Value;
+            level = player.Level;
             maxHp = player.MaxHP;
-            xp = player.xp.Value;
+            xp = player.xp.Value.value;
         }
         /// <summary>
         /// Zrdi informacie o inventari hraca

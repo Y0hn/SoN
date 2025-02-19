@@ -868,8 +868,6 @@ MonoBehaviour:
   audioSource: {fileID: 6406576833458742231}
   speed:
     m_InternalValue: 100
-  level:
-    m_InternalValue: 1
   IsAlive:
     m_InternalValue: 1
   chatField: {fileID: 1004502855553851851}
@@ -877,7 +875,11 @@ MonoBehaviour:
   chatBox: {fileID: 2943676829075204467}
   cam: {fileID: 3585855840883575629}
   xp:
-    m_InternalValue: 0
+    m_InternalValue:
+      minValue: 0
+      value: 0
+      maxValue: 50
+      gainedLevel: 0
   message:
     m_InternalValue:
       utf8LengthInBytes: 0

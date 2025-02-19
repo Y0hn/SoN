@@ -138,6 +138,7 @@ public class Menu : MonoBehaviour
     /// </summary>
     void Awake()
     {   
+        GameManager.GameQuit += delegate { gameObject.SetActive(true); };
         SubscribeToButtons();
         ResetTextFields();
         menu = this;

@@ -52,7 +52,7 @@ public class PlayerStats : EntityStats
     [SerializeField] TMP_Text chatBox;
     [SerializeField] Camera cam;
     
-    protected const uint NEEDED_XP_TO_NEXT_LEVEL = 100;
+    public const uint NEEDED_XP_TO_NEXT_LEVEL = 100;
     protected const float REGAIN_HP_ON_LEVEL_UP = 0.3f;
 
     protected float chatTimer; const float chatTime = 5.0f;
@@ -60,8 +60,7 @@ public class PlayerStats : EntityStats
     protected GameManager game;
     protected Inventory inventUI;
 
-    public NetworkVariable<uint> xp = new(0);
-    protected NetworkVariable<uint> xpMax = new(10, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Server);
+    public NetworkVariable<Experience> xp = new(new (0,0,50));
     protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
     protected NetworkList<FixedString64Bytes> equipment = new(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // je to list ale sprava sa ako Dictionary
     protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -153,7 +152,7 @@ public class PlayerStats : EntityStats
         if (IsServer)
         {
             skillTree = new(this);
-            xpMax.Value = 50;
+            xp.Value = new(0,0,50);
             level.Value = 0;
         }
         if (IsOwner)
@@ -163,9 +162,6 @@ public class PlayerStats : EntityStats
             hpBar.gameObject.SetActive(false);
             hpBar = game.GetHpBar();
             xpBar = game.GetXpBar();
-            xpBar.SliderValue = xp.Value;
-            xpBar.LevelUP(0);
-            xpBar.LevelUP(1);
             cam.gameObject.SetActive(true);
 
             // zursi si valstne povolenie na zivoty
@@ -203,30 +199,33 @@ public class PlayerStats : EntityStats
         {
             xp.OnValueChanged += (old, now) => 
             {
-                if (xpMax.Value <= now)
-                    level.Value++;
+                if (now.LevelUP)
+                {
+                    level.Value+= now.gainedLevel;
+                }
             };
             level.OnValueChanged += (old, now) => 
             {
-                // prida potrebne exp do dalsieho levelu
-                xpMax.Value += NEEDED_XP_TO_NEXT_LEVEL;
-
-                // prida zivoty
-                float addingHP = maxHp.Value * REGAIN_HP_ON_LEVEL_UP;
-                addingHP += hp.Value;
-                addingHP = Mathf.Clamp(addingHP, hp.Value, maxHp.Value);
-                hp.Value = Mathf.RoundToInt(addingHP);
+                // pre pripad viacnasobneho levelupu
+                for (int i = old; i < now; i++)
+                {
+                    // pripocita zivoty
+                    float addingHP = maxHp.Value * REGAIN_HP_ON_LEVEL_UP;
+                    addingHP += hp.Value;
+                    addingHP = Mathf.Clamp(addingHP, hp.Value, maxHp.Value);
+                    hp.Value = Mathf.RoundToInt(addingHP);
+                }
             };
         }
 
         // Pre vstkych
-        playerName.OnValueChanged += (FixedString32Bytes prevValue, FixedString32Bytes newValue) => 
+        playerName.OnValueChanged += (old, now) => 
         { 
-            nameTag.text = newValue.ToString(); 
+            nameTag.text = now.ToString(); 
         };
-        message.OnValueChanged += (FixedString128Bytes prevValue, FixedString128Bytes newMess) => 
+        message.OnValueChanged += (old, now) => 
         {
-            chatBox.text = newMess.ToString();
+            chatBox.text = now.ToString();
             chatField.SetActive(true);
             chatTimer = Time.time + chatTime;
         };
@@ -237,10 +236,12 @@ public class PlayerStats : EntityStats
     protected override void OwnerSubsOnNetValChanged()
     {
         if (!IsOwner) return;
+
         base.OwnerSubsOnNetValChanged();
+
         xp.OnValueChanged += (old, now) => 
         {
-            xpBar.SliderValue = now;
+            xpBar.QueueChange(now.XP, level.Value);
         };
         hp.OnValueChanged += (old, now) => 
         {
@@ -260,8 +261,9 @@ public class PlayerStats : EntityStats
         };
         level.OnValueChanged += (old, now) =>
         {
-            byte l = (byte)(now+1);
-            xpBar.LevelUP(l);
+            for (int i = old; i < now; i++)
+                xpBar.QueueChange(xp.Value.XP, now);
+            FileManager.Log($"Leveled up {old}->{now}", FileLogType.RECORD);
         };
     }
     /// <summary>
@@ -345,7 +347,8 @@ public class PlayerStats : EntityStats
     public override void KilledEnemy(EntityStats died)
     {
         base.KilledEnemy(died);
-        xp.Value += (uint)(died.level.Value * 100);
+        Experience x = new (xp.Value, (uint)(died.Level * Random.Range(25f, 50f)));
+        xp.Value = x;
     }
     /// <summary>
     /// Pokusi sa prerusit utok
@@ -399,8 +402,6 @@ public class PlayerStats : EntityStats
         if (IsOwner)
         {
             game.LocalPlayer = this;
-
-
             xpBar.Load(pSave.xp, pSave.level);
             game.SkillTree.LoadSkills(pSave);
             game.inventory.ReloadAttacks();
@@ -408,7 +409,10 @@ public class PlayerStats : EntityStats
         if (IsServer) 
         {
             level.Value = pSave.level;
-            xp.Value = pSave.xp;
+            int min = pSave.level*100;
+            if (0 < pSave.level)
+                min+= 50;
+            xp.Value = new(min, (int)pSave.xp, (pSave.level+1)*100+50);
             //maxHp.Value = pSave.level*100+50;
             //speed.Value = pSave.speed;
 
@@ -471,12 +475,8 @@ public class PlayerStats : EntityStats
     /// <param name="addHealth"></param>
     [Rpc(SendTo.Server)] public virtual void AddMaxHealthRpc (float addHealth)
     {
-        //if (addHealth % 100 == 0)
-            maxHp.Value += (int)addHealth;
-        //else
-            //maxHp.Value = Mathf.RoundToInt((float)maxHp.Value * (float)(1+addHealth));
-
-        FileManager.Log($"Player hp changed to {maxHp.Value}",FileLogType.RECORD);
+        maxHp.Value += (int)addHealth;
+        FileManager.Log($"Player hp changed to {maxHp.Value}", FileLogType.RECORD);
     }
     /// <summary>
     /// Zastavi aktualne prebiehajuci strelny utok znicenim projektilu
@@ -504,8 +504,7 @@ public class PlayerStats : EntityStats
     /// </summary>
     [Rpc(SendTo.Server)] public void AddLvlRpc()
     {
-        xp.Value = xpMax.Value;
-        FileManager.Log($"XP {xp.Value}-{xpMax.Value} set to player", FileLogType.RECORD);
+        xp.Value = new (xp.Value, NEEDED_XP_TO_NEXT_LEVEL);
     }
     /// <summary>
     /// Znovu zrodi hraca
