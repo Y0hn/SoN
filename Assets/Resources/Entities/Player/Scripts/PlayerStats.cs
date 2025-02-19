@@ -467,20 +467,25 @@ public class PlayerStats : EntityStats
     [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot)
     {
         if (equipment[(int)slot] != "")
-            inventory.Add(reference);
+            inventory.Add(equipment[(int)slot]);
             
-        equipment[(int)slot] = reference;    
         inventory.Remove(reference);
+        equipment[(int)slot] = reference;    
         //FileManager.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
     }
     /// <summary>
-    /// Zbiera a equipuje zbrane
+    /// Zbiera a equipuje zbrane <br />
+    /// Neralne RPC volane len zo servera pre navratovu hodnotu
     /// </summary>
     /// <param name="reference"></param>tile.Stop();
-    [Rpc(SendTo.Server)] public virtual void PickedUpRpc(string reference)
+    public virtual bool PickedUpRpc(string reference)
     {
-        if (reference != "" && !inventory.Contains(reference))
+        bool free = reference != "" && !inventory.Contains(reference) && !equipment.Contains(reference);
+
+        if (free)
             inventory.Add(reference);
+
+        return free;
     }
     /// <summary>
     /// prida level hracovi

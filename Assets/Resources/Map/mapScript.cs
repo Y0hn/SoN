@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using System.Linq;
+using System.Threading.Tasks;
 /// <summary>
 /// Sluzi pre spravne nacitanie udajov mapy a zaroven aj zo serveru vytvara nepriatelov na liniiach mapy
 /// </summary>
@@ -117,8 +118,8 @@ public class MapScript : MapSizer
         }
         else
         {
-            e = regularEnemiesTier1.First(r => r.name == n[0]);
-            e ??= regularEnemiesTier2.First(r => r.name == n[0]);
+            e = regularEnemiesTier1.ToList().Find(r => r.name == n[0]);
+            e ??= regularEnemiesTier2.ToList().Find(r => r.name == n[0]);
         }
 
         if (e != null)

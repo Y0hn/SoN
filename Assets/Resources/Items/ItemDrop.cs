@@ -80,8 +80,8 @@ public class ItemDrop : NetworkBehaviour
     {
         if (IsServer && collision.transform.TryGetComponent(out PlayerStats pl))
         {
-            pl.PickedUpRpc(Item.GetReferency);
-            PickedUpRpc();
+            if (pl.PickedUpRpc(Item.GetReferency))
+                PickedUpRpc();
             // Pridat overenie ci hrac zobral item
         }
     }

@@ -49,8 +49,7 @@ public class GameManager : MonoBehaviour
         {"equipment"},
         {"point"},
     */
-    [HideInInspector] public bool playerLives;
-    /*[SerializedDictionary("Utility", "Aquired")]public SerializedDictionary*/ 
+    [HideInInspector] public bool playerLives = false;
     
     public event Action<Utility> UtilityUpdate;
     public Inventory inventory;
