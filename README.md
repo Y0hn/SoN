@@ -1,6 +1,6 @@
 <div align="center">
     <h1>
-        Project
+        Souls of Nav
     </h1>
 </div>
 <div align="left">

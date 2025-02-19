@@ -13,10 +13,10 @@ Podstatným znakom hry bude vlastná grafika, rôznorodosť herných mechaník a
 - [x] Vytvoriť a použiť primeranú grafiku tvoriacu vizuálny celok vrátane menu a užívateľského rozhrania.
 - [x] Vytvoriť postavu hráča s pokročilým bojovým systémom, inventárom.
 - [x] Vytvoriť 5 typov bežných nepriateľov z pohľadu funkčnosti, každý v 2 variantoch.
-- [ ] Vytvoriť jedného finálneho bossa, s rôznymi typmi útokov meniacich sa v podľa počtu životov bossa.
+- [x] Vytvoriť jedného finálneho bossa, s rôznymi typmi útokov meniacich sa v podľa počtu životov bossa.
 - [x] Vytvoriť bojovú inteligenciu nepriateľov, ktorá bude riadiť ich správanie a útoky.
 - [x] Vytvoriť systém koristi, kde z porazených nepriateľov hráč získava predmety, použiteľné ako aj nositeľné predmety.
-- [ ] Vytvoriť “strom schopností” kde hráč môže investovať získané body schopností na získanie nových schopností a permanentné vylepšenie svojich vlastností.
+- [x] Vytvoriť “strom schopností” kde hráč môže investovať získané body schopností na získanie nových schopností a permanentné vylepšenie svojich vlastností.
 - [x] Použiť pokročilejšie princípy programovania pri vytváraní funkcionalít hry.
 - [x] Vložiť vhodnú hudbu do pozadia a ozvučiť všetky akcie hráča a nepriateľov.
 
@@ -24,5 +24,5 @@ Podstatným znakom hry bude vlastná grafika, rôznorodosť herných mechaník a
 
 - [ ] Vytvoriť GDD (game design document), ktorý popíše celú hru, vrátane príbehu, postáv, herných mechaník atď.
 - [x] Naštudovať technológie vhodné na vývoj hry pre viacerých hráčov v Unity
-- [ ] Napísať sprievodnú dokumentáciu s priloženým zoznamom použitých tutoriálov
+- [ ] Napísať sprievodnú dokumentáciu s priloženým zoznamom použitých tutoriálov a uzivatelskou priruckou
 - [ ] Doložiť priebežnú vizualizáciu a prílohy
