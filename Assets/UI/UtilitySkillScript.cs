@@ -36,7 +36,7 @@ public class UtilitySkillScript : MonoBehaviour
     /// </summary>
     void OnEnable()
     {
-        if (requestStateOnEnable)
+        if (requestStateOnEnable && game != null)
             SetGameObjects(game.IsUtilityEnabled(condition));
     }
     /// <summary>

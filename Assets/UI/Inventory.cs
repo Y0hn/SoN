@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine;
+using UnityEditor;
 using System;
 using TMPro;
 using System.Linq;
@@ -473,7 +474,7 @@ public class Inventory : MonoBehaviour
 
         // nastavi aktivnym utokom parametre od najmensieho po najvacsi pasivny utok
         sbyte actives = 0;
-        for (int i = 0; i < atSlots.Length; i++)
+        for (int i = atSlots.Length-1; 0 <= i; i--)
         {
             sbyte attack= 0;
             foreach (AttackSlotPassive aS in atSlots[i].GetActive())
@@ -490,17 +491,37 @@ public class Inventory : MonoBehaviour
 
         // povodne nebol nejaky utok zapnuty alebo bol nasledne vypnuty
         if (prev == null || acSlots.Find(acS => acS.Identity == prev) == null)
-        {
             prev = acSlots[0].Identity;
-        }
-
+        else
+            FileManager.Log($"Hodnota {prev} na select bola najdena");
+        
         // zapne povodny alebo zakladny utok
-        AttackSlotActive ac = acSlots.Find(acS => acS.Identity == prev);
-        //ac.SetShow(true);
-        ac.Select(true);
-
-        FileManager.Log($"Attacks reloaded selected {ac}");
+        int ii = acSlots.FindIndex(acS => acS.Identity == prev);
+        if (!acSlots[ii].active)
+            acSlots[ii].Select();
     }
 #endregion
 #endregion
 }
+#if UNITY_EDITOR
+[CustomEditor(typeof(Inventory))]
+/// <summary>
+/// Sluzi pre specialne zobrazenie v Unity editore a dovoluje obnovit zameriavanie 
+/// </summary>
+public class ReloadButton : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+
+        // Referencia na cieľový objekt
+        Inventory example = (Inventory)target;
+
+        // Tlačidlo v inspektore
+        if (GUILayout.Button("Reload Attacks"))
+        {
+            example.ReloadAttacks();
+        }
+    }
+}
+#endif

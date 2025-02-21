@@ -206,7 +206,7 @@ public class GameManager : MonoBehaviour
             if (FileManager.World.boss == null)
                 MapScript.map.SpawnBoss();
             // Inak ho nacita zo suboru
-            else
+            else if (FileManager.World.boss.isAlive)
                 MapScript.map.SpawnFromSave(FileManager.World.boss);
         } 
         menu.TiggerHideUI();

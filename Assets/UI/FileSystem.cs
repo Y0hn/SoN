@@ -367,17 +367,17 @@ public static class FileManager
         // Zapise spravu do suboru
         if (writeToFile)
         {
+            log = $"[{Enum.GetName(typeof(FileLogType), type)}] {log}";
             using StreamWriter sw = new (LogPath, true);
             sw.WriteLine(log);
             sw.Flush();
             sw.Close();
-            log = "[RECORDED] " + log;
         }
 
         // Vypise spravu do konzoly v editore
         switch (type)
         {
-            default:                    Debug.Log(log+" [RECORDED]");         break;
+            default:                    Debug.Log(log);         break;
             case FileLogType.ERROR:     Debug.LogError(log);    break;
             case FileLogType.WARNING:   Debug.LogWarning(log);  break;
         }

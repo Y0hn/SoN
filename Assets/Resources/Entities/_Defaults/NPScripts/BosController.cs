@@ -19,7 +19,7 @@ public class BosController : NPController
      *  public bool ForceDecision       { get; protected set; }
      *  protected Vector3 TargetPosition => sensor.ClosestTarget.position;    
      *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
-    [SerializeField] protected GameObject canvas;
+    [SerializeField] protected RectTransform rect;
     protected BosSensor sensorB;
 
     protected bool dfTargeted;
@@ -34,6 +34,7 @@ public class BosController : NPController
             Stats.OnDeath += sensorB.DisableSensor;
             path.endReachedDistance = Stats.AttackDistance;
         }
+        EnableCanvasRpc(false);
         base.OnNetworkSpawn();
     }
     /// <summary>
@@ -115,8 +116,8 @@ public class BosController : NPController
             dfTargeted = false;
         }
 
-        //EnableCanvasRpc(!(selfTarget || defaultTarget));
-        FileManager.Log($"canvas set to {!(dfTargeted || selfTarget)}", FileLogType.RECORD);
+        EnableCanvasRpc(!(dfTargeted || selfTarget));
+        FileManager.Log($"canvas set to {!(dfTargeted || selfTarget)}", FileLogType.WARNING);
         attacking = false;
     }
     /// <summary>
@@ -139,6 +140,6 @@ public class BosController : NPController
     }
     [Rpc(SendTo.Everyone)] void EnableCanvasRpc(bool b)
     {
-        canvas.SetActive(true);        
+        rect.gameObject.SetActive(b);
     }
 }

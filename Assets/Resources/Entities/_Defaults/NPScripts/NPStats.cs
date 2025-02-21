@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Pathfinding;
 using Random = UnityEngine.Random;
 using Unity.Netcode;
+using Unity.VisualScripting;
+using System.Linq;
 public class NPStats : EntityStats
 {
     /*  ZDEDENE ATRIBUTY
@@ -109,6 +111,10 @@ public class NPStats : EntityStats
             sensor.SetRange(rase.view);
             aIPath.maxSpeed = speed.Value/100f;
         }
+        aIPath.radius = 3f;
+        // Vymaze obrany
+        while (rezists.childCount < 0)
+            Destroy(rezists.GetChild(0).gameObject);
         // Nastavi obrany
         foreach (var d in rase.resists)
         {

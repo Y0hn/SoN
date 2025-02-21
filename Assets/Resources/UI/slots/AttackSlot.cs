@@ -23,11 +23,14 @@ using System;
     public virtual void SetShow(bool show = false)
     {
         this.show = show;
+        button.interactable = show;
+
+
+        button.onClick.RemoveAllListeners();
         if (!show)
             SetActive(show);
-        button.interactable = show;
-        button.onClick.RemoveAllListeners();
-        button.onClick.AddListener(OnButtonClick);
+        else
+            button.onClick.AddListener(OnButtonClick);
     }
     /// <summary>
     /// Nastavuje / povoluje slot
@@ -41,11 +44,11 @@ using System;
     /// Po stlaceni tlacitka
     /// </summary>
     public abstract void OnButtonClick();
-
-    public override string ToString()
-    {
-        return $"[ID {id}] damage= {Enum.GetName(typeof(Damage.Type), type)}, act= {active}, sh= {show}";
-    }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>suhrn PARAMETROV</returns>
+    public override string ToString() => $"[ID {id}] damage= {Enum.GetName(typeof(Damage.Type), type)}, act= {active}, sh= {show}";
 }
 #endregion
 #region Povolenie Utoku
@@ -153,8 +156,7 @@ using System;
             return new(weapon, attack);
         } 
     }
-    private string aRef;
-    public string Identity { get => aRef; }
+    private string aRef; public string Identity => aRef; 
 
 
     /// <summary>
@@ -179,9 +181,6 @@ using System;
     }
     public void Select(bool over = false)
     {
-        if (over)
-            active = false;
-
         SetActive(!active);
 
         if (active)
@@ -195,7 +194,10 @@ using System;
     public override void SetActive (bool active = true)
     {
         if (!show && active || this.active && active)
+        {
+            FileManager.Log("Already active");
             return;
+        }
 
         if (active)
         {
@@ -211,7 +213,7 @@ using System;
 
         base.SetActive(active);
 
-        FileManager.Log($"SetActive {Identity} {Weapon} active= {active} => this.active= {this.active}", FileLogType.WARNING);
+        //FileManager.Log($"SetActive {Identity} {Weapon} active= {active} => this.active= {this.active}");
     }
     public override void OnButtonClick()
     {
