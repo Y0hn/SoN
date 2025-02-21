@@ -462,7 +462,8 @@ public class PlayerStats : EntityStats
     /// </summary>
     [Rpc(SendTo.Server)] protected void StopRanAttackRpc()
     {
-        Projectile.StopAttack();
+        if (Projectile != null)
+            Projectile.StopAttack();
     }
     /// <summary>
     /// Pridáva/Odoberā zbrame

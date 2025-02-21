@@ -7,6 +7,7 @@ using System;
 using TMPro;
 using System.Linq;
 using Unity.VisualScripting;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// Uklada inventar hraca lokalne
@@ -428,9 +429,10 @@ public class Inventory : MonoBehaviour
     /// <param name="active"></param>
     public void SetActiveAttackType(sbyte id, bool active)
     {
+        int  fist_att = acSlots.Find(acS => acS.id == 0) != null ? 1 : 0;
         bool already = acSlots.Find(acS => acS.id == id) != null;
         int b = acSlots.FindAll(acS => acS.show).Count;
-        //Debug.Log($"Called set attack id= {id}, active= {active}, already= {already}, b= {b}");
+        b-= fist_att;
 
         // ziska slot ktory zavolal metodu
         AttackSlotPassive change = null;
@@ -438,16 +440,15 @@ public class Inventory : MonoBehaviour
             change = atSlots[i].GetSlot(id);
         
         // vypne posledny utok poslednej zbrane
-        if      (active && !already && b == acSlots.Count)
+        if      (active && !already && b >= acSlots.Count)
         {
-            for (int i = atSlots.Length-1; 0 < i; i--)
-            {
-                int index = atSlots[i].ShutLastActive();
-                if (index >= 0)
-                    acSlots.Find(acS => acS.id == id).SetShow();
-            }
-        }
 
+            int ii = Random.Range(0, atSlots.Length);
+            int index = atSlots[ii].ShutRandomActive();
+
+            if (0 <= index)
+                acSlots.Find(acS => acS.id == id).SetShow();
+        }
         // ak je zapnuty a ma sa vypnut tak sa vypne
         else if (!active && already)
         {
@@ -464,9 +465,7 @@ public class Inventory : MonoBehaviour
     public void ReloadAttacks()
     {
         // ziska prechadzjuci aktivny utok
-        string debug = "";
         string prev = acSlots.Find(acS => acS.active)?.Identity;
-        debug+= "Povodna" + prev;
 
         // vypne vsetky (aj aktivne) utoky v rychlych slotoch
         for (int i = 0; i < acSlots.Count; i++)
@@ -494,14 +493,13 @@ public class Inventory : MonoBehaviour
         {
             prev = acSlots[0].Identity;
         }
-        debug+= " Dalsia" + prev;
 
         // zapne povodny alebo zakladny utok
         AttackSlotActive ac = acSlots.Find(acS => acS.Identity == prev);
-        ac.SetShow(true);
-        ac.SetActive();
+        //ac.SetShow(true);
+        ac.Select(true);
 
-        FileManager.Log($"Attacks reloaded selected {ac} {debug}");
+        FileManager.Log($"Attacks reloaded selected {ac}");
     }
 #endregion
 #endregion

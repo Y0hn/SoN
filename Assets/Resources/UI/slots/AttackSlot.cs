@@ -177,9 +177,13 @@ using System;
             Select();
         //FileManager.Log("Active attcak slot setted \naref= " + aref);
     }
-    public void Select()
+    public void Select(bool over = false)
     {
+        if (over)
+            active = false;
+
         SetActive(!active);
+
         if (active)
             GameManager.instance.LocalPlayer.SetWeaponIndex(Weapon);
     }
@@ -190,7 +194,8 @@ using System;
     }
     public override void SetActive (bool active = true)
     {
-        if (!show && active) return;
+        if (!show && active || this.active && active)
+            return;
 
         if (active)
         {
@@ -206,7 +211,7 @@ using System;
 
         base.SetActive(active);
 
-        FileManager.Log($"SetActive {Identity} {Weapon} active= {active} => this.active= {this.active}");
+        FileManager.Log($"SetActive {Identity} {Weapon} active= {active} => this.active= {this.active}", FileLogType.WARNING);
     }
     public override void OnButtonClick()
     {

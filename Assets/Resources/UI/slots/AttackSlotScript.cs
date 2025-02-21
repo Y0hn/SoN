@@ -70,13 +70,13 @@ public class PassiveAttackSlotScript : MonoBehaviour
     /// Ak je viac zapnutych pasivnych utokov ako aktivnych utokov (3)
     /// </summary>
     /// <returns>ID vypnuteho</returns>
-    public int ShutLastActive()
+    public int ShutRandomActive()
     {
         List<AttackSlotPassive> atsP = GetActive();
         if (0 < atsP.Count)
         {
             // prvy od konca
-            int id = atsP[^1].id;
+            int id = atsP[Random.Range(0, atsP.Count)].id;
             if (SetActive(id))
                 return id;
         }
