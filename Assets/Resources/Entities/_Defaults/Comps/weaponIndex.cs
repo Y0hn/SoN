@@ -5,20 +5,15 @@ using Unity.Netcode;
 /// </summary>
 [Serializable] public struct WeaponIndex : INetworkSerializable
 {
-    public sbyte eIndex;
-    public sbyte aIndex;
+    public byte eIndex;
+    public byte aIndex;
 
-    /// <summary>
-    /// Ak drzi zbran
-    /// </summary>
-    /// <value></value>
-    public bool Holding { get => eIndex >= 0 && 0 <= aIndex;}
     /// <summary>
     /// Vytvara ukazovatel pouzivanej zbrane
     /// </summary>
     /// <param name="e"></param>
     /// <param name="a"></param>
-    public WeaponIndex(sbyte e, sbyte a = 0)
+    public WeaponIndex(byte e, byte a = 0)
     {
         eIndex = e;
         aIndex = a;
@@ -37,7 +32,7 @@ using Unity.Netcode;
     /// Pouzivane na ziskanie kratkeho vypisu hodnot
     /// </summary>
     /// <returns>VYPIS hodnot</returns>
-    public override string ToString()
+    public override readonly string ToString()
     {
         return $"equipIndex= {eIndex} attackIndex= {aIndex}";
     }

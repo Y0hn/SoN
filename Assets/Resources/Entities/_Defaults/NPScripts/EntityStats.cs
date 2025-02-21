@@ -300,9 +300,6 @@ public abstract class EntityStats : NetworkBehaviour
         int newDamage = Defence.CalculateDMG(damage);
         hp.Value -= newDamage;
         
-        // if (FileManager.debug)
-        //Debug.Log($"Damage {damage.amount} from redused by Rezists to {newDamage}");
-        
         if (hp.Value <= 0)
             IsAlive.Value = false;
 
@@ -321,10 +318,8 @@ public abstract class EntityStats : NetworkBehaviour
     /// </summary>
     /// <param name="attack"></param>
     /// <param name="weapon"></param>
-    public virtual void SetWeaponIndex (sbyte attack, sbyte weapon)
+    public virtual void SetWeaponIndex (byte attack, byte weapon)
     {
-        WeaponIndex wi = weapE.Value;
-
         weapE.Value = new (weapon, attack);
 
         //weapE.OnValueChanged.Invoke(wi, weapE.Value);

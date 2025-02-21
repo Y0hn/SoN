@@ -1,6 +1,7 @@
 using UnityEngine.UI;
 using UnityEngine;
 using System;
+#region base Slot Utoku
 /// <summary>
 /// Sluzi ako zakladna pre Drzitelov utokov 
 /// </summary>
@@ -10,21 +11,44 @@ using System;
     /// identifikacia
     /// </summary>
     public sbyte id;
+    [field:SerializeField] protected Button button;
     [field:SerializeField] protected Image background;
     [field:SerializeField] protected Image foreground;
     [HideInInspector] public Damage.Type type;
     public bool active = false, show = false;
+    /// <summary>
+    /// Nastavuje viditelnost texutry
+    /// </summary>
+    /// <param name="show"></param>
     public virtual void SetShow(bool show = false)
     {
         this.show = show;
         if (!show)
             SetActive(show);
+        button.interactable = show;
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(OnButtonClick);
     }
+    /// <summary>
+    /// Nastavuje / povoluje slot
+    /// </summary>
+    /// <param name="active"></param>
     public virtual void SetActive(bool active = true)
     {
         this.active = active;
     }
+    /// <summary>
+    /// Po stlaceni tlacitka
+    /// </summary>
+    public abstract void OnButtonClick();
+
+    public override string ToString()
+    {
+        return $"[ID {id}] damage= {Enum.GetName(typeof(Damage.Type), type)}, act= {active}, sh= {show}";
+    }
 }
+#endregion
+#region Povolenie Utoku
 /// <summary>
 /// Drzi utok zbrane v inventari <br />
 /// Po aktivacii prida hodnoty z utoku medzi aktivne utoky <br />
@@ -32,7 +56,6 @@ using System;
 [Serializable] public class AttackSlotPassive : AttackSlot
 {
     [field:SerializeField] protected Image placeHolder;
-    [field:SerializeField] protected Button button;
     /// <summary>
     /// Zadava zmenu farby podla toho ci je utok aktivny alebo pasivny
     /// </summary>
@@ -41,33 +64,32 @@ using System;
     private static Color 
         activeC = new (190f/255f,  72f/255f, 31f/255f),      // #BE481F
         passiveC = new(149f/255f, 100f/255f, 65f/255f);      // #956441
+
+
     /// <summary>
     /// Sluzi na nastavenie utoku a jeho grafiku podla typu utoku
     /// </summary>
     /// <param name="aType"></param>
     /// <param name="active"></param>
-    public void Set(Damage.Type aType, bool active = false)
+    public void Set(Damage.Type aType, bool disable = false)
     {
         string aref = FileManager.GetAttackRefferency(aType);
         foreground.sprite = Resources.Load<Sprite>(aref);
-        button.onClick.RemoveAllListeners();
-        button.onClick.AddListener(OnButtonClick);
         type = aType;
-        SetActive(active);
+        if (disable)
+            SetActive(false);
         SetShow(true);
-        //Debug.Log("Active attcak slot setted \naref= " + aref);
     }
     /// <summary>
     /// Vypina/Zapina zobrazovanie utoku v ramceku
     /// </summary>
     /// <param name="show">zap/vyp</param>
-    public override void SetShow(bool show = false)
+    public override void SetShow(bool show = true)
     {
         base.SetShow(show);
         background.gameObject.SetActive(show);
         foreground.enabled = show;
         placeHolder.enabled = show;
-        button.interactable = show;
     }
     /// <summary>
     /// Nastavi ci je drzitel aktivny
@@ -83,22 +105,24 @@ using System;
             background.color = passiveC;
     }
     /// <summary>
-    /// Prida tento utok medzi aktivne utoky (max. 3)
+    /// <inheritdoc/> <br />
+    // Prida tento utok medzi aktivne utoky (max. 3)
     /// </summary>
     /// <param name="type">Typ utoku zbrane</param>
-    public void OnButtonClick()
+    public override void OnButtonClick()
     {
         SetActive(!active);
         GameManager.instance.inventory.SetActiveAttackType(id, active);
     }
 }
+#endregion
+#region Rychly Utok
 /// <summary>
 /// Drzi typ utoku v Hracovom Panely UI <br />
 /// Po aktivacii sa nastavi ako aktuany utok hraca   
 /// </summary>
 [Serializable] public class AttackSlotActive : AttackSlot
 {
-    [HideInInspector] public Equipment.Slot slot;
     [field:SerializeField] protected Image edge;
     private static Action<bool> ChangeActive;
     /// <summary>
@@ -109,6 +133,7 @@ using System;
         activeC = new (50f/255f, 103f/255f, 30f/255f),      // #32671e
         passiveC = new(64f/255f,  64f/255f, 64f/255f),      // #404040
         defaultC = new(1f,1f,1f);                           // #ffffff
+
     /// <summary>
     /// Vyrobi ukazovatel drzanej zbrane podla parametrov 
     /// </summary>
@@ -117,16 +142,21 @@ using System;
     { 
         get 
         { 
-            sbyte 
-                attack = (sbyte)(id%10), 
-                weapon = (sbyte)(id-attack);
-            attack--;
-            weapon = weapon == 1 ? (sbyte)Equipment.Slot.WeaponR : (sbyte)Equipment.Slot.WeaponL;
+            byte 
+                attack = (byte)(id%10),
+                weapon = 0;
+
+            if (0 < id)
+            {
+                weapon = (byte)(id/10);
+            }
             return new(weapon, attack);
         } 
     }
     private string aRef;
     public string Identity { get => aRef; }
+
+
     /// <summary>
     /// Nastavi 
     /// </summary>
@@ -136,24 +166,22 @@ using System;
     {
         aRef = FileManager.GetAttackRefferency(aType);
         foreground.sprite = Resources.Load<Sprite>(aRef);
-        //if (id > 0)
-            foreground.color = defaultC;
-        /*else
-            foreground.color = GameManager.instance.LocalPlayer.Color;*/
+        foreground.color = defaultC;
+
         type = aType;
         this.id = id;
         SetShow(true);
 
-        // ak neni ziadni iny utok aktivny
+        // ak neni ziadny iny utok aktivny
         if (ChangeActive == null)
             Select();
-        //Debug.Log("Active attcak slot setted \naref= " + aref);
+        //FileManager.Log("Active attcak slot setted \naref= " + aref);
     }
     public void Select()
     {
         SetActive(!active);
         if (active)
-            GameManager.instance.LocalPlayer.SetWeaponIndex(id);
+            GameManager.instance.LocalPlayer.SetWeaponIndex(Weapon);
     }
     public override void SetShow (bool show = false)
     {
@@ -163,7 +191,6 @@ using System;
     public override void SetActive (bool active = true)
     {
         if (!show && active) return;
-        base.SetActive(active);
 
         if (active)
         {
@@ -176,6 +203,19 @@ using System;
             edge.color = passiveC;
             ChangeActive -= SetActive;
         }
-        //Debug.Log($"SetActive active= {active} => this.active= {this.active}");
+
+        base.SetActive(active);
+
+        FileManager.Log($"SetActive {Identity} {Weapon} active= {active} => this.active= {this.active}");
+    }
+    public override void OnButtonClick()
+    {
+        SetActive(true);
+    }
+
+    public override string ToString()
+    {
+        return base.ToString() + $" Identity= {aRef} WeaponE= {Weapon}";
     }
 }
+#endregion

@@ -180,10 +180,10 @@ public class PlayerStats : EntityStats
         nameTag.text = name;
         
         // Povoli pole mena len pre nevlasniaceho hraca
-        nameTag.gameObject.SetActive(/*Connector.instance.Solo || */!IsOwner);
+        nameTag.gameObject.SetActive(!IsOwner);
 
         onDeathWait = false;
-        GetComponent<NetworkObject>().name = nameTag.text;        
+        GetComponent<NetworkObject>().name = nameTag.text;
     }
 #endregion
 #region ZmenyHodnot
@@ -218,7 +218,7 @@ public class PlayerStats : EntityStats
             };
         }
 
-        // Pre vstkych
+        // Pre vsetkych
         playerName.OnValueChanged += (old, now) => 
         { 
             nameTag.text = now.ToString(); 
@@ -231,7 +231,7 @@ public class PlayerStats : EntityStats
         };
     }
     /// <summary>
-    /// Nastavi odber zmenenych sietovych premennych
+    /// Nastavi odber zmenenych sietovych premennych pre vlastnika
     /// </summary>
     protected override void OwnerSubsOnNetValChanged()
     {
@@ -286,8 +286,13 @@ public class PlayerStats : EntityStats
                     break;
             }
     }
-#endregion
-#region Udalosti
+    public override void SetWeaponIndex(WeaponIndex WeI)
+    {
+        base.SetWeaponIndex(WeI);
+        FileManager.Log($"Weapon index set to {WeI} Equipment= [{equipment[0]},{equipment[1]}]");
+    }
+    #endregion
+    #region Udalosti
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -295,29 +300,6 @@ public class PlayerStats : EntityStats
     {
         OnDeath?.Invoke();
         OnDeath = null;
-    }
-    /// <summary>
-    /// zmena utkou podla ID rychlej volby utku
-    /// </summary>
-    /// <param name="id"></param>
-    public void SetWeaponIndex (sbyte id)
-    {
-        sbyte att, wea= -1;
-
-        if (id < 0)
-        {
-            att = 0;
-            wea = 0;
-        }
-        else 
-        {
-            att = (sbyte)(id % 10 - 1);
-            if (0 <= att)
-                wea = id/10 == 1 ? (sbyte)Equipment.Slot.WeaponR : (sbyte)Equipment.Slot.WeaponL;
-            wea++;
-        }
-        //Debug.Log($"Setting ID={id} to weapon index to new(att= {att} | wea= {wea})\nWeapons count: {Weapons.Length}");
-        SetWeaponIndex(att, wea);
     }
     /// <summary>
     /// <inheritdoc/>
@@ -331,10 +313,7 @@ public class PlayerStats : EntityStats
 
         int newDamage = Defence.CalculateDMG(damage);
         hp.Value -= newDamage;
-        
-        // if (FileManager.debug)
-        //Debug.Log($"Damage {damage.amount} from redused by Rezists to {newDamage}");
-        
+                
         if (hp.Value <= 0)
             IsAlive.Value = false;
 

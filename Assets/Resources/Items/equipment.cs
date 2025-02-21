@@ -9,9 +9,9 @@ public class Equipment : Item
     /// Cesta k texture v hre
     /// </summary>
     public virtual string SpriteRef => sprite;
-    public enum Slot
+    public enum Slot : byte
     {
-        WeaponR, WeaponL, WeaponBoth/*, NoPreference*/
+        WeaponL, WeaponR, WeaponBoth
     }
     /// <summary>
     /// Ziska predmet na zaklade referencnej cesty

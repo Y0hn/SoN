@@ -44,7 +44,7 @@ public class Inventory : MonoBehaviour
     /// <value>PRAVDA ak je otvoreny</value>
     public bool open { get; private set; }
     public bool FreeSpace { get { return itemSlots.Find(iS => iS.empty == true) != null; } }
-    
+
     /// <summary>
     /// Ziska data inventara alebo vybavy
     /// </summary>
@@ -85,7 +85,7 @@ public class Inventory : MonoBehaviour
     
     private event Action onSizeChange;
     private GameManager game;
-    
+#region SetUp 
     void Start()
     {
         button.onClick.AddListener(OC_Inventory);
@@ -95,11 +95,6 @@ public class Inventory : MonoBehaviour
         open = false;
 
         onSizeChange += Sizing;
-    }
-    void OnDrawGizmos()
-    {
-        if (onGizmos)
-            Awake();
     }
     void Awake()
     {
@@ -118,6 +113,35 @@ public class Inventory : MonoBehaviour
         foreach (var atS in atSlots)
             atS.UnsetAttacks();
     }
+#if UNITY_EDITOR
+    /// <summary>
+    /// Meni v editore velkost inventara
+    /// </summary>
+    void OnDrawGizmos()
+    {
+        if (onGizmos)
+            Awake();
+    }
+#endif
+    /// <summary>
+    /// Vrati inventar do povodneho stavu
+    /// </summary>
+    public void Clear()
+    {
+        // reset inventar
+        itemSlots.ForEach(i => i.Item = null);
+
+        // reset equipment
+        foreach (var eq in equipSlots)
+            eq.Value.Item = null;
+
+        // reset utoky
+        foreach(var at in atSlots)
+            at.UnsetAttacks();
+        ReloadAttacks();
+    }
+#endregion
+#region AutomatickaVeskostBuniek 
     /// <summary>
     /// Prisposobenie velkosti drzitelov predmoetov podla ich mnozstva
     /// </summary>
@@ -243,13 +267,22 @@ public class Inventory : MonoBehaviour
     {
         DestroyImmediate(parent.GetChild(index).gameObject);
     }
-
+    /// <summary>
+    /// Nastavi monztvo predmetov, ktore inventar udrzi
+    /// </summary>
+    /// <param name="newSize"></param>
+    public void SetSize(ushort newSize)
+    {
+        size = newSize;
+        Sizing();
+    }
+#endregion
+#region Udalosti
     /// <summary>
     /// Zavola otvorenie / zatvorenie inventara
     /// </summary>
     /// <param name="OC_Inventory("></param>
     void OC_Inventory(InputAction.CallbackContext context) { OC_Inventory(); }
-    
     /// <summary>
     /// Otvori alebo Zavire inventar
     /// </summary>  
@@ -263,15 +296,6 @@ public class Inventory : MonoBehaviour
             if (open) btn.text = "<";
             else btn.text = ">";
         }
-    }
-    /// <summary>
-    /// Nastavi monztvo predmetov, ktore inventar udrzi
-    /// </summary>
-    /// <param name="newSize"></param>
-    public void SetSize(ushort newSize)
-    {
-        size = newSize;
-        Sizing();
     }
     /// <summary>
     /// Prida predmet do inventara <br />
@@ -311,6 +335,17 @@ public class Inventory : MonoBehaviour
         }
     }
     /// <summary>
+    /// Odstrani bez vyhodenia
+    /// </summary>
+    /// <param name="v"></param>
+    public void Delete(string v)
+    {
+        Item item = Item.GetItem(v);
+        ItemSlot its = itemSlots.Find(i => i.Item == item);
+        if (its != null)
+            its.Item = null;
+    }
+    /// <summary>
     /// Predmet sa nastavi ako vybava, presunia sa do vybavy <br />
     /// Nastavia sa k nemu pridruzene utoky podla ich poctu <br />
     /// Ak je miesto nastavia sa aj ako aktivne utoky
@@ -326,28 +361,24 @@ public class Inventory : MonoBehaviour
             game.LocalPlayer.SetEquipmentRpc(eq.GetReferency, eq.slot);
             if (eq is Weapon w)
             {
-                int hand = -1;
-                switch (w.slot)
-                {
-                    case Equipment.Slot.WeaponL:    hand = 1; break;
-                    case Equipment.Slot.WeaponR:    hand = 0; break;
-                    case Equipment.Slot.WeaponBoth: 
-                        hand = 0;
-                        equipSlots[eq.slot].Item = eq;
-                        equipSlots[eq.slot].SetTransparent(true);
-                        break;
-                }
-                if (hand >= 0)
-                    atSlots[hand].SetAttacks(w.attack);
+                // Jednoducho vlozi zbran do jednej z ruk
+                int hand = Math.Clamp((int)w.slot, 0, 1);
+                
+                // Nastavenie utokov -> rozbite do 20.02.2025 
+                atSlots[hand].SetAttacks(w.attack);
 
-                // Auto sett attack
-                int free = acSlots.Count - acSlots.FindAll(acS => acS.show).Count; 
-                //Debug.Log($"acSlots.Count = {acSlots.Count} & acSlots.FindAll(acS => acS.show).Count = {acSlots.FindAll(acS => acS.show).Count}");   
+                // zisti pocet volnych rychlych utokov 
+                int free = acSlots.Count - acSlots.FindAll(acS => !acS.show).Count;   
 
-                // nastavi prny volny            
+                // Nastavi pouzivanu zbran
+                equipSlots[w.slot].Item = eq; 
+
+                // nastavi prny volny
                 for (int slot = 0; slot < free; slot++)
                     atSlots[hand].Click(slot);
-                if (0 <= free)
+
+                // Znova nacita utoky
+                if (0 < free)
                     ReloadAttacks();
             }
         }
@@ -363,30 +394,24 @@ public class Inventory : MonoBehaviour
         if (FreeSpace)
         {
             equip.Item = null;
-            Add(eq.GetReferency);
 
             game.LocalPlayer.SetEquipmentRpc("", equip.slot);
             if (eq is Weapon w)
             {
-                int i = -1;
-                switch (w.slot)
-                {
-                    case Equipment.Slot.WeaponL:    i = 1; break;
-                    case Equipment.Slot.WeaponR:    i = 0; break;
-                    case Equipment.Slot.WeaponBoth: 
-                        i = 0;
-                        equipSlots[eq.slot].Item = null;
-                        equipSlots[eq.slot].SetTransparent(false);
-                        break;
-                }
-                if (i >= 0)
-                {
-                    atSlots[i].UnsetAttacks();
-                    ReloadAttacks();
-                }
+                // Jednoducho vlozi zbran do jednej z ruk
+                int hand = Math.Clamp((int)w.slot, 0, 1);
+
+                // Vynuluje predmet z ruky
+                equipSlots[w.slot].Item = null;
+
+                // Vynuluje utoky ruky
+                atSlots[hand].UnsetAttacks();
+
+                ReloadAttacks();
             }
         }
     }
+#region RychleUtoky
     /// <summary>
     /// Zvoli aktivny utok z nastavenych moznosti 
     /// </summary>
@@ -439,61 +464,45 @@ public class Inventory : MonoBehaviour
     public void ReloadAttacks()
     {
         // ziska prechadzjuci aktivny utok
+        string debug = "";
         string prev = acSlots.Find(acS => acS.active)?.Identity;
+        debug+= "Povodna" + prev;
 
-        // ak predchadzjuci utok bol vypnuty nastavi prvy utok
-        prev ??= acSlots[0].Identity;
-
-        // vypne vsetky (aj aktivne) utoky v aktivnych slotoch
+        // vypne vsetky (aj aktivne) utoky v rychlych slotoch
         for (int i = 0; i < acSlots.Count; i++)
             acSlots[i].SetShow();
 
         // nastavi aktivnym utokom parametre od najmensieho po najvacsi pasivny utok
-        int ii = 0;
-        for (int i = 0; i < atSlots.Length;i++)
+        sbyte actives = 0;
+        for (int i = 0; i < atSlots.Length; i++)
+        {
+            sbyte attack= 0;
             foreach (AttackSlotPassive aS in atSlots[i].GetActive())
             {
-                acSlots[ii].Set(aS.type, aS.id);
-                ii++;
+                acSlots[actives + attack].Set(aS.type, (sbyte)((i+1)*10+attack));
+                attack++;
             }
+            actives+= attack;
+        }
 
         // ak je miesto nastavi unarmened utok
-        if (acSlots.FindAll(acS => acS.show).Count < acSlots.Count)
-            acSlots[ii].Set(Damage.Type.FIST, -1);
+        if (actives < acSlots.Count)
+            acSlots[actives].Set(Damage.Type.FIST, 0);
 
-        // ak je stale povodny utok zapnuty tak zostane zapnuty
+        // povodne nebol nejaky utok zapnuty alebo bol nasledne vypnuty
+        if (prev == null || acSlots.Find(acS => acS.Identity == prev) == null)
+        {
+            prev = acSlots[0].Identity;
+        }
+        debug+= " Dalsia" + prev;
+
+        // zapne povodny alebo zakladny utok
         AttackSlotActive ac = acSlots.Find(acS => acS.Identity == prev);
+        ac.SetShow(true);
+        ac.SetActive();
 
-        // ak nie nastavi sa zakladny utok
-        ac ??= acSlots[0];
-        
-        ac.SetActive(true);
-
-        FileManager.Log($"Attacks reloaded selected {ac.Identity} => {Enum.GetName(typeof(Damage.Type), ac.type)}");
+        FileManager.Log($"Attacks reloaded selected {ac} {debug}");
     }
-    /// <summary>
-    /// Vrati inventar do povodneho stavu
-    /// </summary>
-    public void Clear()
-    {
-        // reset inventar
-        itemSlots.ForEach(i => i.Item = null);
-
-        // reset equipment
-        foreach (var eq in equipSlots)
-            eq.Value.Item = null;
-
-        // reset utoky
-        foreach(var at in atSlots)
-            at.UnsetAttacks();
-        ReloadAttacks();
-    }
-
-    public void Delete(string v)
-    {
-        Item item = Item.GetItem(v);
-        ItemSlot its = itemSlots.Find(i => i.Item == item);
-        if (its != null)
-            its.Item = null;
-    }
+#endregion
+#endregion
 }

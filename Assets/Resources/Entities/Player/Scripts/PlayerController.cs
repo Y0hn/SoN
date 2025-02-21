@@ -145,7 +145,7 @@ public class PlayerController : EntityController
             attacking = false;
             return;
         }
-        FileManager.Log($"Player {name} is attacking, Alive= {Stats.IsAlive.Value}");
+        //FileManager.Log($"Player {name} is attacking, Alive= {Stats.IsAlive.Value}");
         attacking = !context.canceled;
     }
 
