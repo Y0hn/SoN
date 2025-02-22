@@ -146,10 +146,19 @@ public class MapScript : MapSizer
     public void SpawnBoss()
     {
         GameObject v = Resources.Load<GameObject>("Entities/Veles/Veles");
+        FileManager.Log("BossLoaded");
+
         BosController bc = Instantiate(v, BossSpawn).GetComponent<BosController>();
+        FileManager.Log("BossCreated");
+
         bc.SetSensor(BossSpawn.GetComponent<BosSensor>());
+        FileManager.Log("BossSensoredUp");
+
         bc.SetDefaultTarget(BossSpawn);
+        FileManager.Log("BossDefaulted");
+
         bc.Stats.NetObject.Spawn();
+        FileManager.Log("BossSpawned");
     }
     /// <summary>
     /// Ziska ciel pre nepriatela podla jeho nazvu

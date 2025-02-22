@@ -197,7 +197,11 @@ public class Menu : MonoBehaviour
     /// <summary>
     /// Vypne objekt hlavneho menu po postupnom ubudani pozadia
     /// </summary>
-    public void TiggerHideUI() => animator.SetTrigger("change");
+    public void TiggerHideUI()
+    {
+        animator.SetTrigger("change");
+    }
+
     /// <summary>
     /// Pri zapnuti hry vypne menu volane z animatora
     /// </summary>

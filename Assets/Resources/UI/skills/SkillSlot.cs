@@ -15,8 +15,12 @@ public class SkillSlot : MonoBehaviour
     public bool isPurchased { get; private set; }
 
     [SerializeField] SkillCreator skillCreator;
-    [SerializeField] Button button;
+    [SerializeField] GameObject description;
+    [SerializeField] HoverButton button;
+    [SerializeField] RectTransform descBG;
+    [SerializeField] TMP_Text descText;
     [SerializeField] Image icon;
+    [SerializeField] Image underIcon;
     [SerializeField] Image value;
     [SerializeField] Image moddifier;
     [SerializeField] Image background;
@@ -24,7 +28,7 @@ public class SkillSlot : MonoBehaviour
     [SerializeField] List<SkillSlot> dependentcySkills = new();
     [SerializeField] bool needsAllDependecies = false;
     bool started = false;
-    
+
     /// <summary>
     /// Urcuje zmenu farby podla zmneny stavu pre konkretne casti grafiky schopnosti
     /// </summary>
@@ -74,10 +78,18 @@ public class SkillSlot : MonoBehaviour
         started = true;
         
         skillCreator.name = name;
-        defaultColors = new Color[4];
+        defaultColors = new Color[5];
         button.onClick.AddListener(ActivateSkill);
+        button.CursorEnter += PointerEnter;
+        button.CursorExit += PointerExit;
+        if (Skill is ModSkill moS)
+            amountT.text = moS.Value;
+
         ResetGrafic();
         StartSlot();
+        
+        descText.text = Skill.ToolTip;
+
         game = GameManager.instance;
         game.SkillTree.OnChangeAvailablePoints += PurchableSkill;
     }
@@ -102,12 +114,14 @@ public class SkillSlot : MonoBehaviour
     void ResetGrafic()
     {
         icon.enabled = true;
+        //underIcon.enabled = true; riesi hrierarchia v
         moddifier.enabled = true;
         background.enabled = true;
         defaultColors[0] = background.color;
         defaultColors[1] = icon.color;
         defaultColors[2] = moddifier.color;
         defaultColors[3] = value.color;
+        defaultColors[4] = amountT.color;
     }
     /// <summary>
     /// Prida schopnost do stromu schopnosti hraca
@@ -153,7 +167,7 @@ public class SkillSlot : MonoBehaviour
     /// <param name="interactable"></param>
     void SetInteractable(bool interactable)
     {
-        amountT.text = interactable ? skillCreator.Amount : "";
+        //amountT.text = interactable ? skillCreator.Amount : "";
         button.interactable = interactable;
         background.raycastTarget = interactable;
     }
@@ -175,13 +189,26 @@ public class SkillSlot : MonoBehaviour
     void SetGraficColor(Color colorIcon, Color colorBG, Color colorMod)
     {
         if (!started) Start();
-        background.color = colorBG * defaultColors[0];
+        background.color= colorBG * defaultColors[0];
+        underIcon.color = colorIcon * defaultColors[1];
+        icon.color      = colorIcon * defaultColors[1];
         moddifier.color = colorMod * defaultColors[2];
-        icon.color = colorIcon * defaultColors[1];
+        value.color     = colorMod * defaultColors[3];
+        amountT.color   = colorMod * defaultColors[4];
     }
-    void OnDrawGizmos()
+    /// <summary>
+    /// Mys je nad schopnostou
+    /// </summary>
+    public void PointerEnter()
     {
-        //skillCreator = new(name);
+        description.SetActive(true);
+    }
+    /// <summary>
+    /// Mys odide od schopnosti
+    /// </summary>
+    public void PointerExit()
+    {
+        description.SetActive(false);
     }
 
     /// <summary>

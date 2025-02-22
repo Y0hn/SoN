@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class BosStats : NPStats
 {
     /*  ZDEDENE ATRIBUTY
@@ -96,10 +94,7 @@ public class BosStats : NPStats
     protected override void LoadSavedData(World.EntitySave save)
     {
         var b = (World.BossSave)save;
-        if (!b.isAlive)
-            netObject.Despawn();
-        else
-            base.LoadSavedData(save);
+        base.LoadSavedData(save);
     }
     /// <summary>
     /// <inheritdoc/>

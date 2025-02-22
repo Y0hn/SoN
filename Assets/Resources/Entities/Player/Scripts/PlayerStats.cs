@@ -92,6 +92,7 @@ public class PlayerStats : EntityStats
             return w.ToArray();
         } 
     }
+    public Camera Camera => cam;
     public World.PlayerSave.SkillTreeSave SkillTreeSave => IsServer ? skillTree.SkillTreeSave : null;
     public World.PlayerSave.InventorySave InventorySave 
     {
@@ -164,8 +165,10 @@ public class PlayerStats : EntityStats
             xpBar = game.GetXpBar();
             cam.gameObject.SetActive(true);
 
-            // zursi si valstne povolenie na zivoty
-            Destroy(canvas.GetComponent<UtilitySkillScript>());
+            // zursi si valstne povolenia pre canvas vo svete
+            UtilitySkillScript[] ussr = canvas.GetComponents<UtilitySkillScript>();
+            foreach (var us in ussr)
+                Destroy(us);
 
             // Nastavenie 
             for (; equipment.Count < 2;)

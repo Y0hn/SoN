@@ -1,4 +1,5 @@
 using System;
+using NUnit.Framework;
 using Unity.Netcode;
 using UnityEngine;
 /// <summary>
@@ -7,6 +8,11 @@ using UnityEngine;
 [Serializable] public abstract class Skill : INetworkSerializable
 {
     public string name;
+    /// <summary>
+    /// Ziskanie informacii na zobrazenie
+    /// </summary>
+    public virtual string ToolTip => ToString();
+
     public Skill ()
     {
         name = "";
@@ -59,6 +65,11 @@ using UnityEngine;
     /// PRAVDA ak (amount < 0)
     /// </summary>
     public bool isSpeed => amount < 0;
+
+    public virtual string Value => isPercentyl ? Mathf.Abs(amount*100).ToString() + " %" : Mathf.Abs(amount).ToString();
+
+    public override string ToolTip => $"Increases {(isSpeed ? "Speed" : "Health")} \nby {Value}";
+
     public ModSkill ()
     {
         amount = 0;
@@ -98,6 +109,9 @@ using UnityEngine;
 {
     public bool damage;
     public Damage.Type condition;
+    public override string ToolTip => $"Adds {base.Value} to\n{(damage ? "Damage with" : "Defence against")}\n {Enum.GetName(typeof(Damage.Type), condition)}";
+
+    public override string Value => "+ " + base.Value;
     public ModDamage ()
     {
         condition = Damage.Type.None;
@@ -146,6 +160,9 @@ using UnityEngine;
 {
     public bool aquired;
     public Function function;
+
+    public override string ToolTip => $"Adds special \npower {Enum.GetName(typeof(Function), function)} \nto player";
+
     public Utility ()
     {
         aquired = false;

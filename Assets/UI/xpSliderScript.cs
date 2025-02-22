@@ -9,7 +9,6 @@ public class XpSliderScript : MonoBehaviour
     [SerializeField] GameManager game;
     [SerializeField] Slider slider;
     private Queue<float> changes;
-    private bool awoken= false;
     private byte lastLevel;
     private float Update => 0.01f;
 

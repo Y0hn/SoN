@@ -503,6 +503,7 @@ public enum GameType { Online, Local, Solo }
 [Serializable] public class World
 {
     public bool singlePlayer;
+    public bool ended;
     public string worldName;
     public string writeDate;
     public List<ItemOnFoor> items;
@@ -516,6 +517,7 @@ public enum GameType { Online, Local, Solo }
     {
         worldName = "";
         writeDate = DateTime.Now.ToString();
+        ended = false;
         items = new ();
         players = new ();
         entities = new ();
@@ -548,6 +550,9 @@ public enum GameType { Online, Local, Solo }
                 else
                     Debug.LogWarning($"NotEntity with tag Entity: {e.name} was incorectly handled in savefile");
             }
+            if (boss == null)
+                ended = true;
+
             foreach (GameObject p in GameObject.FindGameObjectsWithTag("Player"))
             {
                 if (p.TryGetComponent(out PlayerStats pS))
@@ -773,10 +778,9 @@ public enum GameType { Online, Local, Solo }
     /// </summary>
     [Serializable] public class BossSave : EntitySave
     {
-        public bool isAlive;
         public BossSave(BosStats entity) : base(entity)
         {
-            isAlive = entity.IsAlive.Value;
+            
         }
         /// <summary>
         /// <inheritdoc/>
@@ -785,7 +789,6 @@ public enum GameType { Online, Local, Solo }
         public override string ToString()
         {
             string s = base.ToString();
-            s += $"IsAlive: {isAlive}";
             return s;
         }
     }

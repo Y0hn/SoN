@@ -106,7 +106,7 @@ public class BosController : NPController
         {
             destinationSetter.target = t;
             selfTarget = false;
-            dfTargeted = t == defaultTarget;
+            dfTargeted = t.name == defaultTarget.name;
         }
         else
         {
@@ -115,9 +115,10 @@ public class BosController : NPController
             selfTarget = true;
             dfTargeted = false;
         }
+        
+        if (IsSpawned)
+            EnableCanvasRpc(!(dfTargeted || selfTarget));
 
-        EnableCanvasRpc(!(dfTargeted || selfTarget));
-        FileManager.Log($"canvas set to {!(dfTargeted || selfTarget)}", FileLogType.WARNING);
         attacking = false;
     }
     /// <summary>
@@ -140,6 +141,7 @@ public class BosController : NPController
     }
     [Rpc(SendTo.Everyone)] void EnableCanvasRpc(bool b)
     {
-        rect.gameObject.SetActive(b);
+        if (rect != null)
+            rect.gameObject.SetActive(b);
     }
 }

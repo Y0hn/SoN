@@ -110,3 +110,8 @@ https://youtu.be/ktGJstDvEmU
 ```
 Item item = Item.GetItem(refItem);
 ```
+
+## Tool tips:
+```
+https://youtu.be/wghrwZ4KQrc?list=PLzDRvYVwl53sN4Ewi_f-iyWZzWNmLG_bI
+```

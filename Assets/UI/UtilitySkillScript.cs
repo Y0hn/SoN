@@ -30,6 +30,10 @@ public class UtilitySkillScript : MonoBehaviour
     {
         if (game != null)
             game.UtilityUpdate -= UtilityUpdate;
+            
+        foreach (var g in gameObjects)
+            if (g != null)
+                Destroy(g);
     }
     /// <summary>
     /// Pri povoleni

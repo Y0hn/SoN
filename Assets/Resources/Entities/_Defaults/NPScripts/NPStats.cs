@@ -51,8 +51,6 @@ public class NPStats : EntityStats
     [SerializeField] protected NPSensor sensor;
     [SerializeField] protected AIPath aIPath;
     [SerializeField] protected bool drawGizmo = false;
-    [SerializeField] protected Transform rezists;
-    [SerializeField] protected GameObject def;
     protected float aToFire;
     public Action OnHit;
 
@@ -111,20 +109,7 @@ public class NPStats : EntityStats
             sensor.SetRange(rase.view);
             aIPath.maxSpeed = speed.Value/100f;
         }
-        aIPath.radius = 3f;
-        // Vymaze obrany
-        while (rezists.childCount < 0)
-            Destroy(rezists.GetChild(0).gameObject);
-        // Nastavi obrany
-        foreach (var d in rase.resists)
-        {
-            try {
-                Sprite s = Resources.Load<Sprite>(FileManager.GetDamageReff(d.defenceType));
-                Instantiate(def, rezists).GetComponent<DefType>().image.sprite = s;
-            } catch {
-                FileManager.Log($"{name} failed to set up rezists", FileLogType.ERROR);
-            }
-        }
+        ShowRezists();
     }
     /// <summary>
     /// <inheritdoc/>
@@ -231,6 +216,10 @@ public class NPStats : EntityStats
         string target = save.etName.Split('-')[1];
         GetComponent<NPController>().SetDefaultTarget(target);
     }
+    protected override void LoadSavedData(World.EntitySave save)
+    {
+        base.LoadSavedData(save);
+    }
 #pragma warning disable IDE0051 // Remove unused private members
     /// <summary>
     /// Kresli grafiku v editore ak je zapnuty parameter "drawGizmo"
@@ -240,6 +229,8 @@ public class NPStats : EntityStats
         if (drawGizmo)
             OnDrawGizmosSelected();
     }
+#endregion
+#region Kreslenie a Kolizie
     /// <summary>
     /// Kresli grafiku v edtiore ak je objekt oznaceny
     /// </summary>

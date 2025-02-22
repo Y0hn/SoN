@@ -28,12 +28,12 @@ public class BosSensor : MonoBehaviour
     /// <param name="other"></param>
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (game.IsServer && other.TryGetComponent(out EntityStats et) && et.TargetTeam != me)
+        if (game.IsServer && other.TryGetComponent(out EntityStats et) && et.TargetTeam != me /*&& et is not BosStats*/)
         {
             FileManager.Log($"Sensor of {transform.parent.name} cought {et.name}");
             inRange.Add(other.transform);
             FindClosestTarget();
-            targetChange.Invoke(ClosestTarget);
+            targetChange?.Invoke(ClosestTarget);
         }
     }
     /// <summary>

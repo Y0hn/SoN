@@ -56,6 +56,9 @@ public class GameManager : MonoBehaviour
     public Inventory inventory;
     private List<Utility.Function> utilities = new();
     private const byte MAX_NPC_COUNT = 25;
+
+    private Vector2 RawMousePos => inputs["point"].action.ReadValue<Vector2>();
+
     /// <summary>
     /// Ziska polohu mysi relativnu voci stredu obrazovky
     /// </summary>
@@ -64,7 +67,7 @@ public class GameManager : MonoBehaviour
     { 
         get 
         {
-            Vector2 mouse = inputs["point"].action.ReadValue<Vector2>();
+            Vector2 mouse = RawMousePos;
             Vector2 v= new(Screen.width/2, Screen.height/2);
             v= new(
                 mouse.x - v.x, 
@@ -72,6 +75,20 @@ public class GameManager : MonoBehaviour
             return v;
         }
     }
+    public Vector2 CornerMousePos
+    {
+        get {
+            Vector2 mouse = RawMousePos;
+            //Vector2 modifier = new (1920f/Screen.width, 1080f/Screen.height);
+
+            Vector2 v = new (Mathf.Clamp(mouse.x, 0, Screen.width), Mathf.Clamp(mouse.y, 0, Screen.height));
+            //v *= modifier;
+
+            FileManager.Log($"mouse [{mouse.x}, {mouse.y}] screen= [{Screen.width}, {Screen.height}] v [{v.x}, {v.y}]");
+            return v;
+        }
+    }
+    public Camera Camera => (LocalPlayer != null) ? LocalPlayer.Camera : uiPanels["mainCam"].GetComponent<Camera>();
     public PlayerStats LocalPlayer  { get => player; set => player = value; } 
     public SkillPanel SkillTree     { get => skillTree; }
     public bool PlayerAble          { get => !(paused || chatting || inventory.open); }
@@ -82,7 +99,6 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         instance = this;
-        //uiPanels["mainCam"].SetActive(true);
         skillTree.Awake();
         SetUpTextFields();
         SubscribeInput();
@@ -206,7 +222,7 @@ public class GameManager : MonoBehaviour
             if (FileManager.World.boss == null)
                 MapScript.map.SpawnBoss();
             // Inak ho nacita zo suboru
-            else if (FileManager.World.boss.isAlive)
+            else// if (!FileManager.World.ended)
                 MapScript.map.SpawnFromSave(FileManager.World.boss);
         } 
         menu.TiggerHideUI();
@@ -273,13 +289,14 @@ public class GameManager : MonoBehaviour
             StartGame();
     }
     /// <summary>
-    /// Nastavi 
+    /// Nastavi ui hry
     /// </summary>
     /// <param name="active"></param>
     void SetGameUI(bool active = false)
     {
         uiPanels["deathScreen"].SetActive(false);
         uiPanels["playerUI"].SetActive(active);
+        uiPanels["mainCam"].SetActive(false);
 
         uiPanels["pauseUI"].SetActive(false);
         paused = false;

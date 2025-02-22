@@ -113,7 +113,7 @@ public class NPController : EntityController
     /// <param name="t"></param>
     public virtual void SetDefaultTarget(Transform t)
     {
-        //Debug.Log("Default target setted to " + t.name);
+        //FileManager.Log("Default target setting to " + t.name);
         defaultTarget = t;
         SetTarget(t);
     }

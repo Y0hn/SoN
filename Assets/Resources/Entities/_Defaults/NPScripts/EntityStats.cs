@@ -27,6 +27,8 @@ public abstract class EntityStats : NetworkBehaviour
     [SerializeField] protected AITarget aiTeam = AITarget.Team_2;
     [SerializeField] protected EntityController controller;
     [SerializeField] protected AudioSource audioSource;
+    [SerializeField] protected Transform resists;
+    [SerializeField] protected GameObject res;
 
     [HideInInspector] public NetworkVariable<float> speed = new(100);
     [HideInInspector] public NetworkVariable<bool> IsAlive = new(true);
@@ -83,7 +85,21 @@ public abstract class EntityStats : NetworkBehaviour
     /// </summary>
     /// <param name="wIndex">Index zbrane</param>
     /// <returns>UTOK zo zbrane</returns>
-    protected virtual Attack GetAttackByWeaponIndex(WeaponIndex wIndex) => Weapons[wIndex.eIndex].attack[wIndex.aIndex];
+    protected virtual Attack GetAttackByWeaponIndex(WeaponIndex wIndex)
+    {
+        string log = "Not enough ";
+        if      (Weapons.Length <= wIndex.eIndex)
+            log = $"weapons ({Weapons.Length})";
+        else if (Weapons[wIndex.eIndex].attack.Count <= wIndex.aIndex)
+            log = $"attacks ({Weapons[wIndex.eIndex].attack.Count})";
+        else
+            return Weapons[wIndex.eIndex].attack[wIndex.aIndex];
+
+        log += $" for {wIndex}";
+        FileManager.Log(log, FileLogType.ERROR);
+    
+        return new();
+    }
     
 
     public const float 
@@ -328,6 +344,22 @@ public abstract class EntityStats : NetworkBehaviour
     public virtual void SetWeaponIndex (WeaponIndex WeI)
     {
         SetWeaponIndex(WeI.aIndex, WeI.eIndex);
+    }
+    protected virtual void ShowRezists()
+    {
+        // Vymaze obrany
+        while (resists.childCount < 0)
+            Destroy(resists.GetChild(0).gameObject);
+        // Nastavi obrany
+        foreach (var d in rase.resists)
+        {
+            try {
+                Sprite s = Resources.Load<Sprite>(FileManager.GetDamageReff(d.defenceType));
+                Instantiate(res, resists).GetComponent<DefType>().image.sprite = s;
+            } catch {
+                FileManager.Log($"{name} failed to set up rezists", FileLogType.ERROR);
+            }
+        }
     }
 #endregion
 #region LoadSavedData
