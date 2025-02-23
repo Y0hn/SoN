@@ -127,6 +127,7 @@ using System;
 [Serializable] public class AttackSlotActive : AttackSlot
 {
     [field:SerializeField] protected Image edge;
+    [field:SerializeField] protected Image num;
     private static Action<bool> ChangeActive;
     /// <summary>
     /// Nastavenie farby pre rozne stavy
@@ -195,18 +196,20 @@ using System;
     {
         if (!show && active || this.active && active)
         {
-            FileManager.Log("Already active");
+            //FileManager.Log("Already active");
             return;
         }
 
         if (active)
         {
+            num.color = activeC;
             edge.color = activeC;
             ChangeActive?.Invoke(!active);
             ChangeActive += SetActive;
         }
         else
         {
+            num.color = passiveC;
             edge.color = passiveC;
             ChangeActive -= SetActive;
         }

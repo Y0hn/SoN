@@ -348,8 +348,9 @@ public abstract class EntityStats : NetworkBehaviour
     protected virtual void ShowRezists()
     {
         // Vymaze obrany
-        while (resists.childCount < 0)
-            Destroy(resists.GetChild(0).gameObject);
+        int n = resists.childCount-1;
+        for (int i = n; 0 <= i; i--)
+            Destroy(resists.GetChild(i).gameObject);
         // Nastavi obrany
         foreach (var d in rase.resists)
         {

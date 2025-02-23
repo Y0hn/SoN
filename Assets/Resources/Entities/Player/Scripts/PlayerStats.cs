@@ -4,7 +4,11 @@ using Unity.Collections;
 using Unity.VisualScripting;
 using System.Collections.Generic;
 using TMPro;
+using System;
 using System.Linq;
+
+using Random = UnityEngine.Random;
+
 public class PlayerStats : EntityStats
 {
     /*  ZDEDENE ATRIBUTY
@@ -50,7 +54,6 @@ public class PlayerStats : EntityStats
     [SerializeField] GameObject chatField;
     [SerializeField] Transform canvas;
     [SerializeField] TMP_Text chatBox;
-    [SerializeField] Camera cam;
     
     public const uint NEEDED_XP_TO_NEXT_LEVEL = 100;
     protected const float REGAIN_HP_ON_LEVEL_UP = 0.3f;
@@ -92,7 +95,6 @@ public class PlayerStats : EntityStats
             return w.ToArray();
         } 
     }
-    public Camera Camera => cam;
     public World.PlayerSave.SkillTreeSave SkillTreeSave => IsServer ? skillTree.SkillTreeSave : null;
     public World.PlayerSave.InventorySave InventorySave 
     {
@@ -160,10 +162,11 @@ public class PlayerStats : EntityStats
         {
             game = GameManager.instance;
             inventUI = GameManager.instance.inventory;
+            resists = GameManager.instance.LocalDefence;
+
             hpBar.gameObject.SetActive(false);
-            hpBar = game.GetHpBar();
-            xpBar = game.GetXpBar();
-            cam.gameObject.SetActive(true);
+            hpBar = game.HpBar;
+            xpBar = game.XpBar;
 
             // zursi si valstne povolenia pre canvas vo svete
             UtilitySkillScript[] ussr = canvas.GetComponents<UtilitySkillScript>();
@@ -259,7 +262,6 @@ public class PlayerStats : EntityStats
         IsAlive.OnValueChanged  += (old, now) => 
         {
             game.AnimateUI("isAlive", now);
-            cam.gameObject.SetActive(now);
             game.SetPlayerUI(now);
         };
         level.OnValueChanged += (old, now) =>
@@ -267,6 +269,10 @@ public class PlayerStats : EntityStats
             for (int i = old; i < now; i++)
                 xpBar.QueueChange(xp.Value.XP, now);
             FileManager.Log($"Leveled up {old}->{now}", FileLogType.RECORD);
+        };
+        maxHp.OnValueChanged += (old, now) =>
+        {
+            game.SetMaxHp(now);
         };
     }
     /// <summary>
@@ -292,7 +298,6 @@ public class PlayerStats : EntityStats
     public override void SetWeaponIndex(WeaponIndex WeI)
     {
         base.SetWeaponIndex(WeI);
-        FileManager.Log($"Weapon index set to {WeI} Equipment= [{equipment[0]},{equipment[1]}]");
     }
     #endregion
     #region Udalosti
@@ -331,6 +336,23 @@ public class PlayerStats : EntityStats
         base.KilledEnemy(died);
         Experience x = new (xp.Value, (uint)(died.Level * Random.Range(25f, 50f)));
         xp.Value = x;
+    }
+    protected override void ShowRezists()
+    {
+        // Vymaze obrany
+        int n = resists.childCount-1;
+        for (int i = n; 0 <= i; i--)
+            Destroy(resists.GetChild(i).gameObject);
+        // Nastavi obrany
+        foreach (var d in game.defences)
+        {
+            try {
+                Sprite s = Resources.Load<Sprite>(FileManager.GetDamageReff(d));
+                Instantiate(res, resists).GetComponent<DefType>().image.sprite = s;
+            } catch (Exception ex) {
+                FileManager.Log($"{name} failed to set up rezists {ex.Message}", FileLogType.ERROR);
+            }
+        }
     }
     /// <summary>
     /// Pokusi sa prerusit utok
@@ -432,7 +454,15 @@ public class PlayerStats : EntityStats
         BoughtSkillRpc(skill.name);
 
         if      (skill is ModDamage mD)
+        {
             AddSkillRpc(mD);
+
+            if (IsOwner && !mD.damage)
+            {
+                game.AddResist(mD.condition);
+                ShowRezists();
+            }
+        }
         else if (skill is ModSkill mS)
             AddSkillRpc(mS);
         else if (skill is Utility ut)

@@ -72,14 +72,15 @@ public class MapScript : MapSizer
         SpawnLine[] spawns = spawLines.GetComponentsInChildren<SpawnLine>();
         for (int i = 0; i < spawns.Length; i++)
         {
-            // Mal by si vybrat najblizsiu neprekrocenu liniu k hracom
+            // po vyske linie vyberie nahodnu hodnotu
             Vector2 spawnL = spawns[i].Position;
+            
+            // Mal by si vybrat najblizsiu neprekrocenu liniu k hracom
             if (furtherestPlayer.x < spawnL.x)
             {
-                // po vyske linie vyberie nahodnu hodnotu
                 pos = spawnL;
 
-                // ak je za prvou liniou ma sancu 3/10
+                // ak je za prvou liniou ma sancu 3/10 na silnejsieho nepriatela
                 if (1 < i)
                     firstTier = Random.Range(i,10) < 3; // ak padne [0,1,2] zostava zakladny typ nepriatela
                 break;

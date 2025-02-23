@@ -1,10 +1,14 @@
 using UnityEngine;
 public class SpawnLine : MonoBehaviour 
 {
-    [SerializeField] float up;
-    [SerializeField] float down;
+    [SerializeField] float up   = 0;
+    [SerializeField] float down = 0;
+    [SerializeField] float left = 0;
+    [SerializeField] float right= 0;
 
-    public Vector2 Position => new (transform.position.x, Random.Range(transform.position.y-down, transform.position.y+up));
+    public Vector2 Position => 
+        new (   Random.Range(transform.position.y-left, transform.position.y+right+1), 
+                Random.Range(transform.position.y-down, transform.position.y+up   +1));
 
     void OnDrawGizmosSelected()
     {

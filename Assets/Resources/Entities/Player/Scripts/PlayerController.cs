@@ -27,9 +27,13 @@ public class PlayerController : EntityController
 #if UNITY_EDITOR
     [SerializeField] Equipment[] equipmentPool;
 #endif
+    private Camera cameraMan;
     private GameManager game;
     protected bool wasAttacking;
     protected new PlayerStats Stats => (PlayerStats)base.Stats;
+
+    protected float defaultCameraZooom;
+    protected const float DEATH_CAMERA_OUT_ZOOM = 10f;
 
     /// <summary>
     /// Pripoji sa na lokalny vstup vstup 
@@ -38,6 +42,8 @@ public class PlayerController : EntityController
     {
         if (IsOwner)
         {
+            cameraMan = cam.GetComponent<Camera>();
+            defaultCameraZooom = cameraMan.orthographicSize;
             game = GameManager.instance;
             game.PlayerSpawned(Stats);
             input_actions["attack"].action.started += Fire;
@@ -79,6 +85,11 @@ public class PlayerController : EntityController
         }
         else if (moveDir != Vector2.zero)
             moveDir = Vector2.zero;
+
+        else if (!Stats.IsAlive.Value && cameraMan.orthographicSize < DEATH_CAMERA_OUT_ZOOM)
+        {
+            cameraMan.orthographicSize += 10 * Time.deltaTime;
+        }
 
 #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.P))
@@ -140,6 +151,7 @@ public class PlayerController : EntityController
     {
         if (respawn.Respawnable && !Stats.IsAlive.Value)
         {
+            cam.GetComponent<Camera>().orthographicSize = defaultCameraZooom;
             Stats.Animator.SetBool("isAlive", true);
             Stats.ReviveRpc();
             attacking = false;

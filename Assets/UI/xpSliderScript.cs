@@ -45,7 +45,7 @@ public class XpSliderScript : MonoBehaviour
             if (slider.value < changes.Peek())
             {
                 slider.value += Update;
-                FileManager.Log($"Closing in on <{slider.value}-{changes.Peek()}>");
+                //FileManager.Log($"Closing in on <{slider.value}-{changes.Peek()}>");
             }
             else if (changes.Dequeue() == 1)
             {
