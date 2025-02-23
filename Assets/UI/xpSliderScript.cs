@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 /// <summary>
@@ -11,14 +12,19 @@ public class XpSliderScript : MonoBehaviour
     private Queue<float> changes;
     private byte lastLevel;
     private float Update => 0.01f;
+    private bool awoken =false;
 
     /// <summary>
     /// Volane pri spusteni
     /// </summary>
     void Awake()
     {
+        if (awoken) return;
+
         GameManager.GameQuit += SetUp;
         SetUp();
+
+        awoken = true;
     }
     void SetUp()
     {
@@ -31,7 +37,7 @@ public class XpSliderScript : MonoBehaviour
     }
     public void Load(float xp, byte level)
     {
-        SetUp();
+        Awake();
         slider.value = xp;
         lastLevel = level;
     }

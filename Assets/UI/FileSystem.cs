@@ -247,7 +247,6 @@ public static class FileManager
 
                 // Nacitane hodnoty zo suboru nastavi ako aktuale
                 settings = serializer.Deserialize(reader) as Settings;
-                Menu.menu.LoadSettings(settings);
             }
             finally
             {
@@ -256,7 +255,12 @@ public static class FileManager
             }
         }
         else
-            Log("Settings not found go to setting to gegenerate", FileLogType.WARNING);
+        {
+            settings = new(true);
+            Log("Settings not found go defaulting", FileLogType.WARNING);
+        }
+
+        Menu.menu.LoadSettings(settings);
     }
     #endregion
     #region References
@@ -399,7 +403,8 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
 [Serializable] public class Settings
 {
     public bool fullSc;
-    public int quality;
+    //public int quality;
+    public int resolution;
     public string playerName;
     public float[] audioS;
     
@@ -420,12 +425,25 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
         try {
             lastConnection = Connector.instance.GetConnection();
             playerName = Menu.menu.PlayerName;
-            quality = Menu.menu.Quality;
+            resolution = Menu.menu.Resolution;
+            //quality = Menu.menu.Quality;
             audioS = Menu.menu.Audios;
             fullSc = Menu.menu.FullSc;
         } catch (Exception ex) {
             FileManager.Log($"Setting Creation Error \nExeption: {ex.Message}\nData: {ex.Data}", FileLogType.WARNING);
         }
+    }
+    public Settings(bool df)
+    {
+        lastConnection = "";
+        playerName = "";
+        resolution = 2;
+        //quality = 0;
+        audioS = new float[3]
+        {
+            1, 1, 1,
+        };
+        fullSc = true;
     }
     public void RegeneradeSettings()
     {
@@ -442,7 +460,8 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
 
         fullSc = settings.fullSc;
         audioS = settings.audioS;
-        quality = settings.quality;
+        //quality = settings.quality;
+        resolution = settings.resolution;
         playerName = settings.playerName;     
 
         if (changed && settings.lastConnection != "")
@@ -466,7 +485,8 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
 
         eq &= fullSc == other.fullSc;
         eq &= audioS == other.audioS;
-        eq &= quality == other.quality;
+        //eq &= quality == other.quality;
+        eq &= resolution == other.resolution;
         eq &= playerName == other.playerName;
 
         if (other.lastConnection != "")
@@ -493,7 +513,8 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
         return
             $"Player NameTag= {playerName}\n"+
             $"Last connection= {lastConnection}\n"+
-            $"Quality setting= {quality}\n"+
+            //$"Quality setting= {quality}\n"+
+            $"Resolution= {resolution}\n"+
             $"Fullscreen= {fullSc}\n"+
             $"Auidos list: {auL}";
     }

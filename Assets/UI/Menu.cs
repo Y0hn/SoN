@@ -18,7 +18,8 @@ public class Menu : MonoBehaviour
     [SerializeField] Toggle fullScToggle;
     [SerializeField] AudioSource meneTheme;
     [SerializeField] AudioSource ui_sfx;
-    [SerializeField] QualityScript quality;
+    //[SerializeField] QualityScript quality;
+    [SerializeField] ResolutionScript resolution;
     [SerializeField] AudioMixer[] audioMixers;   
     [SerializedDictionary("Name", "Button"), SerializeField]
     private SerializedDictionary<string, MainUIButton> buttons = new();
@@ -112,7 +113,8 @@ public class Menu : MonoBehaviour
     }
     public bool localGame { get => lanToggle.isOn;  set => lanToggle.isOn = value;   }
     public bool FullSc { get => fullScToggle.isOn;  set => fullScToggle.isOn = value;   }
-    public int Quality { get => quality.Q;          set => quality.Q = value;           }
+    //public int Quality { get => quality.Q;          set => quality.Q = value;           }
+    public int Resolution { get => resolution.R; set => resolution.R = value; }
     public float[] Audios 
     {
         get 
@@ -132,6 +134,8 @@ public class Menu : MonoBehaviour
             }
         }
     }
+
+    public FullScreenMode ScreenMode => FullSc ? FullScreenMode.ExclusiveFullScreen: FullScreenMode.MaximizedWindow;
 
     /// <summary>
     /// Zavola sa na zaciatku
@@ -388,9 +392,10 @@ public class Menu : MonoBehaviour
     public void LoadSettings(Settings settings)
     {
         Audios = settings.audioS;
-        Quality= settings.quality;
-        //localGame= !settings.Online;
+        //Quality= settings.quality;
+        localGame= !settings.Online;
         FullSc = settings.fullSc;
+        Resolution = settings.resolution;
         PlayerName = settings.playerName;
         lastConnection = settings.lastConnection;
         if (lastConnection != "")

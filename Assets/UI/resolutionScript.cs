@@ -17,7 +17,7 @@ public class ResolutionScript : MonoBehaviour
         new(1280, 720)    // HD (720p)
     };
     /// <summary>
-    /// Ziskava alebo nastavuje kvalitu
+    /// Ziskava alebo nastavuje rozlisenie
     /// </summary>
     public int R 
     { 
@@ -26,7 +26,7 @@ public class ResolutionScript : MonoBehaviour
         { 
             resolution= value;
             Vector2Int res = resolutions[value];
-            /*Screen.SetResolution(res.x, res.y, Menu.menu.ScreenMode);*/
+            Screen.SetResolution(res.x, res.y, Menu.menu.ScreenMode);
             text.text = $"{res.x}x{res.y}";
         } 
     }
@@ -36,7 +36,6 @@ public class ResolutionScript : MonoBehaviour
     /// </summary>
     void Start()
     {
-        
         button.onClick.AddListener(OnButtonClick);
     }
     /// <summary>
@@ -46,9 +45,5 @@ public class ResolutionScript : MonoBehaviour
     {
         int r = (R+1 < resolutions.Length) ? R+1 : 0;
         R = r;
-    }
-
-    void ChangeResolution()
-    {
     }
 }

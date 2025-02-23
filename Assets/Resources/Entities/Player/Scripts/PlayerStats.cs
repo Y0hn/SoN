@@ -402,24 +402,25 @@ public class PlayerStats : EntityStats
             if (item != "")
                 inventory.Add(item);
 
+        int min = pSave.level*100;
+        if (0 < pSave.level)
+            min+= 50;
+        Experience exp = new(min, (int)pSave.xp, (pSave.level+1)*100+50);
 
         if (IsOwner)
         {
             game.LocalPlayer = this;
-            float xp = pSave.xp/(pSave.level+1)*100+50;
-            xpBar.Load(xp, pSave.level);
+            xpBar.Load(exp.XP, pSave.level);
             game.SkillTree.LoadSkills(pSave);
             game.inventory.ReloadAttacks();
         }
         if (IsServer) 
         {
             level.Value = pSave.level;
-            int min = pSave.level*100;
-            if (0 < pSave.level)
-                min+= 50;
-            xp.Value = new(min, (int)pSave.xp, (pSave.level+1)*100+50);
             //maxHp.Value = pSave.level*100+50;
             //speed.Value = pSave.speed;
+
+            xp.Value = exp;
 
             // inhereted
             hp.Value = Mathf.RoundToInt(save.hp * (float)pSave.maxHp);
