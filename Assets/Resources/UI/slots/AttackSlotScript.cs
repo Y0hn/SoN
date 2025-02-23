@@ -17,11 +17,7 @@ public class PassiveAttackSlotScript : MonoBehaviour
         } 
         gameObject.SetActive(true);
     }
-    public void Click(int id)
-    {
-        if (0 <= id && id < attackSlots.FindAll(atS => atS.show).Count)
-            attackSlots[id].OnButtonClick();
-    }
+    public void Click(int id) => attackSlots[id].OnButtonClick();
     public void UnsetAttacks()
     {
         SetAttacks(new());
@@ -70,16 +66,15 @@ public class PassiveAttackSlotScript : MonoBehaviour
     /// Ak je viac zapnutych pasivnych utokov ako aktivnych utokov (3)
     /// </summary>
     /// <returns>ID vypnuteho</returns>
-    public int ShutRandomActive()
+    public Damage.Type ShutRandomActive()
     {
         List<AttackSlotPassive> atsP = GetActive();
         if (0 < atsP.Count)
         {
-            // prvy od konca
             int id = atsP[Random.Range(0, atsP.Count)].id;
             if (SetActive(id))
-                return id;
+                return attackSlots.Find(atS => atS.id == id).type;
         }
-        return -1;
+        return Damage.Type.None;
     }
 }

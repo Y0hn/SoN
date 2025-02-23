@@ -36,6 +36,6 @@ public class AudioMixer : MonoBehaviour
     {
         value = Mathf.Log10(value)*20;
         mixerG.audioMixer.SetFloat(mixerG.name, value);
-        //Debug.Log($"Audio volume of {mixerG.name} setted to {value}");
+        FileManager.Log($"Audio volume of {mixerG.name} setted to {value}");
     }
 }

@@ -9,7 +9,7 @@ public class SkillPanel : MonoBehaviour
 {
     public event Action<bool> OnChangeAvailablePoints;
     [SerializeField] TMP_Text skillCounterText;
-    [SerializeField] Transform skills;
+    [SerializeField] RectTransform skills;
     [SerializeField] HoldButton button;
     [SerializeField] GameManager game;
     [SerializeField] Vector2 limitPosition;
@@ -52,12 +52,12 @@ public class SkillPanel : MonoBehaviour
     /// <summary>
     /// Animovanie tahania stromu schopnosti
     /// </summary>
-    void FixedUpdate()
+    void Update()
     {
         if (button.isHolding)
         {
-            Vector2 v = game.MousePos - startMouse;
-            startMouse = game.MousePos;
+            Vector2 v = game.CornerMousePos - startMouse;
+            startMouse = game.CornerMousePos;
             MoveSkills(v);
         }
         if (ReloadLimimts)
@@ -68,9 +68,12 @@ public class SkillPanel : MonoBehaviour
     /// </summary>
     private void CalculateLimits()
     {
+        // ohranicuje lavu sranu a spodok
         limits[0] = new (
             Mathf.Round(transform.position.x-limitPosition.x-limitOffset.x), 
             Mathf.Round(transform.position.y-limitPosition.y-limitOffset.y));
+
+        // ohranicuje provu sranu a vrch
         limits[1] = new (
             Mathf.Round(transform.position.y+limitPosition.x-limitOffset.x), 
             Mathf.Round(transform.position.y+limitPosition.y-limitOffset.y));
@@ -103,17 +106,23 @@ public class SkillPanel : MonoBehaviour
     /// <param name="moveBy"></param>
     public void MoveSkills (Vector2 moveBy)
     {
-        Vector2 newPosition = new (skills.position.x + moveBy.x, skills.position.y + moveBy.y);
+        Vector2 newPosition = new (skills.localPosition.x + moveBy.x, skills.localPosition.y + moveBy.y);
 
-        if  (limits[0].x < newPosition.x && newPosition.x < limits[1].x
-                &&
-             limits[0].y < newPosition.y && newPosition.y < limits[1].y)
+        bool canMove = limits[0].x < newPosition.x && newPosition.x < limits[1].x;
+        canMove &= limits[0].y < newPosition.y && newPosition.y < limits[1].y;
+
+        if  (canMove)
         {
-            skills.position = newPosition;
+            skills.localPosition = newPosition;
             /*
             Debug.Log(  $"Moving skillTree to ({newPosition.x},{newPosition.y})\n" + 
                         $"Base ({transform.position.x},{transform.position.y})\n" +
                         $"Limits: \n0 => ({limits[0].x},{limits[0].y}) \n1 => ({limits[1].x},{limits[1].y})");*/
+        }
+        else
+        {
+            FileManager.Log($"Cannot move to ({newPosition.x},{newPosition.y}) Base ({transform.position.x},{transform.position.y})"+
+                            $"Limits: 0 => ({limits[0].x},{limits[0].y}) 1 => ({limits[1].x},{limits[1].y})");
         }
     }
     /// <summary>
@@ -149,5 +158,8 @@ public class SkillPanel : MonoBehaviour
     {
         foreach (var s in skillSlots)
             s.Value.Restart();
+
+        totalPoints = 0;
+        usedPoints = 0;
     }
 }

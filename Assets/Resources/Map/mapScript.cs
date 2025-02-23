@@ -1,14 +1,14 @@
 using Unity.Netcode;
 using UnityEngine;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 /// <summary>
 /// Sluzi pre spravne nacitanie udajov mapy a zaroven aj zo serveru vytvara nepriatelov na liniiach mapy
 /// </summary>
 public class MapScript : MapSizer
 {
     public static MapScript map;
-    [SerializeField] Transform spawLines;
+    [SerializeField] List<SpawnLine> spawLines;
     [SerializeField] Transform extractions;
     [SerializeField] Vector2 playerSpawnRange = new(5,5);
     [SerializeField] Transform PlayerSpawnPoint;
@@ -23,6 +23,35 @@ public class MapScript : MapSizer
             PlaySpawn.position.y + Random.Range(-playerSpawnRange.y, playerSpawnRange.y));
 
     public static byte npCouter = 0;
+    private const byte BASE_MAX_NPC_COUNT = 15;
+    private Vector2 FurtherestPlayer
+    {
+        get 
+        {
+            Vector2 fP = Vector2.zero;
+            GameObject.FindGameObjectsWithTag("Player").ToList().ForEach(g => 
+            {
+                float x = g.transform.position.x; 
+                if (fP.x < x) 
+                    fP = new (x, fP.y);
+            });
+            return fP;
+        }
+    }
+    /// <summary>
+    /// Najblizsiu neprekrocenu liniu k hracom
+    /// </summary>
+    private int LastLineCrossed 
+    {
+        get {
+            float playerPos = FurtherestPlayer.x + 10;
+            return spawLines.FindIndex(spL => playerPos < spL.Position.x);
+        }
+    }
+    private int lastSpawnedLine = 0;
+
+    public bool SpawnEnemies => npCouter < MaxNPCounter;
+    public int MaxNPCounter => BASE_MAX_NPC_COUNT + 10 * lastSpawnedLine;
 
     /// <summary>
     /// Zavola sa pred prvym snimkom obrazovky hry
@@ -57,37 +86,18 @@ public class MapScript : MapSizer
     /// </summary>
     public void SpawnEnemy()
     {
-        // ziska hraca, ktory zasiel najdalej
-        Vector2 furtherestPlayer = Vector2.zero;
-        GameObject.FindGameObjectsWithTag("Player").ToList().ForEach(g => 
-            {
-                float x = g.transform.position.x; 
-                if (furtherestPlayer.x < x) 
-                    furtherestPlayer = new (x, furtherestPlayer.y);
-            });
+        FileManager.Log("Started spawning");
 
-        // ziska liniu pre vytvorenie nepriatela
-        bool firstTier = true;
-        Vector3 pos = Vector2.zero;
-        SpawnLine[] spawns = spawLines.GetComponentsInChildren<SpawnLine>();
-        for (int i = 0; i < spawns.Length; i++)
-        {
-            // po vyske linie vyberie nahodnu hodnotu
-            Vector2 spawnL = spawns[i].Position;
-            
-            // Mal by si vybrat najblizsiu neprekrocenu liniu k hracom
-            if (furtherestPlayer.x < spawnL.x)
-            {
-                pos = spawnL;
+        // ziska suradnice pre vytvorenie nepriatela
+        lastSpawnedLine = LastLineCrossed;
+        Vector2 pos = spawLines[lastSpawnedLine].SpawnPosition;
+        //FileManager.Log("Spawing Got Position");
 
-                // ak je za prvou liniou ma sancu 3/10 na silnejsieho nepriatela
-                if (1 < i)
-                    firstTier = Random.Range(i,10) < 3; // ak padne [0,1,2] zostava zakladny typ nepriatela
-                break;
-            }
-        }
+        // ak padne menej ako 5 pouzije slabsi model typ nepriatela
+        bool firstTier = Random.Range(lastSpawnedLine,10) < 5; 
+        //FileManager.Log("Spawing Got Tier");
         
-        // Nahodne vyberie typ nepriatela (zakladny / silnejsi) variant
+        // Nahodne vyberie typ nepriatela v danej (zakladny / silnejsi) variante
         GameObject enemy = firstTier ? 
             regularEnemiesTier1[Random.Range(0,regularEnemiesTier1.Length)] 
                 : 
@@ -97,6 +107,7 @@ public class MapScript : MapSizer
         enemy = Instantiate(enemy, pos, Quaternion.identity);
         NPStats npc = enemy.GetComponent<NPStats>();
         npc.NetObject.Spawn();
+        //FileManager.Log("Spawing spawned");
 
         // Zvoli nahodny ciel
         npc.GetComponent<NPController>().SetDefaultTarget(extractions.GetChild(Random.Range(0,extractions.childCount)));

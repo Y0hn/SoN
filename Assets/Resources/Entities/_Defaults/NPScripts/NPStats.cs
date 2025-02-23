@@ -146,7 +146,7 @@ public class NPStats : EntityStats
                 SetWeaponIndex(rase.swapons[i].weaponIndex);
                 //FileManager.Log("Swapon used on " + name);
             }
-        OnHit.Invoke();
+        OnHit?.Invoke();
     }
 #endregion
 #region Udalosti
@@ -271,13 +271,8 @@ public class NPStats : EntityStats
     /// <param name="collision"></param>
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (IsServer && collision.gameObject.layer.Equals(LayerMask.NameToLayer("Water")))
-        {
-            /*int php = hp.Value;
-            hp.Value = 0;
-            hp.OnValueChanged.Invoke(php, hp.Value);*/
+        if (IsServer && collision.gameObject.layer.Equals(LayerMask.NameToLayer("Water")) && IsSpawned && netObject != null)
             netObject.Despawn();
-        }
     }
 #pragma warning restore IDE0051 // Remove unused private members
 #endregion

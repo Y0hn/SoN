@@ -61,7 +61,6 @@ public class GameManager : MonoBehaviour
     public Inventory inventory;
     public List<Damage.Type> defences = new();
     private List<Utility.Function> utilities = new();
-    private const byte MAX_NPC_COUNT = 25;
 
 #region Odkazovace
     private Vector2 RawMousePos => inputs["point"].action.ReadValue<Vector2>();
@@ -214,7 +213,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void EnemySpawner()
     {
-        while (MapScript.npCouter < MAX_NPC_COUNT)
+        while (MapScript.map.SpawnEnemies)
             //FileManager.Log($"Enemy spawing {MapScript.npCouter} < {MAX_NPC_COUNT}");
             MapScript.map.SpawnEnemy();
     }
@@ -316,7 +315,7 @@ public class GameManager : MonoBehaviour
     /// Zobrazi ponuku pauzy <br />
     /// V hre pre jedneho hraca zastavi cas
     /// </summary>
-    void Pause()
+    public void Pause()
     {
         paused = !paused;
         uiPanels["pauseUI"].SetActive(paused);
@@ -410,7 +409,7 @@ public class GameManager : MonoBehaviour
         // Vymaze objekty obrany
         int n = LocalDefence.childCount-1;
         for (int i = n; 0 <= i; i--)
-            Destroy(LocalDefence.GetChild(0).gameObject);
+            Destroy(LocalDefence.GetChild(i).gameObject);
 
         menu.TiggerHideUI();
         FileManager.Log("Game started");

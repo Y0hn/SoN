@@ -406,7 +406,8 @@ public class PlayerStats : EntityStats
         if (IsOwner)
         {
             game.LocalPlayer = this;
-            xpBar.Load(pSave.xp, pSave.level);
+            float xp = pSave.xp/(pSave.level+1)*100+50;
+            xpBar.Load(xp, pSave.level);
             game.SkillTree.LoadSkills(pSave);
             game.inventory.ReloadAttacks();
         }

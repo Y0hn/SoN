@@ -21,7 +21,7 @@ public class QualityScript : MonoBehaviour
             QualitySettings.SetQualityLevel(quality);
         } 
     }
-    int quality = 0;
+    int quality = 2;
     /// <summary>
     /// Spusit sa na zaciatku
     /// </summary>

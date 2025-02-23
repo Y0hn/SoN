@@ -430,32 +430,38 @@ public class Inventory : MonoBehaviour
     /// <param name="active"></param>
     public void SetActiveAttackType(sbyte id, bool active)
     {
-        int  fist_att = acSlots.Find(acS => acS.id == 0) != null ? 1 : 0;
-        bool already = acSlots.Find(acS => acS.id == id) != null;
-        int b = acSlots.FindAll(acS => acS.show).Count;
-        b-= fist_att;
 
-        // ziska slot ktory zavolal metodu
+        // zisti pocet zalnenych miest
+        // ruku tiez vnima ako volne miesto
+        int ocupied = acSlots.FindAll(acS => !acS.show).Count - (acSlots.Find(acS => acS.id == 0) != null ? 1 : 0);
+
+        // ziska pasivny slot ktory zavolal metodu
         AttackSlotPassive change = null;
-        for (int i = 0; i < atSlots.Length && change == null; i++)
-            change = atSlots[i].GetSlot(id);
+        int index = 0;
+        for (; index < atSlots.Length && change == null; index++)
+            change = atSlots[index].GetSlot(id);
+        index--;
+
+        // zisti ci uz bol povoleny
+        bool already = acSlots.Find(acS => acS.type == change.type) != null;
         
-        // vypne posledny utok poslednej zbrane
-        if      (active && !already && b >= acSlots.Count)
+        // ak nie je miesto medzi utokmi a chceme zapnut dalsi
+        if      (active && !already && acSlots.Count <= ocupied)
         {
-
+            // vypne nahodny utok nahodej zbrane
             int ii = Random.Range(0, atSlots.Length);
-            int index = atSlots[ii].ShutRandomActive();
+            Damage.Type dt = atSlots[ii].ShutRandomActive();
+            id -= 10;
 
-            if (0 <= index)
-                acSlots.Find(acS => acS.id == id).SetShow();
+            acSlots.Find(acS => acS.type == dt).Set(change.type, id);
         }
         // ak je zapnuty a ma sa vypnut tak sa vypne
         else if (!active && already)
         {
-            acSlots.Find(acS => acS.id == id).SetShow();
-            change.SetActive(active);
+            acSlots.Find(acS => acS.type == change.type).SetShow();
         }
+        
+        atSlots[index].SetActive(id);
         
         ReloadAttacks();
     }

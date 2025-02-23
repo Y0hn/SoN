@@ -190,6 +190,7 @@ using System;
     public override void SetShow (bool show = false)
     {
         base.SetShow(show);
+        num.gameObject.SetActive(show);
         foreground.gameObject.SetActive(show);
     }
     public override void SetActive (bool active = true)

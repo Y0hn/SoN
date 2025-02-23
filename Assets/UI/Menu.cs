@@ -138,10 +138,10 @@ public class Menu : MonoBehaviour
     /// </summary>
     void Awake()
     {   
+        menu = this;
         GameManager.GameQuit += delegate { gameObject.SetActive(true); };
         SubscribeToButtons();
         ResetTextFields();
-        menu = this;
     }
     /// <summary>
     /// Zavolane pri prvom povoleni objektu
@@ -149,13 +149,13 @@ public class Menu : MonoBehaviour
     void Start() 
     {
         conn = Connector.instance;
+        FileManager.Renew();
     }
     /// <summary>
     /// Zapne sa pri povoleni objektu
     /// </summary>
     void OnEnable()
     {
-        FileManager.Renew();
         meneTheme.Play();
         ResetUI();        
     }
@@ -399,11 +399,13 @@ public class Menu : MonoBehaviour
         }
     }
     /// <summary>
-    /// Obnevi tlacidlo pokracovat podla sveta
+    /// Obnovi tlacidlo pokracovat podla sveta
     /// </summary>
     public void ReloadContinue()
     {
-        bool solo = lastConnection.Contains("solo-");
+        bool solo = !(lastConnection == null || lastConnection == "");
+
+        solo &= lastConnection.Contains("solo-");
         string s = lastConnection.Split('-')[1];
         bool found = false;
 

@@ -73,6 +73,7 @@ public static class FileManager
     /// </summary>
     public static void Renew()
     {
+        CheckWorldPath();
         LoadSettings();
     }
 
@@ -83,9 +84,7 @@ public static class FileManager
     /// <returns>pole udajo SVETOV</returns>
     public static World[] GetSavedWorlds()
     {
-        // Ak priecinok neexistuje vytvori ho
-        if (!Directory.Exists(WorldPath))
-            Directory.CreateDirectory(WorldPath);
+        CheckWorldPath();
 
         // Ziska vsetky cesty ulozenych svetom
         string[] wrs = Worlds;
@@ -97,6 +96,14 @@ public static class FileManager
             worlds[i] = ReadWorld(wrs[i]);
 
         return worlds;
+    }
+    /// <summary>
+    /// Ak priecinok neexistuje vytvori ho
+    /// </summary>
+    public static void CheckWorldPath()
+    {
+        if (!Directory.Exists(WorldPath))
+            Directory.CreateDirectory(WorldPath);
     }
     /// <summary>
     /// Ziska svet na ceste
@@ -147,10 +154,7 @@ public static class FileManager
     /// </summary>
     /// <param name="name"></param>
     public static async Task StartWorld(string name, GameType type = GameType.Online) 
-    {        
-        if (!Directory.Exists(WorldPath)) 
-            Directory.CreateDirectory(WorldPath);
-            
+    {            
         Log($"World {name} is loading", FileLogType.WARNING);
         string path = NameToWorldPath(name);
 
