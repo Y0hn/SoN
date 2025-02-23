@@ -104,4 +104,8 @@ public class BosStats : NPStats
     {
         LoadSavedData(save);
     }
+    protected override void Die()
+    {
+        GameManager.instance.BossKilled();
+    }
 }

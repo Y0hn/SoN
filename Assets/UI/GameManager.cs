@@ -157,7 +157,7 @@ public class GameManager : MonoBehaviour
         inputs["chat"].action.started += OpenChat;
         inputs["submit"].action.started += SendMess;
 
-        quit.onClick.AddListener(Quit);
+        quit.onClick.AddListener(delegate { Quit(); });
     }
 
 #region Nastavovace
@@ -274,6 +274,13 @@ public class GameManager : MonoBehaviour
     {
         return utilities.Contains(f);
     }
+    public void BossKilled()
+    {
+        anima.SetTrigger("titles");
+        /*if (IsServer)
+            FileManager.DeleteWorld(FileManager.World.worldName);*/
+        Quit(false);
+    }
 #region UI_Vstupy
     /// <summary>
     /// Otvori/Zavrie pauzove menu
@@ -357,15 +364,21 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Odide z hry -> do hlavneho menu
     /// </summary>
-    public void Quit()
+    public void Quit(bool gameQuit = true)
     {
         if (IsServer)
             NPStats.npcDied -= EnemySpawner;
 
-        GameQuit.Invoke();
+        if (gameQuit)
+            QuitUI();
+
         themeAudio.Stop();
         Time.timeScale = 1;
         conn.Quit(player.OwnerClientId);
+    }
+    public void QuitUI()
+    {
+        GameQuit.Invoke();
     }
 #endregion
 #endregion
