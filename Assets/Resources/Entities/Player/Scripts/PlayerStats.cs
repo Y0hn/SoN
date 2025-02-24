@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 
 using Random = UnityEngine.Random;
+using UnityEngine.InputSystem.Layouts;
 
 public class PlayerStats : EntityStats
 {
@@ -61,6 +62,7 @@ public class PlayerStats : EntityStats
     protected float chatTimer; const float chatTime = 5.0f;
     protected XpSliderScript xpBar;       // UI nastavene len pre Ownera
     protected GameManager game;
+    protected Connector conn;
     protected Inventory inventUI;
 
     public NetworkVariable<Experience> xp = new(new (0,0,50));
@@ -160,6 +162,7 @@ public class PlayerStats : EntityStats
         }
         if (IsOwner)
         {
+            conn = Connector.instance;
             game = GameManager.instance;
             inventUI = GameManager.instance.inventory;
             resists = GameManager.instance.LocalDefence;
@@ -437,6 +440,8 @@ public class PlayerStats : EntityStats
     /// <param name="reference"></param>tile.Stop();
     public virtual bool PickedUp(string reference)
     {
+        if (!(IsOwner || IsServer)) return false;
+
         bool free = reference != "" && !inventory.Contains(reference) && !equipment.Contains(reference);
 
         if (free)
@@ -527,6 +532,10 @@ public class PlayerStats : EntityStats
     [Rpc(SendTo.Server)] public void ReviveRpc()
     {
         IsAlive.Value = true;
+        ResetPositionRpc();
+    }
+    [Rpc(SendTo.Owner)] public void ResetPositionRpc()
+    {
         MapScript.map.SpawnPlayer(transform);
     }
     [Rpc(SendTo.Owner)] public void QuitRpc()
@@ -537,6 +546,18 @@ public class PlayerStats : EntityStats
     {
         inventory.Remove(i);
         DropRpc(i, new (2,2), new (1,1));
+    }
+    [Rpc(SendTo.Owner)] public void SetRemotePlayerRpc(ulong id, bool connect = true)
+    {
+        if (id != OwnerClientId && conn.netMan.ConnectedClients.TryGetValue(id, out var client))
+        {
+            Transform t = client.PlayerObject.transform;
+
+            if (connect)
+                game.AddRemotePlayer(t);
+            else
+                game.RemoveRemotePlayer(t);
+        }
     }
 #endregion
 }

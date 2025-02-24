@@ -31,7 +31,7 @@ public class PlayerNameField : InputFieldCheck
         if (check)
         {
             Menu.menu.playerName = player;
-            FileManager.RegeneradeSettings();
+            //FileManager.RegeneradeSettings();
         }
         return check;
     }

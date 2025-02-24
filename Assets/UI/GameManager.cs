@@ -111,7 +111,8 @@ public class GameManager : MonoBehaviour
 
             player = value; 
         } 
-    } 
+    }
+    public List<Transform> RemotePlayers= new();
     public SkillPanel SkillTree     { get => skillTree; }
     public bool PlayerAble          { get => !(paused || chatting || inventory.open); }
     public bool IsServer            { get { bool? b = conn.netMan?.IsServer; return b != null && b.Value; } }
@@ -284,6 +285,14 @@ public class GameManager : MonoBehaviour
         uiPanels["titles"].SetActive(true);
         Quit(false);
     }
+    public void AddRemotePlayer(Transform rPlayer)
+    {
+        RemotePlayers.Add(rPlayer);
+    }
+    public void RemoveRemotePlayer(Transform rPlayer)
+    {
+        RemotePlayers.Remove(rPlayer);
+    }
 #region UI_Vstupy
     /// <summary>
     /// Otvori/Zavrie pauzove menu
@@ -377,6 +386,7 @@ public class GameManager : MonoBehaviour
 
         themeAudio.Stop();
         Time.timeScale = 1;
+        RemotePlayers.Clear();
         conn.Quit(player.OwnerClientId);
     }
     public void QuitUI()

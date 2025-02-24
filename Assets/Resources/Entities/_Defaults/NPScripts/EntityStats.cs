@@ -338,8 +338,7 @@ public abstract class EntityStats : NetworkBehaviour
     {
         weapE.Value = new (weapon, attack);
 
-        //weapE.OnValueChanged.Invoke(wi, weapE.Value);
-        //Debug.Log($"Setted Weapon Index= {weapE.Value}");
+        FileManager.Log($"Setted {name} Weapon Index= {weapE.Value}", FileLogType.RECORD);
     }
     public virtual void SetWeaponIndex (WeaponIndex WeI)
     {
@@ -418,8 +417,8 @@ public abstract class EntityStats : NetworkBehaviour
         pos.y += transform.position.y;
 
         GameObject i = Instantiate(Resources.Load<GameObject>("Items/ItemDrop"), pos, Quaternion.identity);
-        i.GetComponent<ItemDrop>().Item = Item.GetItem(itemPath);
         i.GetComponent<NetworkObject>().Spawn();
+        i.GetComponent<ItemDrop>().SetItemRpc(itemPath);
 
         FileManager.Log($"Item {itemPath} droped");
     }

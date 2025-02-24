@@ -211,11 +211,11 @@ public static class FileManager
     /// Vytvori novy subor nastaveni podla aktualnych hodnot <br /> 
     /// ulozi ho vo formate .xml a prepise ten stary
     /// </summary>
-    public static void RegeneradeSettings() // Called on ConnectToSever/SettingsClose
+    public static void RegeneradeSettings(bool reloadWindow= false) // Called on ConnectToSever/SettingsClose
     {
         // Ziska hodnoty aktualneho nastavenia 
         settings ??= new();
-        settings.RegeneradeSettings();
+        settings.RegeneradeSettings(reloadWindow);
 
         TextWriter writer = null;
         try
@@ -260,7 +260,7 @@ public static class FileManager
             Log("Settings not found go defaulting", FileLogType.WARNING);
         }
 
-        Menu.menu.LoadSettings(settings);
+        Menu.menu.LoadSettings(settings, true);
     }
     #endregion
     #region References
@@ -445,10 +445,10 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
         };
         fullSc = true;
     }
-    public void RegeneradeSettings()
+    public void RegeneradeSettings(bool reloadWindow= false)
     {
         if (ReNewSettings(new()))
-            ApplySettings();
+            ApplySettings(reloadWindow);
     }
     /// <summary>
     /// Nastavi hodnoty do statickych clenov menu
@@ -469,10 +469,10 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
         
         return changed;
     }
-    private void ApplySettings()
+    private void ApplySettings(bool reloadWindow =false)
     {
         // Nastavi vlastnosti hry podla novych hodnot
-        Menu.menu.LoadSettings(this);
+        Menu.menu.LoadSettings(this, reloadWindow);
     }
     /// <summary>
     /// Pororvnanie hodnot

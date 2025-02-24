@@ -7,6 +7,7 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 /// <summary>
 /// Sluzi na zhrnutie parametrov potrebnych pre pripojenie
@@ -38,10 +39,11 @@ public class Connector : MonoBehaviour
     /// </summary>
     /// <returns>IP_ADRESA</returns>
     private string ServerIP => IPManager.GetIP();
-
     void Awake()
     {
         instance = this;
+        netMan.OnClientConnectedCallback += OnClientConn;
+        netMan.OnClientDisconnectCallback += OnClientDiss;
     }
     async void Start()
     {
@@ -57,7 +59,44 @@ public class Connector : MonoBehaviour
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
     }
+    /// <summary>
+    /// Spusti sa po pripojeni hraca
+    /// </summary>
+    /// <param name="id"></param>
+    void OnClientConn(ulong id)
+    {
+        // nastavi referenciu pripojeneho hraca pre vsetkych pripojenych hracov 
+        if (netMan.IsServer && id != netMan.LocalClientId)
+        {
+            foreach (var c in netMan.ConnectedClients.Values)
+                c.PlayerObject.GetComponent<PlayerStats>().SetRemotePlayerRpc(id, true);
+        }
+        
+        // nastavuje vsetkych hracov novo pripojenemu hracovi
+        if (netMan.ConnectedClients.TryGetValue(id, out var client))
+        {
+            PlayerStats plS = client.PlayerObject.GetComponent<PlayerStats>();
 
+            foreach (var cId in netMan.ConnectedClientsIds)
+                plS.SetRemotePlayerRpc(cId, true);
+        }
+    }
+    /// <summary>
+    /// Spusti sa po odpojeni hraca
+    /// </summary>
+    /// <param name="id"></param>
+    void OnClientDiss(ulong id)
+    {
+        if (netMan.IsServer && id != netMan.LocalClientId)
+        {
+            foreach (var c in netMan.ConnectedClients.Values)
+                c.PlayerObject.GetComponent<PlayerStats>().SetRemotePlayerRpc(id, false);
+        }
+        else if (id != netMan.LocalClientId)
+        {
+            FileManager.Log("Neziskany objekt hraca");
+        }
+    }
     /// <summary>
     /// Vrati aktuale pripojenie
     /// </summary>

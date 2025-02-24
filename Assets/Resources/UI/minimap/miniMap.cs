@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class miniMap : MonoBehaviour
@@ -6,11 +7,16 @@ public class miniMap : MonoBehaviour
     [SerializeField] RectTransform map;
     [SerializeField] Vector2 offset = new (0,0);
     [SerializeField] float modifier = 1;
+    [SerializeField] GameObject RP; // remote player => vzdialeny hrac
+    
+    private List<RectTransform> rPlayers = new();
+
     /// <summary>
-    /// Animuje pohyb lokalneho hraca
+    /// Animuje pohyb hracov po mape
     /// </summary>
-    void FixedUpdate()
+    void Update()
     {
+        // Nastavuje poziciou mapy ukazovatel pozicie hlavneho hraca
         if (game.playerLives && game.LocalPlayer != null)
         {
             Vector2 pos = game.LocalPlayer.transform.position * modifier;
@@ -18,5 +24,27 @@ public class miniMap : MonoBehaviour
 
             map.anchoredPosition = pos;
         }
+
+        // Vytvori ukazovaatele pre hracov na mape
+        while (rPlayers.Count < game.RemotePlayers.Count)
+            rPlayers.Add(Instantiate(RP, map).GetComponent<RectTransform>());
+
+        // Nastavi pozicie pre hracov
+        for (int i = 0; i < game.RemotePlayers.Count; i++)
+            rPlayers[i].localPosition = OnMapPosition(game.RemotePlayers[i]);
+            
+        // Odstrani nepotrebne ukazovatele
+        for (int i = rPlayers.Count-1; game.RemotePlayers.Count-1 < i; i--)
+        {
+            Destroy(rPlayers[i]);
+            rPlayers.RemoveAt(i);
+        }
+    }
+    Vector2 OnMapPosition(Transform playerPos)
+    {
+        Vector2 pos = playerPos.position * (-1) * modifier;
+        pos -= offset;
+
+        return pos;
     }
 }

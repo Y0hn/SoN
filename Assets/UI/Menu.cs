@@ -278,7 +278,7 @@ public class Menu : MonoBehaviour
 
             // Ak odchadza z nastaveni ulozi ich
             if (currentLayer.Peek() == "SubSett")
-                FileManager.RegeneradeSettings();
+                FileManager.RegeneradeSettings(true);
         }
         else
         {
@@ -389,13 +389,16 @@ public class Menu : MonoBehaviour
     /// Sluzi pre nacitanie hodnot z nastaveni
     /// </summary>
     /// <param name="settings">hodnoty NASTAVENI</param>
-    public void LoadSettings(Settings settings)
+    public void LoadSettings(Settings settings, bool reloadWindow = false)
     {
         Audios = settings.audioS;
         //Quality= settings.quality;
         localGame= !settings.Online;
         FullSc = settings.fullSc;
-        Resolution = settings.resolution;
+        
+        if (reloadWindow)
+            Resolution = settings.resolution;
+            
         PlayerName = settings.playerName;
         lastConnection = settings.lastConnection;
         if (lastConnection != "")

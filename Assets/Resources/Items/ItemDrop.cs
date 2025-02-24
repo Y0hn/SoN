@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -11,7 +9,7 @@ public class ItemDrop : NetworkBehaviour
     [SerializeField] private Item item;
     [SerializeField] bool tester = false;
     //private static List<World.ItemOnFoor> itemsOnFoor = new();     // iba na Servery
-    private World.ItemOnFoor itFoor;
+    //private World.ItemOnFoor itFoor;
     /// <summary>
     /// Atribut nastavujuci spadnuty predmet <br />
     /// ak je nastavenie "NULL" objekt sa znici
@@ -26,7 +24,7 @@ public class ItemDrop : NetworkBehaviour
             {
                 texture.sprite = Resources.Load<Sprite>(item.iconRef);
                 texture.color = item.color;
-                Register();
+                //Register();
             }
             else
                 netObj.Despawn();
@@ -39,19 +37,19 @@ public class ItemDrop : NetworkBehaviour
     {
         if (item == null) return;
         name = name.Split('(')[0];
-        Item = item;        
-        Register();
+        Item = item;
+        //Register();
     }
     /// <summary>
     /// Registruje predmet na zemi
     /// </summary>
-    private void Register()
+    /*private void Register()
     {
         if (!IsServer || itFoor != null)  return;
         itFoor = new (transform.position, item.GetReferency);
         //itemsOnFoor.Add(itFoor);
         name = name.Split('-')[0] + "-" + item.name;
-    }
+    }*/
     /// <summary>
     /// Vykona sa pred zanikom objektu v sieti
     /// </summary>
@@ -78,7 +76,7 @@ public class ItemDrop : NetworkBehaviour
     /// <param name="collision"></param>
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (IsServer && collision.transform.TryGetComponent(out PlayerStats pl))
+        if (collision.transform.TryGetComponent(out PlayerStats pl))
         {
             if (pl.PickedUp(Item.GetReferency))
                 PickedUpRpc();
