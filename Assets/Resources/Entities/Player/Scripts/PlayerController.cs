@@ -103,7 +103,7 @@ public class PlayerController : EntityController
         }
         else if (Input.GetKeyDown(KeyCode.K))
         {
-            //Stats.TakeDamage();
+            game.BossKilled();
         }
         else if (Input.GetKeyDown(KeyCode.O))
         {

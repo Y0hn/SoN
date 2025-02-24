@@ -415,7 +415,7 @@ public class Menu : MonoBehaviour
         bool found = false;
 
         if (solo)
-            FileManager.Worlds.ToList().ForEach(w => found |= w.Contains(s));
+            FileManager.Worlds.ToList().ForEach(w => { found |= w.Contains(s) && !FileManager.ReadWorld(w).ended; });
         
         solo &= found;
         buttons["soloCont"].Interactable = solo;

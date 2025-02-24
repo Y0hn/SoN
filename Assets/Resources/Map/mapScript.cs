@@ -45,7 +45,8 @@ public class MapScript : MapSizer
     {
         get {
             float playerPos = FurtherestPlayer.x + 10;
-            return spawLines.FindIndex(spL => playerPos < spL.Position.x);
+            int i = spawLines.FindIndex(spL => playerPos < spL.Position.x);
+            return 0 < i && i < spawLines.Count ? i : spawLines.Count-1;
         }
     }
     private int lastSpawnedLine = 0;

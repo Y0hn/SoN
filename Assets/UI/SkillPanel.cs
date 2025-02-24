@@ -56,8 +56,8 @@ public class SkillPanel : MonoBehaviour
     {
         if (button.isHolding)
         {
-            Vector2 v = game.CornerMousePos - startMouse;
-            startMouse = game.CornerMousePos;
+            Vector2 v = game.MousePos - startMouse;
+            startMouse = game.MousePos;
             MoveSkills(v);
         }
         if (ReloadLimimts)
@@ -70,13 +70,13 @@ public class SkillPanel : MonoBehaviour
     {
         // ohranicuje lavu sranu a spodok
         limits[0] = new (
-            Mathf.Round(transform.position.x-limitPosition.x-limitOffset.x), 
-            Mathf.Round(transform.position.y-limitPosition.y-limitOffset.y));
+            Mathf.Round(transform.localPosition.x-limitPosition.x-limitOffset.x), 
+            Mathf.Round(transform.localPosition.y-limitPosition.y-limitOffset.y));
 
         // ohranicuje provu sranu a vrch
         limits[1] = new (
-            Mathf.Round(transform.position.y+limitPosition.x-limitOffset.x), 
-            Mathf.Round(transform.position.y+limitPosition.y-limitOffset.y));
+            Mathf.Round(transform.localPosition.y+limitPosition.x-limitOffset.x), 
+            Mathf.Round(transform.localPosition.y+limitPosition.y-limitOffset.y));
     }
     /// <summary>
     /// Pripocitanie bodu po dosiahnuti urovne

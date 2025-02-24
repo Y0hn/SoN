@@ -199,6 +199,7 @@ public class GameManager : MonoBehaviour
     {
         uiPanels["deathScreen"].SetActive(false);
         uiPanels["playerUI"].SetActive(active);
+        uiPanels["titles"].SetActive(false);
 
         uiPanels["pauseUI"].SetActive(false);
         paused = false;
@@ -277,8 +278,10 @@ public class GameManager : MonoBehaviour
     public void BossKilled()
     {
         anima.SetTrigger("titles");
-        /*if (IsServer)
-            FileManager.DeleteWorld(FileManager.World.worldName);*/
+
+        if (IsServer)
+            FileManager.World.ended = true;
+        uiPanels["titles"].SetActive(true);
         Quit(false);
     }
 #region UI_Vstupy

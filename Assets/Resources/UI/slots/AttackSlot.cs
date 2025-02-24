@@ -184,7 +184,7 @@ using System;
     {
         SetActive(!active);
 
-        if (active)
+        if (active && GameManager.instance.LocalPlayer != null)
             GameManager.instance.LocalPlayer.SetWeaponIndex(Weapon);
     }
     public override void SetShow (bool show = false)
