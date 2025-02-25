@@ -4,6 +4,10 @@ using Unity.Netcode.Components;
 /// </summary>
 public class ClientNetworkAnimator : NetworkAnimator
 {
+    /// <summary>
+    /// Prepisuje metodu overenia
+    /// </summary>
+    /// <returns></returns>
     protected override bool OnIsServerAuthoritative()
     {
         return false;

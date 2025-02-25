@@ -28,16 +28,21 @@ public class miniMap : MonoBehaviour
         // Vytvori ukazovaatele pre hracov na mape
         while (rPlayers.Count < game.RemotePlayers.Count)
             rPlayers.Add(Instantiate(RP, map).GetComponent<RectTransform>());
-
-        // Nastavi pozicie pre hracov
-        for (int i = 0; i < game.RemotePlayers.Count; i++)
-            rPlayers[i].localPosition = OnMapPosition(game.RemotePlayers[i]);
             
         // Odstrani nepotrebne ukazovatele
         for (int i = rPlayers.Count-1; game.RemotePlayers.Count-1 < i; i--)
         {
-            Destroy(rPlayers[i]);
+            Destroy(rPlayers[i].gameObject);
             rPlayers.RemoveAt(i);
+        }
+        
+        // Nastavi pozicie pre hracov
+        for (int i = 0; i < game.RemotePlayers.Count; i++)
+        {
+            if (game.RemotePlayers[i] != null)
+                rPlayers[i].localPosition = OnMapPosition(game.RemotePlayers[i]);
+            else
+                game.RemotePlayers.RemoveAt(i);
         }
     }
     Vector2 OnMapPosition(Transform playerPos)

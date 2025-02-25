@@ -4953,7 +4953,7 @@ MonoBehaviour:
   m_ProtocolType: 1
   m_UseWebSockets: 0
   m_UseEncryption: 0
-  m_MaxPacketQueueSize: 128
+  m_MaxPacketQueueSize: 512
   m_MaxPayloadSize: 6144
   m_HeartbeatTimeoutMS: 500
   m_ConnectTimeoutMS: 1000
@@ -4962,7 +4962,7 @@ MonoBehaviour:
   ConnectionData:
     Address: 127.0.0.1
     Port: 7777
-    ServerListenAddress: 127.0.0.1
+    ServerListenAddress: 0.0.0.0
   DebugSimulator:
     PacketDelayMS: 0
     PacketJitterMS: 0
@@ -18338,6 +18338,7 @@ MonoBehaviour:
   playerLives: 0
   inventory: {fileID: 3757689252860375559}
   defences: 
+  RemotePlayers: []
 --- !u!1 &2581500440216004370
 GameObject:
   m_ObjectHideFlags: 0
@@ -23058,6 +23059,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2879884868227898773}
     m_Modifications:
+    - target: {fileID: 100518791190913060, guid: 497b343b62e6001489adab80407b367d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 1273361179921098789, guid: 497b343b62e6001489adab80407b367d, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -23084,7 +23089,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1273361179921098789, guid: 497b343b62e6001489adab80407b367d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: -60
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 1273361179921098789, guid: 497b343b62e6001489adab80407b367d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -23120,7 +23125,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1273361179921098789, guid: 497b343b62e6001489adab80407b367d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 1273361179921098789, guid: 497b343b62e6001489adab80407b367d, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -23137,6 +23142,14 @@ PrefabInstance:
     - target: {fileID: 1273361179921098789, guid: 497b343b62e6001489adab80407b367d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4766306871680353842, guid: 497b343b62e6001489adab80407b367d, type: 3}
+      propertyPath: m_text
+      value: use Local network
+      objectReference: {fileID: 0}
+    - target: {fileID: 4766306871680353842, guid: 497b343b62e6001489adab80407b367d, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7166799987417984024, guid: 497b343b62e6001489adab80407b367d, type: 3}
       propertyPath: m_Name

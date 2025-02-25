@@ -155,7 +155,7 @@ public static class FileManager
     /// <param name="name"></param>
     public static async Task StartWorld(string name, GameType type = GameType.Online) 
     {            
-        Log($"World {name} is loading", FileLogType.WARNING);
+        //Log($"World {name} is loading", FileLogType.WARNING);
         string path = NameToWorldPath(name);
 
         if (File.Exists(path))
@@ -168,7 +168,7 @@ public static class FileManager
             world.worldName = name;
         }
 
-        Log($"World {name} is in process of loading", FileLogType.WARNING);
+        //Log($"World {name} is in process of loading", FileLogType.WARNING);
 
         if (type == GameType.Solo)
         {
@@ -181,7 +181,7 @@ public static class FileManager
         }
 
         GameManager.instance.StartGame();
-        Log($"World {world.worldName} has been opened", FileLogType.WARNING);
+        //Log($"World {world.worldName} has been opened", FileLogType.WARNING);
     }
     public static void EndWorld()
     {

@@ -23,7 +23,10 @@ public class IpCodeField : InputFieldCheck
             ErrorMessage("Should be x.x.x.x or XXXXXX");
 
         if (check)
+        {
             FileManager.RegeneradeSettings();
+            ErrorMessage();
+        }
 
         return check;
     }

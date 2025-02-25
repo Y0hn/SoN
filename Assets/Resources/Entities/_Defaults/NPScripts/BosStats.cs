@@ -1,3 +1,5 @@
+using Unity.Netcode;
+
 public class BosStats : NPStats
 {
     /*  ZDEDENE ATRIBUTY
@@ -105,6 +107,10 @@ public class BosStats : NPStats
         LoadSavedData(save);
     }
     protected override void Die()
+    {
+        KilledRpc();
+    }
+    [Rpc(SendTo.Everyone)] void KilledRpc()
     {
         GameManager.instance.BossKilled();
     }

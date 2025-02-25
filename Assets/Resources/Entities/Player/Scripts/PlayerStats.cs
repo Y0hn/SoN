@@ -9,6 +9,7 @@ using System.Linq;
 
 using Random = UnityEngine.Random;
 using UnityEngine.InputSystem.Layouts;
+using System.IO;
 
 public class PlayerStats : EntityStats
 {
@@ -66,7 +67,7 @@ public class PlayerStats : EntityStats
     protected Inventory inventUI;
 
     public NetworkVariable<Experience> xp = new(new (0,0,50));
-    protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
+    protected NetworkList<FixedString64Bytes> inventory = new(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected NetworkList<FixedString64Bytes> equipment = new(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner); // je to list ale sprava sa ako Dictionary
     protected NetworkVariable<FixedString32Bytes> playerName = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     public NetworkVariable<FixedString128Bytes> message = new("", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -82,7 +83,12 @@ public class PlayerStats : EntityStats
             List<Equipment> eq = new();
             foreach (var e in equipment)
                 eq.Add(Equipment.GetItem(e.ToString()));
-            //Debug.Log($"Additional weapons {eq.Count}");
+            
+            string log = "";
+            foreach (var e in equipment)
+                log += $"[{e.ToString()}]\n";
+
+            FileManager.Log($"Additional weapons {eq.Count}\n{log}");
             return eq.ToArray();
         }
     }
@@ -90,10 +96,9 @@ public class PlayerStats : EntityStats
     { 
         get 
         { 
-            
             var w = base.Weapons.ToList();
             w.AddRange(Equipments); 
-            //Debug.Log($"Returning weapons [{w.Count}]");
+            FileManager.Log($"Returning weapons [{w.Count}]");
             return w.ToArray();
         } 
     }
@@ -164,6 +169,7 @@ public class PlayerStats : EntityStats
         {
             conn = Connector.instance;
             game = GameManager.instance;
+
             inventUI = GameManager.instance.inventory;
             resists = GameManager.instance.LocalDefence;
 
@@ -300,6 +306,7 @@ public class PlayerStats : EntityStats
     }
     public override void SetWeaponIndex(WeaponIndex WeI)
     {
+        FileManager.Log($"Setting weapon index to {WeI}");
         base.SetWeaponIndex(WeI);
     }
     #endregion
@@ -437,7 +444,7 @@ public class PlayerStats : EntityStats
     /// Zbiera a equipuje zbrane <br />
     /// Volane len zo servera z vypadnuteho itemu pre navratovu hodnotu
     /// </summary>
-    /// <param name="reference"></param>tile.Stop();
+    /// <param name="reference"></param>
     public virtual bool PickedUp(string reference)
     {
         if (!(IsOwner || IsServer)) return false;
@@ -510,13 +517,13 @@ public class PlayerStats : EntityStats
     /// </summary>
     /// <param name="reference"></param>
     /// <param name="slot"></param>
-    [Rpc(SendTo.Server)] public void SetEquipmentRpc(string reference, Equipment.Slot slot)
+    public void SetEquipmentRpc(string reference, Equipment.Slot slot)
     {
         if (equipment[(int)slot] != "")
             inventory.Add(equipment[(int)slot]);
             
         inventory.Remove(reference);
-        equipment[(int)slot] = reference;    
+        equipment[(int)slot] = reference;  
         //FileManager.Log($"Equiped {Equipment.GetItem(reference).name} on slot {(int)slot}={slot} with Weapon {Weapon.GetItem(reference)}");
     }
     /// <summary>

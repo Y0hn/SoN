@@ -28,7 +28,7 @@ public class MapScript : MapSizer
     {
         get 
         {
-            Vector2 fP = Vector2.zero;
+            Vector2 fP = new(-500,0);
             GameObject.FindGameObjectsWithTag("Player").ToList().ForEach(g => 
             {
                 float x = g.transform.position.x; 
@@ -46,7 +46,7 @@ public class MapScript : MapSizer
         get {
             float playerPos = FurtherestPlayer.x + 10;
             int i = spawLines.FindIndex(spL => playerPos < spL.Position.x);
-            return 0 < i && i < spawLines.Count ? i : spawLines.Count-1;
+            return 0 <= i && i < spawLines.Count ? i : spawLines.Count-1;
         }
     }
     private int lastSpawnedLine = 0;
@@ -87,15 +87,15 @@ public class MapScript : MapSizer
     /// </summary>
     public void SpawnEnemy()
     {
-        FileManager.Log("Started spawning");
+        //FileManager.Log("Started spawning");
 
         // ziska suradnice pre vytvorenie nepriatela
         lastSpawnedLine = LastLineCrossed;
         Vector2 pos = spawLines[lastSpawnedLine].SpawnPosition;
         //FileManager.Log("Spawing Got Position");
 
-        // ak padne menej ako 5 pouzije slabsi model typ nepriatela
-        bool firstTier = Random.Range(lastSpawnedLine,10) < 5; 
+        // ak padne menej ako 7 pouzije slabsi model typ nepriatela
+        bool firstTier = Random.Range(lastSpawnedLine,10) < 7; 
         //FileManager.Log("Spawing Got Tier");
         
         // Nahodne vyberie typ nepriatela v danej (zakladny / silnejsi) variante
@@ -114,7 +114,7 @@ public class MapScript : MapSizer
         npc.GetComponent<NPController>().SetDefaultTarget(extractions.GetChild(Random.Range(0,extractions.childCount)));
         npCouter++;
 
-        //FileManager.Log($"Enemy spawned {enemy.name} current number of em= {npCouter}");
+        FileManager.Log($"Enemy spawned {enemy.name} for {FurtherestPlayer} on [{pos.x}{pos.y}] line {lastSpawnedLine} current number of em= {npCouter}");
     }
     /// <summary>
     /// Nacita charakter nepiratela z ulozenych dat

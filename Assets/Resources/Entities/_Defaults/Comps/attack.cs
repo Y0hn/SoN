@@ -79,6 +79,7 @@ using System;
         proj.SetUp(self);
         NetworkObject netP = p.GetComponent<NetworkObject>();
         netP.Spawn(true);
+        proj.SetShooterRpc(self.NetworkObjectId);
         netP.TrySetParent(par);
 
         if      (self is PlayerStats plS)

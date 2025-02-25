@@ -25,6 +25,7 @@ public class SubMenuLoad : MonoBehaviour
         // Pre každý získany svet
         for (int i = 0; i < saves.Length; i++)
         {
+            // Skontroluje ci sa zhoduje s voľbou typu hry
             if (saves[i].singlePlayer == solo)
             {                
                 // Vytvorí zápis v zozname

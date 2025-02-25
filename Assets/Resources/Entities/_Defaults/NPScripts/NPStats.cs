@@ -163,7 +163,8 @@ public class NPStats : EntityStats
             // Urci maximalnu kvalitu podla levela
             int maxQ = level.Value < 10 ? 3 : 5;
             // Nahodne vyberie kvalitu zbrane
-            maxQ = Random.Range(0, maxQ);
+            // zmena z 0 pre 1/5 alebo 1/3 nacu na neziskanie dropu kvoli spatnej vazbe hracov
+            maxQ = Random.Range(1, maxQ);
 
             if (0 < maxQ)
             {

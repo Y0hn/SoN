@@ -6,6 +6,7 @@ using UnityEngine;
 public class AttackTrigger : NetworkBehaviour
 {
     [SerializeField] EntityStats stats;
+    [SerializeField] EntityController controller;
     [SerializeField] AudioSource audioSource;
     private bool atoFire = false;
     public void Trigger()
@@ -21,6 +22,13 @@ public class AttackTrigger : NetworkBehaviour
         {
             atoFire = true;
             npS.AboutToFire= atoFire;
+        }
+    }
+    public void TrySwitchHand()
+    {
+        if (IsOwner)
+        {
+            controller.SwitchHand();
         }
     }
 }

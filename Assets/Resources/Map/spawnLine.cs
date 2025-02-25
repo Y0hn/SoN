@@ -18,5 +18,8 @@ public class SpawnLine : MonoBehaviour
 
         Gizmos.color = Color.cyan;
         Gizmos.DrawCube(new (transform.position.x, transform.position.y-down/2+up/2), size);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawCube(SpawnPosition, new(1,1));
     }
 }

@@ -361,6 +361,7 @@ public class Inventory : MonoBehaviour
             equipSlots[eq.slot].Item = eq;
 
             game.LocalPlayer.SetEquipmentRpc(eq.GetReferency, eq.slot);
+            
             if (eq is Weapon w)
             {
                 // Jednoducho vlozi zbran do jednej z ruk

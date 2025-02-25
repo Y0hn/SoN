@@ -87,16 +87,15 @@ public abstract class EntityStats : NetworkBehaviour
     /// <returns>UTOK zo zbrane</returns>
     protected virtual Attack GetAttackByWeaponIndex(WeaponIndex wIndex)
     {
-        string log = "Not enough ";
-        if      (Weapons.Length <= wIndex.eIndex)
-            log = $"weapons ({Weapons.Length})";
-        else if (Weapons[wIndex.eIndex].attack.Count <= wIndex.aIndex)
-            log = $"attacks ({Weapons[wIndex.eIndex].attack.Count})";
-        else
+        try {
             return Weapons[wIndex.eIndex].attack[wIndex.aIndex];
+        } catch {
+            string log= "";
+            foreach (var v in Weapons)
+                log+= v.GetReferency;
+            FileManager.Log($"Weapon index {wIndex} request failed with lenght {Weapons.Length}", FileLogType.ERROR);
+        }
 
-        log += $" for {wIndex}";
-        FileManager.Log(log, FileLogType.ERROR);
     
         return new();
     }
@@ -338,7 +337,7 @@ public abstract class EntityStats : NetworkBehaviour
     {
         weapE.Value = new (weapon, attack);
 
-        FileManager.Log($"Setted {name} Weapon Index= {weapE.Value}", FileLogType.RECORD);
+        //FileManager.Log($"Setted {name} Weapon Index= {weapE.Value}", FileLogType.RECORD);
     }
     public virtual void SetWeaponIndex (WeaponIndex WeI)
     {

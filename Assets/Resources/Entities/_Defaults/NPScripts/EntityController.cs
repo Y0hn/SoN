@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 /// <summary>
@@ -85,18 +86,24 @@ public abstract class EntityController : NetworkBehaviour
     {
         if (atTime < Time.time)
         {
-            // sem sa dostane ak moze utocit (uz utoci) 
-            // ak je casovac utoku < cas
-            if (Stats.AttackBoth)   
-            {
-                // ak utok pouziva obe ruky tak sa meni utociaca ruka
-                float atBlend = Stats.Animator.GetFloat("atBlend") * -1;
-                Stats.Animator.SetFloat("atBlend", atBlend);
-            }
             atTime = Time.time + Stats.Attack.AttackTime;
 
             // zanimuje utok
             Stats.Animator.SetTrigger("attack");
+        }
+    }
+    /// <summary>
+    /// Pokusi sa vymenit ruku pocas utoku
+    /// </summary>
+    public void SwitchHand()
+    {
+        // sem sa dostane ak moze utocit (uz utoci) 
+        // ak je casovac utoku < cas
+        if (Stats.AttackBoth)   
+        {
+            // ak utok pouziva obe ruky tak sa meni utociaca ruka
+            float atBlend = Stats.Animator.GetFloat("atBlend") * -1;
+            Stats.Animator.SetFloat("atBlend", atBlend);
         }
     }
 }

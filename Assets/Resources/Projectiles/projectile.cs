@@ -74,7 +74,7 @@ public class Projectile : NetworkBehaviour
     void FixedUpdate()
     {
         // Toci sa okolo strelca podla toho kam mieri
-        if (0 < timers[0] && shooter.ViewAngle != transform.rotation.z)
+        if (0 < timers[0] && shooter != null && shooter.ViewAngle != transform.rotation.z)
         {
             RotateAroundPoint();
         }
@@ -157,5 +157,12 @@ public class Projectile : NetworkBehaviour
             networkObject.Despawn();
         else
             Destroy(gameObject);
+    }
+    [Rpc(SendTo.NotServer)] public void SetShooterRpc(ulong id)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(id, out NetworkObject netObj))
+        {
+            shooter = netObj.GetComponent<EntityStats>();
+        }
     }
 }
