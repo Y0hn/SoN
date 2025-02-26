@@ -139,13 +139,20 @@ public class NPStats : EntityStats
     /// <param name="now"></param>
     protected override void OnHpUpdate(int prev, int now)
     {
+        // vola povodnu metodu pre prehranie zvuku
         base.OnHpUpdate(prev, now);
+        
+        // prejde pole menenia zbrani od najmensiho po najvacsie
         for (int i = rase.swapons.Length-1; 0 <= i; i--)
-            if (i < rase.swapons.Length && rase.swapons[i].ReachedHP(HP))
+            // ak bola podmienka splnena
+            if (rase.swapons[i].ReachedHP(HP))
             {
+                // Zmeni aktuanu zbran
                 SetWeaponIndex(rase.swapons[i].weaponIndex);
                 FileManager.Log("Swapon {rase.swapons[i].weaponIndex} used on " + name);
             }
+
+        // vola 
         OnHit?.Invoke();
     }
 #endregion

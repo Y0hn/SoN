@@ -91,7 +91,7 @@ public class PlayerController : EntityController
             cameraMan.orthographicSize += 10 * Time.deltaTime;
         }
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR    // Testovanie v editore
         if (Input.GetKeyDown(KeyCode.P))
         {
             int e = Random.Range(0, equipmentPool.Length);
@@ -107,7 +107,12 @@ public class PlayerController : EntityController
         }
         else if (Input.GetKeyDown(KeyCode.O))
         {
-            //Stats.KilledEnemy();
+            foreach (var v in GameObject.FindGameObjectsWithTag("Entity"))
+                if (v.TryGetComponent(out BosStats bs))
+                {
+                    bs.TakeDamage(new Damage(Damage.Type.FIST, 100));
+                    break;
+                }
         }
 #endif
     }

@@ -389,12 +389,17 @@ public class PlayerStats : EntityStats
     /// </summary>
     protected void ServerRequestData()
     {
+        // kontroluje ci je volaná zo servera
         if (!IsServer) return;
         
+        // pokusi sa ziskat ulozene udaje hraca podla jeho mena
         if (FileManager.World.TryGetPlayerSave(name, out var saved))
+        
+            // Nacita ulozene data
             LoadSavedData(saved);
+        
+        // ak data o hracovi nenajde nastavi jeho poziciu v okruhu zaciatocneho bodu
         else 
-            // ak data o hracovi nenajde nastavi jeho poziciu v okruhu zaciatocneho bodu
             MapScript.map.SpawnPlayer(transform);
     }
     /// <summary>
