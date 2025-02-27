@@ -152,7 +152,7 @@ public class NPStats : EntityStats
                 FileManager.Log("Swapon {rase.swapons[i].weaponIndex} used on " + name);
             }
 
-        // vola 
+        // vola akciu utrzenia poskodenia
         OnHit?.Invoke();
     }
 #endregion

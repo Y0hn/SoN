@@ -435,7 +435,7 @@ public enum FileLogType { LOG, RECORD, ERROR, WARNING }
     }
     public Settings(bool df)
     {
-        lastConnection = "";
+        lastConnection = "client-";
         playerName = "";
         resolution = 2;
         //quality = 0;
