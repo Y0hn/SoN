@@ -201,6 +201,14 @@ PrefabInstance:
       propertyPath: sensor
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 2722258256657211096, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2722258256657211096, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -35
+      objectReference: {fileID: 0}
     - target: {fileID: 3689161656949318301, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: body
       value: 
@@ -217,6 +225,10 @@ PrefabInstance:
       propertyPath: sensor
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 3689161656949318301, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
+      propertyPath: resists
+      value: 
+      objectReference: {fileID: 6258036738423006311}
     - target: {fileID: 3689161656949318301, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: weaponL
       value: 
@@ -259,12 +271,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4956322951046876544, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 582546325
+      value: 1749880267
       objectReference: {fileID: 0}
     - target: {fileID: 5740010194347206202, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: m_Name
       value: Veles
       objectReference: {fileID: 0}
+    - target: {fileID: 6109321265275769383, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
+      propertyPath: 'gameObjects.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2897481567463668785}
     - target: {fileID: 6278688074988316867, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       propertyPath: m_text
       value: Veles
@@ -334,6 +350,7 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 6602889043505360278, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
     - {fileID: 4678522612610398334, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
+    - {fileID: 1495048454696510040, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6940803972882625263, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
       insertIndex: 0
@@ -343,6 +360,11 @@ PrefabInstance:
 --- !u!4 &1390719789523568720 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6940803972882625263, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
+  m_PrefabInstance: {fileID: 8295177754402454207}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2897481567463668785 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6569494107709277838, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
   m_PrefabInstance: {fileID: 8295177754402454207}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &3107799953027872772 stripped
@@ -366,6 +388,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b43434a3566578b459d965d713c80163, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &6258036738423006311 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2722258256657211096, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}
+  m_PrefabInstance: {fileID: 8295177754402454207}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &8836067633308055617 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 702104719103247102, guid: 49bd1624fa0e1e442bd1dce6bb7bf7bb, type: 3}

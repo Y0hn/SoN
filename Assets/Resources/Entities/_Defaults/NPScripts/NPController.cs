@@ -33,6 +33,11 @@ public class NPController : EntityController
             sensor.targetChange += SetTarget;
             Stats.OnDeath += sensor.DisableSensor;
             path.endReachedDistance = Stats.AttackDistance;
+            
+            if (Stats.HasSwapons)
+            {
+                Stats.OnHit += delegate { path.endReachedDistance = Stats.AttackDistance; };  
+            }
         }
     }
     /// <summary>
@@ -84,8 +89,11 @@ public class NPController : EntityController
     protected virtual void FollowTarget()
     {
         if (viewDir != Vector2.zero) viewDir = Vector2.zero;
+        // ziskava chceny smer pohybu
         Vector2 move = new (path.desiredVelocity.x*100, path.desiredVelocity.y*100);
+
         moveDir = move.normalized;
+
         if (!attacking) attacking = true; 
     }
     /// <summary>

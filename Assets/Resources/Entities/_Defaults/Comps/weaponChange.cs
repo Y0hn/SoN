@@ -20,4 +20,5 @@ using UnityEngine;
     /// Ziska index zbrane
     /// </summary>
     public WeaponIndex weaponIndex => wpI;
+    public float HP => ownerHP;
 } 

@@ -22,7 +22,7 @@ Podstatným znakom hry bude vlastná grafika, rôznorodosť herných mechaník a
 
 ### Všeobecné čiastkové ciele:
 
-- [ ] Vytvoriť GDD (game design document), ktorý popíše celú hru, vrátane príbehu, postáv, herných mechaník atď.
+- [x] Vytvoriť GDD (game design document), ktorý popíše celú hru, vrátane príbehu, postáv, herných mechaník atď.
 - [x] Naštudovať technológie vhodné na vývoj hry pre viacerých hráčov v Unity
-- [ ] Napísať sprievodnú dokumentáciu s priloženým zoznamom použitých tutoriálov a uzivatelskou priruckou
-- [ ] Doložiť priebežnú vizualizáciu a prílohy
+- [x] Napísať sprievodnú dokumentáciu s priloženým zoznamom použitých tutoriálov a uzivatelskou priruckou
+- [x] Doložiť priebežnú vizualizáciu a prílohy

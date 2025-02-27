@@ -289,7 +289,7 @@ public static class FileManager
             case Damage.Type.BOW_MULTI:
                 refer += "bow-triple";
                 break;
-            case Damage.Type.POLE:
+            case Damage.Type.BROOM:
                 refer += "bat-swing";
                 break;
         }
@@ -311,7 +311,7 @@ public static class FileManager
                 break;
             case Damage.Type.BOW_MULTI:     refer += "bow-triple";
                 break;
-            case Damage.Type.POLE:          refer += "bat-swing";
+            case Damage.Type.BROOM:          refer += "bat-swing";
                 break;
         }
         //Debug.Log("Returning at ref on: " + refer);

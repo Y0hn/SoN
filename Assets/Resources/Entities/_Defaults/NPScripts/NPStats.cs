@@ -60,7 +60,7 @@ public class NPStats : EntityStats
         ATTACK_DISTANCE_PERCENTAGE = 0.3f;
 
     public static Action npcDied;
-
+    public bool HasSwapons => 0 < rase.swapons.Length;
     public override Quaternion Rotation => body.transform.rotation;
     public float AttackDistance             
     { 
@@ -149,8 +149,11 @@ public class NPStats : EntityStats
             {
                 // Zmeni aktuanu zbran
                 SetWeaponIndex(rase.swapons[i].weaponIndex);
-                FileManager.Log("Swapon {rase.swapons[i].weaponIndex} used on " + name);
+                FileManager.Log($"Swapon {rase.swapons[i].weaponIndex} used on " + name, FileLogType.WARNING);
             }
+            else 
+                FileManager.Log($"Swapon {rase.swapons[i].HP} was not used on " + name, FileLogType.WARNING);
+
 
         // vola akciu utrzenia poskodenia
         OnHit?.Invoke();
@@ -178,10 +181,18 @@ public class NPStats : EntityStats
                 string weapon = FileManager.WEAPONS_DEFAULT_PATH + "/";
 
                 // Nahodne vyberie typ zbrane
-                weapon += Random.value < 0.5 ? "sword" : "bow";   
+                weapon += Random.value < 0.5 ? "sword" : "bow";
 
+                if (name == "BabaJaga" || "Kikimora" == name)
+                {
+                    weapon += "pole";
+
+                    // Ziska len hodnotu 1 - 2
+                    weapon += "-" + Mathf.Floor(maxQ/2);
+                }
                 // Prida kvalitu             
-                weapon += "-" + maxQ;
+                else
+                    weapon += "-" + maxQ;
 
                 // Vyhodi zbran
                 DropRpc(weapon, new (0.2f,0.2f), new (0,0));

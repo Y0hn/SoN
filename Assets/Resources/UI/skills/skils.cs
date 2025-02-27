@@ -66,7 +66,7 @@ using UnityEngine;
     /// </summary>
     public bool isSpeed => amount < 0;
 
-    public virtual string Value => isPercentyl ? Mathf.Abs(amount*100).ToString() + " %" : Mathf.Abs(amount).ToString();
+    public virtual string Value => isPercentyl ? (Mathf.Abs(amount*100)-100).ToString() + " %" : Mathf.Abs(amount).ToString();
 
     public override string ToolTip => $"Increases {(isSpeed ? "Speed" : "Health")} \nby {Value}";
 

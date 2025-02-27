@@ -32,10 +32,10 @@ public abstract class EntityStats : NetworkBehaviour
 
     [HideInInspector] public NetworkVariable<float> speed = new(100);
     [HideInInspector] public NetworkVariable<bool> IsAlive = new(true);
-    protected   NetworkVariable<int> maxHp = new(100);    
-    protected   NetworkVariable<int> hp = new(100);
+    protected NetworkVariable<int> maxHp = new(100);    
+    protected NetworkVariable<int> hp = new(100);
     protected NetworkVariable<byte> level = new(1);    
-    protected   NetworkVariable<WeaponIndex> weapE = new(new(0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    protected NetworkVariable<WeaponIndex> weapE = new(new(0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     protected NetworkVariable<bool> onPath = new(false);
 
 #region Ukazovace

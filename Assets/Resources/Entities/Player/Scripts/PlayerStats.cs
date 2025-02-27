@@ -6,53 +6,10 @@ using System.Collections.Generic;
 using TMPro;
 using System;
 using System.Linq;
-
 using Random = UnityEngine.Random;
-using UnityEngine.InputSystem.Layouts;
-using System.IO;
 
 public class PlayerStats : EntityStats
 {
-    /*  ZDEDENE ATRIBUTY
-     *
-     * [SF] protected TMP_Text nameTag;
-     * [SF] protected Rase rase;
-     * [SF] protected Slider hpBar;
-     * [SF] protected GameObject body;
-     * [SF] protected NetworkObject netObject;
-     * [SF] protected Transform attackPoint;
-     * [SF] protected ColorChainReference color;
-     * [SF] protected SpriteRenderer weaponR, weaponL;
-     * [SF] protected NetworkAnimator animator;
-     * [SF] protected Rigidbody2D rb;
-     * [SF] protected Collider2D coll;
-     * [SF] protected AITarget aiTeam = AITarget.Team_2;
-     * [SF] protected EntityController controller;
-     * [SF, SD("Nazov","Audios")] protected SerializedDictionary<string, AudioSource> audioSources;
-     *
-     * [HII] public NetworkVariable<float> speed = new(100);
-     * [HII] public NetworkVariable<byte> level = new(1);
-     * [HII] public NetworkVariable<bool> IsAlive = new(true);
-     * protected   NetworkVariable<int> hp = new(100);
-     * protected   NetworkVariable<int> maxHp = new(100);    
-     * protected   NetworkVariable<byte> stepIndex = new(0);
-     * protected   NetworkVariable<WeaponIndex> weapE = new(new(0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-     *
-     * public float HP                     => (float)hp.Value/(float)maxHp.Value;    
-     * public virtual Quaternion Rotation  => transform.rotation;
-     * protected virtual Weapon[] Weapons  => rase.weapons;
-     * public Weapon EquipedWeapon         => Weapons[weapE.Value.eIndex];
-     * public NetworkObject NetObject      => netObject;
-     * public Rigidbody2D RigidBody2D      => rb;
-     * public Transform AttackPoint        => attackPoint;
-     * public virtual Attack Attack        => GetAttackByWeaponIndex(weapE.Value);  
-     * public AITarget TargetTeam          => aiTeam;
-     * public Animator Animator            => animator.Animator;
-     * public Vector2 View                 => controller.View;
-     * public Color Color                  => color.Color;
-     * public float ViewAngle              => Mathf.Atan2(View.x, View.y);
-     * public bool AttackBoth              => Attack.bothHanded;
-     *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
     [SerializeField] GameObject chatField;
     [SerializeField] Transform canvas;
     [SerializeField] TMP_Text chatBox;
@@ -119,7 +76,7 @@ public class PlayerStats : EntityStats
     }
     public override Attack Attack => IsServer && skillTree != null ? skillTree.ModAttack(base.Attack) : base.Attack;    
     public bool ImunityToCoruption => skillTree.hasImunityToCoruption;
-
+    public bool Corruped { get; set; }
 
 #region SetUp
     /// <summary>

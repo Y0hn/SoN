@@ -25,7 +25,7 @@ using System;
     [Serializable] public enum Type
     {
         None,
-        FIST, POLE,
+        FIST, BROOM,
         SWORD_SLASH, SWORD_TRUST, 
         BOW_SINLE, BOW_MULTI
     }
@@ -34,7 +34,7 @@ using System;
     /// </summary>
     public readonly bool Melee => type switch
     {
-        Type.FIST or Type.POLE or Type.SWORD_SLASH or Type.SWORD_TRUST => true,
+        Type.FIST or Type.BROOM or Type.SWORD_SLASH or Type.SWORD_TRUST => true,
         _ => false
     };
     /// <summary>
