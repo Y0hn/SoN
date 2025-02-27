@@ -109,7 +109,7 @@ using UnityEngine;
 {
     public bool damage;
     public Damage.Type condition;
-    public override string ToolTip => $"Adds {base.Value} to\n{(damage ? "Damage with" : "Defence against")}\n {Enum.GetName(typeof(Damage.Type), condition)}";
+    public override string ToolTip => $"Adds {Mathf.Abs(amount)} to\n{(damage ? "Damage with" : "Defence against")}\n {Enum.GetName(typeof(Damage.Type), condition)}";
 
     public override string Value => "+ " + base.Value;
     public ModDamage ()
