@@ -149,11 +149,8 @@ public class NPStats : EntityStats
             {
                 // Zmeni aktuanu zbran
                 SetWeaponIndex(rase.swapons[i].weaponIndex);
-                FileManager.Log($"Swapon {rase.swapons[i].weaponIndex} used on " + name, FileLogType.WARNING);
+                FileManager.Log($"Swapon {rase.swapons[i].weaponIndex} used on " + name);
             }
-            else 
-                FileManager.Log($"Swapon {rase.swapons[i].HP} was not used on " + name, FileLogType.WARNING);
-
 
         // vola akciu utrzenia poskodenia
         OnHit?.Invoke();
@@ -180,19 +177,22 @@ public class NPStats : EntityStats
             {
                 string weapon = FileManager.WEAPONS_DEFAULT_PATH + "/";
 
-                // Nahodne vyberie typ zbrane
-                weapon += Random.value < 0.5 ? "sword" : "bow";
 
-                if (name == "BabaJaga" || "Kikimora" == name)
+                if (rase.weapons[0].name == "Baba's Broom")
                 {
                     weapon += "pole";
 
                     // Ziska len hodnotu 1 - 2
                     weapon += "-" + Mathf.Floor(maxQ/2);
                 }
-                // Prida kvalitu             
                 else
+                {                    
+                    // Nahodne vyberie typ zbrane
+                    weapon += Random.value < 0.5 ? "sword" : "bow";
+
+                    // Prida kvalitu             
                     weapon += "-" + maxQ;
+                }
 
                 // Vyhodi zbran
                 DropRpc(weapon, new (0.2f,0.2f), new (0,0));

@@ -32,7 +32,8 @@ public class BosController : NPController
         {
             sensorB.targetChange += SetTarget;
             Stats.OnDeath += sensorB.DisableSensor;
-            path.endReachedDistance = Stats.AttackDistance;
+            path.endReachedDistance = Stats.AttackDistance*2;
+            Stats.OnHit += delegate { path.endReachedDistance = Stats.AttackDistance*2; }; 
         }
         EnableCanvasRpc(false);
         base.OnNetworkSpawn();
@@ -41,29 +42,7 @@ public class BosController : NPController
     /// <inheritdoc/>
     /// </summary>
     protected override void Update()
-    {
-        /* base.Update(); *\
-         * if (!IsServer || path == null || !Stats.IsAlive.Value) return;  
-         * if (selfTarget && moveDir != Vector2.zero)
-         * {
-         *     viewDir = Vector2.zero;
-         *     moveDir = Vector2.zero;
-         *     attacking = false;   
-         * }
-         * else if (!selfTarget && attacking && path.reachedEndOfPath)
-         * {
-         *     if (!Stats.AboutToFire)
-         *         TurnForTarget();
-         *     Attack();
-         * }
-         * else if (!selfTarget)
-         * {
-         *     FollowTarget();
-         * }
-         * else
-         *     SetTarget(defaultTarget);
-         */
-        
+    {        
         if (!IsServer || path == null || !Stats.IsAlive.Value) return;
             
         if (selfTarget && moveDir != Vector2.zero)

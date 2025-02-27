@@ -240,8 +240,11 @@ public class GameManager : MonoBehaviour
     /// <param name="level"></param>
     public void LevelUP()
     {
-        skillTree.LevelUP(LocalPlayer.Level);
-        textFields["curLevel"].text = LocalPlayer.Level.ToString();
+        if (skillTree != null)
+        {
+            skillTree.LevelUP(LocalPlayer.Level);
+            textFields["curLevel"].text = LocalPlayer.Level.ToString();
+        }
     }
     /// <summary>
     /// Prida odomknutu schopnost
@@ -281,7 +284,9 @@ public class GameManager : MonoBehaviour
         anima.SetTrigger("titles");
 
         if (IsServer)
-            FileManager.World.ended = true;
+        {
+            FileManager.NoMorePlaingWorld();   
+        }
         uiPanels["titles"].SetActive(true);
         Quit(false);
     }

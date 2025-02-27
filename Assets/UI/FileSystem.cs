@@ -390,6 +390,11 @@ public static class FileManager
             case FileLogType.WARNING:   Debug.LogWarning(log);  break;
         }
     }
+
+    public static void NoMorePlaingWorld()
+    {
+        world.ended = true;
+    }
 }
 /// <summary>
 /// Typ zapisu v denniku ("LOG" sa do suboru nepise)
@@ -555,6 +560,7 @@ public enum GameType { Online, Local, Solo }
     /// <exception cref="Ak nie je server tak zlyha"></exception>
     public World(string name)
     {
+        boss = null;
         worldName = name;
         singlePlayer = Connector.instance.Solo;
         writeDate = DateTime.Now.ToString();
@@ -567,7 +573,7 @@ public enum GameType { Online, Local, Solo }
             {
                 if (e.TryGetComponent(out EntityStats eS))
                 {
-                    if (eS is BosStats bS)
+                    if (eS is BosStats bS && bS.IsAlive.Value)
                         boss = new (bS);
                     else
                         entities.Add(new (eS));
@@ -575,8 +581,8 @@ public enum GameType { Online, Local, Solo }
                 else
                     Debug.LogWarning($"NotEntity with tag Entity: {e.name} was incorectly handled in savefile");
             }
-            if (boss == null)
-                ended = true;
+            
+            ended = boss == null;
 
             foreach (GameObject p in GameObject.FindGameObjectsWithTag("Player"))
             {

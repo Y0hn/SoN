@@ -9,7 +9,6 @@ public class StonePath : MonoBehaviour
     /// Aktivne len na servery
     /// </summary>
     public bool Active => GameManager.instance.IsServer;
-    public bool Coruption => isCoruption; 
 
     /// <summary>
     /// Pri vstupe na cestu
@@ -23,7 +22,6 @@ public class StonePath : MonoBehaviour
                 if (!isCoruption || !(es is PlayerStats pl && pl.ImunityToCoruption))
                 {
                     es.TerrainChangeRpc(speedModifier, true);
-                    ((PlayerStats)es).Corruped |= Coruption;
                 }
             }
         } catch {
@@ -38,7 +36,7 @@ public class StonePath : MonoBehaviour
     {
         try {
             if (Active && collider.TryGetComponent(out EntityStats es) && es.IsSpawned && (!playerOnly || es is not NPStats))
-                if (!isCoruption || !(es is PlayerStats pl && pl.ImunityToCoruption) || pl.Corruped)
+                if (!isCoruption || !(es is PlayerStats pl && pl.ImunityToCoruption))
                     es.TerrainChangeRpc(1f/speedModifier, true);
         } catch {
 

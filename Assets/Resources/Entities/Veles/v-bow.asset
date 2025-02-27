@@ -22,12 +22,18 @@ MonoBehaviour:
   sprite: bow-2
   attack:
   - damage:
+      type: 5
+      amount: 15
+    range: 10
+    rate: 0.5
+    bothHanded: 0
+  - damage:
       type: 6
-      amount: 20
-    range: 20
+      amount: 25
+    range: 10
     rate: 0.5
     bothHanded: 0
   clips:
   - audioClip: {fileID: 8300000, guid: 9c2c434f50febf44999d2b63961d76cd, type: 3}
     volume: 0.7
-  projSpawnPosition: {x: 0, y: 1}
+  projSpawnPosition: {x: 0, y: 0.7}

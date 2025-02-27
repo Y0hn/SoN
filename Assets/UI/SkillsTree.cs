@@ -106,6 +106,7 @@ public class SkillTree
         else if (skill is Utility ut)   // ak je schopnost specialna
         {
             // Prida odomknutu schopnost
+            hasImunityToCoruption |= ut.function == Utility.Function.BecomeImuneCorruption;
             player.UnlockUtilityRpc(ut);
             debug += "Utility";
         }

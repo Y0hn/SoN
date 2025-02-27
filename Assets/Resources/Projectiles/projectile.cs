@@ -32,7 +32,7 @@ public class Projectile : NetworkBehaviour
         //lineSpr.enabled = false;
         
         timers = new float[3];
-        timers[0] = Time.time + delay;
+        timers[0] = IsServer ? Time.time + delay : 0;
         timers[1] = Time.time + graficDelay;
         timers[2] = Time.time + graficDelay*0.5f;
     }
@@ -53,7 +53,8 @@ public class Projectile : NetworkBehaviour
         else if (TimerReached(timers[0]))  // vystrelenie projektilu
         {
             // pre istotu
-            FixedUpdate();
+            RotateAroundPoint();
+
             shooter.PlaySoundRpc(releaseSound, 1f);
             transform.SetParent(null);
             coll.enabled = true;
@@ -63,7 +64,7 @@ public class Projectile : NetworkBehaviour
             rb.AddForce(force);
             timers[0] = 0;
         }
-        else if (coll.enabled)              // limitovanie letu projektilu
+        else if (coll.enabled && IsServer)              // limitovanie letu projektilu
         {
             float distance = Vector2.Distance(startPos, transform.position);
             if (distance >= RangeLimit)

@@ -101,10 +101,6 @@ public class PlayerController : EntityController
         {
             Stats.AddLvlRpc();
         }
-        else if (Input.GetKeyDown(KeyCode.K))
-        {
-            game.BossKilled();
-        }
         else if (Input.GetKeyDown(KeyCode.O))
         {
             foreach (var v in GameObject.FindGameObjectsWithTag("Entity"))
@@ -175,7 +171,7 @@ public class PlayerController : EntityController
     /// <summary>
     ///  Prerusi utok ak hrac prestane drzat mys 
     /// </summary>
-    protected virtual void AttackInterupt()
+    void AttackInterupt()
     {
         attacking = false;
         wasAttacking = false;
