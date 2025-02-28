@@ -53,9 +53,10 @@ public class ItemSlot : MonoBehaviour
 
             if (remove != null)
             {
-                remove.onClick.AddListener( delegate { GameManager.instance.inventory.Remove(s); });
+                remove.onClick.AddListener( delegate { GameManager.instance.inventory.Remove(Item.GetReferency); });
                 remove.gameObject.SetActive(true);
             }
+            
             
             background.color = Item.rarity;
             icon.color = Item.color;

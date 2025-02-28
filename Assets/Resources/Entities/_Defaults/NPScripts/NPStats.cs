@@ -166,37 +166,27 @@ public class NPStats : EntityStats
         base.Die();
 
         if (IsServer)
-        {            
-            // Urci maximalnu kvalitu podla levela
-            int maxQ = level.Value < 10 ? 3 : 5;
-            // Nahodne vyberie kvalitu zbrane
-            // zmena z 0 pre 1/5 alebo 1/3 nacu na neziskanie dropu kvoli spatnej vazbe hracov
-            maxQ = Random.Range(1, maxQ);
+        {
 
-            if (0 < maxQ)
+            string weapon = FileManager.WEAPONS_DEFAULT_PATH + "/";
+
+            if (rase.weapons[0].title == "Baba's Broom")
             {
-                string weapon = FileManager.WEAPONS_DEFAULT_PATH + "/";
-
-
-                if (rase.weapons[0].name == "Baba's Broom")
-                {
-                    weapon += "pole";
-
-                    // Ziska len hodnotu 1 - 2
-                    weapon += "-" + Mathf.Floor(maxQ/2);
-                }
-                else
-                {                    
-                    // Nahodne vyberie typ zbrane
-                    weapon += Random.value < 0.5 ? "sword" : "bow";
-
-                    // Prida kvalitu             
-                    weapon += "-" + maxQ;
-                }
-
-                // Vyhodi zbran
-                DropRpc(weapon, new (0.2f,0.2f), new (0,0));
+                weapon += "pole";
+             // Ziska len hodnotu 1 - 2
+                weapon += "-" + Mathf.Floor(Random.Range(1, 3));
             }
+            else
+            {                    
+                // Nahodne vyberie typ zbrane
+                weapon += Random.value < 0.5 ? "sword" : "bow";
+                // Nahodne vyberie kvalitu zbrane
+                int maxQ = Random.Range(1, 5);
+             // Prida kvalitu             
+                weapon += "-" + maxQ;
+            }
+            // Vyhodi zbran
+            DropRpc(weapon, new (0.2f,0.2f), new (0,0));
         }
     }
     /// <summary>
