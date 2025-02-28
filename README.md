@@ -3,10 +3,7 @@
   <p>
     <b>A 2D Multiplayer RPG inspired by Slavic mythology</b>
   </p>
-  <img src="./_attachs/Screenshot%202024-10-23%20181823.png" alt="Main Menu" width="600"/>
 </div>
-
----
 
 ## 🧙 About
 
