@@ -5,7 +5,7 @@
   </p>
 </div>
 
-## 🧙 About
+## About
 
 **Souls of Nav** is a top-down 2D multiplayer RPG developed in Unity. Inspired by classics like <i>The Binding of Isaac</i>, <i>Don't Starve Together</i>, and <i>Castle Wolfenstein</i>, the game immerses players in a magical world rooted in Slavic mythology. Experience engaging stories, thrilling battles, and the opportunity to influence the fate of the world.
 
@@ -23,7 +23,7 @@ Our main goal is to bring mythological characters and stories from Slavic tradit
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 <div align="center">
 
@@ -34,32 +34,28 @@ Our main goal is to bring mythological characters and stories from Slavic tradit
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/souls-of-nav.git
-   ```
-2. **Open in Unity:**  
-   Open the project folder in Unity Hub (Unity 6.0.15 or newer recommended).
+1. **Download build**
+  [Build Here](https://github.com/Y0hn/SoN/releases/latest/download/Build.zip)
 
-3. **Run the Game:**  
-   Press <kbd>Play</kbd> in the Unity Editor.
+2. **Run the Game**  
+   Don't worry about the warning ;) 
+
+3. **Enjoy** :D
 
 ---
 
-## 📖 Documentation
+## Documentation
 
 For detailed information, see the [Documentation](./DOCUMENTATION.md).
 
 ---
 
-## 🙏 Credits
+## Credits
 
 - **Development Team:**  
-  [Y0hn]  set GIT_AUTHOR_DATE=2025-02-28T01:45:00
-  set GIT_COMMITTER_DATE=2025-02-28T01:45:00
-  git commit -am "Your commit message"
+  [Y0hn]
 - **Inspiration:**  
   The Binding of Isaac, Don't Starve Together, Castle Wolfenstein, Path of Exile
 
